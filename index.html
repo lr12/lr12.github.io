@@ -272,7 +272,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/05/25/约瑟夫问题/" itemprop="url">云取证第三周周报</a></h1>
+                <a class="post-title-link" href="/2017/05/25/约瑟夫问题/" itemprop="url">约瑟夫问题</a></h1>
         
 
         <div class="post-meta">
@@ -321,7 +321,8 @@
       
         
           
-            <h3 id="hello-world"><a href="#hello-world" class="headerlink" title="hello world"></a>hello world</h3>
+            <h3 id="问题：0-1-…-n-1-这-n-个数字排成一个圈圈，从数字-0-开始每次从圆圏里删除第-m-个数字。求出这个圈圈里剩下的最后一个数字。"><a href="#问题：0-1-…-n-1-这-n-个数字排成一个圈圈，从数字-0-开始每次从圆圏里删除第-m-个数字。求出这个圈圈里剩下的最后一个数字。" class="headerlink" title="问题：0, 1, … , n-1 这 n 个数字排成一个圈圈，从数字 0 开始每次从圆圏里删除第 m 个数字。求出这个圈圈里剩下的最后一个数字。"></a>问题：0, 1, … , n-1 这 n 个数字排成一个圈圈，从数字 0 开始每次从圆圏里删除第 m 个数字。求出这个圈圈里剩下的最后一个数字。</h3><h4 id="解法一，通过一个list存储现有节点，然后一个变量存上一次删除的位置，经过移动m-1次即可到删除节点"><a href="#解法一，通过一个list存储现有节点，然后一个变量存上一次删除的位置，经过移动m-1次即可到删除节点" class="headerlink" title="解法一，通过一个list存储现有节点，然后一个变量存上一次删除的位置，经过移动m-1次即可到删除节点"></a>解法一，通过一个list存储现有节点，然后一个变量存上一次删除的位置，经过移动m-1次即可到删除节点</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">public static int lastRemaining(int n, int m) &#123;</div><div class="line">    <span class="keyword">if</span> (n &lt; 1 || m &lt; 1) &#123;</div><div class="line">        <span class="built_in">return</span> -1;</div><div class="line">    &#125;</div><div class="line">    List&lt;Integer&gt; list = new LinkedList&lt;&gt;();</div><div class="line">    <span class="keyword">for</span> (int i = 0; i &lt; n; i++) &#123;</div><div class="line">        list.add(i);</div><div class="line">    &#125;</div><div class="line">    // 要删除元素的位置</div><div class="line">    int idx = 0;</div><div class="line">    // 开始计数的位置</div><div class="line">    int start = 0;</div><div class="line">    <span class="keyword">while</span> (list.size() &gt; 1) &#123;</div><div class="line">        // 只要移动m-1次就可以移动到下一个要删除的元素上</div><div class="line">        <span class="keyword">for</span> (int i = 1; i &lt; m; i++) &#123;</div><div class="line">            idx = (idx + 1) % list.size(); // 【A】</div><div class="line">        &#125;</div><div class="line">        list.remove(idx);</div><div class="line">        // 确保idx指向每一轮的第一个位置</div><div class="line">        // 下面的可以不用，【A】已经可以保证其正确性了，可以分析n=6，m=6的第一次删除情况</div><div class="line">    //  <span class="keyword">if</span> (idx == list.size()) &#123;</div><div class="line">    //      idx = 0;</div><div class="line">    //  &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="built_in">return</span> list.get(0);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+
           
         
       
