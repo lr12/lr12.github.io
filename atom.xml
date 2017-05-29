@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-05-29T02:45:40.219Z</updated>
+  <updated>2017-05-29T02:46:36.390Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,10 +20,9 @@
     <link href="http://yoursite.com/2017/05/29/%E4%BA%91%E5%8F%96%E8%AF%81%E7%AC%AC%E4%B8%89%E5%91%A8%E5%91%A8%E6%8A%A5/"/>
     <id>http://yoursite.com/2017/05/29/云取证第三周周报/</id>
     <published>2017-05-29T02:33:03.000Z</published>
-    <updated>2017-05-29T02:45:40.219Z</updated>
+    <updated>2017-05-29T02:46:36.390Z</updated>
     
-    <content type="html"><![CDATA[<h3 id="本周我主要做的工作有，对云取证综述文章又看了一些。接下来谈谈阅读Impact-of-Cloud-Computing-on-Traditional-Digital-Forensic-Investigations-的想法。"><a href="#本周我主要做的工作有，对云取证综述文章又看了一些。接下来谈谈阅读Impact-of-Cloud-Computing-on-Traditional-Digital-Forensic-Investigations-的想法。" class="headerlink" title="本周我主要做的工作有，对云取证综述文章又看了一些。接下来谈谈阅读Impact of Cloud Computing on Traditional Digital Forensic Investigations 的想法。"></a>本周我主要做的工作有，对云取证综述文章又看了一些。接下来谈谈阅读Impact of Cloud Computing on Traditional Digital Forensic Investigations 的想法。</h3><p>####文章首先提出云取证的困难在于因为多个客户的日志记录和数据可能位于同一位置，也可能分布在不断变化的主机和数据中心集合中。</p>
-]]></content>
+    <content type="html"><![CDATA[<h3 id="本周我主要做的工作有，对云取证综述文章又看了一些。接下来谈谈阅读Impact-of-Cloud-Computing-on-Traditional-Digital-Forensic-Investigations-的想法。"><a href="#本周我主要做的工作有，对云取证综述文章又看了一些。接下来谈谈阅读Impact-of-Cloud-Computing-on-Traditional-Digital-Forensic-Investigations-的想法。" class="headerlink" title="本周我主要做的工作有，对云取证综述文章又看了一些。接下来谈谈阅读Impact of Cloud Computing on Traditional Digital Forensic Investigations 的想法。"></a>本周我主要做的工作有，对云取证综述文章又看了一些。接下来谈谈阅读Impact of Cloud Computing on Traditional Digital Forensic Investigations 的想法。</h3><h4 id="文章首先提出云取证的困难在于因为多个客户的日志记录和数据可能位于同一位置，也可能分布在不断变化的主机和数据中心集合中。"><a href="#文章首先提出云取证的困难在于因为多个客户的日志记录和数据可能位于同一位置，也可能分布在不断变化的主机和数据中心集合中。" class="headerlink" title="文章首先提出云取证的困难在于因为多个客户的日志记录和数据可能位于同一位置，也可能分布在不断变化的主机和数据中心集合中。"></a>文章首先提出云取证的困难在于因为多个客户的日志记录和数据可能位于同一位置，也可能分布在不断变化的主机和数据中心集合中。</h4>]]></content>
     
     <summary type="html">
     
