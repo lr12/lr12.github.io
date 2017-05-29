@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-05-25T08:32:58.206Z</updated>
+  <updated>2017-05-29T02:34:52.986Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -16,11 +16,27 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>云取证第三周周报</title>
+    <link href="http://yoursite.com/2017/05/29/%E4%BA%91%E5%8F%96%E8%AF%81%E7%AC%AC%E4%B8%89%E5%91%A8%E5%91%A8%E6%8A%A5/"/>
+    <id>http://yoursite.com/2017/05/29/云取证第三周周报/</id>
+    <published>2017-05-29T02:33:03.000Z</published>
+    <updated>2017-05-29T02:34:52.986Z</updated>
+    
+    <summary type="html">
+    
+    </summary>
+    
+    
+      <category term="云取证" scheme="http://yoursite.com/tags/%E4%BA%91%E5%8F%96%E8%AF%81/"/>
+    
+  </entry>
+  
+  <entry>
     <title>约瑟夫问题</title>
     <link href="http://yoursite.com/2017/05/25/%E7%BA%A6%E7%91%9F%E5%A4%AB%E9%97%AE%E9%A2%98/"/>
     <id>http://yoursite.com/2017/05/25/约瑟夫问题/</id>
     <published>2017-05-25T04:46:56.000Z</published>
-    <updated>2017-05-25T08:32:58.206Z</updated>
+    <updated>2017-05-29T02:34:49.491Z</updated>
     
     <content type="html"><![CDATA[<h3 id="问题：0-1-…-n-1-这-n-个数字排成一个圈圈，从数字-0-开始每次从圆圏里删除第-m-个数字。求出这个圈圈里剩下的最后一个数字。"><a href="#问题：0-1-…-n-1-这-n-个数字排成一个圈圈，从数字-0-开始每次从圆圏里删除第-m-个数字。求出这个圈圈里剩下的最后一个数字。" class="headerlink" title="问题：0, 1, … , n-1 这 n 个数字排成一个圈圈，从数字 0 开始每次从圆圏里删除第 m 个数字。求出这个圈圈里剩下的最后一个数字。"></a>问题：0, 1, … , n-1 这 n 个数字排成一个圈圈，从数字 0 开始每次从圆圏里删除第 m 个数字。求出这个圈圈里剩下的最后一个数字。</h3><h4 id="解法一，通过一个list存储现有节点，然后记录一个删除位置变量存上一次删除的位置，经过移动变量往后m-1次即可到删除节点，然后通过list删除该节点，将删除位置变量更新"><a href="#解法一，通过一个list存储现有节点，然后记录一个删除位置变量存上一次删除的位置，经过移动变量往后m-1次即可到删除节点，然后通过list删除该节点，将删除位置变量更新" class="headerlink" title="解法一，通过一个list存储现有节点，然后记录一个删除位置变量存上一次删除的位置，经过移动变量往后m-1次即可到删除节点，然后通过list删除该节点，将删除位置变量更新"></a>解法一，通过一个list存储现有节点，然后记录一个删除位置变量存上一次删除的位置，经过移动变量往后m-1次即可到删除节点，然后通过list删除该节点，将删除位置变量更新</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">public static int lastRemaining(int n, int m) &#123;</div><div class="line">    <span class="keyword">if</span> (n &lt; 1 || m &lt; 1) &#123;</div><div class="line">        <span class="built_in">return</span> -1;</div><div class="line">    &#125;</div><div class="line">    List&lt;Integer&gt; list = new LinkedList&lt;&gt;();</div><div class="line">    <span class="keyword">for</span> (int i = 0; i &lt; n; i++) &#123;</div><div class="line">        list.add(i);</div><div class="line">    &#125;</div><div class="line">    // 要删除元素的位置</div><div class="line">    int idx = 0;</div><div class="line">    // 开始计数的位置</div><div class="line">    int start = 0;</div><div class="line">    <span class="keyword">while</span> (list.size() &gt; 1) &#123;</div><div class="line">        // 只要移动m-1次就可以移动到下一个要删除的元素上</div><div class="line">        <span class="keyword">for</span> (int i = 1; i &lt; m; i++) &#123;</div><div class="line">            idx = (idx + 1) % list.size(); // 【A】</div><div class="line">        &#125;</div><div class="line">        list.remove(idx);</div><div class="line">        // 确保idx指向每一轮的第一个位置</div><div class="line">        // 下面的可以不用，【A】已经可以保证其正确性了，可以分析n=6，m=6的第一次删除情况</div><div class="line">    //  <span class="keyword">if</span> (idx == list.size()) &#123;</div><div class="line">    //      idx = 0;</div><div class="line">    //  &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="built_in">return</span> list.get(0);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <h4 id="解法二：通过数学的思路-我们假设我们每次删除完一个数字后，剩下的数字都要进行重新编号，他们的映射关系为f-那么我们假设他的逆向映射关系为f-。首先我们知道最后一定只剩下一个数字重新编号0，所以根据倒推规律，我们只需要做n-1次逆向映射即可推出原来该位置的映射关系。接下来是我们找寻逆向映射规律。"><a href="#解法二：通过数学的思路-我们假设我们每次删除完一个数字后，剩下的数字都要进行重新编号，他们的映射关系为f-那么我们假设他的逆向映射关系为f-。首先我们知道最后一定只剩下一个数字重新编号0，所以根据倒推规律，我们只需要做n-1次逆向映射即可推出原来该位置的映射关系。接下来是我们找寻逆向映射规律。" class="headerlink" title="解法二：通过数学的思路, 我们假设我们每次删除完一个数字后，剩下的数字都要进行重新编号，他们的映射关系为f,那么我们假设他的逆向映射关系为f`。首先我们知道最后一定只剩下一个数字重新编号0，所以根据倒推规律，我们只需要做n-1次逆向映射即可推出原来该位置的映射关系。接下来是我们找寻逆向映射规律。"></a>解法二：通过数学的思路, 我们假设我们每次删除完一个数字后，剩下的数字都要进行重新编号，他们的映射关系为f,那么我们假设他的逆向映射关系为f`。首先我们知道最后一定只剩下一个数字重新编号0，所以根据倒推规律，我们只需要做n-1次逆向映射即可推出原来该位置的映射关系。接下来是我们找寻逆向映射规律。</h4><p>首先我们定义一个关于 n 和 m 的方程时，表示每次在 n 个数字 0，1， … ，n-1中每次删除第 m 个数字最后剩下的数字。</p>
@@ -34,6 +50,8 @@
     
     </summary>
     
+    
+      <category term="算法" scheme="http://yoursite.com/tags/%E7%AE%97%E6%B3%95/"/>
     
   </entry>
   
