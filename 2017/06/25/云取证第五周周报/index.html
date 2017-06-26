@@ -74,10 +74,12 @@
 <link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="云取证," />
 
 
 
+
+  
 
 
   <link rel="alternate" href="/atom.xml" title="博客" type="application/atom+xml" />
@@ -92,13 +94,17 @@
 
 
 
+<meta name="description" content="本周主要的工作有，对云取证分析的文章进行阅读。下面谈谈对这些论文的看法。 首先是System Log Analysis Using Google BigQuery。里面有提到通过谷歌的BigQuery在pb级别的数据，小于一分钟的响应速度。具体举了这么一个查询SELECT taskname,datacenter FROM systemlog.today WHERE severity=’warnin">
+<meta name="keywords" content="云取证">
 <meta property="og:type" content="article">
 <meta property="og:title" content="云取证第五周周报">
 <meta property="og:url" content="http://yoursite.com/2017/06/25/云取证第五周周报/index.html">
 <meta property="og:site_name" content="博客">
-<meta property="og:updated_time" content="2017-06-25T12:50:47.927Z">
+<meta property="og:description" content="本周主要的工作有，对云取证分析的文章进行阅读。下面谈谈对这些论文的看法。 首先是System Log Analysis Using Google BigQuery。里面有提到通过谷歌的BigQuery在pb级别的数据，小于一分钟的响应速度。具体举了这么一个查询SELECT taskname,datacenter FROM systemlog.today WHERE severity=’warnin">
+<meta property="og:updated_time" content="2017-06-26T05:23:44.620Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="云取证第五周周报">
+<meta name="twitter:description" content="本周主要的工作有，对云取证分析的文章进行阅读。下面谈谈对这些论文的看法。 首先是System Log Analysis Using Google BigQuery。里面有提到通过谷歌的BigQuery在pb级别的数据，小于一分钟的响应速度。具体举了这么一个查询SELECT taskname,datacenter FROM systemlog.today WHERE severity=’warnin">
 
 
 
@@ -316,7 +322,9 @@
       
 
       
-        
+        <p>本周主要的工作有，对云取证分析的文章进行阅读。下面谈谈对这些论文的看法。</p>
+<p>首先是System Log Analysis Using Google BigQuery。里面有提到通过谷歌的BigQuery在pb级别的数据，小于一分钟的响应速度。具体举了这么一个查询SELECT taskname,datacenter FROM systemlog.today WHERE severity=’warning’，扫描的数据量有100GB级别的数据量，但是查询时间仅仅需要10秒左右。<strong>因为我以前在做数据交换平台的时候，对于非基于lucene的全文检索的传统数据库，例如mysql查询时候，对于上百万或者上千万条甚至在上亿条数据量的查询，即使是针对索引列的查询也会很慢，更不用说数据量达到pb级别的数据量</strong>。查了下资料，总体而言，BigQuery 在大规模数据（数十亿行）上查询有很好得速度、适合快速分析大规模数据，不支持数据修改；BigQuery是OLAP系统，通过CSV格式将数据导入BigQuery，数据以弱关系型存储与云上。BigQuery 不是一个数据库系统， 1. 不支持表索引和其他关系数据库特性 2. BigQuery支持SQL得一个子集，不支持update,delete操作 3.BigQuery得join只在一张表远比另一张表小时有效（也就是不支持两张大表得join）。BigQuery 支持REST接口。</p>
+
       
     </div>
 
@@ -342,6 +350,12 @@
     </div>
 
     <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/云取证/" rel="tag"># 云取证</a>
+          
+        </div>
       
 
       
