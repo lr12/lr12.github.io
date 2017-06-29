@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-06-29T04:44:53.972Z</updated>
+  <updated>2017-06-29T07:01:19.687Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,12 +20,22 @@
     <link href="http://yoursite.com/2017/06/29/%E4%BA%91%E5%8F%96%E8%AF%81%E7%AC%AC%E5%85%AD%E5%91%A8%E5%91%A8%E6%8A%A5/"/>
     <id>http://yoursite.com/2017/06/29/云取证第六周周报/</id>
     <published>2017-06-29T04:44:53.000Z</published>
-    <updated>2017-06-29T04:44:53.972Z</updated>
+    <updated>2017-06-29T07:01:19.687Z</updated>
+    
+    <content type="html"><![CDATA[<p>本周主要的工作有，对云取证数据定位及数据起源文章进行了一些阅读。</p>
+<p>首先谈谈对Collecting Provenance via the Xen Hypervisor。本文主要讲述对paas的改进。首先paas是通过在Linux内核中拦截系统调用，并从存储在文件系统的源文件来收集系统级别的来源。虽然这种方法是有效的，但是它具有两个显着的缺点：内核的每个新版本都需要重新整合PASS变化，其稳定性必须不断测试; 同样，使用可堆叠的文件系统使得很难在根卷上收集来源，特别是在早期引导过程中。所通过以Xen虚拟机管理程序运行的虚拟客户机收集系统级别来源的方法可以有效解决这两个缺点。</p>
+<p>PASS拦截execve，fork，exit，read，readv，write，writev，mmap，open，pipe以及内核操作drop inode。这些调用足以捕获Linux文件，管道和进程之间丰富的祖先关系。这种原始的“原始来源”转向观察者，将原始来源转化为证明记录。例如，当进程P读取文件A时，观察器生成包含P取决于A的事实的记录。接着是修改Xen虚拟机管理程序的方法（Xen 是一个开放源代码虚拟机监视器）。</p>
+]]></content>
     
     <summary type="html">
     
+      &lt;p&gt;本周主要的工作有，对云取证数据定位及数据起源文章进行了一些阅读。&lt;/p&gt;
+&lt;p&gt;首先谈谈对Collecting Provenance via the Xen Hypervisor。本文主要讲述对paas的改进。首先paas是通过在Linux内核中拦截系统调用，并从存储在文件
+    
     </summary>
     
+    
+      <category term="云取证" scheme="http://yoursite.com/tags/%E4%BA%91%E5%8F%96%E8%AF%81/"/>
     
   </entry>
   
