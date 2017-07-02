@@ -101,7 +101,7 @@
 <meta property="og:url" content="http://yoursite.com/2017/06/29/云取证第八周周报/index.html">
 <meta property="og:site_name" content="博客">
 <meta property="og:description" content="本周主要阅读了云证据收集的一些文章。下面谈谈对这些论文的理解。首先是Acquiring forensic evidence from infrastructure-as-a-service cloud。文章分这么个层次来阐述：1.创建一个模型来显示云中所需的信任层次。2.显示云测试的总体上下文；3.提供了包括Guidance EnCase和AccesData Forensic Toolkit在内的">
-<meta property="og:updated_time" content="2017-07-02T12:11:49.913Z">
+<meta property="og:updated_time" content="2017-07-02T12:13:49.148Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="云取证第八周周报">
 <meta name="twitter:description" content="本周主要阅读了云证据收集的一些文章。下面谈谈对这些论文的理解。首先是Acquiring forensic evidence from infrastructure-as-a-service cloud。文章分这么个层次来阐述：1.创建一个模型来显示云中所需的信任层次。2.显示云测试的总体上下文；3.提供了包括Guidance EnCase和AccesData Forensic Toolkit在内的">
@@ -323,7 +323,7 @@
 
       
         <p>本周主要阅读了云证据收集的一些文章。下面谈谈对这些论文的理解。<br>首先是Acquiring forensic evidence from infrastructure-as-a-service cloud。文章分这么个层次来阐述：1.创建一个模型来显示云中所需的信任层次。2.显示云测试的总体上下文；3.提供了包括Guidance EnCase和AccesData Forensic Toolkit在内的流行取证获取工具。<br>云计算使取证不同，特别是考虑到证据的远程性质，缺乏实体访问权限以及完整性和真实性所需的信任。虽然取证检查员的目标与以前相同，但非传统困难的问题包括：远程数据的取证知识获取，大量传播，分布式数据，监管链和数据所有权。检获和获取数字文物是取证进程的初步步骤。存在两种可能的情况：远程调查员可以从源头自己收集取证证据，或者提供者可以提供证据。每个场景需要对所返回数据的不同程度的信任。此外，每种情况都使用不同的技术实现来恢复数据。主要工作有亚马逊弹性计算云（EC2）在公共云中执行持续和非持久性数据收集的现有工具的三个实验结果。对于使用客户机操作系统的数据采集不够信任的情况，分析基础设施堆栈较低级别的取证方法。演示如何使用虚拟机内省来注入远程取证代理进行远程采集。用不受信任的管理程序探索取证数据采集的四个策略。</p>
-<table><br>    <tr><br>        <td>Layer</td><br>        <td>Cloud layer</td><br>        <td>Acquisition method</td><br>        <td>Trust required</td><br>    </tr><br></table>
+<table><br>    <tr><br>        <td>Layer</td><br>        <td>Cloud layer</td><br>        <td>Acquisition method</td><br>        <td>Trust required</td><br>    </tr><br>    <tr><br><br>        <td>6</td><br>        <td>Guest application/data</td><br>        <td>Depends on data</td><br>        <td>Guest operating system (OS), hypervisor, host OS, hardware, network</td><br>    </tr><br></table>
 
       
     </div>
