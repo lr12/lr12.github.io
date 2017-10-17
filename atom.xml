@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-10-17T14:52:38.438Z</updated>
+  <updated>2017-10-17T15:01:20.325Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2017/10/17/%E5%A4%A7%E5%9E%8B%E8%BD%AF%E4%BB%B6%E6%9E%B6%E6%9E%84%E5%8F%8A%E5%85%B6%E7%BB%93%E6%9E%84%E6%BC%94%E8%BF%9B%E8%BF%87%E7%A8%8B/"/>
     <id>http://yoursite.com/2017/10/17/大型软件架构及其结构演进过程/</id>
     <published>2017-10-17T09:25:39.000Z</published>
-    <updated>2017-10-17T14:52:38.438Z</updated>
+    <updated>2017-10-17T15:01:20.325Z</updated>
     
     <content type="html"><![CDATA[<h1 id="什么是大型网站"><a href="#什么是大型网站" class="headerlink" title="什么是大型网站"></a>什么是大型网站</h1><p>访问量和数据量二者缺一不可，本身的业务和系统的复杂度也缺一不可。海量的数据和高并发的访问量，它肯定是个分布式系统</p>
 <h1 id="大型网站的架构演进"><a href="#大型网站的架构演进" class="headerlink" title="大型网站的架构演进"></a>大型网站的架构演进</h1><h2 id="用java技术和单机来构建网站"><a href="#用java技术和单机来构建网站" class="headerlink" title="用java技术和单机来构建网站"></a>用java技术和单机来构建网站</h2><p>选择一个开源的server作为容器，使用一些JSP/servlet技术或者开源框架构建我们的应用，选择一个数据库管理系统来管理数据，通过jdbc进行数据库的连接和操作。</p>
@@ -29,6 +29,7 @@
 <h2 id="应用服务器告警，如何让应用服务器走向集群"><a href="#应用服务器告警，如何让应用服务器走向集群" class="headerlink" title="应用服务器告警，如何让应用服务器走向集群"></a>应用服务器告警，如何让应用服务器走向集群</h2><p>服务器压力仍然变大，把应用从单机升级为集群，我们可以考虑一台应用服务器变为两台。我们要考虑如下两个问题，第一个是服务器的选择问题，可以用dns或者增加负载均衡设备来解决这个问题；第二个是session问题。</p>
 <h3 id="引入负载均衡设备"><a href="#引入负载均衡设备" class="headerlink" title="引入负载均衡设备"></a>引入负载均衡设备</h3><h3 id="解决应用服务器变为集群后的session问题"><a href="#解决应用服务器变为集群后的session问题" class="headerlink" title="解决应用服务器变为集群后的session问题"></a>解决应用服务器变为集群后的session问题</h3><p>http协议本身是无状态的，需要基于http协议支持会话状态机制，具体的实现方式是：在会话开始时，分配唯一的会话标识（sessionId），通过cookie把这个标识告诉浏览器，以后再每次请求的时候，浏览器会带上这个会话标识告诉web服务器请求属于哪个会话的。在web服务器上，各个会话有独立的存储，保存不同的会话信息。如果是禁用cookie的情况，就把会话标识放在url参数上。<br>当应用服务器扩展时就会遇到session问题。因为session是存在单机上的。</p>
 <h3 id="session-sticky（保持-粘滞会话）"><a href="#session-sticky（保持-粘滞会话）" class="headerlink" title="session sticky（保持-粘滞会话）"></a>session sticky（保持-粘滞会话）</h3><p>在负载均衡器上做了操作，同样的session请求每次发送给同一个服务器端处理。但也带来以下的问题：1.如果一台服务器宕机或者重启，那么这台服务器上的会话数据会全部丢失，如果会话中有登录状态的数据的话，那就要重新登录。2.会话标识的应用层信息，那么负载均衡器需要进行应用层解析，这个开销比第四层交换大。3.负载均衡器变为有状态的节点，要将会话保存到web服务器映射。和无状态节点相比，内存消耗更大，容灾更麻烦。</p>
+<h3 id="session-Replication（复制会话）"><a href="#session-Replication（复制会话）" class="headerlink" title="session Replication（复制会话）"></a>session Replication（复制会话）</h3><p>web服务器会增加会话的同步，但在一些场景存在问题：1.同步session造成网络的开销。只要session数据发生变化，就需要把数据同步到其他机器上，机器越多，同步带来的网络带宽的开销就会越大；2.每台web服务器都需要保存所有的session数据，如果整个集群的session数很多，每台机器用于保存session的内容占用会很严重。</p>
 <h2 id="数据读压力大，那么就读写分离吧"><a href="#数据读压力大，那么就读写分离吧" class="headerlink" title="数据读压力大，那么就读写分离吧"></a>数据读压力大，那么就读写分离吧</h2><h2 id="弥补关系型数据库的不足，引入分布式存储系统"><a href="#弥补关系型数据库的不足，引入分布式存储系统" class="headerlink" title="弥补关系型数据库的不足，引入分布式存储系统"></a>弥补关系型数据库的不足，引入分布式存储系统</h2><h2 id="读写分离后，数据库又遇到瓶颈"><a href="#读写分离后，数据库又遇到瓶颈" class="headerlink" title="读写分离后，数据库又遇到瓶颈"></a>读写分离后，数据库又遇到瓶颈</h2><h2 id="数据库问题解决后，"><a href="#数据库问题解决后，" class="headerlink" title="数据库问题解决后，"></a>数据库问题解决后，</h2>]]></content>
     
     <summary type="html">
