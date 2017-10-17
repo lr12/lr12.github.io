@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-10-17T09:01:51.157Z</updated>
+  <updated>2017-10-17T09:23:17.238Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2017/10/16/%E5%A4%A7%E5%9E%8B%E7%BD%91%E7%AB%99%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%AE%9E%E8%B7%B5%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
     <id>http://yoursite.com/2017/10/16/大型网站系统与中间件实践读书笔记/</id>
     <published>2017-10-16T03:22:37.000Z</published>
-    <updated>2017-10-17T09:01:51.157Z</updated>
+    <updated>2017-10-17T09:23:17.238Z</updated>
     
     <content type="html"><![CDATA[<h2 id="分布式系统介绍"><a href="#分布式系统介绍" class="headerlink" title="分布式系统介绍"></a>分布式系统介绍</h2><h3 id="分布式系统的定义"><a href="#分布式系统的定义" class="headerlink" title="分布式系统的定义"></a>分布式系统的定义</h3><p>1.组件分布在网络计算机上；<br>2.组件之间仅仅通过消息传递来通信并协调行动</p>
 <h3 id="分布式系统的意义"><a href="#分布式系统的意义" class="headerlink" title="分布式系统的意义"></a>分布式系统的意义</h3><p>1.升级单机处理能力的性价比越来越低<br>2.单机处理能力存在瓶颈<br>3.出于稳定性和可用性的考虑</p>
@@ -47,8 +47,9 @@
 <h5 id="存储器的变化"><a href="#存储器的变化" class="headerlink" title="存储器的变化"></a>存储器的变化</h5><p>存储器分为内存和外存，内存在断电、重启或者OS崩溃情况下会丢失，而外存是用来长久保存数据的。在分布式系统中，我们需要把承担存储功能的多个节点组织在一起，使之看起是一个存储器。以最基础的key-value为例。</p>
 <h5 id="单机的key-value"><a href="#单机的key-value" class="headerlink" title="单机的key-value"></a>单机的key-value</h5><h5 id="在应用服务器与key-value存储服务器之间加了一个代理服务器"><a href="#在应用服务器与key-value存储服务器之间加了一个代理服务器" class="headerlink" title="在应用服务器与key-value存储服务器之间加了一个代理服务器"></a>在应用服务器与key-value存储服务器之间加了一个代理服务器</h5><h5 id="名称服务的key-value服务"><a href="#名称服务的key-value服务" class="headerlink" title="名称服务的key-value服务"></a>名称服务的key-value服务</h5><h5 id="规则服务器的key-value服务"><a href="#规则服务器的key-value服务" class="headerlink" title="规则服务器的key-value服务"></a>规则服务器的key-value服务</h5><h5 id="master控制的key-value服务"><a href="#master控制的key-value服务" class="headerlink" title="master控制的key-value服务"></a>master控制的key-value服务</h5><h4 id="分布式系统的难点"><a href="#分布式系统的难点" class="headerlink" title="分布式系统的难点"></a>分布式系统的难点</h4><h5 id="缺乏全局时钟"><a href="#缺乏全局时钟" class="headerlink" title="缺乏全局时钟"></a>缺乏全局时钟</h5><p>单机的以单机的时钟为准控制时序。多机每个节点都有自己的时钟，如果依赖时序，将会难以处理。</p>
 <h5 id="面对故障的独立性"><a href="#面对故障的独立性" class="headerlink" title="面对故障的独立性"></a>面对故障的独立性</h5><p>在单机系统的单进程程序中，不会出现一些模块不行，一些模块正常。而在分布式系统中，整个系统一部分有问题而其他模块正常的情况是经常出现。我们称故障独立性。</p>
-<h5 id="处理单点故障"><a href="#处理单点故障" class="headerlink" title="处理单点故障"></a>处理单点故障</h5><p>在分布式系统中，如果某个角色或者功能只有单机在支撑，那么这个节点我们称之为单点。避免单点的关键就是把这个功能从单机实现变为集群实现。如果不能把单机实现变为集群实现，那一般还有另外两种选择：<br>1.给单点做好备份<br>2.降低单点故障的影响范围（比如，在交易网站中，交易信息放在一个数据库里，这就形成了单点，我们会给这个数据库增加一个备库以解决容灾问题。我们可以考虑拆分数据，把一份数据库拆分成多个数据库后，出现故障的影响面就更小了）</p>
-<h5 id="分布式事务的挑战"><a href="#分布式事务的挑战" class="headerlink" title="分布式事务的挑战"></a>分布式事务的挑战</h5>]]></content>
+<h5 id="处理单点故障"><a href="#处理单点故障" class="headerlink" title="处理单点故障"></a>处理单点故障</h5><p>在分布式系统中，如果某个角色或者功能只有单机在支撑，那么这个节点我们称之为单点。避免单点的关键就是把这个功能从单机实现变为集群实现。如果不能把单机实现变为集群实现，那一般还有另外两种选择：<br>1.给单点做好备份<br>2.降低单点故障的影响范围（比如，在交易网站中，交易信息放在一个数据库里，这就形成了单点，我们会给这个数据库增加一个备库以解决容灾问题。我们可以考虑拆分数据，把一份数据库拆分成多个数据库后，出现故障的影响面就更小了。从本质上说，这种方式更多是转移和交换）</p>
+<h5 id="分布式事务的挑战"><a href="#分布式事务的挑战" class="headerlink" title="分布式事务的挑战"></a>分布式事务的挑战</h5><p>2pc、3pc、最终一致、BASE、CAP、paxos算法</p>
+]]></content>
     
     <summary type="html">
     
