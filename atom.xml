@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-10-19T15:22:38.203Z</updated>
+  <updated>2017-10-19T15:58:56.489Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2017/10/19/%E6%9E%84%E5%BB%BAjava%E4%B8%AD%E9%97%B4%E4%BB%B6/"/>
     <id>http://yoursite.com/2017/10/19/构建java中间件/</id>
     <published>2017-10-19T02:59:08.000Z</published>
-    <updated>2017-10-19T15:22:38.203Z</updated>
+    <updated>2017-10-19T15:58:56.489Z</updated>
     
     <content type="html"><![CDATA[<h2 id="java中间件的定义"><a href="#java中间件的定义" class="headerlink" title="java中间件的定义"></a>java中间件的定义</h2><p>基于java基础构建的中间件。中间件为软件应用提供操作系统所提供的服务之外的服务，中间件不是操作系统的一部分，不是数据库管理的一部分，不是软件应用的一部分，而是能够让软件开发者更方便的处理通信、输入、输出，能够专注在他们自己应用的部分。总体来说，中间件不是最上层应用，也不是最底层的操作系统，是处于中间的组件，起到桥梁的作用，是应用和应用之间，应用和服务之间的桥梁。<br>主要有三个领域的中间件：</p>
 <h3 id="远程对象调用和对象访问中间件"><a href="#远程对象调用和对象访问中间件" class="headerlink" title="远程对象调用和对象访问中间件"></a>远程对象调用和对象访问中间件</h3><p>解决分布式的应用互相访问的问题</p>
@@ -38,6 +38,8 @@
 <p>unlock写在finally表示一定可以释放锁，ReentrantReadWriteLock与ReentrantLock用法相似，但是通过readLock()和writeLock()两个方法来获取读锁和写锁，这两个锁按照前面的方式进行加锁和解锁。</p>
 <h3 id="volatile"><a href="#volatile" class="headerlink" title="volatile"></a>volatile</h3><p>sychronized除了有互斥性，还有可见性。可见性是指一个线程修改了变量后，其他线程能够马上看到这个修改值。volatile能够保证变量的可见性，它更多是修饰开关的可见性，它不能保证操作的原子性。</p>
 <h3 id="Atomics"><a href="#Atomics" class="headerlink" title="Atomics"></a>Atomics</h3><p>JDK 1.5增加了java.util.concurrent.atomic包，这些包是以Atomic开头的类，这些类提供了一些原子操作，以AtomicInteger为例，通过jni使用硬件支持的CAS指令：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">public class Sample &#123;</div><div class="line"></div><div class="line">    private static AtomicInteger count = new AtomicInteger(0);</div><div class="line"></div><div class="line">    public static void <span class="function"><span class="title">increment</span></span>() &#123;</div><div class="line">        count.incrementAndGet();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public static void <span class="function"><span class="title">decrease</span></span>() &#123;</div><div class="line">        count.decrementAndGet();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="wait、notify和notifyAll"><a href="#wait、notify和notifyAll" class="headerlink" title="wait、notify和notifyAll"></a>wait、notify和notifyAll</h3><p>wait、notify和notifyAll是java的object对象的三个方法，wait是用来等待的，notify和notifyAll是用来通知的。在多线程中，可以把某个对象做为事件对象，通过这个对象的wait、notify、notifyAll完成线程的通知。notify和notifyAll都是唤醒调用同一个对象的wait，但不同的是notify会唤醒一个等待线程，notifyAll会唤醒全部等待线程。对wait、notify、notifyAll的调用必须在对象的sychronized中。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">public void <span class="function"><span class="title">testWait</span></span>()&#123;</div><div class="line">  sychronized(this)&#123;</div><div class="line">    this.wait();</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line">public void <span class="function"><span class="title">testNotify</span></span>()&#123;</div><div class="line">  sychronized(this)&#123;</div><div class="line">    this.notify();</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>在实践中，对wait的使用一般在循环里，并且会判断相关的数据状态是否达到预期，如果没有，继续等待，这样做主要是为了防止虚假唤醒。虚假唤醒就是一些obj.wait()会在除了obj.notify()和obj.notifyAll()的其他情况被唤醒，而此时是不应该唤醒的。<br>解决<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">synchronized (obj) &#123;  </div><div class="line">        <span class="keyword">while</span> (&lt;condition does not hold&gt;)  </div><div class="line">            obj.wait();  </div><div class="line">        ... // Perform action appropriate to condition  </div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
 ]]></content>
     
     <summary type="html">
