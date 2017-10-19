@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-10-19T02:59:56.656Z</updated>
+  <updated>2017-10-19T03:04:29.571Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -16,27 +16,27 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>构建java中间件</title>
+    <title>构建java中间件（第三章）</title>
     <link href="http://yoursite.com/2017/10/19/%E6%9E%84%E5%BB%BAjava%E4%B8%AD%E9%97%B4%E4%BB%B6/"/>
     <id>http://yoursite.com/2017/10/19/构建java中间件/</id>
     <published>2017-10-19T02:59:08.000Z</published>
-    <updated>2017-10-19T02:59:56.656Z</updated>
+    <updated>2017-10-19T03:04:29.571Z</updated>
     
     <summary type="html">
     
     </summary>
     
     
-      <category term="大型网站系统与中间件实践读书笔记第三章" scheme="http://yoursite.com/tags/%E5%A4%A7%E5%9E%8B%E7%BD%91%E7%AB%99%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%AE%9E%E8%B7%B5%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%89%E7%AB%A0/"/>
+      <category term="大型网站系统与中间件实践读书笔记" scheme="http://yoursite.com/tags/%E5%A4%A7%E5%9E%8B%E7%BD%91%E7%AB%99%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%AE%9E%E8%B7%B5%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
     
   </entry>
   
   <entry>
-    <title>大型软件架构及其结构演进过程</title>
+    <title>大型软件架构及其结构演进过程第二章</title>
     <link href="http://yoursite.com/2017/10/17/%E5%A4%A7%E5%9E%8B%E8%BD%AF%E4%BB%B6%E6%9E%B6%E6%9E%84%E5%8F%8A%E5%85%B6%E7%BB%93%E6%9E%84%E6%BC%94%E8%BF%9B%E8%BF%87%E7%A8%8B/"/>
     <id>http://yoursite.com/2017/10/17/大型软件架构及其结构演进过程/</id>
     <published>2017-10-17T09:25:39.000Z</published>
-    <updated>2017-10-19T02:59:47.983Z</updated>
+    <updated>2017-10-19T03:04:55.085Z</updated>
     
     <content type="html"><![CDATA[<h1 id="什么是大型网站"><a href="#什么是大型网站" class="headerlink" title="什么是大型网站"></a>什么是大型网站</h1><p>访问量和数据量二者缺一不可，本身的业务和系统的复杂度也缺一不可。海量的数据和高并发的访问量，它肯定是个分布式系统</p>
 <h1 id="大型网站的架构演进"><a href="#大型网站的架构演进" class="headerlink" title="大型网站的架构演进"></a>大型网站的架构演进</h1><h2 id="用java技术和单机来构建网站"><a href="#用java技术和单机来构建网站" class="headerlink" title="用java技术和单机来构建网站"></a>用java技术和单机来构建网站</h2><p>选择一个开源的server作为容器，使用一些JSP/servlet技术或者开源框架构建我们的应用，选择一个数据库管理系统来管理数据，通过jdbc进行数据库的连接和操作。</p>
@@ -70,16 +70,16 @@
     </summary>
     
     
-      <category term="大型网站系统与中间件实践读书笔记第二章" scheme="http://yoursite.com/tags/%E5%A4%A7%E5%9E%8B%E7%BD%91%E7%AB%99%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%AE%9E%E8%B7%B5%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%BA%8C%E7%AB%A0/"/>
+      <category term="大型网站系统与中间件实践读书笔记" scheme="http://yoursite.com/tags/%E5%A4%A7%E5%9E%8B%E7%BD%91%E7%AB%99%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%AE%9E%E8%B7%B5%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
     
   </entry>
   
   <entry>
-    <title>分布式系统介绍</title>
+    <title>分布式系统介绍（第一章）</title>
     <link href="http://yoursite.com/2017/10/16/%E5%A4%A7%E5%9E%8B%E7%BD%91%E7%AB%99%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%AE%9E%E8%B7%B5%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
     <id>http://yoursite.com/2017/10/16/大型网站系统与中间件实践读书笔记/</id>
     <published>2017-10-16T03:22:37.000Z</published>
-    <updated>2017-10-19T03:02:43.921Z</updated>
+    <updated>2017-10-19T03:04:46.444Z</updated>
     
     <content type="html"><![CDATA[<h2 id="分布式系统的定义"><a href="#分布式系统的定义" class="headerlink" title="分布式系统的定义"></a>分布式系统的定义</h2><p>1.组件分布在网络计算机上；<br>2.组件之间仅仅通过消息传递来通信并协调行动</p>
 <h2 id="分布式系统的意义"><a href="#分布式系统的意义" class="headerlink" title="分布式系统的意义"></a>分布式系统的意义</h2><p>1.升级单机处理能力的性价比越来越低<br>2.单机处理能力存在瓶颈<br>3.出于稳定性和可用性的考虑</p>
@@ -118,7 +118,7 @@
     </summary>
     
     
-      <category term="大型网站系统与中间件实践读书笔记第一章" scheme="http://yoursite.com/tags/%E5%A4%A7%E5%9E%8B%E7%BD%91%E7%AB%99%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%AE%9E%E8%B7%B5%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E7%AB%A0/"/>
+      <category term="大型网站系统与中间件实践读书笔记" scheme="http://yoursite.com/tags/%E5%A4%A7%E5%9E%8B%E7%BD%91%E7%AB%99%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%AE%9E%E8%B7%B5%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
     
   </entry>
   
