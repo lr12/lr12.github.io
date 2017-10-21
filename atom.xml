@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-10-21T11:56:49.462Z</updated>
+  <updated>2017-10-21T14:27:42.913Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,15 +20,21 @@
     <link href="http://yoursite.com/2017/10/21/%E6%9C%8D%E5%8A%A1%E6%A1%86%E6%9E%B6/"/>
     <id>http://yoursite.com/2017/10/21/服务框架/</id>
     <published>2017-10-21T11:56:11.000Z</published>
-    <updated>2017-10-21T11:56:49.462Z</updated>
+    <updated>2017-10-21T14:27:42.913Z</updated>
     
-    <content type="html"><![CDATA[<p>##</p>
+    <content type="html"><![CDATA[<h2 id="网站功能持续丰富后的困境与应对"><a href="#网站功能持续丰富后的困境与应对" class="headerlink" title="网站功能持续丰富后的困境与应对"></a>网站功能持续丰富后的困境与应对</h2><p>网站的功能主要集中在几个大应用上，而且这些应用都直接访问底层的服务，例如数据库、缓存、搜索引擎、分布式存储。随着网站规模扩大，开发人的增多，每个应用变得复杂、臃肿。</p>
+<h3 id="把应用拆小"><a href="#把应用拆小" class="headerlink" title="把应用拆小"></a>把应用拆小</h3><p>把庞大的应用拆成多个。这样的好处是相对较快的完成，但是仍然存在一些问题。一方面是数据库的连接数的压力还在，其次是代码的重复问题。</p>
+<h3 id="服务化方案"><a href="#服务化方案" class="headerlink" title="服务化方案"></a>服务化方案</h3><p>我们在原来的应用和底层的数据库、缓存系统、文件系统等系统之间增加了服务层。</p>
+<h2 id="服务框架的设计和实现"><a href="#服务框架的设计和实现" class="headerlink" title="服务框架的设计和实现"></a>服务框架的设计和实现</h2><h3 id="应用从集中式走向分布式所遇到的问题"><a href="#应用从集中式走向分布式所遇到的问题" class="headerlink" title="应用从集中式走向分布式所遇到的问题"></a>应用从集中式走向分布式所遇到的问题</h3><p>要把单层Web应用的结构改为多层的、有服务层的结构的时，很多人不会直接做一个通用的服务框架，而是为当前要用的服务做一个RPC的功能，为服务使用者提供相关的客户端。而当提供的服务的集群多于一个小时，通用的服务框架就非常重要。服务化会使得把本地调用变为远程调用。研发人员关注的是提高易用性和降低性能损失这两方面。<br>在单机单进程中，程序只需要将寄存器地址改为相应的入口地址就好，而在多机之间，我们需要对调用的请求信息进行编码，然后传给远程的节点，解码后再进行真正的调用。寻址路由是为了让调用方确定哪个实例被调用的，实际定位是指被调用的机器找到对应的实例来进行方法调用，从而实现功能。</p>
+<h3 id="通过示例看服务框架原型"><a href="#通过示例看服务框架原型" class="headerlink" title="通过示例看服务框架原型"></a>通过示例看服务框架原型</h3><p>服务框架即包含调用方的逻辑，又包含服务端的逻辑的一个实现。</p>
+<h4 id="单机方式"><a href="#单机方式" class="headerlink" title="单机方式"></a>单机方式</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">public class Calculator&#123;</div><div class="line">     public int add(int a,int b)&#123;</div><div class="line">       <span class="built_in">return</span> a+b;</div><div class="line">     &#125;</div><div class="line"></div><div class="line">&#125;</div><div class="line">Calculator calculator =new Calculator();</div><div class="line">calculator.add(2,3);</div></pre></td></tr></table></figure>
+<h4 id="实现远程服务的调用客户端"><a href="#实现远程服务的调用客户端" class="headerlink" title="实现远程服务的调用客户端"></a>实现远程服务的调用客户端</h4><p>以单机为例，我们希望实现这个服务的方式和当前的做法一样<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">public int add(int a,int b)&#123;</div><div class="line"></div><div class="line">  //获取可用服务列表</div><div class="line">  List&lt;String&gt; l=getAvailableServiceAddresses(<span class="string">"Calculator.add"</span>);</div><div class="line">  //获取调用服务的目标机器</div><div class="line">  String address=chooseTarget();</div><div class="line">  //建立连接</div><div class="line">  Socket socket=new Socket(address);</div><div class="line">  //请求序列化</div><div class="line">  byte[] request=getRequest(a,b);</div><div class="line">  //发送请求</div><div class="line">  socket.getOuputStream().write(request);</div><div class="line">  //接受结果</div><div class="line">  byte[] response=new byte[1024];</div><div class="line">  socket.getInputStream().read(response);</div><div class="line">  int result=getResult(response);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>接下来我们解析这段代码，首先是获取服务机器的地址列表，并且从可用的服务地址列表中选取一个要调用的目标机器。如果我们采取的LVS或者硬件负载均衡方案，那么getAvailableServiceAddresses获取的就是获取LVS或者硬件负载均衡器的地址和端口，并且choosTarget会直接返回地址和端口。如果我们采取名称服务，那么getAvailableServiceAddresses返回的是当前的服务的地址列表，参数值用来定位服务，这个一般用做key的服务名字一般采用接口的全名，也就是全限类名，也可以用类名加版本号。</p>
 ]]></content>
     
     <summary type="html">
     
-      &lt;p&gt;##&lt;/p&gt;
-
+      &lt;h2 id=&quot;网站功能持续丰富后的困境与应对&quot;&gt;&lt;a href=&quot;#网站功能持续丰富后的困境与应对&quot; class=&quot;headerlink&quot; title=&quot;网站功能持续丰富后的困境与应对&quot;&gt;&lt;/a&gt;网站功能持续丰富后的困境与应对&lt;/h2&gt;&lt;p&gt;网站的功能主要集中在几个大应用上，而
     
     </summary>
     
