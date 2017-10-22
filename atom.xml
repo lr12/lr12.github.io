@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-10-21T15:18:23.728Z</updated>
+  <updated>2017-10-22T02:27:59.438Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2017/10/21/%E6%9C%8D%E5%8A%A1%E6%A1%86%E6%9E%B6/"/>
     <id>http://yoursite.com/2017/10/21/服务框架/</id>
     <published>2017-10-21T11:56:11.000Z</published>
-    <updated>2017-10-21T15:18:23.728Z</updated>
+    <updated>2017-10-22T02:27:59.438Z</updated>
     
     <content type="html"><![CDATA[<h2 id="网站功能持续丰富后的困境与应对"><a href="#网站功能持续丰富后的困境与应对" class="headerlink" title="网站功能持续丰富后的困境与应对"></a>网站功能持续丰富后的困境与应对</h2><p>网站的功能主要集中在几个大应用上，而且这些应用都直接访问底层的服务，例如数据库、缓存、搜索引擎、分布式存储。随着网站规模扩大，开发人的增多，每个应用变得复杂、臃肿。</p>
 <h3 id="把应用拆小"><a href="#把应用拆小" class="headerlink" title="把应用拆小"></a>把应用拆小</h3><p>把庞大的应用拆成多个。这样的好处是相对较快的完成，但是仍然存在一些问题。一方面是数据库的连接数的压力还在，其次是代码的重复问题。</p>
@@ -34,6 +34,14 @@
 <p>在这段伪代码中，我们需要持续接受请求并进行响应，收到的数据也需要反序列化。在这里，我们关注服务的名称、服务的版本号、调用的方法名称和参数以及调用的连接。当我们拿到请求对象后，我们需要本地定位具体的服务，我们会有个服务注册表，我们可以动态发布服务。得到服务实例后，我们会服务调用，一般通过反射来调用，然后序列化结果，传输给客户端。</p>
 <h3 id="服务调用端的设计和实现"><a href="#服务调用端的设计和实现" class="headerlink" title="服务调用端的设计和实现"></a>服务调用端的设计和实现</h3><p>调用过程是调用发起、寻址路由、协议适配/序列化、网络传输、反序列化/协议解析、得到结果返回调用方。</p>
 <h4 id="从代码的角度看如何使用服务框架"><a href="#从代码的角度看如何使用服务框架" class="headerlink" title="从代码的角度看如何使用服务框架"></a>从代码的角度看如何使用服务框架</h4><p>客户端的引入是我们首先需要解决的问题，大多数的java开发都会使用spring作为容器。</p>
+<p><bean id="calculator" class="ConsumerBean"></bean></p>
+<p><property name="interfaceName"><br></property></p>
+<p><property name="version"><br></property></p>
+<p><property name="group"><br></property><br><br>以上是简单的版本的服务框架，我们先看三个基础的属性</p>
+<h5 id="interfaceName"><a href="#interfaceName" class="headerlink" title="interfaceName"></a>interfaceName</h5><p>接口名称，在进程远程通信时ConsumerBean必须要知道调用的接口是哪一个，然后才能生成这个接口的代理，以供本地调用。</p>
+<h5 id="version"><a href="#version" class="headerlink" title="version"></a>version</h5><p>版本号，在实际场景中，接口的变化是可能的。如果直接变化，那么要求所有使用的地方一起修改，一起升级。解决问题的方式有两种，一种是需要修改方法的参数或者返回值，也就是新增一个方法，保持原来方法不变，不过在过渡阶段导致代码臃肿，并且方法名不好取名。第二种是通过版本号进行隔离。</p>
+<h5 id="group"><a href="#group" class="headerlink" title="group"></a>group</h5><p>分组。分组属性的好处是如果对同一个接口的远程调用有很多机器，那么我们可以把远程机器分组，然后调用者可以选择不同分组调用，这样就可以把不同调用者对同一服务进行隔离。</p>
+<h4 id="运行期服务框架与应用和容器的关系"><a href="#运行期服务框架与应用和容器的关系" class="headerlink" title="运行期服务框架与应用和容器的关系"></a>运行期服务框架与应用和容器的关系</h4><p>有两个比较重要的问题需要解决：1.服务框架本身的部署方式问题；2.实现服务框架所依赖的一些外部包和应用自身依赖的jar包冲突。<br>首先是部署方式；一种方案是把服务框架作为应用的一个依赖包并与应用进行打包。通过这个方式，服务框架就变为应用的一个库，并随应用启动。存在的问题是，如果要升级服务框架，就需要更新应用本身；并且服务框架也没办法接管classloader，也没办法做到隔离和包的实现替换工作。<br>另一种方案是把服务框架作为容器的一部分，那么服务框架就变为一个容器提供远程调用和远程服务的功能。</p>
 ]]></content>
     
     <summary type="html">
