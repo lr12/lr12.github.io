@@ -42,7 +42,7 @@
     <link href="http://yoursite.com/2017/10/21/%E6%9C%8D%E5%8A%A1%E6%A1%86%E6%9E%B6/"/>
     <id>http://yoursite.com/2017/10/21/服务框架/</id>
     <published>2017-10-21T11:56:11.000Z</published>
-    <updated>2017-10-23T14:01:01.763Z</updated>
+    <updated>2017-10-23T14:03:13.462Z</updated>
     
     <content type="html"><![CDATA[<h2 id="网站功能持续丰富后的困境与应对"><a href="#网站功能持续丰富后的困境与应对" class="headerlink" title="网站功能持续丰富后的困境与应对"></a>网站功能持续丰富后的困境与应对</h2><p>网站的功能主要集中在几个大应用上，而且这些应用都直接访问底层的服务，例如数据库、缓存、搜索引擎、分布式存储。随着网站规模扩大，开发人的增多，每个应用变得复杂、臃肿。</p>
 <h3 id="把应用拆小"><a href="#把应用拆小" class="headerlink" title="把应用拆小"></a>把应用拆小</h3><p>把庞大的应用拆成多个。这样的好处是相对较快的完成，但是仍然存在一些问题。一方面是数据库的连接数的压力还在，其次是代码的重复问题。</p>
@@ -73,11 +73,8 @@
 <h4 id="Future"><a href="#Future" class="headerlink" title="Future"></a>Future</h4><p>把数据写入队列，把future写入队列，通过future获取结果</p>
 <h4 id="可靠的异步"><a href="#可靠的异步" class="headerlink" title="可靠的异步"></a>可靠的异步</h4><p>通过消息中间件</p>
 <h3 id="使用Future对远程服务调用的优化"><a href="#使用Future对远程服务调用的优化" class="headerlink" title="使用Future对远程服务调用的优化"></a>使用Future对远程服务调用的优化</h3><p>如果我们在一个请求处理中调用多个远程服务，如果采用同步的方式，那么总时间是全部请求时间求和，如果我们仍然按照顺序把服务的请求依次发给各个服务，但是请求过去后并不等待结果，而是在最后服务发出去后在等待，这样总时间变为单个远程服务时间的最大值。但是这有个前提，所有的服务并没有依赖关系，所以他们可以一起等。</p>
-<h2 id="服务端的设计和实现"><a href="#服务端的设计和实现" class="headerlink" title="服务端的设计和实现"></a>服务端的设计和实现</h2><h3 id="如何暴露远程服务"><a href="#如何暴露远程服务" class="headerlink" title="如何暴露远程服务"></a>如何暴露远程服务</h3><p><bean id="calculator" class="ProviderBean"></bean></p>
-<p><property name="interfaceName"><br></property></p>
-<p><property name="target"><br></property></p>
-<p><property name="version"><br></property></p>
-<p><property name="group"><br></property><br><br>服务端提供的是providerBean，而客户端提供的是ConsumerBean。providerBean的职能是服务需要注册到服务查找中心后才能被服务调用者发现，所以providerBean需要将自己所代表的服务注册到服务注册查找中心。也需要在本机注册服务和对应服务的实例。</p>
+<h2 id="服务端的设计和实现"><a href="#服务端的设计和实现" class="headerlink" title="服务端的设计和实现"></a>服务端的设计和实现</h2><h3 id="如何暴露远程服务"><a href="#如何暴露远程服务" class="headerlink" title="如何暴露远程服务"></a>如何暴露远程服务</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">&lt;bean id=<span class="string">"calculator"</span> class=<span class="string">"ProviderBean"</span>&gt;</div><div class="line">&lt;property name=<span class="string">"interfaceName"</span>&gt;</div><div class="line">&lt;/property&gt;</div><div class="line">&lt;property name=<span class="string">"target"</span>&gt;</div><div class="line">&lt;/property&gt;</div><div class="line">&lt;property name=<span class="string">"version"</span>&gt;</div><div class="line">&lt;/property&gt;</div><div class="line">&lt;property name=<span class="string">"group"</span>&gt;</div><div class="line">&lt;/property&gt;</div><div class="line">&lt;/bean&gt;</div></pre></td></tr></table></figure>
+<p>服务端提供的是providerBean，而客户端提供的是ConsumerBean。providerBean的职能是服务需要注册到服务查找中心后才能被服务调用者发现，所以providerBean需要将自己所代表的服务注册到服务注册查找中心。也需要在本机注册服务和对应服务的实例。</p>
 <h3 id="服务端对请求处理的流程"><a href="#服务端对请求处理的流程" class="headerlink" title="服务端对请求处理的流程"></a>服务端对请求处理的流程</h3><p>服务框架启动时需要监听端口号，并且等待调用的请求。当服务注册好，监听端口号也准备好，就只需等待服务调用的请求进来。请求处理流程是：网络通信层、协议解析/反序列化、定位服务、调用服务。</p>
 <h3 id="执行不同服务的线程池隔离"><a href="#执行不同服务的线程池隔离" class="headerlink" title="执行不同服务的线程池隔离"></a>执行不同服务的线程池隔离</h3><h3 id="服务提供者的流控处理"><a href="#服务提供者的流控处理" class="headerlink" title="服务提供者的流控处理"></a>服务提供者的流控处理</h3><p>在服务提供者看来，不同来源的服务调用者、0-1开关、限制具体数值的QPS方式都需要实现。对不同调用者进行升级，确保优先级高的服务调用者被优先调用</p>
 <h3 id="服务升级"><a href="#服务升级" class="headerlink" title="服务升级"></a>服务升级</h3><h4 id="增加方法"><a href="#增加方法" class="headerlink" title="增加方法"></a>增加方法</h4><h4 id="修改调用参数列表"><a href="#修改调用参数列表" class="headerlink" title="修改调用参数列表"></a>修改调用参数列表</h4><p>1.对原来的方法的代码进行修改<br>2.通过版本号来解决<br>3.在设计的方法上考虑参数的扩展。但是不可行，通过map不直观</p>
