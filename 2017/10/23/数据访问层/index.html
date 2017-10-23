@@ -79,8 +79,6 @@
 
 
 
-  
-
 
   <link rel="alternate" href="/atom.xml" title="博客" type="application/atom+xml" />
 
@@ -94,17 +92,17 @@
 
 
 
-<meta name="description" content="数据库从单机到分布式的挑战和应对">
+<meta name="description" content="数据库从单机到分布式的挑战和应对从应用使用单机数据库开始各种类似ODBC、JDBC的封装、以及ORM的封装都很成熟，我们这里重点考虑数据量和访问量增大的时候，系统要面临的问题和相应的解决方案。 数据库垂直拆分和水平拆分的困难垂直拆分会带来的影响：1.单机的ACID保证会被打破；要么放弃单机事务，修改实现，要么引入分布式事务。">
 <meta name="keywords" content="大型网站系统与中间件实践读书笔记">
 <meta property="og:type" content="article">
 <meta property="og:title" content="数据访问层（第五章）">
 <meta property="og:url" content="http://yoursite.com/2017/10/23/数据访问层/index.html">
 <meta property="og:site_name" content="博客">
-<meta property="og:description" content="数据库从单机到分布式的挑战和应对">
-<meta property="og:updated_time" content="2017-10-23T09:26:20.713Z">
+<meta property="og:description" content="数据库从单机到分布式的挑战和应对从应用使用单机数据库开始各种类似ODBC、JDBC的封装、以及ORM的封装都很成熟，我们这里重点考虑数据量和访问量增大的时候，系统要面临的问题和相应的解决方案。 数据库垂直拆分和水平拆分的困难垂直拆分会带来的影响：1.单机的ACID保证会被打破；要么放弃单机事务，修改实现，要么引入分布式事务。">
+<meta property="og:updated_time" content="2017-10-23T13:57:45.695Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="数据访问层（第五章）">
-<meta name="twitter:description" content="数据库从单机到分布式的挑战和应对">
+<meta name="twitter:description" content="数据库从单机到分布式的挑战和应对从应用使用单机数据库开始各种类似ODBC、JDBC的封装、以及ORM的封装都很成熟，我们这里重点考虑数据量和访问量增大的时候，系统要面临的问题和相应的解决方案。 数据库垂直拆分和水平拆分的困难垂直拆分会带来的影响：1.单机的ACID保证会被打破；要么放弃单机事务，修改实现，要么引入分布式事务。">
 
 
 
@@ -322,7 +320,9 @@
       
 
       
-        <h2 id="数据库从单机到分布式的挑战和应对"><a href="#数据库从单机到分布式的挑战和应对" class="headerlink" title="数据库从单机到分布式的挑战和应对"></a>数据库从单机到分布式的挑战和应对</h2>
+        <h2 id="数据库从单机到分布式的挑战和应对"><a href="#数据库从单机到分布式的挑战和应对" class="headerlink" title="数据库从单机到分布式的挑战和应对"></a>数据库从单机到分布式的挑战和应对</h2><h3 id="从应用使用单机数据库开始"><a href="#从应用使用单机数据库开始" class="headerlink" title="从应用使用单机数据库开始"></a>从应用使用单机数据库开始</h3><p>各种类似ODBC、JDBC的封装、以及ORM的封装都很成熟，我们这里重点考虑数据量和访问量增大的时候，系统要面临的问题和相应的解决方案。</p>
+<h3 id="数据库垂直拆分和水平拆分的困难"><a href="#数据库垂直拆分和水平拆分的困难" class="headerlink" title="数据库垂直拆分和水平拆分的困难"></a>数据库垂直拆分和水平拆分的困难</h3><p>垂直拆分会带来的影响：<br>1.单机的ACID保证会被打破；要么放弃单机事务，修改实现，要么引入分布式事务。</p>
+
       
     </div>
 
@@ -499,7 +499,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#数据库从单机到分布式的挑战和应对"><span class="nav-number">1.</span> <span class="nav-text">数据库从单机到分布式的挑战和应对</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#数据库从单机到分布式的挑战和应对"><span class="nav-number">1.</span> <span class="nav-text">数据库从单机到分布式的挑战和应对</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#从应用使用单机数据库开始"><span class="nav-number">1.1.</span> <span class="nav-text">从应用使用单机数据库开始</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数据库垂直拆分和水平拆分的困难"><span class="nav-number">1.2.</span> <span class="nav-text">数据库垂直拆分和水平拆分的困难</span></a></li></ol></li></ol></div>
             
 
           </div>
