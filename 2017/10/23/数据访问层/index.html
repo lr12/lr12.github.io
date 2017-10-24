@@ -79,8 +79,6 @@
 
 
 
-  
-
 
   <link rel="alternate" href="/atom.xml" title="博客" type="application/atom+xml" />
 
@@ -101,7 +99,7 @@
 <meta property="og:url" content="http://yoursite.com/2017/10/23/数据访问层/index.html">
 <meta property="og:site_name" content="博客">
 <meta property="og:description" content="数据库从单机到分布式的挑战和应对从应用使用单机数据库开始各种类似ODBC、JDBC的封装、以及ORM的封装都很成熟，我们这里重点考虑数据量和访问量增大的时候，系统要面临的问题和相应的解决方案。 数据库垂直拆分和水平拆分的困难垂直拆分会带来的影响：1.单机的ACID保证会被打破；要么放弃单机事务，修改实现，要么引入分布式事务。2.一些join操作会变得比较困难，因为数据已经在两个数据库中，所以不是很">
-<meta property="og:updated_time" content="2017-10-23T14:09:30.551Z">
+<meta property="og:updated_time" content="2017-10-24T01:02:22.884Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="数据访问层（第五章）">
 <meta name="twitter:description" content="数据库从单机到分布式的挑战和应对从应用使用单机数据库开始各种类似ODBC、JDBC的封装、以及ORM的封装都很成熟，我们这里重点考虑数据量和访问量增大的时候，系统要面临的问题和相应的解决方案。 数据库垂直拆分和水平拆分的困难垂直拆分会带来的影响：1.单机的ACID保证会被打破；要么放弃单机事务，修改实现，要么引入分布式事务。2.一些join操作会变得比较困难，因为数据已经在两个数据库中，所以不是很">
@@ -324,7 +322,9 @@
       
         <h2 id="数据库从单机到分布式的挑战和应对"><a href="#数据库从单机到分布式的挑战和应对" class="headerlink" title="数据库从单机到分布式的挑战和应对"></a>数据库从单机到分布式的挑战和应对</h2><h3 id="从应用使用单机数据库开始"><a href="#从应用使用单机数据库开始" class="headerlink" title="从应用使用单机数据库开始"></a>从应用使用单机数据库开始</h3><p>各种类似ODBC、JDBC的封装、以及ORM的封装都很成熟，我们这里重点考虑数据量和访问量增大的时候，系统要面临的问题和相应的解决方案。</p>
 <h3 id="数据库垂直拆分和水平拆分的困难"><a href="#数据库垂直拆分和水平拆分的困难" class="headerlink" title="数据库垂直拆分和水平拆分的困难"></a>数据库垂直拆分和水平拆分的困难</h3><p>垂直拆分会带来的影响：<br>1.单机的ACID保证会被打破；要么放弃单机事务，修改实现，要么引入分布式事务。<br>2.一些join操作会变得比较困难，因为数据已经在两个数据库中，所以不是很方便利用数据库自身的join；<br>3.靠外键进行约束的场景会受限制；<br>水平拆分会带来的影响：<br>1.同样可能ACID会被打破；<br>2.同样join可能会受到影响；<br>3.靠外键进行约束的场景会受限制；<br>4.依靠单库生成递增唯一标识会受影响；<br>5.针对单个逻辑上的表的查询要跨库；</p>
-<h3 id="多机事务如何处理"><a href="#多机事务如何处理" class="headerlink" title="多机事务如何处理"></a>多机事务如何处理</h3>
+<h3 id="多机事务如何处理"><a href="#多机事务如何处理" class="headerlink" title="多机事务如何处理"></a>多机事务如何处理</h3><h4 id="分布式事务知识"><a href="#分布式事务知识" class="headerlink" title="分布式事务知识"></a>分布式事务知识</h4><h5 id="分布式事务模型与规范"><a href="#分布式事务模型与规范" class="headerlink" title="分布式事务模型与规范"></a>分布式事务模型与规范</h5><p>X/Open组织（the open group）提出了分布式事务规范-XA，分布式事务处理模型-X/Open DTP（distributed transaction processing reference model）模型。定义了三个组件–application  program、Resource manager和transaction manager。<br>AP:应用程序，它定义了事务的边界，并定义了构成该事务的应用程序的特定操作。<br>RM：资源管理器，可以理解为DBMS系统，或者消息服务器管理系统。AP通过RM对资源进行控制，资源必须实现XA接口。资源管理器提供了存储共享资源的支持。<br>TM：事务管理器，负责协调和管理事务，提供给AP接口用来管理RM。事务管理器向事务指定标识，监视他们的进程，并负责处理事务的完成和失败。事务分支标识（XID）用TM指定，标识一个RM的全局事务和特定分支。他是TM日志和RM日志之间的相关标识。两阶段性提交用到XID<br>AP和TM、RM通信，TM和RM之间互相通信，通过XA接口。</p>
+<h5 id="两阶段提交"><a href="#两阶段提交" class="headerlink" title="两阶段提交"></a>两阶段提交</h5><p>准备阶段<br>事务协调者(事务管理器)给每个参与者(资源管理器)发送Prepare消息，每个参与者要么直接返回失败(如权限验证失败)，要么在本地执行事务，写本地的redo和undo日志，但不提交。<br>提交阶段<br>如果协调者收到了参与者的失败消息或者超时，直接给每个参与者发送回滚(Rollback)消息；否则，发送提交(Commit)消息；参与者根据协调者的指令执行提交或者回滚操作，释放所有事务处理过程中使用的锁资源。(注意:必须在最后阶段释放锁资源)</p>
+
       
     </div>
 
@@ -501,7 +501,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#数据库从单机到分布式的挑战和应对"><span class="nav-number">1.</span> <span class="nav-text">数据库从单机到分布式的挑战和应对</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#从应用使用单机数据库开始"><span class="nav-number">1.1.</span> <span class="nav-text">从应用使用单机数据库开始</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数据库垂直拆分和水平拆分的困难"><span class="nav-number">1.2.</span> <span class="nav-text">数据库垂直拆分和水平拆分的困难</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#多机事务如何处理"><span class="nav-number">1.3.</span> <span class="nav-text">多机事务如何处理</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#数据库从单机到分布式的挑战和应对"><span class="nav-number">1.</span> <span class="nav-text">数据库从单机到分布式的挑战和应对</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#从应用使用单机数据库开始"><span class="nav-number">1.1.</span> <span class="nav-text">从应用使用单机数据库开始</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数据库垂直拆分和水平拆分的困难"><span class="nav-number">1.2.</span> <span class="nav-text">数据库垂直拆分和水平拆分的困难</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#多机事务如何处理"><span class="nav-number">1.3.</span> <span class="nav-text">多机事务如何处理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#分布式事务知识"><span class="nav-number">1.3.1.</span> <span class="nav-text">分布式事务知识</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#分布式事务模型与规范"><span class="nav-number">1.3.1.1.</span> <span class="nav-text">分布式事务模型与规范</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#两阶段提交"><span class="nav-number">1.3.1.2.</span> <span class="nav-text">两阶段提交</span></a></li></ol></li></ol></li></ol></li></ol></div>
             
 
           </div>
