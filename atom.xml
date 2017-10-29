@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-10-29T05:21:14.521Z</updated>
+  <updated>2017-10-29T05:25:33.146Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,20 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>构建大型网站的其他要素</title>
+    <link href="http://yoursite.com/2017/10/29/%E6%9E%84%E5%BB%BA%E5%A4%A7%E5%9E%8B%E7%BD%91%E7%AB%99%E7%9A%84%E5%85%B6%E4%BB%96%E8%A6%81%E7%B4%A0/"/>
+    <id>http://yoursite.com/2017/10/29/构建大型网站的其他要素/</id>
+    <published>2017-10-29T05:25:33.000Z</published>
+    <updated>2017-10-29T05:25:33.146Z</updated>
+    
+    <summary type="html">
+    
+    </summary>
+    
+    
+  </entry>
   
   <entry>
     <title>软负载中心与集中配置管理（第七章）</title>
@@ -54,7 +68,7 @@
     <link href="http://yoursite.com/2017/10/25/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/"/>
     <id>http://yoursite.com/2017/10/25/消息中间件/</id>
     <published>2017-10-25T07:23:21.000Z</published>
-    <updated>2017-10-27T07:31:26.134Z</updated>
+    <updated>2017-10-27T09:03:41.696Z</updated>
     
     <content type="html"><![CDATA[<h2 id="消息中间件的价值"><a href="#消息中间件的价值" class="headerlink" title="消息中间件的价值"></a>消息中间件的价值</h2><h3 id="消息中间件的定义"><a href="#消息中间件的定义" class="headerlink" title="消息中间件的定义"></a>消息中间件的定义</h3><p>Message oriented middleWare,面向消息的系统（消息中间件）是在分布式系统中完成消息的发送和接收的基础软件</p>
 <h3 id="通过示例看消息中间件对应用的解耦"><a href="#通过示例看消息中间件对应用的解耦" class="headerlink" title="通过示例看消息中间件对应用的解耦"></a>通过示例看消息中间件对应用的解耦</h3><h4 id="通过服务调用让其他系统感知事件发生的方式"><a href="#通过服务调用让其他系统感知事件发生的方式" class="headerlink" title="通过服务调用让其他系统感知事件发生的方式"></a>通过服务调用让其他系统感知事件发生的方式</h4><p>假设我们的登录系统，需要支持的一个功能是发短信给用户，如果在增加后续跟其他系统打交道的工作，会让登录系统变得十分复杂。<br>如登陆系统负责向消息中间件发送消息，而其他的系统则向消息中间件来订阅这个消息，然后完成自己的工作。</p>
