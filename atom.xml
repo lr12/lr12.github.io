@@ -63,7 +63,7 @@
     <link href="http://yoursite.com/2017/10/29/%E6%9E%84%E5%BB%BA%E5%A4%A7%E5%9E%8B%E7%BD%91%E7%AB%99%E7%9A%84%E5%85%B6%E4%BB%96%E8%A6%81%E7%B4%A0/"/>
     <id>http://yoursite.com/2017/10/29/构建大型网站的其他要素/</id>
     <published>2017-10-29T05:25:33.000Z</published>
-    <updated>2017-10-31T00:57:38.681Z</updated>
+    <updated>2017-11-01T01:45:39.410Z</updated>
     
     <content type="html"><![CDATA[<h2 id="加速静态内容访问的速度的CDN"><a href="#加速静态内容访问的速度的CDN" class="headerlink" title="加速静态内容访问的速度的CDN"></a>加速静态内容访问的速度的CDN</h2><p>CDN，Content Delivery Network，内容分发网络。CDN的作用是把用户需要的内容分发到离用户近的地方，这样可以从用户能就近获取所需的内容。整个CDN系统分为CDN源站和CDN节点。CDN源站提供CDN节点使用的数据源头，CDN节点部署在离最终用户比较近的地方，加速用户对站点的访问。CDN就是网络缓存技术，一般存放静态文件（js，css，图片，视频，页面框架）。<br>浏览器访问网站的顺序：<br>1.用户提交要访问的域名地址；<br>2.浏览器对域名进行解析，获取ip地址；<br>3.浏览器向所得到的ip发送请求；<br>4.浏览器根据返回的内容显示数据<br>有了CDN后的顺序：<br>1.用户提交要访问的域名地址；<br>2.浏览器对域名进行解析，由于CDN对域名解析过程做了调整，所以得到该域名对应的CNAME记录。<br>3.对CNAME进行解析得到实际的ip地址。在这次解析中会使用全局负载均衡CDN解析，需要我们根据地理位置以及所在的ISP确定结果，然后获取到具体的IP地址。<br>4.得到实际的ip地址后，我们会向服务器发送请求。<br>5.CDN会根据请求的内容是否在本地缓存进行不同的处理。<br>如果存在，直接返回结果；不存在，则请求CDN源站，获取内容，返回结果。<br>CDN关键的技术：<br>1.全局调度<br>全局调度是完成用户就近访问的第一步，我们需要根据用户地域、接入运营商、以及CDN机房的负载情况去调度。<br>2.缓存技术<br>如果请求不存在CDN节点，则请求CDN源站，获取内容，返回结果。如果命中率不高，加速有限。要提升命中率，首先缓存的容量要足够大，可以使用内存+SSD+硬盘混合存储。还有新增变更数据预加载也能提升命中<br>3.内容分发<br>内容分发主要包括在CDN上不用回源的数据的管理和分发，主要包括静态页面。<br>4.带宽优化<br>只返回必要数据和使用更好的压缩算法</p>
 <h2 id="大型网站的存储支持"><a href="#大型网站的存储支持" class="headerlink" title="大型网站的存储支持"></a>大型网站的存储支持</h2><h3 id="分布式文件系统"><a href="#分布式文件系统" class="headerlink" title="分布式文件系统"></a>分布式文件系统</h3><p>对一些图片、大文本的存储使用数据库就不合适了。GFS主要由三部分构成：GFS Client、GFS Master、GFS chunkserver</p>
@@ -97,6 +97,8 @@
     
     </summary>
     
+      <category term="分布式" scheme="http://yoursite.com/categories/%E5%88%86%E5%B8%83%E5%BC%8F/"/>
+    
     
       <category term="大型网站系统与中间件实践读书笔记" scheme="http://yoursite.com/tags/%E5%A4%A7%E5%9E%8B%E7%BD%91%E7%AB%99%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%AE%9E%E8%B7%B5%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
     
@@ -107,7 +109,7 @@
     <link href="http://yoursite.com/2017/10/27/%E8%BD%AF%E8%B4%9F%E8%BD%BD%E4%B8%AD%E5%BF%83%E4%B8%8E%E9%9B%86%E4%B8%AD%E9%85%8D%E7%BD%AE%E7%AE%A1%E7%90%86/"/>
     <id>http://yoursite.com/2017/10/27/软负载中心与集中配置管理/</id>
     <published>2017-10-27T07:39:30.000Z</published>
-    <updated>2017-10-29T05:21:14.521Z</updated>
+    <updated>2017-11-01T01:45:54.593Z</updated>
     
     <content type="html"><![CDATA[<h2 id="初始软负载中心"><a href="#初始软负载中心" class="headerlink" title="初始软负载中心"></a>初始软负载中心</h2><p>在服务框架，服务查找中心就是软负载中心；而在消息中间件中消息发送者以及消息消费者对于消息中间件的感知也是通过软负载中心。<br>软负载中心有两个最基本的职能：<br>1.聚合地址信息；无论是服务框架中需要用到的服务提供者地址还是消息中间件系统中的消息中间件地址，都需要由软负载中心去聚合地址列表，形成一个可供服务调用者及消息发送者、接收者接收的列表。<br>2.生命周期感知；软件负载中心能够对服务上下线自动感知，并且根据这个变化去更新服务地址数据，形成新的地址列表后，把数据传给需要数据的调用者或者消息的发送者和接收者。</p>
 <h2 id="软负载中心的结构"><a href="#软负载中心的结构" class="headerlink" title="软负载中心的结构"></a>软负载中心的结构</h2><p>软负载中心包括：一个是软负载中心的服务端，另一个是软负载中心的客户端；服务端主要负责感知提供服务的机器是否在线，聚合提供者的机器信息，并且负责把数据传给使用数据的应用。客户端承载了两个角色，作为服务提供者，客户端主要是把服务提供者提供服务的具体信息主动传给服务端，并且随着提供服务的变化去更新数据；而作为服务使用者，客户端主要向服务端告知自己所需要的数据，并负责去更新数据，还要进行本地缓存，使得每次去请求服务来获取列表都是一个本地操作。<br>软件负载中心内部有三部分重要数据<br>1.聚合数据<br>聚合后的地址列表。对于提供的服务信息，我们使用唯一的dataId来标识，同时dataId支持分组（group），通过dataId和group可以定位到唯一的数据内容，这个内容是通过聚合完成的完整数据，而这个信息在内部就是一个key-value结构。<br>2.订阅关系<br>在软负载中心中，需要数据的应用把自己需要的数据告诉软负载中心，这就是订阅关系，订阅的粒度也是通过dataId和group来确定数据，那么会有dataId和group到数据订阅者的分组ID的一个映射关系，当聚合的数据发生变化，通过订阅关系的数据找到需要通知的数据订阅者，然后去进行数据更新操作。<br>3.连接关系<br>连接到软负载中心的节点和软负载中心已经建立的连接管理。使用软负载中心的应用，无论是发布数据还是订阅数据，都会有一个独立的分组，而连接数据就是用groupId作为key，然后对应管理这个物理连接，采用的是长连接方式。当订阅的数据发生变化，通过订阅关系找到需要通知的groupId，在连接数据这里就能够找到对应的连接，完成对应用的更新。</p>
@@ -131,6 +133,8 @@
     
     </summary>
     
+      <category term="分布式" scheme="http://yoursite.com/categories/%E5%88%86%E5%B8%83%E5%BC%8F/"/>
+    
     
       <category term="大型网站系统与中间件实践读书笔记" scheme="http://yoursite.com/tags/%E5%A4%A7%E5%9E%8B%E7%BD%91%E7%AB%99%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%AE%9E%E8%B7%B5%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
     
@@ -141,7 +145,7 @@
     <link href="http://yoursite.com/2017/10/25/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/"/>
     <id>http://yoursite.com/2017/10/25/消息中间件/</id>
     <published>2017-10-25T07:23:21.000Z</published>
-    <updated>2017-10-27T09:03:41.696Z</updated>
+    <updated>2017-11-01T01:46:05.374Z</updated>
     
     <content type="html"><![CDATA[<h2 id="消息中间件的价值"><a href="#消息中间件的价值" class="headerlink" title="消息中间件的价值"></a>消息中间件的价值</h2><h3 id="消息中间件的定义"><a href="#消息中间件的定义" class="headerlink" title="消息中间件的定义"></a>消息中间件的定义</h3><p>Message oriented middleWare,面向消息的系统（消息中间件）是在分布式系统中完成消息的发送和接收的基础软件</p>
 <h3 id="通过示例看消息中间件对应用的解耦"><a href="#通过示例看消息中间件对应用的解耦" class="headerlink" title="通过示例看消息中间件对应用的解耦"></a>通过示例看消息中间件对应用的解耦</h3><h4 id="通过服务调用让其他系统感知事件发生的方式"><a href="#通过服务调用让其他系统感知事件发生的方式" class="headerlink" title="通过服务调用让其他系统感知事件发生的方式"></a>通过服务调用让其他系统感知事件发生的方式</h4><p>假设我们的登录系统，需要支持的一个功能是发短信给用户，如果在增加后续跟其他系统打交道的工作，会让登录系统变得十分复杂。<br>如登陆系统负责向消息中间件发送消息，而其他的系统则向消息中间件来订阅这个消息，然后完成自己的工作。</p>
@@ -178,6 +182,8 @@
     
     </summary>
     
+      <category term="分布式" scheme="http://yoursite.com/categories/%E5%88%86%E5%B8%83%E5%BC%8F/"/>
+    
     
       <category term="大型网站系统与中间件实践读书笔记" scheme="http://yoursite.com/tags/%E5%A4%A7%E5%9E%8B%E7%BD%91%E7%AB%99%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%AE%9E%E8%B7%B5%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
     
@@ -188,7 +194,7 @@
     <link href="http://yoursite.com/2017/10/23/%E6%95%B0%E6%8D%AE%E8%AE%BF%E9%97%AE%E5%B1%82/"/>
     <id>http://yoursite.com/2017/10/23/数据访问层/</id>
     <published>2017-10-23T09:24:31.000Z</published>
-    <updated>2017-10-25T07:14:17.688Z</updated>
+    <updated>2017-11-01T01:46:01.389Z</updated>
     
     <content type="html"><![CDATA[<h2 id="数据库从单机到分布式的挑战和应对"><a href="#数据库从单机到分布式的挑战和应对" class="headerlink" title="数据库从单机到分布式的挑战和应对"></a>数据库从单机到分布式的挑战和应对</h2><h3 id="从应用使用单机数据库开始"><a href="#从应用使用单机数据库开始" class="headerlink" title="从应用使用单机数据库开始"></a>从应用使用单机数据库开始</h3><p>各种类似ODBC、JDBC的封装、以及ORM的封装都很成熟，我们这里重点考虑数据量和访问量增大的时候，系统要面临的问题和相应的解决方案。</p>
 <h3 id="数据库垂直拆分和水平拆分的困难"><a href="#数据库垂直拆分和水平拆分的困难" class="headerlink" title="数据库垂直拆分和水平拆分的困难"></a>数据库垂直拆分和水平拆分的困难</h3><p>垂直拆分会带来的影响：<br>1.单机的ACID保证会被打破；要么放弃单机事务，修改实现，要么引入分布式事务。<br>2.一些join操作会变得比较困难，因为数据已经在两个数据库中，所以不是很方便利用数据库自身的join；<br>3.靠外键进行约束的场景会受限制；<br>水平拆分会带来的影响：<br>1.同样可能ACID会被打破；<br>2.同样join可能会受到影响；<br>3.靠外键进行约束的场景会受限制；<br>4.依靠单库生成递增唯一标识会受影响；<br>5.针对单个逻辑上的表的查询要跨库；</p>
@@ -225,6 +231,8 @@
     
     </summary>
     
+      <category term="分布式" scheme="http://yoursite.com/categories/%E5%88%86%E5%B8%83%E5%BC%8F/"/>
+    
     
       <category term="大型网站系统与中间件实践读书笔记" scheme="http://yoursite.com/tags/%E5%A4%A7%E5%9E%8B%E7%BD%91%E7%AB%99%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%AE%9E%E8%B7%B5%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
     
@@ -235,7 +243,7 @@
     <link href="http://yoursite.com/2017/10/21/%E6%9C%8D%E5%8A%A1%E6%A1%86%E6%9E%B6/"/>
     <id>http://yoursite.com/2017/10/21/服务框架/</id>
     <published>2017-10-21T11:56:11.000Z</published>
-    <updated>2017-10-23T14:03:13.462Z</updated>
+    <updated>2017-11-01T01:45:33.977Z</updated>
     
     <content type="html"><![CDATA[<h2 id="网站功能持续丰富后的困境与应对"><a href="#网站功能持续丰富后的困境与应对" class="headerlink" title="网站功能持续丰富后的困境与应对"></a>网站功能持续丰富后的困境与应对</h2><p>网站的功能主要集中在几个大应用上，而且这些应用都直接访问底层的服务，例如数据库、缓存、搜索引擎、分布式存储。随着网站规模扩大，开发人的增多，每个应用变得复杂、臃肿。</p>
 <h3 id="把应用拆小"><a href="#把应用拆小" class="headerlink" title="把应用拆小"></a>把应用拆小</h3><p>把庞大的应用拆成多个。这样的好处是相对较快的完成，但是仍然存在一些问题。一方面是数据库的连接数的压力还在，其次是代码的重复问题。</p>
@@ -281,6 +289,8 @@
     
     </summary>
     
+      <category term="分布式" scheme="http://yoursite.com/categories/%E5%88%86%E5%B8%83%E5%BC%8F/"/>
+    
     
       <category term="大型网站系统与中间件实践读书笔记" scheme="http://yoursite.com/tags/%E5%A4%A7%E5%9E%8B%E7%BD%91%E7%AB%99%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%AE%9E%E8%B7%B5%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
     
@@ -291,7 +301,7 @@
     <link href="http://yoursite.com/2017/10/19/%E6%9E%84%E5%BB%BAjava%E4%B8%AD%E9%97%B4%E4%BB%B6/"/>
     <id>http://yoursite.com/2017/10/19/构建java中间件/</id>
     <published>2017-10-19T02:59:08.000Z</published>
-    <updated>2017-10-21T09:02:22.324Z</updated>
+    <updated>2017-11-01T01:45:50.247Z</updated>
     
     <content type="html"><![CDATA[<h2 id="java中间件的定义"><a href="#java中间件的定义" class="headerlink" title="java中间件的定义"></a>java中间件的定义</h2><p>基于java基础构建的中间件。中间件为软件应用提供操作系统所提供的服务之外的服务，中间件不是操作系统的一部分，不是数据库管理的一部分，不是软件应用的一部分，而是能够让软件开发者更方便的处理通信、输入、输出，能够专注在他们自己应用的部分。总体来说，中间件不是最上层应用，也不是最底层的操作系统，是处于中间的组件，起到桥梁的作用，是应用和应用之间，应用和服务之间的桥梁。<br>主要有三个领域的中间件：</p>
 <h3 id="远程对象调用和对象访问中间件"><a href="#远程对象调用和对象访问中间件" class="headerlink" title="远程对象调用和对象访问中间件"></a>远程对象调用和对象访问中间件</h3><p>解决分布式的应用互相访问的问题</p>
@@ -326,13 +336,15 @@
 <h3 id="动态执行方法"><a href="#动态执行方法" class="headerlink" title="动态执行方法"></a>动态执行方法</h3><p>Method method=clazz.getDeclaredMethod(“doSomething”);<br>method.invoke(subject);</p>
 <h3 id="动态操作属性"><a href="#动态操作属性" class="headerlink" title="动态操作属性"></a>动态操作属性</h3><p>Field field=clazz.getDeclaredField(“name”);<br>field.set(subject, “lr”)<br>这里要强调如果方法和属性是静态的，这时候可以不用传对象，可以传null。</p>
 <h3 id="网络通信实现选择"><a href="#网络通信实现选择" class="headerlink" title="网络通信实现选择"></a>网络通信实现选择</h3><p>网络通信三个模型：BIO、NIO、AIO。在1.4的版本中增加了NIO，在1.7的版本中增加了AIO。</p>
-]]></content>
+<h2 id="分布式系统中的中间件"><a href="#分布式系统中的中间件" class="headerlink" title="分布式系统中的中间件"></a>分布式系统中的中间件</h2>]]></content>
     
     <summary type="html">
     
       &lt;h2 id=&quot;java中间件的定义&quot;&gt;&lt;a href=&quot;#java中间件的定义&quot; class=&quot;headerlink&quot; title=&quot;java中间件的定义&quot;&gt;&lt;/a&gt;java中间件的定义&lt;/h2&gt;&lt;p&gt;基于java基础构建的中间件。中间件为软件应用提供操作系统所提供的服务之外的
     
     </summary>
+    
+      <category term="分布式" scheme="http://yoursite.com/categories/%E5%88%86%E5%B8%83%E5%BC%8F/"/>
     
     
       <category term="大型网站系统与中间件实践读书笔记" scheme="http://yoursite.com/tags/%E5%A4%A7%E5%9E%8B%E7%BD%91%E7%AB%99%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%AE%9E%E8%B7%B5%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
@@ -389,7 +401,7 @@
     <link href="http://yoursite.com/2017/10/16/%E5%A4%A7%E5%9E%8B%E7%BD%91%E7%AB%99%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%AE%9E%E8%B7%B5%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
     <id>http://yoursite.com/2017/10/16/大型网站系统与中间件实践读书笔记/</id>
     <published>2017-10-16T03:22:37.000Z</published>
-    <updated>2017-10-19T03:04:46.444Z</updated>
+    <updated>2017-11-01T01:45:29.944Z</updated>
     
     <content type="html"><![CDATA[<h2 id="分布式系统的定义"><a href="#分布式系统的定义" class="headerlink" title="分布式系统的定义"></a>分布式系统的定义</h2><p>1.组件分布在网络计算机上；<br>2.组件之间仅仅通过消息传递来通信并协调行动</p>
 <h2 id="分布式系统的意义"><a href="#分布式系统的意义" class="headerlink" title="分布式系统的意义"></a>分布式系统的意义</h2><p>1.升级单机处理能力的性价比越来越低<br>2.单机处理能力存在瓶颈<br>3.出于稳定性和可用性的考虑</p>
@@ -426,6 +438,8 @@
 &lt;
     
     </summary>
+    
+      <category term="分布式" scheme="http://yoursite.com/categories/%E5%88%86%E5%B8%83%E5%BC%8F/"/>
     
     
       <category term="大型网站系统与中间件实践读书笔记" scheme="http://yoursite.com/tags/%E5%A4%A7%E5%9E%8B%E7%BD%91%E7%AB%99%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%AE%9E%E8%B7%B5%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
