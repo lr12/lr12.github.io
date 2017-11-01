@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-11-01T14:15:32.522Z</updated>
+  <updated>2017-11-01T15:41:07.026Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,13 +20,15 @@
     <link href="http://yoursite.com/2017/11/01/hbase%E7%AE%80%E4%BB%8B/"/>
     <id>http://yoursite.com/2017/11/01/hbase简介/</id>
     <published>2017-11-01T01:38:49.000Z</published>
-    <updated>2017-11-01T14:15:32.522Z</updated>
+    <updated>2017-11-01T15:41:07.026Z</updated>
     
     <content type="html"><![CDATA[<h2 id="海量数据的黎明"><a href="#海量数据的黎明" class="headerlink" title="海量数据的黎明"></a>海量数据的黎明</h2><p>hadoop项目有两个模块：HDFS和MapReduce。Hadoop擅长存储任意的、半结构化数据，可以帮助用户分析数据时决定如何解释这些数据，同时允许用户随时更改数据分类的方式；一旦用户更新了算法，只需要重新分析数据。Hadoop是现有数据库的一个补充，提供了数据存储无限的空间，并且针对大文件存储、批量访问和流式访问做了优化。<br>列式存储数据库，以列为单位聚合数据，然后将列值顺序存入磁盘，而行式数据库则是连续存储整行。<br>1.优点是：查询时只有涉及到的列会被读取；投影(projection)很高效；任何列都能作为索引。缺点：选择完成时，被选择的列要重新组装；INSERT/UPDATE比较麻烦。<br>2.更好的进行数据压缩：通过字典表压缩数据。经过字典表进行数据压缩后，表中的字符串才都变成数字了，比如我们的材料名可以用一张材料表，这样子在列存储就可以根据id来关联材料。<br>3.查询性能<br>我们能根据列查询结果通过为运算（&amp;或者|）进行结果合并，加快速度<br>关键步骤如下：<br>1.去字典表里找到字符串对应数字(只进行一次字符串比较)。<br>2.用数字去列表里匹配，匹配上的位置设为1。<br>3.把不同列的匹配结果进行位运算得到符合所有条件的记录下标。<br>4.使用这个下标组装出最终的结果集。<br>Hbase以列式存储的格式存储数据，传统的列式存储比较适合实时存储数据的场景，Hbase比较适合键值对的数据存取或者有序的数据存取。</p>
 <h2 id="关系数据库系统的问题"><a href="#关系数据库系统的问题" class="headerlink" title="关系数据库系统的问题"></a>关系数据库系统的问题</h2><p>数据量大时，索引量也大到足以让数据库的性能直线下降。最后能够提供的查询也只剩下主键查询，最后的采取的方案就是数据分区，也就是分库分表。</p>
 <h2 id="非关系型数据库系统"><a href="#非关系型数据库系统" class="headerlink" title="非关系型数据库系统"></a>非关系型数据库系统</h2><h3 id="维度"><a href="#维度" class="headerlink" title="维度"></a>维度</h3><p>包括数据模型、存储模型、一致性模型、物理模型、读写性能、辅助索引、故障处理、压缩、负载均衡、原子操作的读修改写、加锁等待死锁</p>
-<h3 id="可扩展性"><a href="#可扩展性" class="headerlink" title="可扩展性"></a>可扩展性</h3><h3 id="数据库的范式和反范式"><a href="#数据库的范式和反范式" class="headerlink" title="数据库的范式和反范式"></a>数据库的范式和反范式</h3><h2 id="Hbase结构"><a href="#Hbase结构" class="headerlink" title="Hbase结构"></a>Hbase结构</h2><h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><h3 id="表、行、列和单元格"><a href="#表、行、列和单元格" class="headerlink" title="表、行、列和单元格"></a>表、行、列和单元格</h3><p>最基本的单位是列，一列或者多列构成一行，并由唯一的行健来确定存储。反过来，一个表中有若干行，其中每列可能有多个版本，在每个单元格中存储了不同值。行序是按照字典顺序进行排序的，意思是从左到右一次对比每一个键。关于排序：排列顺序如果跟预期的不一样，需要补键，比如  row-1 永远小于 row-2，无论后面是什么，将始终按照这个顺序排列。行健总是唯一的，否则你就是在更新同一行。行健可以是任意的字节数组，但它不一定是人直接可读。<br>一行由若干列组成，若干列构成一个列族，有助于构建语义边界，还有助于给他们设置某些特性（压缩），或者指示他们存储在内存中。一个列族所有列存储在HFile。<br>常用的引用列的格式为family：qualifier，qualifier是任意字节数组。一个列族没有列的数量限制，可以有数百万列。列值没有类型和长度的限制。</p>
-]]></content>
+<h3 id="可扩展性"><a href="#可扩展性" class="headerlink" title="可扩展性"></a>可扩展性</h3><h3 id="数据库的范式和反范式"><a href="#数据库的范式和反范式" class="headerlink" title="数据库的范式和反范式"></a>数据库的范式和反范式</h3><h2 id="Hbase结构"><a href="#Hbase结构" class="headerlink" title="Hbase结构"></a>Hbase结构</h2><h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><h3 id="表、行、列和单元格"><a href="#表、行、列和单元格" class="headerlink" title="表、行、列和单元格"></a>表、行、列和单元格</h3><p>最基本的单位是列，一列或者多列构成一行，并由唯一的行健来确定存储。反过来，一个表中有若干行，其中每列可能有多个版本，在每个单元格中存储了不同值。行序是按照字典顺序进行排序的，意思是从左到右一次对比每一个键。关于排序：排列顺序如果跟预期的不一样，需要补键，比如  row-1 永远小于 row-2，无论后面是什么，将始终按照这个顺序排列。行健总是唯一的，否则你就是在更新同一行。行健可以是任意的字节数组，但它不一定是人直接可读。<br>一行由若干列组成，若干列构成一个列族，有助于构建语义边界，还有助于给他们设置某些特性（压缩），或者指示他们存储在内存中。一个列族所有列存储在HFile。<br>常用的引用列的格式为family：qualifier，qualifier是任意字节数组。一个列族没有列的数量限制，可以有数百万列。列值没有类型和长度的限制。NUll值在Hbase不占任何空间。<br>每一列的值或者单元格都有时间戳，不同时间戳区分不同的版本值，同一个单元格的不同版本值按照时间戳降序排序，访问时候优先读取最新的值。这样优化使得新值比老值更容易读到。用户可以指定每个值能保存的最大版本数，此外还支持谓词删除（LSM树）。<br>Hbase是一个稀疏的、分布式的、持久化的、多维的映射、由行健列键和时间戳索引。数据存储模式：(Table,RowKey,Family,Column,TimeStamp)-&gt;value</p>
+<h3 id="自动分区"><a href="#自动分区" class="headerlink" title="自动分区"></a>自动分区</h3><p>Hbase中扩展和负载均衡的基本单元是region，region本质是以行键排序的连续存储的区间。如果region太大，系统会动态拆分，相反会合并region，减少存储文件数量。<br>一张表初始化只有一个region，用户不断插入数据，当数据量超过配置的最大值，会在中间键处将这个region拆分成两个大致相等的region。每一个region只能由一台regionServer加载，而一台RegionServer可以同时加载多个region。（每台regionServer1加载的最佳数量是10~1000，每个region最佳大小是1GB~2GB）。当某个region服务器由于负载过大等原因导致不可用时，系统会将该region转到其他服务器上。</p>
+<h3 id="存储API"><a href="#存储API" class="headerlink" title="存储API"></a>存储API</h3><p>API提供了建表、删表、增加列族、删除列族、修改表、修改列族元数据（压缩，设置块大小）、行键值的增加，删除，查找<br>scan可以限定返回的列或者返回的版本数，可以设置过滤器。系统支持单行事务，进一步实现单行键下存储的数据的 读-修改-写（read-modify-write）序列。单元格的值可以当计数器用，并且支持原子更新，意味着这个计数器可以在一个操作中实现读写，客户端可以基于此实现一个全局强一致的计数器。协处理器(coprocessor): 可以在服务器的地址空间执行来自客户端的代码。用于实现轻量级的批处理作业，或者使用表达式分析或者汇总数据。通过包装器可以将表转换成MapReduce的输入输出目标</p>
+<h3 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h3>]]></content>
     
     <summary type="html">
     
@@ -71,7 +73,7 @@
     <link href="http://yoursite.com/2017/10/29/%E6%9E%84%E5%BB%BA%E5%A4%A7%E5%9E%8B%E7%BD%91%E7%AB%99%E7%9A%84%E5%85%B6%E4%BB%96%E8%A6%81%E7%B4%A0/"/>
     <id>http://yoursite.com/2017/10/29/构建大型网站的其他要素/</id>
     <published>2017-10-29T05:25:33.000Z</published>
-    <updated>2017-11-01T01:45:39.410Z</updated>
+    <updated>2017-11-01T14:22:18.862Z</updated>
     
     <content type="html"><![CDATA[<h2 id="加速静态内容访问的速度的CDN"><a href="#加速静态内容访问的速度的CDN" class="headerlink" title="加速静态内容访问的速度的CDN"></a>加速静态内容访问的速度的CDN</h2><p>CDN，Content Delivery Network，内容分发网络。CDN的作用是把用户需要的内容分发到离用户近的地方，这样可以从用户能就近获取所需的内容。整个CDN系统分为CDN源站和CDN节点。CDN源站提供CDN节点使用的数据源头，CDN节点部署在离最终用户比较近的地方，加速用户对站点的访问。CDN就是网络缓存技术，一般存放静态文件（js，css，图片，视频，页面框架）。<br>浏览器访问网站的顺序：<br>1.用户提交要访问的域名地址；<br>2.浏览器对域名进行解析，获取ip地址；<br>3.浏览器向所得到的ip发送请求；<br>4.浏览器根据返回的内容显示数据<br>有了CDN后的顺序：<br>1.用户提交要访问的域名地址；<br>2.浏览器对域名进行解析，由于CDN对域名解析过程做了调整，所以得到该域名对应的CNAME记录。<br>3.对CNAME进行解析得到实际的ip地址。在这次解析中会使用全局负载均衡CDN解析，需要我们根据地理位置以及所在的ISP确定结果，然后获取到具体的IP地址。<br>4.得到实际的ip地址后，我们会向服务器发送请求。<br>5.CDN会根据请求的内容是否在本地缓存进行不同的处理。<br>如果存在，直接返回结果；不存在，则请求CDN源站，获取内容，返回结果。<br>CDN关键的技术：<br>1.全局调度<br>全局调度是完成用户就近访问的第一步，我们需要根据用户地域、接入运营商、以及CDN机房的负载情况去调度。<br>2.缓存技术<br>如果请求不存在CDN节点，则请求CDN源站，获取内容，返回结果。如果命中率不高，加速有限。要提升命中率，首先缓存的容量要足够大，可以使用内存+SSD+硬盘混合存储。还有新增变更数据预加载也能提升命中<br>3.内容分发<br>内容分发主要包括在CDN上不用回源的数据的管理和分发，主要包括静态页面。<br>4.带宽优化<br>只返回必要数据和使用更好的压缩算法</p>
 <h2 id="大型网站的存储支持"><a href="#大型网站的存储支持" class="headerlink" title="大型网站的存储支持"></a>大型网站的存储支持</h2><h3 id="分布式文件系统"><a href="#分布式文件系统" class="headerlink" title="分布式文件系统"></a>分布式文件系统</h3><p>对一些图片、大文本的存储使用数据库就不合适了。GFS主要由三部分构成：GFS Client、GFS Master、GFS chunkserver</p>
@@ -81,7 +83,7 @@
 <h3 id="NOSQL"><a href="#NOSQL" class="headerlink" title="NOSQL"></a>NOSQL</h3><p>not only sql。基本上处于分布式文件系统和SQL关系型数据库之间的系统都被归为NoSql范畴。<br>在NoSql Data Modeling Techniques文章中，一个NoSql和Sql的基础都来自key value，另外一个NoSql继续发展，就会变成Sql数据库。</p>
 <h4 id="key-value"><a href="#key-value" class="headerlink" title="key-value"></a>key-value</h4><p>最基础的技术支撑，后续的产品都基于key-value存储发展起来。但是有个问题，没有办法进行高效的范围查询。</p>
 <h4 id="ordered-key-value"><a href="#ordered-key-value" class="headerlink" title="ordered key-value"></a>ordered key-value</h4><p>key是有序的，可以解决key的范围查询的效率，但是在这个模型中，value本身的内容和结构是由应用来负责解析和存储的。</p>
-<h4 id="Big-Table"><a href="#Big-Table" class="headerlink" title="Big Table"></a>Big Table</h4><p>是google发表的名为BigTable：A Distributed Storage System for Structured Data论文中提到的一个产品，是一个结构化数据的分布式存储系统。BigTable对value进行了schema的支持，value是由多个Column family组成，Column family的内部是Column，ColumnFami不能动态扩展，但是Column能够动态扩展。（hbase可以是里面的一个实现）</p>
+<h4 id="Big-Table"><a href="#Big-Table" class="headerlink" title="Big Table"></a>Big Table</h4><p>是google发表的名为BigTable：A Distributed Storage System for Structured Data论文中提到的一个产品，是一个结构化数据的分布式存储系统。BigTable对value进行了schema的支持，value是由多个Column family组成，Column family的内部是Column，ColumnFamily不能动态扩展，但是Column能够动态扩展。（hbase可以是里面的一个实现）</p>
 <h4 id="Document-full-text-Search"><a href="#Document-full-text-Search" class="headerlink" title="Document full-text Search"></a>Document full-text Search</h4><p>Document数据库有两个很大的进步，一个是可以在内部任意定义schema，而不再仅仅是map的嵌套；另一个是全文检索的支持。</p>
 <h4 id="Graph"><a href="#Graph" class="headerlink" title="Graph"></a>Graph</h4><p>图数据库可以看成从有序的key-value数据库发展而来的一个分支，主要是支持图结构的数据模型。<br>这里面讲的Full-Text Search和Graph在一些地方可能不能归为NoSql。<br>Hbase是借鉴Google BigTable的一个java版本的实现，存储到hbase的数据是通过HRegionServer来管理，每个HRegionServer管理了多个HRegion，每个Region管理了具体数据。HMaster管理所有的HRegionServer节点，是一个中心控制结构。还有比较经典的Amazon的Dynamo，它是采用了一致性哈希来进行管理。</p>
 <h3 id="缓存系统"><a href="#缓存系统" class="headerlink" title="缓存系统"></a>缓存系统</h3><p>缓存是非持久化，用来加速应用对数据的读取。Redis和Memcache是两个广泛的缓存系统，Redis已经有了对于集群的支持，memcache本身还是一个单机的应用。如果想把多个节点构成一个集群，常见的有一致性哈希。有两个使用缓存的场景<br>首先是使用缓存降低底层读的压力，需要注意缓存和数据一致性的问题。在这种方式中，应用不直接操作缓存，存储由缓存控制。但是这种场景下，因为保证写入缓存后要能写入存储，所以缓存本身的逻辑比较复杂，需要很多操作日志和故障恢复。<br>另一种使用缓存的方式是，应用直接与缓存和存储系统打交道，一般的做法是在写操作时更新缓存，然后失效缓存；而在读数据时先读缓存，如果缓存没有命中，再去读数据，写入缓存。<br>这里重点考虑缓存与存储数据一致性问题，这里指最终一致性。重点考虑缓存没有命中和数据更改的情况，以及更新存储中的数据后没来得及将缓存失效<br>还有就是全数据缓存，当存储的数据变化就直接同步到缓存，这样应用取数据都从缓存中取。用于数据变更通知平台<br>大型网站使用缓存的场景还有对于web应用页面渲染的缓存。以一个页面展示为例，我们队页面进行了分块，其中有静态内容，也有动态内容，如果整个页面采用服务器渲染的方式，我们希望相对静止的内容可以进行缓存而不用每次都要重新渲染。具体的技术有ESI（edge side includes），是通过在返回的页面加上标签，然后标签的内容去用缓存填充的一个过程。处理ESI标签可以放在java应用容器中去处理，也可以放在java应用容器前置的服务器去处理。<br>两种方式对比如下：<br>1.渲染页面和ESI处理在一个进程里，处理效率会提升，当页面内容是内部对象时就可以处理ESI标签，而如果放在前置服务器，需要对内容进行一次扫描，定位到ESI标签后再处理。<br>2.ESI放在Web前置服务器去处理，对于后端来说可以不用去考虑ESI标签问题，例如当后端处理请求为java应用、php 应用时，可以统一把ESI处理放在前置服务器上，这样后端就只用处理请求，不必对每个应用做都去处理ESI工作。</p>
