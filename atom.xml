@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-11-01T01:41:05.835Z</updated>
+  <updated>2017-11-01T13:43:55.895Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,9 +20,16 @@
     <link href="http://yoursite.com/2017/11/01/hbase%E7%AE%80%E4%BB%8B/"/>
     <id>http://yoursite.com/2017/11/01/hbase简介/</id>
     <published>2017-11-01T01:38:49.000Z</published>
-    <updated>2017-11-01T01:41:05.835Z</updated>
+    <updated>2017-11-01T13:43:55.895Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="海量数据的黎明"><a href="#海量数据的黎明" class="headerlink" title="海量数据的黎明"></a>海量数据的黎明</h2><p>hadoop项目有两个模块：HDFS和MapReduce。Hadoop擅长存储任意的、半结构化数据，可以帮助用户分析数据时决定如何解释这些数据，同时允许用户随时更改数据分类的方式；一旦用户更新了算法，只需要重新分析数据。Hadoop是现有数据库的一个补充，提供了数据存储无限的空间，并且针对大文件存储、批量访问和流式访问做了优化。<br>列式存储数据库，以列为单位聚合数据，然后将列值顺序存入磁盘，而行式数据库则是连续存储整行。<br>1.优点是：查询时只有涉及到的列会被读取；投影(projection)很高效；任何列都能作为索引。缺点：选择完成时，被选择的列要重新组装；INSERT/UPDATE比较麻烦。<br>2.更好的进行数据压缩：通过字典表压缩数据。经过字典表进行数据压缩后，表中的字符串才都变成数字了，比如我们的材料名可以用一张材料表，这样子在列存储就可以根据id来关联材料。<br>3.查询性能<br>我们能根据列查询结果通过为运算（&amp;或者|）进行结果合并，加快速度<br>关键步骤如下：<br>1.去字典表里找到字符串对应数字(只进行一次字符串比较)。<br>2.用数字去列表里匹配，匹配上的位置设为1。<br>3.把不同列的匹配结果进行位运算得到符合所有条件的记录下标。<br>4.使用这个下标组装出最终的结果集。<br>Hbase以列式存储的格式存储数据，传统的列式存储比较适合实时存储数据的场景，Hbase比较适合键值对的数据存取或者有序的数据存取。</p>
+<h2 id="关系数据库系统的问题"><a href="#关系数据库系统的问题" class="headerlink" title="关系数据库系统的问题"></a>关系数据库系统的问题</h2><p>数据量大时，索引量也大到足以让数据库的性能直线下降。最后能够提供的查询也只剩下主键查询，最后的采取的方案就是数据分区，也就是分库分表。</p>
+<h2 id="非关系型数据库系统"><a href="#非关系型数据库系统" class="headerlink" title="非关系型数据库系统"></a>非关系型数据库系统</h2><h3 id="维度"><a href="#维度" class="headerlink" title="维度"></a>维度</h3><p>包括数据模型、存储模型、一致性模型、物理模型、读写性能、辅助索引、故障处理、压缩、负载均衡、原子操作的读修改写、加锁等待死锁</p>
+<h3 id="可扩展性"><a href="#可扩展性" class="headerlink" title="可扩展性"></a>可扩展性</h3><h3 id="数据库的范式和反范式"><a href="#数据库的范式和反范式" class="headerlink" title="数据库的范式和反范式"></a>数据库的范式和反范式</h3><h2 id="Hbase结构"><a href="#Hbase结构" class="headerlink" title="Hbase结构"></a>Hbase结构</h2><h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><h3 id="表、行、列和单元格"><a href="#表、行、列和单元格" class="headerlink" title="表、行、列和单元格"></a>表、行、列和单元格</h3>]]></content>
     
     <summary type="html">
+    
+      &lt;h2 id=&quot;海量数据的黎明&quot;&gt;&lt;a href=&quot;#海量数据的黎明&quot; class=&quot;headerlink&quot; title=&quot;海量数据的黎明&quot;&gt;&lt;/a&gt;海量数据的黎明&lt;/h2&gt;&lt;p&gt;hadoop项目有两个模块：HDFS和MapReduce。Hadoop擅长存储任意的、半结构化数据，
     
     </summary>
     
