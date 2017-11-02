@@ -2,9 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yoursite.com/2017/11/02/hbase-java-api/</loc>
+    
+    <lastmod>2017-11-02T08:30:46.474Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/2017/11/01/hbase%E7%AE%80%E4%BB%8B/</loc>
     
-    <lastmod>2017-11-01T16:31:29.886Z</lastmod>
+    <lastmod>2017-11-02T02:11:44.082Z</lastmod>
     
   </url>
   
