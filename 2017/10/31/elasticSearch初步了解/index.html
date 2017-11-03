@@ -92,17 +92,17 @@
 
 
 
-<meta name="description" content="elasticSearch简介1.基于Apache Lucene构建的开源搜索引擎2.基于java编写，提供简单易用的Resful API3.轻松的横向扩展，可支持PB级别的结构化和非结构化的数据处理 应用场景1.海量数据分析引擎2.站内搜索引擎3.数据仓库备注应用：github站内搜索、维基百科、百度实时日志监控 版本问题版本历史 1.x-&amp;gt;2.x-&amp;gt;5.x">
+<meta name="description" content="elasticSearch简介1.基于Apache Lucene构建的开源搜索引擎2.基于java编写，提供简单易用的Resful API3.轻松的横向扩展，可支持PB级别的结构化和非结构化的数据处理 应用场景1.海量数据分析引擎2.站内搜索引擎3.数据仓库备注应用：github站内搜索、维基百科、百度实时日志监控 版本问题版本历史 1.x-&amp;gt;2.x-&amp;gt;5.x 安装head插件安装el">
 <meta name="keywords" content="搜索引擎">
 <meta property="og:type" content="article">
 <meta property="og:title" content="elasticSearch入门">
 <meta property="og:url" content="http://yoursite.com/2017/10/31/elasticSearch初步了解/index.html">
 <meta property="og:site_name" content="博客">
-<meta property="og:description" content="elasticSearch简介1.基于Apache Lucene构建的开源搜索引擎2.基于java编写，提供简单易用的Resful API3.轻松的横向扩展，可支持PB级别的结构化和非结构化的数据处理 应用场景1.海量数据分析引擎2.站内搜索引擎3.数据仓库备注应用：github站内搜索、维基百科、百度实时日志监控 版本问题版本历史 1.x-&amp;gt;2.x-&amp;gt;5.x">
-<meta property="og:updated_time" content="2017-11-01T00:49:46.664Z">
+<meta property="og:description" content="elasticSearch简介1.基于Apache Lucene构建的开源搜索引擎2.基于java编写，提供简单易用的Resful API3.轻松的横向扩展，可支持PB级别的结构化和非结构化的数据处理 应用场景1.海量数据分析引擎2.站内搜索引擎3.数据仓库备注应用：github站内搜索、维基百科、百度实时日志监控 版本问题版本历史 1.x-&amp;gt;2.x-&amp;gt;5.x 安装head插件安装el">
+<meta property="og:updated_time" content="2017-11-02T16:09:33.816Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="elasticSearch入门">
-<meta name="twitter:description" content="elasticSearch简介1.基于Apache Lucene构建的开源搜索引擎2.基于java编写，提供简单易用的Resful API3.轻松的横向扩展，可支持PB级别的结构化和非结构化的数据处理 应用场景1.海量数据分析引擎2.站内搜索引擎3.数据仓库备注应用：github站内搜索、维基百科、百度实时日志监控 版本问题版本历史 1.x-&amp;gt;2.x-&amp;gt;5.x">
+<meta name="twitter:description" content="elasticSearch简介1.基于Apache Lucene构建的开源搜索引擎2.基于java编写，提供简单易用的Resful API3.轻松的横向扩展，可支持PB级别的结构化和非结构化的数据处理 应用场景1.海量数据分析引擎2.站内搜索引擎3.数据仓库备注应用：github站内搜索、维基百科、百度实时日志监控 版本问题版本历史 1.x-&amp;gt;2.x-&amp;gt;5.x 安装head插件安装el">
 
 
 
@@ -343,6 +343,15 @@
         <h2 id="elasticSearch简介"><a href="#elasticSearch简介" class="headerlink" title="elasticSearch简介"></a>elasticSearch简介</h2><p>1.基于Apache Lucene构建的开源搜索引擎<br>2.基于java编写，提供简单易用的Resful API<br>3.轻松的横向扩展，可支持PB级别的结构化和非结构化的数据处理</p>
 <h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><p>1.海量数据分析引擎<br>2.站内搜索引擎<br>3.数据仓库<br>备注应用：github站内搜索、维基百科、百度实时日志监控</p>
 <h2 id="版本问题"><a href="#版本问题" class="headerlink" title="版本问题"></a>版本问题</h2><p>版本历史 1.x-&gt;2.x-&gt;5.x</p>
+<h2 id="安装head插件"><a href="#安装head插件" class="headerlink" title="安装head插件"></a>安装head插件</h2><p>安装elasticsearch-head,github地址：<a href="https://github.com/mobz/elasticsearch-head.git，然后进行npm" target="_blank" rel="external">https://github.com/mobz/elasticsearch-head.git，然后进行npm</a> install，在启动head插件（npm run start），<a href="http://localhost:9100。" target="_blank" rel="external">http://localhost:9100。</a><br>同时更改elasticsearch.yml，新增以下内容支持跨域<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">http.cors.enabled: <span class="literal">true</span></div><div class="line">http.cors.allow-origin: <span class="string">"*"</span></div></pre></td></tr></table></figure></p>
+<h2 id="集群的搭建"><a href="#集群的搭建" class="headerlink" title="集群的搭建"></a>集群的搭建</h2><p>举个例子，三个节点<br>master节点配置如下，在elasticsearch.yml修改<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">cluster.name: lili</div><div class="line">node.name: master</div><div class="line">node.master: <span class="literal">true</span></div><div class="line">network.host: 127.0.0.1</div></pre></td></tr></table></figure></p>
+<p>slave节点的配置如下，在elasticsearch.yml修改<br>master节点配置如下，在elasticsearch.yml修改<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">cluster.name: lili</div><div class="line">node.name: slave1</div><div class="line">network.host: 127.0.0.1</div><div class="line">http.port: 8200</div><div class="line">discovery.zen.ping.unicast.hosts: [<span class="string">"127.0.0.1"</span>]</div></pre></td></tr></table></figure></p>
+<h2 id="集群和节点"><a href="#集群和节点" class="headerlink" title="集群和节点"></a>集群和节点</h2><p>集群有节点组成，每个集群有唯一的名字。 一个节点只是集群的一部分，节点通过集群名字加入集群</p>
+<h2 id="索引-database"><a href="#索引-database" class="headerlink" title="索引(database)"></a>索引(database)</h2><p>含有相同属性的文档集合</p>
+<h2 id="类型-table"><a href="#类型-table" class="headerlink" title="类型(table)"></a>类型(table)</h2><p>索引可以定义一个或者多个类型，文档必须属于一个类型</p>
+<h2 id="文档-row"><a href="#文档-row" class="headerlink" title="文档(row)"></a>文档(row)</h2><p>文档是可以被索引的基本数据单位</p>
+<h2 id="分片"><a href="#分片" class="headerlink" title="分片"></a>分片</h2><p>每个索引都有多个分片，每个分片是lucene索引</p>
+<h2 id="备份"><a href="#备份" class="headerlink" title="备份"></a>备份</h2><p>拷贝一份分片就完成了分片的备份<br>备注：es默认五个分片一个备份</p>
 
       
     </div>
@@ -533,7 +542,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#elasticSearch简介"><span class="nav-number">1.</span> <span class="nav-text">elasticSearch简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#应用场景"><span class="nav-number">2.</span> <span class="nav-text">应用场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#版本问题"><span class="nav-number">3.</span> <span class="nav-text">版本问题</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#elasticSearch简介"><span class="nav-number">1.</span> <span class="nav-text">elasticSearch简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#应用场景"><span class="nav-number">2.</span> <span class="nav-text">应用场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#版本问题"><span class="nav-number">3.</span> <span class="nav-text">版本问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装head插件"><span class="nav-number">4.</span> <span class="nav-text">安装head插件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#集群的搭建"><span class="nav-number">5.</span> <span class="nav-text">集群的搭建</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#集群和节点"><span class="nav-number">6.</span> <span class="nav-text">集群和节点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#索引-database"><span class="nav-number">7.</span> <span class="nav-text">索引(database)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#类型-table"><span class="nav-number">8.</span> <span class="nav-text">类型(table)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文档-row"><span class="nav-number">9.</span> <span class="nav-text">文档(row)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分片"><span class="nav-number">10.</span> <span class="nav-text">分片</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#备份"><span class="nav-number">11.</span> <span class="nav-text">备份</span></a></li></ol></div>
             
 
           </div>
