@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-11-03T15:19:39.327Z</updated>
+  <updated>2017-11-04T02:29:11.481Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,20 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>hbase高级特性</title>
+    <link href="http://yoursite.com/2017/11/04/hbase%E9%AB%98%E7%BA%A7%E7%89%B9%E6%80%A7/"/>
+    <id>http://yoursite.com/2017/11/04/hbase高级特性/</id>
+    <published>2017-11-04T02:29:11.000Z</published>
+    <updated>2017-11-04T02:29:11.481Z</updated>
+    
+    <summary type="html">
+    
+    </summary>
+    
+    
+  </entry>
   
   <entry>
     <title>hbase java api</title>
@@ -121,7 +135,7 @@
     <link href="http://yoursite.com/2017/10/29/%E6%9E%84%E5%BB%BA%E5%A4%A7%E5%9E%8B%E7%BD%91%E7%AB%99%E7%9A%84%E5%85%B6%E4%BB%96%E8%A6%81%E7%B4%A0/"/>
     <id>http://yoursite.com/2017/10/29/构建大型网站的其他要素/</id>
     <published>2017-10-29T05:25:33.000Z</published>
-    <updated>2017-11-01T14:22:18.862Z</updated>
+    <updated>2017-11-01T14:22:18.863Z</updated>
     
     <content type="html"><![CDATA[<h2 id="加速静态内容访问的速度的CDN"><a href="#加速静态内容访问的速度的CDN" class="headerlink" title="加速静态内容访问的速度的CDN"></a>加速静态内容访问的速度的CDN</h2><p>CDN，Content Delivery Network，内容分发网络。CDN的作用是把用户需要的内容分发到离用户近的地方，这样可以从用户能就近获取所需的内容。整个CDN系统分为CDN源站和CDN节点。CDN源站提供CDN节点使用的数据源头，CDN节点部署在离最终用户比较近的地方，加速用户对站点的访问。CDN就是网络缓存技术，一般存放静态文件（js，css，图片，视频，页面框架）。<br>浏览器访问网站的顺序：<br>1.用户提交要访问的域名地址；<br>2.浏览器对域名进行解析，获取ip地址；<br>3.浏览器向所得到的ip发送请求；<br>4.浏览器根据返回的内容显示数据<br>有了CDN后的顺序：<br>1.用户提交要访问的域名地址；<br>2.浏览器对域名进行解析，由于CDN对域名解析过程做了调整，所以得到该域名对应的CNAME记录。<br>3.对CNAME进行解析得到实际的ip地址。在这次解析中会使用全局负载均衡CDN解析，需要我们根据地理位置以及所在的ISP确定结果，然后获取到具体的IP地址。<br>4.得到实际的ip地址后，我们会向服务器发送请求。<br>5.CDN会根据请求的内容是否在本地缓存进行不同的处理。<br>如果存在，直接返回结果；不存在，则请求CDN源站，获取内容，返回结果。<br>CDN关键的技术：<br>1.全局调度<br>全局调度是完成用户就近访问的第一步，我们需要根据用户地域、接入运营商、以及CDN机房的负载情况去调度。<br>2.缓存技术<br>如果请求不存在CDN节点，则请求CDN源站，获取内容，返回结果。如果命中率不高，加速有限。要提升命中率，首先缓存的容量要足够大，可以使用内存+SSD+硬盘混合存储。还有新增变更数据预加载也能提升命中<br>3.内容分发<br>内容分发主要包括在CDN上不用回源的数据的管理和分发，主要包括静态页面。<br>4.带宽优化<br>只返回必要数据和使用更好的压缩算法</p>
 <h2 id="大型网站的存储支持"><a href="#大型网站的存储支持" class="headerlink" title="大型网站的存储支持"></a>大型网站的存储支持</h2><h3 id="分布式文件系统"><a href="#分布式文件系统" class="headerlink" title="分布式文件系统"></a>分布式文件系统</h3><p>对一些图片、大文本的存储使用数据库就不合适了。GFS主要由三部分构成：GFS Client、GFS Master、GFS chunkserver</p>
@@ -167,7 +181,7 @@
     <link href="http://yoursite.com/2017/10/27/%E8%BD%AF%E8%B4%9F%E8%BD%BD%E4%B8%AD%E5%BF%83%E4%B8%8E%E9%9B%86%E4%B8%AD%E9%85%8D%E7%BD%AE%E7%AE%A1%E7%90%86/"/>
     <id>http://yoursite.com/2017/10/27/软负载中心与集中配置管理/</id>
     <published>2017-10-27T07:39:30.000Z</published>
-    <updated>2017-11-01T01:45:54.593Z</updated>
+    <updated>2017-11-01T01:45:54.594Z</updated>
     
     <content type="html"><![CDATA[<h2 id="初始软负载中心"><a href="#初始软负载中心" class="headerlink" title="初始软负载中心"></a>初始软负载中心</h2><p>在服务框架，服务查找中心就是软负载中心；而在消息中间件中消息发送者以及消息消费者对于消息中间件的感知也是通过软负载中心。<br>软负载中心有两个最基本的职能：<br>1.聚合地址信息；无论是服务框架中需要用到的服务提供者地址还是消息中间件系统中的消息中间件地址，都需要由软负载中心去聚合地址列表，形成一个可供服务调用者及消息发送者、接收者接收的列表。<br>2.生命周期感知；软件负载中心能够对服务上下线自动感知，并且根据这个变化去更新服务地址数据，形成新的地址列表后，把数据传给需要数据的调用者或者消息的发送者和接收者。</p>
 <h2 id="软负载中心的结构"><a href="#软负载中心的结构" class="headerlink" title="软负载中心的结构"></a>软负载中心的结构</h2><p>软负载中心包括：一个是软负载中心的服务端，另一个是软负载中心的客户端；服务端主要负责感知提供服务的机器是否在线，聚合提供者的机器信息，并且负责把数据传给使用数据的应用。客户端承载了两个角色，作为服务提供者，客户端主要是把服务提供者提供服务的具体信息主动传给服务端，并且随着提供服务的变化去更新数据；而作为服务使用者，客户端主要向服务端告知自己所需要的数据，并负责去更新数据，还要进行本地缓存，使得每次去请求服务来获取列表都是一个本地操作。<br>软件负载中心内部有三部分重要数据<br>1.聚合数据<br>聚合后的地址列表。对于提供的服务信息，我们使用唯一的dataId来标识，同时dataId支持分组（group），通过dataId和group可以定位到唯一的数据内容，这个内容是通过聚合完成的完整数据，而这个信息在内部就是一个key-value结构。<br>2.订阅关系<br>在软负载中心中，需要数据的应用把自己需要的数据告诉软负载中心，这就是订阅关系，订阅的粒度也是通过dataId和group来确定数据，那么会有dataId和group到数据订阅者的分组ID的一个映射关系，当聚合的数据发生变化，通过订阅关系的数据找到需要通知的数据订阅者，然后去进行数据更新操作。<br>3.连接关系<br>连接到软负载中心的节点和软负载中心已经建立的连接管理。使用软负载中心的应用，无论是发布数据还是订阅数据，都会有一个独立的分组，而连接数据就是用groupId作为key，然后对应管理这个物理连接，采用的是长连接方式。当订阅的数据发生变化，通过订阅关系找到需要通知的groupId，在连接数据这里就能够找到对应的连接，完成对应用的更新。</p>
@@ -301,7 +315,7 @@
     <link href="http://yoursite.com/2017/10/21/%E6%9C%8D%E5%8A%A1%E6%A1%86%E6%9E%B6/"/>
     <id>http://yoursite.com/2017/10/21/服务框架/</id>
     <published>2017-10-21T11:56:11.000Z</published>
-    <updated>2017-11-01T01:45:33.977Z</updated>
+    <updated>2017-11-01T01:45:33.978Z</updated>
     
     <content type="html"><![CDATA[<h2 id="网站功能持续丰富后的困境与应对"><a href="#网站功能持续丰富后的困境与应对" class="headerlink" title="网站功能持续丰富后的困境与应对"></a>网站功能持续丰富后的困境与应对</h2><p>网站的功能主要集中在几个大应用上，而且这些应用都直接访问底层的服务，例如数据库、缓存、搜索引擎、分布式存储。随着网站规模扩大，开发人的增多，每个应用变得复杂、臃肿。</p>
 <h3 id="把应用拆小"><a href="#把应用拆小" class="headerlink" title="把应用拆小"></a>把应用拆小</h3><p>把庞大的应用拆成多个。这样的好处是相对较快的完成，但是仍然存在一些问题。一方面是数据库的连接数的压力还在，其次是代码的重复问题。</p>
@@ -359,7 +373,7 @@
     <link href="http://yoursite.com/2017/10/19/%E6%9E%84%E5%BB%BAjava%E4%B8%AD%E9%97%B4%E4%BB%B6/"/>
     <id>http://yoursite.com/2017/10/19/构建java中间件/</id>
     <published>2017-10-19T02:59:08.000Z</published>
-    <updated>2017-11-01T01:45:50.247Z</updated>
+    <updated>2017-11-01T01:45:50.248Z</updated>
     
     <content type="html"><![CDATA[<h2 id="java中间件的定义"><a href="#java中间件的定义" class="headerlink" title="java中间件的定义"></a>java中间件的定义</h2><p>基于java基础构建的中间件。中间件为软件应用提供操作系统所提供的服务之外的服务，中间件不是操作系统的一部分，不是数据库管理的一部分，不是软件应用的一部分，而是能够让软件开发者更方便的处理通信、输入、输出，能够专注在他们自己应用的部分。总体来说，中间件不是最上层应用，也不是最底层的操作系统，是处于中间的组件，起到桥梁的作用，是应用和应用之间，应用和服务之间的桥梁。<br>主要有三个领域的中间件：</p>
 <h3 id="远程对象调用和对象访问中间件"><a href="#远程对象调用和对象访问中间件" class="headerlink" title="远程对象调用和对象访问中间件"></a>远程对象调用和对象访问中间件</h3><p>解决分布式的应用互相访问的问题</p>
@@ -414,7 +428,7 @@
     <link href="http://yoursite.com/2017/10/17/%E5%A4%A7%E5%9E%8B%E8%BD%AF%E4%BB%B6%E6%9E%B6%E6%9E%84%E5%8F%8A%E5%85%B6%E7%BB%93%E6%9E%84%E6%BC%94%E8%BF%9B%E8%BF%87%E7%A8%8B/"/>
     <id>http://yoursite.com/2017/10/17/大型软件架构及其结构演进过程/</id>
     <published>2017-10-17T09:25:39.000Z</published>
-    <updated>2017-11-01T01:06:48.194Z</updated>
+    <updated>2017-11-01T01:06:48.195Z</updated>
     
     <content type="html"><![CDATA[<h1 id="什么是大型网站"><a href="#什么是大型网站" class="headerlink" title="什么是大型网站"></a>什么是大型网站</h1><p>访问量和数据量二者缺一不可，本身的业务和系统的复杂度也缺一不可。海量的数据和高并发的访问量，它肯定是个分布式系统</p>
 <h1 id="大型网站的架构演进"><a href="#大型网站的架构演进" class="headerlink" title="大型网站的架构演进"></a>大型网站的架构演进</h1><h2 id="用java技术和单机来构建网站"><a href="#用java技术和单机来构建网站" class="headerlink" title="用java技术和单机来构建网站"></a>用java技术和单机来构建网站</h2><p>选择一个开源的server作为容器，使用一些JSP/servlet技术或者开源框架构建我们的应用，选择一个数据库管理系统来管理数据，通过jdbc进行数据库的连接和操作。</p>
@@ -509,7 +523,7 @@
     <link href="http://yoursite.com/2017/06/29/%E4%BA%91%E5%8F%96%E8%AF%81%E7%AC%AC%E5%85%AB%E5%91%A8%E5%91%A8%E6%8A%A5/"/>
     <id>http://yoursite.com/2017/06/29/云取证第八周周报/</id>
     <published>2017-06-29T11:54:42.000Z</published>
-    <updated>2017-07-05T14:57:11.842Z</updated>
+    <updated>2017-07-05T14:57:11.843Z</updated>
     
     <content type="html"><![CDATA[<p>本周主要阅读了云证据收集的一些文章。下面谈谈对这些论文的理解。<br>首先是Acquiring forensic evidence from infrastructure-as-a-service cloud。文章分这么个层次来阐述：1.创建一个模型来显示云中所需的信任层次。2.显示云测试的总体上下文；3.提供了包括Guidance EnCase和AccesData Forensic Toolkit在内的流行取证获取工具。<br>云计算使取证不同，特别是考虑到证据的远程性质，缺乏实体访问权限以及完整性和真实性所需的信任。虽然取证检查员的目标与以前相同，但非传统困难的问题包括：远程数据的取证知识获取，大量传播，分布式数据，监管链和数据所有权。检获和获取数字文物是取证进程的初步步骤。存在两种可能的情况：远程调查员可以从源头自己收集取证证据，或者提供者可以提供证据。每个场景需要对所返回数据的不同程度的信任。此外，每种情况都使用不同的技术实现来恢复数据。主要工作有亚马逊弹性计算云（EC2）在公共云中执行持续和非持久性数据收集的现有工具的三个实验结果。对于使用客户机操作系统的数据采集不够信任的情况，分析基础设施堆栈较低级别的取证方法。演示如何使用虚拟机内省来注入远程取证代理进行远程采集。用不受信任的管理程序探索取证数据采集的四个策略。<table><tr><td>Layer</td><td>Cloud layer</td><td>Acquisition method</td><td>Trust required</td></tr><br>    <tr><td>6</td><td>Guest application/data</td><td>Depends on data</td><td>Guest operating system (OS), hypervisor, host OS, hardware, network</td></tr>  <tr><td>5</td><td>Guest OS</td><td>Remote forensic software</td><td>Guest OS, hypervisor, host OS, hardware, network</td></tr><tr><td>4</td><td>Virtualization</td><td>Introspection</td><td>Hypervisor, host OS, hardware, network</td></tr><tr><td>3</td><td>Access virtual disk</td><td>Access virtual disk</td><td>Host OS, hardware, network</td></tr><tr><td>2</td><td>Physical hardware</td><td>Access physical disk</td><td>Hardware, network</td></tr><tr><td>1</td><td>Network</td><td>Packet capture </td><td>Network</td></tr></table><br>  在IaaS中，尽管没有物理访问，消费者仍保留对第5层（访客操作系统）和6（访客应用程序）的管理控制权。此外，各层次的取证行为将不同。每一层需要不同的信任，即该层是安全和信任的;堆栈越远，累积的信任就越少。在公共云中，所有层都需要提供商的一些信任，特别是对恶意内部人员的信任。防伪策略，病毒检测器应在多层次上检查证据。调查人员可以选择云层的哪一层进行取证处理。关于这一决定的考虑首先围绕在该级别进行取证的技术能力，再次对所返回数据的信任。该层还影响可用于收集的哪些类型的取证数据，例如第1层（网络）上的数据包捕获，第2层物理文件（物理硬件）或第3层（主机操作系统）上的虚拟文件。对于每种数据类型，数据必须遵守严格的监管链，并且必须包括完整性检查机制。云计算引入了一个强大的新选项：虚拟机快照。利用虚拟化的许多云实现可以拍摄正在运行的计算机的快照，然后像现在一样将该快照恢复并运行。这提供了创造历史记录的能力，以及事后做“活”取证。</p>
 <p>  接下来就是实验。能够远程获取aharddrive和内存映像。分析EnCase Forensic和FTK Investigator中的这些映像分别正确显示了活动的时间表，包括安装Apache和网页创建和删除。分析显示虚拟环境的异常现象，也没有任何明显的异议，引起对数据完整性的怀疑。采集过程的速度受到我们学习如何使用远程代理和网络带宽传输数据的限制。每个EnCase和FTK大约12小时，使用我们大学的OC-12连接传输30 GB磁盘映像和2 GB内存映像。实验2成功地形成了驱动器的完整图像和正确的时间线。 VM内省是取证学的强大工具，允许人的实时调查，而不会显露调查人员的存在。然而，内省是云服务提供商必须实施的一个特殊功能。这是我们能够验证图像完整性的唯一实验，因为我们可以访问物理磁盘，并且可以比较EnCase映像和原始磁盘的散列值。实验3中的AWS导出过程也成功地返回了驱动器的完整映像。我们能够将驱动器加载到EnCase和FTK中，没有任何困难，并验证了驱动器的内容。这种方法的另外一个好处是，AWS会为导出的每个文件生成一个具有元数据的日志报告。此报告包含以下每个文件：传输的日期和时间，存储设备上的位置，MD5校验和和字节数。使用快速运输，花了五天时间收到我们的数据，费用为125美元。我们设想这个过程将会严格地模仿AWS在遵守搜索令或传票时所采取的步骤。 EnCase和FTK最容易使用。尽管使用远程功能需要安装和学习时间，但工具的功能是熟悉且易于执行的。检索磁盘映像所需的12小时时间远远少于此数据卷的AWS导出过程所需的120小时。下载数据平均每小时2.5 GB。 AWSExport花了4小时加载了我们的数据，而剩下的116小时在运输过程中花费了时间。按照这些速率，最有效的选择是导出过程，当超过240 GB的数据将被检索。</p>
@@ -563,7 +577,7 @@
     <link href="http://yoursite.com/2017/06/29/%E4%BA%91%E5%8F%96%E8%AF%81%E7%AC%AC%E5%85%AD%E5%91%A8%E5%91%A8%E6%8A%A5/"/>
     <id>http://yoursite.com/2017/06/29/云取证第六周周报/</id>
     <published>2017-06-29T04:44:53.000Z</published>
-    <updated>2017-06-29T09:03:59.109Z</updated>
+    <updated>2017-06-29T09:03:59.110Z</updated>
     
     <content type="html"><![CDATA[<p>本周主要的工作有，对云取证数据定位及数据起源文章进行了一些阅读。</p>
 <p>首先谈谈对Collecting Provenance via the Xen Hypervisor。本文主要讲述对paas的改进。首先paas是通过在Linux内核中拦截系统调用，并从存储在文件系统的源文件来收集系统级别的来源。虽然这种方法是有效的，但是它具有两个显着的缺点：内核的每个新版本都需要重新整合PASS变化，其稳定性必须不断测试; 同样，使用可堆叠的文件系统使得很难在根卷上收集来源，特别是在早期引导过程中。所通过以Xen虚拟机管理程序运行的虚拟客户机收集系统级别来源的方法可以有效解决这两个缺点。</p>
@@ -615,7 +629,7 @@
     <link href="http://yoursite.com/2017/06/11/%E4%BA%91%E5%8F%96%E8%AF%81%E7%AC%AC%E5%9B%9B%E5%91%A8%E5%91%A8%E6%8A%A5/"/>
     <id>http://yoursite.com/2017/06/11/云取证第四周周报/</id>
     <published>2017-06-11T12:10:43.000Z</published>
-    <updated>2017-06-11T12:47:26.878Z</updated>
+    <updated>2017-06-11T12:47:26.879Z</updated>
     
     <content type="html"><![CDATA[<p>本周我主要做的工作有，将云取证收集文章看了一些，印象深刻的是Cloud application logging for forensics，即用于取证的云应用程序日志记录。这篇文章重点从日志的重要性、云的日志分析和取证相关的挑战、日志重点的记录方向以及日志的一些标准等这些方面论述。</p>
 <p>首先是关于日志在云取证的重要性。日志是基于云的服务基础设施中最重要的分析数据之一。在任何时候，服务所有者和运营商都需要了解每个基础架构组件的状态，以进行故障监控，评估功能使用情况和监控业务流程。软件开发生命周期，用例按以下顺序：调试和取证、故障监控、故障排除、功能使用、绩效监测、安全/事件检测。监管和标准合规性这些用例都可以利用日志分析来完全解决或至少帮助大大加快和简化用例的解决方案。</p>
@@ -641,7 +655,7 @@
     <link href="http://yoursite.com/2017/06/04/%E4%BA%91%E5%8F%96%E8%AF%81%E7%AC%AC%E4%B8%89%E5%91%A8%E5%91%A8%E6%8A%A5/"/>
     <id>http://yoursite.com/2017/06/04/云取证第三周周报/</id>
     <published>2017-06-04T12:44:36.000Z</published>
-    <updated>2017-06-13T08:07:42.693Z</updated>
+    <updated>2017-06-13T08:07:42.694Z</updated>
     
     <content type="html"><![CDATA[<p>本周我主要做的工作有，对云取证综述文章以及一些分析文章看了一些。接下来谈谈阅读Impact of Cloud Computing on Traditional Digital Forensic Investigations 的理解。</p>
 <p>文章首先提出云取证的困难在于因为多个客户的日志记录和数据可能位于同一位置，也可能分布在不断变化的主机和数据中心集合中。如果有没有合同承诺支持具体形式的调查，那么调查和发现请求可能是不可能的。数字证据本身就非常脆弱。不正确的处理或检查可能会更改，损坏或毁坏。为此，必须采取预防措施来记录，收集，保存和检查此类证据。<strong>而在这点上我的一个想法是，能不能比如根据取得的证据例如云环境日志来复现操作顺序来达到重现犯罪现场进行案情重组的过程。比如说在初始环境1，经过若干步操作，变成环境2，环境2通过逆向操作，恢复成还原环境1，在还原过程中，其实也是对云攻击过程的一个模拟复原。当然这一切的假设都是建立在该云服务的的操作是可逆的。而在还原过程中，有利于对云攻击进行分析。</strong></p>
@@ -694,7 +708,7 @@
     <link href="http://yoursite.com/2017/04/25/%E4%BA%91%E5%8F%96%E8%AF%81%E7%AC%AC%E4%B8%80%E5%91%A8%E5%91%A8%E6%8A%A5/"/>
     <id>http://yoursite.com/2017/04/25/云取证第一周周报/</id>
     <published>2017-04-25T02:33:03.000Z</published>
-    <updated>2017-05-31T11:59:00.747Z</updated>
+    <updated>2017-05-31T11:59:00.748Z</updated>
     
     <content type="html"><![CDATA[<p>本周我主要做的工作有，上网查询有关于云计算方面的知识点、云安全的相关知识点以及云取证的一些概念。</p>
 <p>首先是对于云计算的一些见解，定义就是，云计算是基于互联网的相关服务的增加、使用和交付模式，通常涉及通过互联网来提供动态易扩展且经常是虚拟化的资源。特点是通过使计算分布在大量的分布式计算机上，而非本地计算机或远程服务器中，企业数据中心的运行将与互联网更相似。这使得企业能够将资源切换到需要的应用上，根据需求访问计算机和存储系统。从我个人角度出发，我认为云这个概念其实就是任何可以通过互联网访问的服务。而这个服务往往通过分布式计算机来协助完成。</p>
@@ -713,30 +727,6 @@
     
     
       <category term="云取证" scheme="http://yoursite.com/tags/%E4%BA%91%E5%8F%96%E8%AF%81/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>约瑟夫问题</title>
-    <link href="http://yoursite.com/2017/04/05/%E7%BA%A6%E7%91%9F%E5%A4%AB%E9%97%AE%E9%A2%98/"/>
-    <id>http://yoursite.com/2017/04/05/约瑟夫问题/</id>
-    <published>2017-04-05T04:46:56.000Z</published>
-    <updated>2017-05-31T11:51:31.863Z</updated>
-    
-    <content type="html"><![CDATA[<h3 id="问题：0-1-…-n-1-这-n-个数字排成一个圈圈，从数字-0-开始每次从圆圏里删除第-m-个数字。求出这个圈圈里剩下的最后一个数字。"><a href="#问题：0-1-…-n-1-这-n-个数字排成一个圈圈，从数字-0-开始每次从圆圏里删除第-m-个数字。求出这个圈圈里剩下的最后一个数字。" class="headerlink" title="问题：0, 1, … , n-1 这 n 个数字排成一个圈圈，从数字 0 开始每次从圆圏里删除第 m 个数字。求出这个圈圈里剩下的最后一个数字。"></a>问题：0, 1, … , n-1 这 n 个数字排成一个圈圈，从数字 0 开始每次从圆圏里删除第 m 个数字。求出这个圈圈里剩下的最后一个数字。</h3><h4 id="解法一，通过一个list存储现有节点，然后记录一个删除位置变量存上一次删除的位置，经过移动变量往后m-1次即可到删除节点，然后通过list删除该节点，将删除位置变量更新"><a href="#解法一，通过一个list存储现有节点，然后记录一个删除位置变量存上一次删除的位置，经过移动变量往后m-1次即可到删除节点，然后通过list删除该节点，将删除位置变量更新" class="headerlink" title="解法一，通过一个list存储现有节点，然后记录一个删除位置变量存上一次删除的位置，经过移动变量往后m-1次即可到删除节点，然后通过list删除该节点，将删除位置变量更新"></a>解法一，通过一个list存储现有节点，然后记录一个删除位置变量存上一次删除的位置，经过移动变量往后m-1次即可到删除节点，然后通过list删除该节点，将删除位置变量更新</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">public static int lastRemaining(int n, int m) &#123;</div><div class="line">    <span class="keyword">if</span> (n &lt; 1 || m &lt; 1) &#123;</div><div class="line">        <span class="built_in">return</span> -1;</div><div class="line">    &#125;</div><div class="line">    List&lt;Integer&gt; list = new LinkedList&lt;&gt;();</div><div class="line">    <span class="keyword">for</span> (int i = 0; i &lt; n; i++) &#123;</div><div class="line">        list.add(i);</div><div class="line">    &#125;</div><div class="line">    // 要删除元素的位置</div><div class="line">    int idx = 0;</div><div class="line">    // 开始计数的位置</div><div class="line">    int start = 0;</div><div class="line">    <span class="keyword">while</span> (list.size() &gt; 1) &#123;</div><div class="line">        // 只要移动m-1次就可以移动到下一个要删除的元素上</div><div class="line">        <span class="keyword">for</span> (int i = 1; i &lt; m; i++) &#123;</div><div class="line">            idx = (idx + 1) % list.size(); // 【A】</div><div class="line">        &#125;</div><div class="line">        list.remove(idx);</div><div class="line">        // 确保idx指向每一轮的第一个位置</div><div class="line">        // 下面的可以不用，【A】已经可以保证其正确性了，可以分析n=6，m=6的第一次删除情况</div><div class="line">    //  <span class="keyword">if</span> (idx == list.size()) &#123;</div><div class="line">    //      idx = 0;</div><div class="line">    //  &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="built_in">return</span> list.get(0);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h4 id="解法二：通过数学的思路-我们假设我们每次删除完一个数字后，剩下的数字都要进行重新编号，他们的映射关系为f-那么我们假设他的逆向映射关系为f-。首先我们知道最后一定只剩下一个数字重新编号0，所以根据倒推规律，我们只需要做n-1次逆向映射即可推出原来该位置的映射关系。接下来是我们找寻逆向映射规律。"><a href="#解法二：通过数学的思路-我们假设我们每次删除完一个数字后，剩下的数字都要进行重新编号，他们的映射关系为f-那么我们假设他的逆向映射关系为f-。首先我们知道最后一定只剩下一个数字重新编号0，所以根据倒推规律，我们只需要做n-1次逆向映射即可推出原来该位置的映射关系。接下来是我们找寻逆向映射规律。" class="headerlink" title="解法二：通过数学的思路, 我们假设我们每次删除完一个数字后，剩下的数字都要进行重新编号，他们的映射关系为f,那么我们假设他的逆向映射关系为f`。首先我们知道最后一定只剩下一个数字重新编号0，所以根据倒推规律，我们只需要做n-1次逆向映射即可推出原来该位置的映射关系。接下来是我们找寻逆向映射规律。"></a>解法二：通过数学的思路, 我们假设我们每次删除完一个数字后，剩下的数字都要进行重新编号，他们的映射关系为f,那么我们假设他的逆向映射关系为f`。首先我们知道最后一定只剩下一个数字重新编号0，所以根据倒推规律，我们只需要做n-1次逆向映射即可推出原来该位置的映射关系。接下来是我们找寻逆向映射规律。</h4><p>首先我们定义一个关于 n 和 m 的方程时，表示每次在 n 个数字 0，1， … ，n-1中每次删除第 m 个数字最后剩下的数字。</p>
-<p>在这 n个数字中， 第一个被删除的数字是(m-1)%n。为了简单起见，我们把(m- 1)%n 记为 k，那么删除k之后剩下的 n-1 个数字为 0，1，… ，k-1，k+1，… ，n-1，并且下一次删除从数字 k+1 开始计数。相当于在剩下的序列中， k+1 排在最前面，从而形成 k+1，… ，n- 1，0，I，… ，k-1 。该序列最后剩下的数字也应该是关于 n 和 m 的函数。由于这个序列的规律和前面最初的序列不一样（最初的序列是从 0 开始的连续序列），因此该函数不同于前面的函数，记为 f’(n-1,m)。最初序列最后剩下的数字 f(n, m）一定是删除一个数字之后的序列最后剩下的数字，即 f(n, m)=f’(n-1, m）。</p>
-<p>接下来我们把剩下的这 n-1 个数字的序列 k-1， …，n-1，0，1，… ，k-1 做一个映射，映射的结果是形成一个从 0 到 n-2 的序列：<br><img src="http://wiki.jikexueyuan.com/project/for-offer/images/63.png" alt=""> 　　<br> <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">public static int lastRemaining2(int n, int m) &#123;</div><div class="line">     <span class="keyword">if</span> (n &lt; 1 || m &lt; 1) &#123;</div><div class="line">         <span class="built_in">return</span> -1;</div><div class="line">     &#125;</div><div class="line">     int last = 0;</div><div class="line">     <span class="keyword">for</span> (int i = 2; i &lt;=n ; i++) &#123;</div><div class="line">         last = (last + m)%i;</div><div class="line">     &#125;</div><div class="line">     <span class="built_in">return</span> last;</div><div class="line"> &#125;</div></pre></td></tr></table></figure></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h3 id=&quot;问题：0-1-…-n-1-这-n-个数字排成一个圈圈，从数字-0-开始每次从圆圏里删除第-m-个数字。求出这个圈圈里剩下的最后一个数字。&quot;&gt;&lt;a href=&quot;#问题：0-1-…-n-1-这-n-个数字排成一个圈圈，从数字-0-开始每次从圆圏里删除第-m-个数字。求
-    
-    </summary>
-    
-    
-      <category term="算法" scheme="http://yoursite.com/tags/%E7%AE%97%E6%B3%95/"/>
     
   </entry>
   
