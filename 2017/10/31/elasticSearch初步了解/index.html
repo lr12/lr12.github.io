@@ -99,7 +99,7 @@
 <meta property="og:url" content="http://yoursite.com/2017/10/31/elasticSearch初步了解/index.html">
 <meta property="og:site_name" content="博客">
 <meta property="og:description" content="elasticSearch简介1.基于Apache Lucene构建的开源搜索引擎2.基于java编写，提供简单易用的Resful API3.轻松的横向扩展，可支持PB级别的结构化和非结构化的数据处理 应用场景1.海量数据分析引擎2.站内搜索引擎3.数据仓库备注应用：github站内搜索、维基百科、百度实时日志监控 版本问题版本历史 1.x-&amp;gt;2.x-&amp;gt;5.x 安装head插件安装el">
-<meta property="og:updated_time" content="2017-11-06T13:20:50.443Z">
+<meta property="og:updated_time" content="2017-11-06T13:23:16.152Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="elasticSearch入门">
 <meta name="twitter:description" content="elasticSearch简介1.基于Apache Lucene构建的开源搜索引擎2.基于java编写，提供简单易用的Resful API3.轻松的横向扩展，可支持PB级别的结构化和非结构化的数据处理 应用场景1.海量数据分析引擎2.站内搜索引擎3.数据仓库备注应用：github站内搜索、维基百科、百度实时日志监控 版本问题版本历史 1.x-&amp;gt;2.x-&amp;gt;5.x 安装head插件安装el">
@@ -347,12 +347,12 @@
 <h2 id="集群的搭建"><a href="#集群的搭建" class="headerlink" title="集群的搭建"></a>集群的搭建</h2><p>举个例子，三个节点<br>master节点配置如下，在elasticsearch.yml修改<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">cluster.name: lili</div><div class="line">node.name: master</div><div class="line">node.master: <span class="literal">true</span></div><div class="line">network.host: 127.0.0.1</div></pre></td></tr></table></figure></p>
 <p>slave节点的配置如下，在elasticsearch.yml修改<br>master节点配置如下，在elasticsearch.yml修改<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">cluster.name: lili</div><div class="line">node.name: slave1</div><div class="line">network.host: 127.0.0.1</div><div class="line">http.port: 8200</div><div class="line">discovery.zen.ping.unicast.hosts: [<span class="string">"127.0.0.1"</span>]</div></pre></td></tr></table></figure></p>
 <h2 id="集群和节点"><a href="#集群和节点" class="headerlink" title="集群和节点"></a>集群和节点</h2><p>集群有节点组成，每个集群有唯一的名字。 一个节点只是集群的一部分，节点通过集群名字加入集群</p>
-<h2 id="索引-database"><a href="#索引-database" class="headerlink" title="索引(database)"></a>索引(database)</h2><p>含有相同属性的文档集合</p>
-<h2 id="类型-table"><a href="#类型-table" class="headerlink" title="类型(table)"></a>类型(table)</h2><p>索引可以定义一个或者多个类型，文档必须属于一个类型</p>
-<h2 id="文档-row"><a href="#文档-row" class="headerlink" title="文档(row)"></a>文档(row)</h2><p>文档是可以被索引的基本数据单位</p>
-<h2 id="分片"><a href="#分片" class="headerlink" title="分片"></a>分片</h2><p>每个索引都有多个分片，每个分片是lucene索引</p>
-<h2 id="备份"><a href="#备份" class="headerlink" title="备份"></a>备份</h2><p>拷贝一份分片就完成了分片的备份<br>备注：es默认五个分片一个备份</p>
-<h2 id="es的基本用法"><a href="#es的基本用法" class="headerlink" title="es的基本用法"></a>es的基本用法</h2><ul>
+<ul>
+<li>索引(database)<br>含有相同属性的文档集合</li>
+<li>类型(table)<br>索引可以定义一个或者多个类型，文档必须属于一个类型</li>
+<li>文档(row)<br>文档是可以被索引的基本数据单位</li>
+<li>分片<br>每个索引都有多个分片，每个分片是lucene索引</li>
+<li>备份<br>拷贝一份分片就完成了分片的备份<br>备注：es默认五个分片一个备份<h2 id="es的基本用法"><a href="#es的基本用法" class="headerlink" title="es的基本用法"></a>es的基本用法</h2></li>
 <li>api的基本格式：http://<ip>:<port>/&lt;索引&gt;/&lt;类型&gt;/&lt;文档id&gt;</port></ip></li>
 <li>常用的动词有：GET/PUT/POST/DELETE<br>在head插件创建索引<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  <span class="string">"novel"</span>: &#123;</div><div class="line">    <span class="string">"properties"</span>: &#123;</div><div class="line">      <span class="string">"title"</span>: &#123;</div><div class="line">        <span class="string">"type"</span>: <span class="string">"text"</span></div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 </li>
@@ -548,7 +548,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#elasticSearch简介"><span class="nav-number">1.</span> <span class="nav-text">elasticSearch简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#应用场景"><span class="nav-number">2.</span> <span class="nav-text">应用场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#版本问题"><span class="nav-number">3.</span> <span class="nav-text">版本问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装head插件"><span class="nav-number">4.</span> <span class="nav-text">安装head插件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#集群的搭建"><span class="nav-number">5.</span> <span class="nav-text">集群的搭建</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#集群和节点"><span class="nav-number">6.</span> <span class="nav-text">集群和节点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#索引-database"><span class="nav-number">7.</span> <span class="nav-text">索引(database)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#类型-table"><span class="nav-number">8.</span> <span class="nav-text">类型(table)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文档-row"><span class="nav-number">9.</span> <span class="nav-text">文档(row)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分片"><span class="nav-number">10.</span> <span class="nav-text">分片</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#备份"><span class="nav-number">11.</span> <span class="nav-text">备份</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#es的基本用法"><span class="nav-number">12.</span> <span class="nav-text">es的基本用法</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#elasticSearch简介"><span class="nav-number">1.</span> <span class="nav-text">elasticSearch简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#应用场景"><span class="nav-number">2.</span> <span class="nav-text">应用场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#版本问题"><span class="nav-number">3.</span> <span class="nav-text">版本问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装head插件"><span class="nav-number">4.</span> <span class="nav-text">安装head插件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#集群的搭建"><span class="nav-number">5.</span> <span class="nav-text">集群的搭建</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#集群和节点"><span class="nav-number">6.</span> <span class="nav-text">集群和节点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#es的基本用法"><span class="nav-number">7.</span> <span class="nav-text">es的基本用法</span></a></li></ol></div>
             
 
           </div>
