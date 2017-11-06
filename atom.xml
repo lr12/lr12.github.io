@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-11-04T07:23:57.822Z</updated>
+  <updated>2017-11-05T09:08:00.867Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -16,11 +16,39 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>慕课网java</title>
+    <link href="http://yoursite.com/2017/11/05/%E6%85%95%E8%AF%BE%E7%BD%91java/"/>
+    <id>http://yoursite.com/2017/11/05/慕课网java/</id>
+    <published>2017-11-05T00:49:22.000Z</published>
+    <updated>2017-11-05T09:08:00.867Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="操作系统"><a href="#操作系统" class="headerlink" title="操作系统"></a>操作系统</h2><h2 id="网络"><a href="#网络" class="headerlink" title="网络"></a>网络</h2><h2 id="数据库"><a href="#数据库" class="headerlink" title="数据库"></a>数据库</h2><h2 id="程序设计语言基础"><a href="#程序设计语言基础" class="headerlink" title="程序设计语言基础"></a>程序设计语言基础</h2><h2 id="编码技巧"><a href="#编码技巧" class="headerlink" title="编码技巧"></a>编码技巧</h2><h2 id="面向对象"><a href="#面向对象" class="headerlink" title="面向对象"></a>面向对象</h2><h3 id="面向对象不可变性"><a href="#面向对象不可变性" class="headerlink" title="面向对象不可变性"></a>面向对象不可变性</h3><p>final关键字<br>类申明：类不可集成<br>函数申明：函数不可在派生类重写<br>变量申明：变量不可指向其他对象，但是变量指向对象的内容可以改变<br>习惯性常量 static final 一般大写<br>实现不可变性：<br>1.final关键字无法保证不可变性<br>2.从接口的定义上，类的实现上保证不可变性（例如通过暴露部分变量的接口只能获取部分变量，而不能获取整个类的实例，String类的substring方法和replace方法，都不会改变自身的内容，都是new）<br>3.Collections.unmodifiableXXX(例如：list=Collections.unmodifiable(new ArrayList&lt;&gt;(t)))，编译通过，运行add会抛异常</p>
+<h3 id="泛型"><a href="#泛型" class="headerlink" title="泛型"></a>泛型</h3><p>Java 泛型的参数只可以代表类，不能代表个别对象。由于 Java 泛型的类型参数之实际类型在编译时会被消除，所以无法在运行时得知其类型参数的类型。Java 编译器在编译泛型时会自动加入类型转换的编码，故运行速度不会因为使用泛型而加快。<br>从List到List<t><br>规定类型只能是类型T，但是实现无所谓T是什么类型。<br>从List到List<t>语法<br>List<string> list=new ArrayList&lt;&gt;();//1.7<br>List<integer> list=LinkedList.of(1,2,3);<br>List<string> list=LinkedList.newEmptyList();<br>java Type erasure<br>1.早期java没有泛型；2.为了兼容性，在运行时将所有泛型擦除<br>运行时：List、List<string>、List<integer>没有区别<br>covariance<br>ArrayList<integer>是List<integer>,但是List<integer>不是List<object><br>将List<integer>转化成List<object>:<br>new ArrayList<object>(intList)或者List<object>(List) intList（危险，先要明确目的为什么转）</object></object></object></integer></object></integer></integer></integer></integer></string></string></integer></string></t></t></p>
+<h3 id="虚函数表"><a href="#虚函数表" class="headerlink" title="虚函数表"></a>虚函数表</h3><h2 id="高级知识点"><a href="#高级知识点" class="headerlink" title="高级知识点"></a>高级知识点</h2><h3 id="并行计算"><a href="#并行计算" class="headerlink" title="并行计算"></a>并行计算</h3><p>并行计算的方法：<br>把数据拆分到每个节点<br>每个节点并行的计算结果<br>把结果汇总<br>k路归并排序。把数据切分成k份，每份内部进行排序（可以用快排或者归并），然后进行k路归并，可以用k最小堆，PriorityQueue,从数据源拿数据需要使用缓存，读一段，可以考虑Iterable接口<br>Iterable<t> merge(List<iterable<t> sortedData&gt;)<br>Iterable接口的next方法，如果缓存区空，读取一段数据到缓存，给出缓存区第一个元素，缓存区元素大小（可配置）</iterable<t></t></p>
+<h3 id="多线程"><a href="#多线程" class="headerlink" title="多线程"></a>多线程</h3><p>死锁条件：<br>1.互斥等待<br>2.hold and wait<br>3.循环等待<br>4.无法剥夺的等待<br>解决：<br>1.一次性获取所有资源；2.顺序获取资源（根据资源某个标识顺序加锁）；3.加入超时机制</p>
+<h3 id="线程池"><a href="#线程池" class="headerlink" title="线程池"></a>线程池</h3><p>创建线程开销大<br>线程池：预先建立好线程，等待任务派发。</p>
+<h4 id="线程池参数"><a href="#线程池参数" class="headerlink" title="线程池参数"></a>线程池参数</h4><p>corePoolSize：线程池初始线程的数量<br>maximumPoolSize：线程中最大允许数量<br>KeepAliveTime：超出corePoolSize的线程如果等待时间超过这个时间就会被回收<br>TimeUnit:时间单位，毫秒、秒微秒，描述KeepAliveTime<br>BlockingQueue<runnable>:<br>资源的连接问题：例如数据库的连接，虽然对象被回收但是资源依然不释放。</runnable></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;操作系统&quot;&gt;&lt;a href=&quot;#操作系统&quot; class=&quot;headerlink&quot; title=&quot;操作系统&quot;&gt;&lt;/a&gt;操作系统&lt;/h2&gt;&lt;h2 id=&quot;网络&quot;&gt;&lt;a href=&quot;#网络&quot; class=&quot;headerlink&quot; title=&quot;网络&quot;&gt;&lt;/a&gt;网络&lt;/h
+    
+    </summary>
+    
+      <category term="java" scheme="http://yoursite.com/categories/java/"/>
+    
+    
+      <category term="java视频" scheme="http://yoursite.com/tags/java%E8%A7%86%E9%A2%91/"/>
+    
+  </entry>
+  
+  <entry>
     <title>hbase高级特性</title>
     <link href="http://yoursite.com/2017/11/04/hbase%E9%AB%98%E7%BA%A7%E7%89%B9%E6%80%A7/"/>
     <id>http://yoursite.com/2017/11/04/hbase高级特性/</id>
     <published>2017-11-04T02:29:11.000Z</published>
-    <updated>2017-11-04T07:23:57.822Z</updated>
+    <updated>2017-11-04T13:50:18.393Z</updated>
     
     <content type="html"><![CDATA[<h2 id="过滤器"><a href="#过滤器" class="headerlink" title="过滤器"></a>过滤器</h2><h3 id="过滤器简介"><a href="#过滤器简介" class="headerlink" title="过滤器简介"></a>过滤器简介</h3><p>Get和Scan都支持过滤器，过滤器最基本的接口是Filter，所有的过滤器都在服务器生效（谓词下推），可以保证过滤的数据不会传递到客户端。<br>1.过滤器层次结构<br>最底层的过滤器是Filter和FilterBase，定好的过滤器可以传递给get和scan，通过setFilter<br>2.比较运算符<br>CompareFilter多了个compare方法，需要使用传递参数，参数有<br>LESS,LESS_OR_EQUAL,EQUAL,NOT_EQUAL,GREATER_OR_EQUAL,GREATER,NO_OP<br>3.比较器<br>CompareFilter所需要的第二个类型是比较器，比较常用的比较器有：BinaryComparator、NullComparator（判断是否为null）、RegexStringComparator（正则比较）、SubstringComparator（通过contains去操作）、BitComparator（位比较&amp;|^）</p>
 <h3 id="比较过滤器"><a href="#比较过滤器" class="headerlink" title="比较过滤器"></a>比较过滤器</h3><p>CompareFilter创建实例需要运算符和比较器，</p>
@@ -42,6 +70,15 @@
 <h3 id="filterList"><a href="#filterList" class="headerlink" title="filterList"></a>filterList</h3><p>用于综合使用多个过滤器。其有两种关系：FilterList.Operator.MUST_PASS_ONE和FilterList.Operator.MUST_PASS_ALL，默认的是FilterList.Operator.MUST_PASS_ALL，顾名思义，它们分别是AND和OR的关系，并且FilterList可以嵌套使用FilterList，使我们能够表达更多的需求：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">List&lt;Filter&gt; filters = new ArrayList&lt;Filter&gt;();  </div><div class="line">filters.add(rf);  </div><div class="line">filters.add(vf);  </div><div class="line">FilterList fl = new FilterList(FilterList.Operator.MUST_PASS_ALL, filters); // OK 综合使用多个过滤器， AND 和 OR 两种关系</div></pre></td></tr></table></figure></p>
 <h2 id="计数器"><a href="#计数器" class="headerlink" title="计数器"></a>计数器</h2><h3 id="计数器简介"><a href="#计数器简介" class="headerlink" title="计数器简介"></a>计数器简介</h3><p>1.许多收集统计信息的应用有点击流或在线广告意见，这些应用需要收集到日志文件用作后续的分析，用户可以使用计数器做实时统计，从而放弃延时较高的批量处理操作。<br>2.原子操作检查并修改：将当前列当作计数器。<br>即把一个 column 当作一个 counter，这样便于给某些在线应用提供实时统计功能。（PS：比如帖子的实时浏览量：PV）<br>3.如果没有计数器特性：用户需要对一行数据加锁，然后读取数据，再对当前数据做加法，最后写回Hbase并释放该行锁。这样会引起大量的资源竞争，有其是当客户端进程崩溃之后，尚未释放的锁需要等待超时恢复，这会是一个高负载的系统中引起灾难性的后果。<br>4.计数器的增量可以是正数负数，正数代表加，负数代表减。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">hbase(main):006:0&gt; create<span class="string">'counters'</span>,<span class="string">'daily'</span>,<span class="string">'weekly'</span>,<span class="string">'monthly'</span></div><div class="line">0 row(s) <span class="keyword">in</span> 2.2260 seconds</div><div class="line">hbase(main):007:0&gt; incr <span class="string">'counters'</span>,<span class="string">'201031003100'</span>,<span class="string">'daily:hites'</span>,1</div><div class="line">COUNTER VALUE = 1</div><div class="line">hbase(main):008:0&gt; incr<span class="string">'counters'</span>,<span class="string">'201031003100'</span>,<span class="string">'daily:hites'</span>,1</div><div class="line">COUNTER VALUE = 2</div><div class="line">hbase(main):009:0&gt; get_counter  <span class="string">'counters'</span>,<span class="string">'201031003100'</span>,<span class="string">'daily:hites'</span></div><div class="line">COUNTER VALUE = 2</div></pre></td></tr></table></figure></p>
 <p>终端命令为incr ‘tablename’,’row’,’column’,[increment_value]</p>
+<h4 id="单计数器"><a href="#单计数器" class="headerlink" title="单计数器"></a>单计数器</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">public void oneCounter(long num) throws IOException&#123;</div><div class="line">long cnt1 = table.incrementColumnValue(Bytes.toBytes(<span class="string">"3100"</span>),</div><div class="line">Bytes.toBytes(<span class="string">"info"</span>), Bytes.toBytes(<span class="string">"name"</span>), num);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="多计数器"><a href="#多计数器" class="headerlink" title="多计数器"></a>多计数器</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">public void moreCounter() throws IOException&#123;</div><div class="line">Increment increment1 = new Increment(Bytes.toBytes(<span class="string">"3100"</span>));</div><div class="line"></div><div class="line">increment1.addColumn(Bytes.toBytes(<span class="string">"info"</span>), Bytes.toBytes(<span class="string">"clicks"</span>), 20);</div><div class="line">increment1.addColumn(Bytes.toBytes(<span class="string">"info"</span>), Bytes.toBytes(<span class="string">"hits"</span>), 1);</div><div class="line">increment1.addColumn(Bytes.toBytes(<span class="string">"class"</span>), Bytes.toBytes(<span class="string">"clicks"</span>), 10);</div><div class="line">increment1.addColumn(Bytes.toBytes(<span class="string">"class"</span>), Bytes.toBytes(<span class="string">"hits"</span>), 10);</div><div class="line"></div><div class="line">Result result1 = table.increment(increment1);</div><div class="line"><span class="keyword">for</span>(KeyValue kv:result1.raw())&#123;</div><div class="line">System.out.println(<span class="string">"KV1: "</span>+kv +<span class="string">"value: "</span>+Bytes.toLong(kv.getValue()));</div><div class="line">&#125;</div><div class="line">Increment increment2 = new Increment(Bytes.toBytes(<span class="string">"3102"</span>));</div><div class="line">increment1.addColumn(Bytes.toBytes(<span class="string">"info"</span>), Bytes.toBytes(<span class="string">"clicks"</span>), 5);</div><div class="line">increment1.addColumn(Bytes.toBytes(<span class="string">"info"</span>), Bytes.toBytes(<span class="string">"hits"</span>), 1);</div><div class="line">increment1.addColumn(Bytes.toBytes(<span class="string">"class"</span>), Bytes.toBytes(<span class="string">"clicks"</span>), 0);</div><div class="line">increment1.addColumn(Bytes.toBytes(<span class="string">"class"</span>), Bytes.toBytes(<span class="string">"hits"</span>), -5);</div><div class="line">Result result2 = table.increment(increment2);</div><div class="line"><span class="keyword">for</span>(KeyValue kv:result2.raw())&#123;</div><div class="line">System.out.println(<span class="string">"KV2: "</span>+kv +<span class="string">"value: "</span>+Bytes.toLong(kv.getValue()));</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="协处理器"><a href="#协处理器" class="headerlink" title="协处理器"></a>协处理器</h3><p>协处理器允许用户在region server上运行自己的代码，准确的说是执行region级的操作，并且可以使用关系型数据库的触发器的功能。有很多使用协处理器的场景，使用钩子关联行修改操作来维护一个辅助索引，或维护一些数据间的引用完整性。协处理器主要提供两大类，observer和endpoint。<br>1）Observer（观察者）<br>该类是与RDMS中的触发器类似。回调函数在一些特定的事件发生时被调用。<br>事件包括：用户产生的事件或者服务端内部产生的事件。<br>协处理器框架提供的接口如下：<br>a、RegionObserver：用户可以通过这种处理器来处理数据修改事件，它们与表的Region紧密关联。region级的操作。对应的操作是：put/delete/scan/get<br>b、MasterObserver：可以用作管理或DDL类型的操作，是集群级的操作。对应的操作是：创建、删除、修改表。<br>c、WALObserver：提供控制WAL的钩子函数。(WAL: write ahead log)<br>Observer定义好钩子函数，服务端可以调用。<br>2）endPoint<br>该类的功能类似RDMS中的存储过程。将用户的自定义操作添加到服务器端，endPoint可以通过添加远程过程调用来扩展RPC协议。用户可以将自定义完成某项操作代码部署到服务器端。其中Endpoint可以理解为传统数据库的存储过程操作，比如可以进行某族某列值得加和。无Endpoint特性的情况下需要全局扫描表，通过Endpoint则可以在多台分布有对应表的regionserver上同步加和，在将加和数返回给客户端进行全局加和操作，充分利用了集群资源，增加性能。</p>
+<h4 id="coprocessor类"><a href="#coprocessor类" class="headerlink" title="coprocessor类"></a>coprocessor类</h4><p>1）协处理器的执行顺序<br>Coprocessor.Priority枚举类型定义了两个值：SYSTEM、USER。前者优于后者执行，后者定义的按顺序执行。<br>2）协处理器的生命周期<br>协处理器的生命周期是由框架管理的，接口定义两个方法start、stop。这两个方法的参数是：CoprocessorEnvironment。该类提供了访问HBase的版本、Coprocessor版本、协处理器优先级等方法。start/stop方法是被隐式调用的，且关于协处理器的状态的定义是有一个枚举类Coprocessor.State对应的。<br>3）协处理器环境和实例的维护<br>CoprocessorHost类来完成，其有相应的子类来完成维护region、master协处理器的实例和环境。</p>
+<h4 id="协处理器加载"><a href="#协处理器加载" class="headerlink" title="协处理器加载"></a>协处理器加载</h4><p>1.从配置中加载，hbase-site.xml;2.从表描述符中加载</p>
+<h4 id="RegionObserver类"><a href="#RegionObserver类" class="headerlink" title="RegionObserver类"></a>RegionObserver类</h4><p>1.处理生命周期事件<br>状态1：pendingOpen，region将要被打开的状态。<br>协处理器以实现的方法是：<br>preOpen()/postOpen().完成功能是：搭载或者阻止这次打开过程。<br>preWALRestore()/postWALRestore.完成的功能是：用户可以访问那些记录被修改了，监督那些记录被实施了。<br>状态2：open，这个状态的标志是：region被部署到一个region server上且正常工作时。<br>协处理器可以实现的方法是：<br>void preFlush()/void postFlush()     内存被持久到磁盘<br>void preSpilt()/void postSpilt()          region达到足够大时进行拆分<br>状态3：pendingClose。region将要被关闭时的状态。<br>协处理器可以实现的方法是：<br>void preClose()/void postClose()<br>2.处理客户端API事件<br>这里是指在调用Java API 时，响应的事件。如：<br>void prePut()/void postPut、void preDelete()/postDelete()、void preGet()/void postGet()……..</p>
+<h4 id="MasterObserver"><a href="#MasterObserver" class="headerlink" title="MasterObserver"></a>MasterObserver</h4><p>协处理器定义明确为master服务器的所有回调函数。这些回调函数中的操作是类似DDL，创建、删除、修改表。<br>1）MasterCoprocessorEnvironment<br>MasterCoprocessorEnvironment封装了MasterObserver实例，通过该类可以访问MasterService实例。<br>2）BaseMasterServer<br>BaseMasterServer是MasterServer的空实现，可以通过实现相应的pre/post来自定义相关操作。                        例如：  void preCreateTable()/void postCreateTable()  void preDeleteTable()/void postDeleteTable()……</p>
+<h4 id="endpoint"><a href="#endpoint" class="headerlink" title="endpoint"></a>endpoint</h4><p>该接口可以使用户自定义RPC协议，它的实现代码被安装在服务端，在客户端HTable提供调用方法，使用该协议可以和协处理器实例之间通信。</p>
+<h2 id="HTablePool"><a href="#HTablePool" class="headerlink" title="HTablePool"></a>HTablePool</h2><p>创建一个HTable实例，然后去复用它，可以通过HTableFactory来创建HTable，<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">Configuration conf = HBaseConfiguration.create();</div><div class="line">HTablePool pool = new HTablePool(conf, 10);</div><div class="line"></div><div class="line">public void createUser(String username, String firstName, String lastName, String email, String password,String roles) throws IOException &#123;</div><div class="line">　　HTable table = rm.getTable(UserTable.NAME);</div><div class="line">　　Put put = new Put(Bytes.toBytes(username));</div><div class="line">　　put.add(UserTable.DATA_FAMILY, UserTable.FIRSTNAME,</div><div class="line">　　Bytes.toBytes(firstName));</div><div class="line">　　put.add(UserTable.DATA_FAMILY, UserTable.LASTNAME,</div><div class="line">　　　　Bytes.toBytes(lastName));</div><div class="line">　　put.add(UserTable.DATA_FAMILY, UserTable.EMAIL, Bytes.toBytes(email));</div><div class="line">　　put.add(UserTable.DATA_FAMILY, UserTable.CREDENTIALS,</div><div class="line">　　　　Bytes.toBytes(password));</div><div class="line">　　put.add(UserTable.DATA_FAMILY, UserTable.ROLES, Bytes.toBytes(roles));</div><div class="line">　　table.put(put);</div><div class="line">　　table.flushCommits();</div><div class="line">　　rm.putTable(table);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 ]]></content>
     
     <summary type="html">
@@ -133,7 +170,7 @@
     <link href="http://yoursite.com/2017/10/31/elasticSearch%E5%88%9D%E6%AD%A5%E4%BA%86%E8%A7%A3/"/>
     <id>http://yoursite.com/2017/10/31/elasticSearch初步了解/</id>
     <published>2017-10-31T15:10:46.000Z</published>
-    <updated>2017-11-02T16:09:33.816Z</updated>
+    <updated>2017-11-06T13:06:42.008Z</updated>
     
     <content type="html"><![CDATA[<h2 id="elasticSearch简介"><a href="#elasticSearch简介" class="headerlink" title="elasticSearch简介"></a>elasticSearch简介</h2><p>1.基于Apache Lucene构建的开源搜索引擎<br>2.基于java编写，提供简单易用的Resful API<br>3.轻松的横向扩展，可支持PB级别的结构化和非结构化的数据处理</p>
 <h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><p>1.海量数据分析引擎<br>2.站内搜索引擎<br>3.数据仓库<br>备注应用：github站内搜索、维基百科、百度实时日志监控</p>
@@ -147,6 +184,9 @@
 <h2 id="文档-row"><a href="#文档-row" class="headerlink" title="文档(row)"></a>文档(row)</h2><p>文档是可以被索引的基本数据单位</p>
 <h2 id="分片"><a href="#分片" class="headerlink" title="分片"></a>分片</h2><p>每个索引都有多个分片，每个分片是lucene索引</p>
 <h2 id="备份"><a href="#备份" class="headerlink" title="备份"></a>备份</h2><p>拷贝一份分片就完成了分片的备份<br>备注：es默认五个分片一个备份</p>
+<h2 id="es的基本用法"><a href="#es的基本用法" class="headerlink" title="es的基本用法"></a>es的基本用法</h2><ul>
+<li>api的基本格式：http://<ip>:<port>/&lt;索引&gt;/&lt;类型&gt;/&lt;文档id&gt;</port></ip></li>
+</ul>
 ]]></content>
     
     <summary type="html">
@@ -725,33 +765,6 @@
     <summary type="html">
     
       &lt;p&gt;本周我主要做的工作有，看了几篇论文，主要还是了解现在云取证的一些情况和了解了一下docker这个新兴的技术在云计算中的应用和使用问题，印象比较深的有几篇云取证综述的论文。Cloud forensics State-of-the-art and future directio
-    
-    </summary>
-    
-    
-      <category term="云取证" scheme="http://yoursite.com/tags/%E4%BA%91%E5%8F%96%E8%AF%81/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>云取证第一周周报</title>
-    <link href="http://yoursite.com/2017/04/25/%E4%BA%91%E5%8F%96%E8%AF%81%E7%AC%AC%E4%B8%80%E5%91%A8%E5%91%A8%E6%8A%A5/"/>
-    <id>http://yoursite.com/2017/04/25/云取证第一周周报/</id>
-    <published>2017-04-25T02:33:03.000Z</published>
-    <updated>2017-05-31T11:59:00.748Z</updated>
-    
-    <content type="html"><![CDATA[<p>本周我主要做的工作有，上网查询有关于云计算方面的知识点、云安全的相关知识点以及云取证的一些概念。</p>
-<p>首先是对于云计算的一些见解，定义就是，云计算是基于互联网的相关服务的增加、使用和交付模式，通常涉及通过互联网来提供动态易扩展且经常是虚拟化的资源。特点是通过使计算分布在大量的分布式计算机上，而非本地计算机或远程服务器中，企业数据中心的运行将与互联网更相似。这使得企业能够将资源切换到需要的应用上，根据需求访问计算机和存储系统。从我个人角度出发，我认为云这个概念其实就是任何可以通过互联网访问的服务。而这个服务往往通过分布式计算机来协助完成。</p>
-<p>然后是云计算的分类，具体是分为IaaS、PaaS、SaaS。IaaS(Infrastructure as a Service，基础架构即服务)通过互联网提供了数据中心、基础架构硬件和软件资源。IaaS可以提供服务器、操作系统、磁盘存储、数据库和/或信息资源。IaaS通常会按照”弹性云”的模式引入其他的使用和计价模式，也就是在任何一个特定的时间，都只使用你需要的服务，并且只为之付费。PaaS(Platform as a Service，平台即服务)提供了基础架构，软件开发者可以在这个基础架构之上建设新的应用，或者扩展已有的应用，同时却不必购买开发、质量控制或生产服务器。这些平台允许公司创建个性化的应用，也允许独立软件厂商或者其他的第三方机构针对垂直细分行业创造新的解决方案。SaaS(Software as a Service，软件即服务)是最为成熟、最出名，也是得到最广泛应用的一种云计算。大家可以将它理解为一种软件分布模式，在这种模式下，应用软件安装在厂商或者服务供应商那里，用户可以通过某个网络来使用这些软件，通常使用的网络是互联网。这种模式通常也被称为”随需应变”软件，这是最成熟的云计算模式，因为这种模式具有高度的灵活性、已经证明可靠的支持服务、强大的可扩展性，因此能够降低客户的维护成本和投入，而且由于这种模式的多宗旨式的基础架构，运营成本也得以降低。</p>
-<p>“云安全（Cloud Security）”计划是网络时代信息安全的最新体现，它融合了并行处理、网格计算、未知病毒行为判断等新兴技术和概念，通过网状的大量客户端对网络中软件行为的异常监测，获取互联网中木马、恶意程序的最新信息，推送到Server端进行自动分析和处理，再把病毒和木马的解决方案分发到每一个客户端。常见的云安全问题有：用户身份安全问题、共享业务安全问题、用户数据安全问题。</p>
-<p>术语“云取证”是指从云基础设施采集数字取证数据。例如，本地取证证据包括从日志文件、存储在磁盘上的数据、网络流量和入侵标志物等收集到的信息。本地分析与云服务分析之间的基本区别是，使用本地计算机，通过简单地进入系统，从而可以收集并分析信息。然而，当涉及到云时，机器无法进行物理访问，只有计算机的某些部分，可以通过云应用程序接口进行访问。</p>
-<p>我的个人见解是，对于云取证来说，可以从两个方面进行考虑。第一个是怎么取证，也就是取证的手段，换句话说就是在取证的技术或者方式上有所改善或者突破；第二个就是对于获取到的证据如何去分析，也就是在分析证据的手段上有所改善或者突破，我觉得这块可以跟比如数据挖掘或者人工智能联系起来，例如有个论文提到的，用数据挖掘来形成聚类，找出ip的之间的关系，具体是通过kmeans的算法针对原始数据进行聚类，将所有数据划分成不同的数据集；接着在各个聚类后的数据集内部，使用 IP 地址统计方法来捕捉各个数据集特征，从而找出离群值，即可能的入侵者。又比如可以对文件简历索引，通过搜索引擎大大提高海量数据查询的效率，具体做法是集中为每个文件创建唯一标志签名， 该签名会一直跟随文件直到文件被删除， 然后借助分布式任务检测海量数据中符合签名的匹配文件 ， 从而大大提高了文件搜索的效率。</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;本周我主要做的工作有，上网查询有关于云计算方面的知识点、云安全的相关知识点以及云取证的一些概念。&lt;/p&gt;
-&lt;p&gt;首先是对于云计算的一些见解，定义就是，云计算是基于互联网的相关服务的增加、使用和交付模式，通常涉及通过互联网来提供动态易扩展且经常是虚拟化的资源。特点是通过使计算
     
     </summary>
     

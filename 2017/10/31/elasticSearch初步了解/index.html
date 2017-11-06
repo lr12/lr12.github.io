@@ -99,7 +99,7 @@
 <meta property="og:url" content="http://yoursite.com/2017/10/31/elasticSearch初步了解/index.html">
 <meta property="og:site_name" content="博客">
 <meta property="og:description" content="elasticSearch简介1.基于Apache Lucene构建的开源搜索引擎2.基于java编写，提供简单易用的Resful API3.轻松的横向扩展，可支持PB级别的结构化和非结构化的数据处理 应用场景1.海量数据分析引擎2.站内搜索引擎3.数据仓库备注应用：github站内搜索、维基百科、百度实时日志监控 版本问题版本历史 1.x-&amp;gt;2.x-&amp;gt;5.x 安装head插件安装el">
-<meta property="og:updated_time" content="2017-11-02T16:09:33.816Z">
+<meta property="og:updated_time" content="2017-11-06T13:06:42.008Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="elasticSearch入门">
 <meta name="twitter:description" content="elasticSearch简介1.基于Apache Lucene构建的开源搜索引擎2.基于java编写，提供简单易用的Resful API3.轻松的横向扩展，可支持PB级别的结构化和非结构化的数据处理 应用场景1.海量数据分析引擎2.站内搜索引擎3.数据仓库备注应用：github站内搜索、维基百科、百度实时日志监控 版本问题版本历史 1.x-&amp;gt;2.x-&amp;gt;5.x 安装head插件安装el">
@@ -352,6 +352,9 @@
 <h2 id="文档-row"><a href="#文档-row" class="headerlink" title="文档(row)"></a>文档(row)</h2><p>文档是可以被索引的基本数据单位</p>
 <h2 id="分片"><a href="#分片" class="headerlink" title="分片"></a>分片</h2><p>每个索引都有多个分片，每个分片是lucene索引</p>
 <h2 id="备份"><a href="#备份" class="headerlink" title="备份"></a>备份</h2><p>拷贝一份分片就完成了分片的备份<br>备注：es默认五个分片一个备份</p>
+<h2 id="es的基本用法"><a href="#es的基本用法" class="headerlink" title="es的基本用法"></a>es的基本用法</h2><ul>
+<li>api的基本格式：http://<ip>:<port>/&lt;索引&gt;/&lt;类型&gt;/&lt;文档id&gt;</port></ip></li>
+</ul>
 
       
     </div>
@@ -478,7 +481,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">22</span>
+                <span class="site-state-item-count">23</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -489,7 +492,7 @@
             
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
-                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-count">3</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -500,7 +503,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-count">8</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -542,7 +545,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#elasticSearch简介"><span class="nav-number">1.</span> <span class="nav-text">elasticSearch简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#应用场景"><span class="nav-number">2.</span> <span class="nav-text">应用场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#版本问题"><span class="nav-number">3.</span> <span class="nav-text">版本问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装head插件"><span class="nav-number">4.</span> <span class="nav-text">安装head插件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#集群的搭建"><span class="nav-number">5.</span> <span class="nav-text">集群的搭建</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#集群和节点"><span class="nav-number">6.</span> <span class="nav-text">集群和节点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#索引-database"><span class="nav-number">7.</span> <span class="nav-text">索引(database)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#类型-table"><span class="nav-number">8.</span> <span class="nav-text">类型(table)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文档-row"><span class="nav-number">9.</span> <span class="nav-text">文档(row)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分片"><span class="nav-number">10.</span> <span class="nav-text">分片</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#备份"><span class="nav-number">11.</span> <span class="nav-text">备份</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#elasticSearch简介"><span class="nav-number">1.</span> <span class="nav-text">elasticSearch简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#应用场景"><span class="nav-number">2.</span> <span class="nav-text">应用场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#版本问题"><span class="nav-number">3.</span> <span class="nav-text">版本问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装head插件"><span class="nav-number">4.</span> <span class="nav-text">安装head插件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#集群的搭建"><span class="nav-number">5.</span> <span class="nav-text">集群的搭建</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#集群和节点"><span class="nav-number">6.</span> <span class="nav-text">集群和节点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#索引-database"><span class="nav-number">7.</span> <span class="nav-text">索引(database)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#类型-table"><span class="nav-number">8.</span> <span class="nav-text">类型(table)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文档-row"><span class="nav-number">9.</span> <span class="nav-text">文档(row)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分片"><span class="nav-number">10.</span> <span class="nav-text">分片</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#备份"><span class="nav-number">11.</span> <span class="nav-text">备份</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#es的基本用法"><span class="nav-number">12.</span> <span class="nav-text">es的基本用法</span></a></li></ol></div>
             
 
           </div>
