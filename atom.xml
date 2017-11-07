@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-11-05T09:08:00.867Z</updated>
+  <updated>2017-11-07T14:20:41.589Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,26 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>hbase架构</title>
+    <link href="http://yoursite.com/2017/11/07/hbase%E6%9E%B6%E6%9E%84/"/>
+    <id>http://yoursite.com/2017/11/07/hbase架构/</id>
+    <published>2017-11-07T14:19:10.000Z</published>
+    <updated>2017-11-07T14:20:41.589Z</updated>
+    
+    <summary type="html">
+    
+    </summary>
+    
+      <category term="hbase" scheme="http://yoursite.com/categories/hbase/"/>
+    
+    
+      <category term="hbase权威指南" scheme="http://yoursite.com/tags/hbase%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97/"/>
+    
+      <category term="分布式" scheme="http://yoursite.com/tags/%E5%88%86%E5%B8%83%E5%BC%8F/"/>
+    
+  </entry>
   
   <entry>
     <title>慕课网java</title>
@@ -170,7 +190,7 @@
     <link href="http://yoursite.com/2017/10/31/elasticSearch%E5%88%9D%E6%AD%A5%E4%BA%86%E8%A7%A3/"/>
     <id>http://yoursite.com/2017/10/31/elasticSearch初步了解/</id>
     <published>2017-10-31T15:10:46.000Z</published>
-    <updated>2017-11-06T13:37:55.577Z</updated>
+    <updated>2017-11-07T01:24:18.725Z</updated>
     
     <content type="html"><![CDATA[<h2 id="elasticSearch简介"><a href="#elasticSearch简介" class="headerlink" title="elasticSearch简介"></a>elasticSearch简介</h2><p>1.基于Apache Lucene构建的开源搜索引擎<br>2.基于java编写，提供简单易用的Resful API<br>3.轻松的横向扩展，可支持PB级别的结构化和非结构化的数据处理</p>
 <h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><p>1.海量数据分析引擎<br>2.站内搜索引擎<br>3.数据仓库<br>备注应用：github站内搜索、维基百科、百度实时日志监控</p>
@@ -186,13 +206,27 @@
 <li>分片<br>每个索引都有多个分片，每个分片是lucene索引</li>
 <li>备份<br>拷贝一份分片就完成了分片的备份<br>备注：es默认五个分片一个备份<h2 id="es的基本用法"><a href="#es的基本用法" class="headerlink" title="es的基本用法"></a>es的基本用法</h2></li>
 <li>api的基本格式：http://<ip>:<port>/&lt;索引&gt;/&lt;类型&gt;/&lt;文档id&gt;</port></ip></li>
-<li>常用的动词有：GET/PUT/POST/DELETE<h3 id="创建索引"><a href="#创建索引" class="headerlink" title="创建索引"></a>创建索引</h3>在head插件创建索引<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  <span class="string">"novel"</span>: &#123;</div><div class="line">    <span class="string">"properties"</span>: &#123;</div><div class="line">      <span class="string">"title"</span>: &#123;</div><div class="line">        <span class="string">"type"</span>: <span class="string">"text"</span></div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<li>常用的动词有：GET/PUT/POST/DELETE<h3 id="创建索引"><a href="#创建索引" class="headerlink" title="创建索引"></a>创建索引</h3>在head插件创建索引<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">//localhost:9200:book put请求</div><div class="line">&#123;</div><div class="line">  <span class="string">"novel"</span>: &#123;</div><div class="line">    <span class="string">"properties"</span>: &#123;</div><div class="line">      <span class="string">"title"</span>: &#123;</div><div class="line">        <span class="string">"type"</span>: <span class="string">"text"</span></div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 </li>
 </ul>
-<p>使用postman插件，可视化插件<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">	<span class="string">"settings"</span>:&#123;</div><div class="line">		<span class="string">"number_of_shards"</span>:3,</div><div class="line">		<span class="string">"number_of_replicas"</span>:1</div><div class="line">	&#125;,</div><div class="line">	<span class="string">"mappings"</span>:&#123;</div><div class="line">		<span class="string">"man"</span>:&#123;</div><div class="line">			<span class="string">"properties"</span>:&#123;</div><div class="line">				<span class="string">"name"</span>:&#123;</div><div class="line">					<span class="string">"type"</span>:<span class="string">"text"</span></div><div class="line">				&#125;,</div><div class="line">			    <span class="string">"country"</span>:&#123;</div><div class="line">			    	<span class="string">"type"</span>:<span class="string">"keyword"</span></div><div class="line">			    &#125;,</div><div class="line">			    <span class="string">"age"</span>:&#123;</div><div class="line">			    	<span class="string">"type"</span>:<span class="string">"integer"</span></div><div class="line">			    &#125;,</div><div class="line">			    <span class="string">"date"</span>:&#123;</div><div class="line">			    	<span class="string">"type"</span>:<span class="string">"date"</span>,</div><div class="line">			    	<span class="string">"format"</span>:<span class="string">"yyyy-MM-dd HH:mm:ss"</span></div><div class="line">			    &#125;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>使用postman插件，可视化插件<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">//localhost:9200:people put请求</div><div class="line">&#123;</div><div class="line">	<span class="string">"settings"</span>:&#123;</div><div class="line">		<span class="string">"number_of_shards"</span>:3,</div><div class="line">		<span class="string">"number_of_replicas"</span>:1</div><div class="line">	&#125;,</div><div class="line">	<span class="string">"mappings"</span>:&#123;</div><div class="line">		<span class="string">"man"</span>:&#123;</div><div class="line">			<span class="string">"properties"</span>:&#123;</div><div class="line">				<span class="string">"name"</span>:&#123;</div><div class="line">					<span class="string">"type"</span>:<span class="string">"text"</span></div><div class="line">				&#125;,</div><div class="line">			    <span class="string">"country"</span>:&#123;</div><div class="line">			    	<span class="string">"type"</span>:<span class="string">"keyword"</span></div><div class="line">			    &#125;,</div><div class="line">			    <span class="string">"age"</span>:&#123;</div><div class="line">			    	<span class="string">"type"</span>:<span class="string">"integer"</span></div><div class="line">			    &#125;,</div><div class="line">			    <span class="string">"date"</span>:&#123;</div><div class="line">			    	<span class="string">"type"</span>:<span class="string">"date"</span>,</div><div class="line">			    	<span class="string">"format"</span>:<span class="string">"yyyy-MM-dd HH:mm:ss"</span></div><div class="line">			    &#125;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <h3 id="插入索引"><a href="#插入索引" class="headerlink" title="插入索引"></a>插入索引</h3><ul>
-<li>指定文档id插入</li>
-<li>自动产生文档id插入</li>
+<li><p>指定文档id插入</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">//127.0.0.1:9200/people/man/1 Put请求</div><div class="line">&#123;</div><div class="line">	<span class="string">"name"</span>:<span class="string">"lirui"</span>,</div><div class="line">	<span class="string">"country"</span>: <span class="string">"china"</span>,</div><div class="line">	<span class="string">"age"</span>: 24,</div><div class="line">	<span class="string">"date"</span>: <span class="string">"2000-09-01 11:00:23"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>自动产生文档id插入</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">//127.0.0.1:9200/people/man POST请求</div><div class="line">&#123;</div><div class="line">	<span class="string">"name"</span>:<span class="string">"李睿"</span>,</div><div class="line">	<span class="string">"country"</span>: <span class="string">"china"</span>,</div><div class="line">	<span class="string">"age"</span>: 25,</div><div class="line">	<span class="string">"date"</span>: <span class="string">"2000-06-01 11:00:23"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="修改文档"><a href="#修改文档" class="headerlink" title="修改文档"></a>修改文档</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">//127.0.0.1:9200/people/man/1/_update POST请求</div><div class="line">  &#123;</div><div class="line">  	<span class="string">"doc"</span>:&#123;</div><div class="line">       <span class="string">"name"</span>:<span class="string">"kobe_brant"</span></div><div class="line">    &#125;</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<h3 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h3><h4 id="删除文档"><a href="#删除文档" class="headerlink" title="删除文档"></a>删除文档</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">//127.0.0.1:9200/people/man/1/ DELETE请求</div></pre></td></tr></table></figure>
+<h4 id="删除索引"><a href="#删除索引" class="headerlink" title="删除索引"></a>删除索引</h4><p>使用head插件删除索引或者<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">//127.0.0.1:9200/people/ DELETE请求</div></pre></td></tr></table></figure></p>
+<h3 id="查询文档"><a href="#查询文档" class="headerlink" title="查询文档"></a>查询文档</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">//127.0.0.1:9200/people/_search POST</div><div class="line">//查询全部</div><div class="line">&#123;</div><div class="line">  <span class="string">"query"</span>:&#123;</div><div class="line">    <span class="string">"match_all"</span>:&#123;&#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line">//针对查询</div><div class="line">&#123;</div><div class="line">  <span class="string">"query"</span>:&#123;</div><div class="line">    <span class="string">"match"</span>:&#123;<span class="string">"name"</span>:<span class="string">"kobe"</span>&#125;</div><div class="line">  &#125;,</div><div class="line">  <span class="string">"sort"</span>:[</div><div class="line">    	   &#123;</div><div class="line">    	   	<span class="string">"date"</span>:&#123;</div><div class="line">    	   	  <span class="string">"order"</span>:<span class="string">"desc"</span></div><div class="line">    	   &#125;</div><div class="line">    	   &#125;</div><div class="line">    	]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="聚合函数"><a href="#聚合函数" class="headerlink" title="聚合函数"></a>聚合函数</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">	<span class="string">"aggs"</span>:&#123;</div><div class="line">		<span class="string">"group_by_name"</span>:&#123;</div><div class="line">			<span class="string">"terms"</span>:&#123;</div><div class="line">				<span class="string">"field"</span>:<span class="string">"country"</span></div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="高级查询"><a href="#高级查询" class="headerlink" title="高级查询"></a>高级查询</h3><ul>
+<li>子条件查询<br>特定字段查询所指的特定值<h4 id="query-context"><a href="#query-context" class="headerlink" title="query context"></a>query context</h4>查询过程中，除了判断文档是否满足条件外，es会计算一个_sore来标识匹配程度<br>分为全文本查询（文本类型数据）和字段级别查询（结构化数据如数字、日期）<h4 id="filter-context"><a href="#filter-context" class="headerlink" title="filter context"></a>filter context</h4>在查询时只需要判断文档是否满足条件，只有Yes或者No。</li>
+<li>复合条件查询<br>以一定逻辑组合子条件查询<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  <span class="string">"query"</span>:&#123;</div><div class="line">    <span class="string">"bool"</span>:&#123;</div><div class="line">      <span class="string">"should"</span>:[&#123;</div><div class="line">         <span class="string">"match"</span>:&#123;</div><div class="line">           <span class="string">"author"</span>:<span class="string">"瓦力"</span></div><div class="line">         &#125;</div><div class="line">       &#125;,</div><div class="line">       &#123;</div><div class="line">          <span class="string">"match"</span>:&#123;</div><div class="line">            <span class="string">"title"</span>:<span class="string">"瓦力"</span></div><div class="line">          &#125;</div><div class="line">        &#125;</div><div class="line">      ],</div><div class="line">    <span class="string">"filter"</span>:[</div><div class="line">      &#123;</div><div class="line">        <span class="string">"term"</span>:&#123;</div><div class="line">          <span class="string">"word_count"</span>:1000</div><div class="line">        &#125;</div><div class="line">      &#125;</div><div class="line">    ]</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
 </ul>
 ]]></content>
     
@@ -212,7 +246,7 @@
     <link href="http://yoursite.com/2017/10/29/%E6%9E%84%E5%BB%BA%E5%A4%A7%E5%9E%8B%E7%BD%91%E7%AB%99%E7%9A%84%E5%85%B6%E4%BB%96%E8%A6%81%E7%B4%A0/"/>
     <id>http://yoursite.com/2017/10/29/构建大型网站的其他要素/</id>
     <published>2017-10-29T05:25:33.000Z</published>
-    <updated>2017-11-01T14:22:18.863Z</updated>
+    <updated>2017-11-07T14:20:08.626Z</updated>
     
     <content type="html"><![CDATA[<h2 id="加速静态内容访问的速度的CDN"><a href="#加速静态内容访问的速度的CDN" class="headerlink" title="加速静态内容访问的速度的CDN"></a>加速静态内容访问的速度的CDN</h2><p>CDN，Content Delivery Network，内容分发网络。CDN的作用是把用户需要的内容分发到离用户近的地方，这样可以从用户能就近获取所需的内容。整个CDN系统分为CDN源站和CDN节点。CDN源站提供CDN节点使用的数据源头，CDN节点部署在离最终用户比较近的地方，加速用户对站点的访问。CDN就是网络缓存技术，一般存放静态文件（js，css，图片，视频，页面框架）。<br>浏览器访问网站的顺序：<br>1.用户提交要访问的域名地址；<br>2.浏览器对域名进行解析，获取ip地址；<br>3.浏览器向所得到的ip发送请求；<br>4.浏览器根据返回的内容显示数据<br>有了CDN后的顺序：<br>1.用户提交要访问的域名地址；<br>2.浏览器对域名进行解析，由于CDN对域名解析过程做了调整，所以得到该域名对应的CNAME记录。<br>3.对CNAME进行解析得到实际的ip地址。在这次解析中会使用全局负载均衡CDN解析，需要我们根据地理位置以及所在的ISP确定结果，然后获取到具体的IP地址。<br>4.得到实际的ip地址后，我们会向服务器发送请求。<br>5.CDN会根据请求的内容是否在本地缓存进行不同的处理。<br>如果存在，直接返回结果；不存在，则请求CDN源站，获取内容，返回结果。<br>CDN关键的技术：<br>1.全局调度<br>全局调度是完成用户就近访问的第一步，我们需要根据用户地域、接入运营商、以及CDN机房的负载情况去调度。<br>2.缓存技术<br>如果请求不存在CDN节点，则请求CDN源站，获取内容，返回结果。如果命中率不高，加速有限。要提升命中率，首先缓存的容量要足够大，可以使用内存+SSD+硬盘混合存储。还有新增变更数据预加载也能提升命中<br>3.内容分发<br>内容分发主要包括在CDN上不用回源的数据的管理和分发，主要包括静态页面。<br>4.带宽优化<br>只返回必要数据和使用更好的压缩算法</p>
 <h2 id="大型网站的存储支持"><a href="#大型网站的存储支持" class="headerlink" title="大型网站的存储支持"></a>大型网站的存储支持</h2><h3 id="分布式文件系统"><a href="#分布式文件系统" class="headerlink" title="分布式文件系统"></a>分布式文件系统</h3><p>对一些图片、大文本的存储使用数据库就不合适了。GFS主要由三部分构成：GFS Client、GFS Master、GFS chunkserver</p>
@@ -246,7 +280,7 @@
     
     </summary>
     
-      <category term="分布式" scheme="http://yoursite.com/categories/%E5%88%86%E5%B8%83%E5%BC%8F/"/>
+      <category term="大型网站中间件" scheme="http://yoursite.com/categories/%E5%A4%A7%E5%9E%8B%E7%BD%91%E7%AB%99%E4%B8%AD%E9%97%B4%E4%BB%B6/"/>
     
     
       <category term="大型网站系统与中间件实践读书笔记" scheme="http://yoursite.com/tags/%E5%A4%A7%E5%9E%8B%E7%BD%91%E7%AB%99%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%AE%9E%E8%B7%B5%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
@@ -258,7 +292,7 @@
     <link href="http://yoursite.com/2017/10/27/%E8%BD%AF%E8%B4%9F%E8%BD%BD%E4%B8%AD%E5%BF%83%E4%B8%8E%E9%9B%86%E4%B8%AD%E9%85%8D%E7%BD%AE%E7%AE%A1%E7%90%86/"/>
     <id>http://yoursite.com/2017/10/27/软负载中心与集中配置管理/</id>
     <published>2017-10-27T07:39:30.000Z</published>
-    <updated>2017-11-01T01:45:54.594Z</updated>
+    <updated>2017-11-07T14:20:20.024Z</updated>
     
     <content type="html"><![CDATA[<h2 id="初始软负载中心"><a href="#初始软负载中心" class="headerlink" title="初始软负载中心"></a>初始软负载中心</h2><p>在服务框架，服务查找中心就是软负载中心；而在消息中间件中消息发送者以及消息消费者对于消息中间件的感知也是通过软负载中心。<br>软负载中心有两个最基本的职能：<br>1.聚合地址信息；无论是服务框架中需要用到的服务提供者地址还是消息中间件系统中的消息中间件地址，都需要由软负载中心去聚合地址列表，形成一个可供服务调用者及消息发送者、接收者接收的列表。<br>2.生命周期感知；软件负载中心能够对服务上下线自动感知，并且根据这个变化去更新服务地址数据，形成新的地址列表后，把数据传给需要数据的调用者或者消息的发送者和接收者。</p>
 <h2 id="软负载中心的结构"><a href="#软负载中心的结构" class="headerlink" title="软负载中心的结构"></a>软负载中心的结构</h2><p>软负载中心包括：一个是软负载中心的服务端，另一个是软负载中心的客户端；服务端主要负责感知提供服务的机器是否在线，聚合提供者的机器信息，并且负责把数据传给使用数据的应用。客户端承载了两个角色，作为服务提供者，客户端主要是把服务提供者提供服务的具体信息主动传给服务端，并且随着提供服务的变化去更新数据；而作为服务使用者，客户端主要向服务端告知自己所需要的数据，并负责去更新数据，还要进行本地缓存，使得每次去请求服务来获取列表都是一个本地操作。<br>软件负载中心内部有三部分重要数据<br>1.聚合数据<br>聚合后的地址列表。对于提供的服务信息，我们使用唯一的dataId来标识，同时dataId支持分组（group），通过dataId和group可以定位到唯一的数据内容，这个内容是通过聚合完成的完整数据，而这个信息在内部就是一个key-value结构。<br>2.订阅关系<br>在软负载中心中，需要数据的应用把自己需要的数据告诉软负载中心，这就是订阅关系，订阅的粒度也是通过dataId和group来确定数据，那么会有dataId和group到数据订阅者的分组ID的一个映射关系，当聚合的数据发生变化，通过订阅关系的数据找到需要通知的数据订阅者，然后去进行数据更新操作。<br>3.连接关系<br>连接到软负载中心的节点和软负载中心已经建立的连接管理。使用软负载中心的应用，无论是发布数据还是订阅数据，都会有一个独立的分组，而连接数据就是用groupId作为key，然后对应管理这个物理连接，采用的是长连接方式。当订阅的数据发生变化，通过订阅关系找到需要通知的groupId，在连接数据这里就能够找到对应的连接，完成对应用的更新。</p>
@@ -282,7 +316,7 @@
     
     </summary>
     
-      <category term="分布式" scheme="http://yoursite.com/categories/%E5%88%86%E5%B8%83%E5%BC%8F/"/>
+      <category term="大型网站中间件" scheme="http://yoursite.com/categories/%E5%A4%A7%E5%9E%8B%E7%BD%91%E7%AB%99%E4%B8%AD%E9%97%B4%E4%BB%B6/"/>
     
     
       <category term="大型网站系统与中间件实践读书笔记" scheme="http://yoursite.com/tags/%E5%A4%A7%E5%9E%8B%E7%BD%91%E7%AB%99%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%AE%9E%E8%B7%B5%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
@@ -294,7 +328,7 @@
     <link href="http://yoursite.com/2017/10/25/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/"/>
     <id>http://yoursite.com/2017/10/25/消息中间件/</id>
     <published>2017-10-25T07:23:21.000Z</published>
-    <updated>2017-11-01T01:46:05.374Z</updated>
+    <updated>2017-11-07T14:20:27.901Z</updated>
     
     <content type="html"><![CDATA[<h2 id="消息中间件的价值"><a href="#消息中间件的价值" class="headerlink" title="消息中间件的价值"></a>消息中间件的价值</h2><h3 id="消息中间件的定义"><a href="#消息中间件的定义" class="headerlink" title="消息中间件的定义"></a>消息中间件的定义</h3><p>Message oriented middleWare,面向消息的系统（消息中间件）是在分布式系统中完成消息的发送和接收的基础软件</p>
 <h3 id="通过示例看消息中间件对应用的解耦"><a href="#通过示例看消息中间件对应用的解耦" class="headerlink" title="通过示例看消息中间件对应用的解耦"></a>通过示例看消息中间件对应用的解耦</h3><h4 id="通过服务调用让其他系统感知事件发生的方式"><a href="#通过服务调用让其他系统感知事件发生的方式" class="headerlink" title="通过服务调用让其他系统感知事件发生的方式"></a>通过服务调用让其他系统感知事件发生的方式</h4><p>假设我们的登录系统，需要支持的一个功能是发短信给用户，如果在增加后续跟其他系统打交道的工作，会让登录系统变得十分复杂。<br>如登陆系统负责向消息中间件发送消息，而其他的系统则向消息中间件来订阅这个消息，然后完成自己的工作。</p>
@@ -331,7 +365,7 @@
     
     </summary>
     
-      <category term="分布式" scheme="http://yoursite.com/categories/%E5%88%86%E5%B8%83%E5%BC%8F/"/>
+      <category term="大型网站中间件" scheme="http://yoursite.com/categories/%E5%A4%A7%E5%9E%8B%E7%BD%91%E7%AB%99%E4%B8%AD%E9%97%B4%E4%BB%B6/"/>
     
     
       <category term="大型网站系统与中间件实践读书笔记" scheme="http://yoursite.com/tags/%E5%A4%A7%E5%9E%8B%E7%BD%91%E7%AB%99%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%AE%9E%E8%B7%B5%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
@@ -343,7 +377,7 @@
     <link href="http://yoursite.com/2017/10/23/%E6%95%B0%E6%8D%AE%E8%AE%BF%E9%97%AE%E5%B1%82/"/>
     <id>http://yoursite.com/2017/10/23/数据访问层/</id>
     <published>2017-10-23T09:24:31.000Z</published>
-    <updated>2017-11-01T01:46:01.389Z</updated>
+    <updated>2017-11-07T14:20:24.066Z</updated>
     
     <content type="html"><![CDATA[<h2 id="数据库从单机到分布式的挑战和应对"><a href="#数据库从单机到分布式的挑战和应对" class="headerlink" title="数据库从单机到分布式的挑战和应对"></a>数据库从单机到分布式的挑战和应对</h2><h3 id="从应用使用单机数据库开始"><a href="#从应用使用单机数据库开始" class="headerlink" title="从应用使用单机数据库开始"></a>从应用使用单机数据库开始</h3><p>各种类似ODBC、JDBC的封装、以及ORM的封装都很成熟，我们这里重点考虑数据量和访问量增大的时候，系统要面临的问题和相应的解决方案。</p>
 <h3 id="数据库垂直拆分和水平拆分的困难"><a href="#数据库垂直拆分和水平拆分的困难" class="headerlink" title="数据库垂直拆分和水平拆分的困难"></a>数据库垂直拆分和水平拆分的困难</h3><p>垂直拆分会带来的影响：<br>1.单机的ACID保证会被打破；要么放弃单机事务，修改实现，要么引入分布式事务。<br>2.一些join操作会变得比较困难，因为数据已经在两个数据库中，所以不是很方便利用数据库自身的join；<br>3.靠外键进行约束的场景会受限制；<br>水平拆分会带来的影响：<br>1.同样可能ACID会被打破；<br>2.同样join可能会受到影响；<br>3.靠外键进行约束的场景会受限制；<br>4.依靠单库生成递增唯一标识会受影响；<br>5.针对单个逻辑上的表的查询要跨库；</p>
@@ -380,7 +414,7 @@
     
     </summary>
     
-      <category term="分布式" scheme="http://yoursite.com/categories/%E5%88%86%E5%B8%83%E5%BC%8F/"/>
+      <category term="大型网站中间件" scheme="http://yoursite.com/categories/%E5%A4%A7%E5%9E%8B%E7%BD%91%E7%AB%99%E4%B8%AD%E9%97%B4%E4%BB%B6/"/>
     
     
       <category term="大型网站系统与中间件实践读书笔记" scheme="http://yoursite.com/tags/%E5%A4%A7%E5%9E%8B%E7%BD%91%E7%AB%99%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%AE%9E%E8%B7%B5%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
@@ -450,7 +484,7 @@
     <link href="http://yoursite.com/2017/10/19/%E6%9E%84%E5%BB%BAjava%E4%B8%AD%E9%97%B4%E4%BB%B6/"/>
     <id>http://yoursite.com/2017/10/19/构建java中间件/</id>
     <published>2017-10-19T02:59:08.000Z</published>
-    <updated>2017-11-01T01:45:50.248Z</updated>
+    <updated>2017-11-07T14:20:14.511Z</updated>
     
     <content type="html"><![CDATA[<h2 id="java中间件的定义"><a href="#java中间件的定义" class="headerlink" title="java中间件的定义"></a>java中间件的定义</h2><p>基于java基础构建的中间件。中间件为软件应用提供操作系统所提供的服务之外的服务，中间件不是操作系统的一部分，不是数据库管理的一部分，不是软件应用的一部分，而是能够让软件开发者更方便的处理通信、输入、输出，能够专注在他们自己应用的部分。总体来说，中间件不是最上层应用，也不是最底层的操作系统，是处于中间的组件，起到桥梁的作用，是应用和应用之间，应用和服务之间的桥梁。<br>主要有三个领域的中间件：</p>
 <h3 id="远程对象调用和对象访问中间件"><a href="#远程对象调用和对象访问中间件" class="headerlink" title="远程对象调用和对象访问中间件"></a>远程对象调用和对象访问中间件</h3><p>解决分布式的应用互相访问的问题</p>
@@ -493,7 +527,7 @@
     
     </summary>
     
-      <category term="分布式" scheme="http://yoursite.com/categories/%E5%88%86%E5%B8%83%E5%BC%8F/"/>
+      <category term="大型网站中间件" scheme="http://yoursite.com/categories/%E5%A4%A7%E5%9E%8B%E7%BD%91%E7%AB%99%E4%B8%AD%E9%97%B4%E4%BB%B6/"/>
     
     
       <category term="大型网站系统与中间件实践读书笔记" scheme="http://yoursite.com/tags/%E5%A4%A7%E5%9E%8B%E7%BD%91%E7%AB%99%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%AE%9E%E8%B7%B5%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
@@ -505,7 +539,7 @@
     <link href="http://yoursite.com/2017/10/17/%E5%A4%A7%E5%9E%8B%E8%BD%AF%E4%BB%B6%E6%9E%B6%E6%9E%84%E5%8F%8A%E5%85%B6%E7%BB%93%E6%9E%84%E6%BC%94%E8%BF%9B%E8%BF%87%E7%A8%8B/"/>
     <id>http://yoursite.com/2017/10/17/大型软件架构及其结构演进过程/</id>
     <published>2017-10-17T09:25:39.000Z</published>
-    <updated>2017-11-01T01:06:48.195Z</updated>
+    <updated>2017-11-07T14:19:47.456Z</updated>
     
     <content type="html"><![CDATA[<h1 id="什么是大型网站"><a href="#什么是大型网站" class="headerlink" title="什么是大型网站"></a>什么是大型网站</h1><p>访问量和数据量二者缺一不可，本身的业务和系统的复杂度也缺一不可。海量的数据和高并发的访问量，它肯定是个分布式系统</p>
 <h1 id="大型网站的架构演进"><a href="#大型网站的架构演进" class="headerlink" title="大型网站的架构演进"></a>大型网站的架构演进</h1><h2 id="用java技术和单机来构建网站"><a href="#用java技术和单机来构建网站" class="headerlink" title="用java技术和单机来构建网站"></a>用java技术和单机来构建网站</h2><p>选择一个开源的server作为容器，使用一些JSP/servlet技术或者开源框架构建我们的应用，选择一个数据库管理系统来管理数据，通过jdbc进行数据库的连接和操作。</p>
@@ -538,7 +572,7 @@
     
     </summary>
     
-      <category term="分布式" scheme="http://yoursite.com/categories/%E5%88%86%E5%B8%83%E5%BC%8F/"/>
+      <category term="大型网站中间件" scheme="http://yoursite.com/categories/%E5%A4%A7%E5%9E%8B%E7%BD%91%E7%AB%99%E4%B8%AD%E9%97%B4%E4%BB%B6/"/>
     
     
       <category term="大型网站系统与中间件实践读书笔记" scheme="http://yoursite.com/tags/%E5%A4%A7%E5%9E%8B%E7%BD%91%E7%AB%99%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%AE%9E%E8%B7%B5%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
@@ -745,33 +779,6 @@
     
       &lt;p&gt;本周我主要做的工作有，对云取证综述文章以及一些分析文章看了一些。接下来谈谈阅读Impact of Cloud Computing on Traditional Digital Forensic Investigations 的理解。&lt;/p&gt;
 &lt;p&gt;文章首先提出云取证的困难在
-    
-    </summary>
-    
-    
-      <category term="云取证" scheme="http://yoursite.com/tags/%E4%BA%91%E5%8F%96%E8%AF%81/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>云取证第二周周报</title>
-    <link href="http://yoursite.com/2017/05/01/%E4%BA%91%E5%8F%96%E8%AF%81%E7%AC%AC%E4%BA%8C%E5%91%A8%E5%91%A8%E6%8A%A5/"/>
-    <id>http://yoursite.com/2017/05/01/云取证第二周周报/</id>
-    <published>2017-05-01T10:56:11.000Z</published>
-    <updated>2017-06-11T12:48:32.497Z</updated>
-    
-    <content type="html"><![CDATA[<p>本周我主要做的工作有，看了几篇论文，主要还是了解现在云取证的一些情况和了解了一下docker这个新兴的技术在云计算中的应用和使用问题，印象比较深的有几篇云取证综述的论文。Cloud forensics State-of-the-art and future directions、cloud computing and digital forensics这两篇。</p>
-<p>首先是Cloud forensics State-of-the-art and future directions。本论文主要讲的是在现有阶段下云取证的研究进展所面临的的挑战以及移动云取证的一些研究。首先文章开篇讲了在，美国国家标准与技术研究在“NIST云计算取证科学挑战”草案中，这致力于报告这一新兴调查领域的最新进展和最新进展。而在这里，接受率仅为15.4%。这侧面反应了这个评审的难度，也说明现在的挑战还是很大。其次是在新工具的使用上，文章只是提到了促进多节点Hadoop集群中的取证调查，但并没有进行展开讨论。以此为例引出了如果没有开发根本的新工具和能力，取证专家将面临越来越多的困难和成本。因此，今天的数字侦探不仅与罪犯进行军备竞赛，而且还与未来计算机系统的开发者进行了斗争。文章最后提到移动（云）取证是一个未被研究的主题，特别是从提供高级安全性的设备中获取数据，不仅可以用于静态数据（现在已经在所有智能移动设备中变得司空见惯），而且还通过高级加密的数据。NIST IR 8006将挑战分为九组，涉及架构，数据收集，分析，反取证，事件首次响应者，角色管理，法律话题，标准和培训等问题。我的体会是，首先这篇论文也算是我的看的入门第一篇论文，首先在现在云取证面临的挑战是非常大的，不仅在于理论研究还在于新技术的取证工具。文章最后提到的移动云取证现在还是一个比较新的主题，可以算是一个小小备选方案（但我上周和学长们简单交流了下，他们说现在移动云取证几乎该挖的坑都挖完了，所以在这边还是有分歧，有可能跟时间有问题或者跟看的问题角度有关）。</p>
-<p>其次是cloud computing and digital forensics（云取证和数字取证）。这篇论文令我印象深的有这么几点：1.日志这一取证的手段。在网络入侵的情况下，受害者组织普遍存在于准备阶段，为了保护数字犯罪现场，关闭整个网络极少可行。因此，有用的证据可能不再可用，可能难以收集，也许完全不可接触，或者可能没有以法定的方式保存。例如，各种类型的日志在网络入侵调查中可能是非常有价值的，但是许多组织不会收集这些日志或不保留日志超过几天，或者不以确保其完整性的方式存储日志。这给我的体会是可以结合一个场景，将日志这个功能进行完善分析。2. 取证方法的分析，涉及哦取证技术；网络取证工具，内存取证方法和数据库取证方法。里面提到了计算机和智能手机云存储服务留下的痕迹的取证分析，是智能手机中碎片闪存页面的取证分析技术。Fasan和Olivier提出了一种重建存储在数据库中的数字证据的可靠方法（参见“数据库重建算法的正确性证明”）。这是一个重要的话题，因为更多的证据存储在数据库中，包括在云环境中，使得可以将很多证据得以保存，便于以后排查原因入侵者等因素。</p>
-<p>关于Docker的研究。Docker 是一个开源的应用容器引擎，让开发者可以打包他们的应用以及依赖包到一个可移植的容器中，然后发布到任何流行的 Linux 机器上，也可以实现虚拟化。容器是完全使用沙箱机制，相互之间不会有任何接口。docker的出现极大了加快了PAAS的发展，企业私有PAAS构建蓬勃发展起来。可以看到PAAS核心是解决软件代码完成后部署运行运维到监控的所有事情。基于Docker的PaaS平台现在逐渐成为主流。关于docker的安全问题有：</p>
-<h5 id="1-权限及资源限制。"><a href="#1-权限及资源限制。" class="headerlink" title="1.    权限及资源限制。"></a>1.    权限及资源限制。</h5><p>限制用户运行特权及访问资源。对于多租户应用，不同的容器共享同一主机的资源和环境，普通用户权限的恶意提升将会使宿主主机完全处于被非法操控的险境，而对于用户的合法操作，大量的资源申请也会将主机推向崩溃的编译。因此，有必要对用户权限进行限定，避免根权限的赋予，进而减少主机暴露的攻击面和潜力。同时，在CPU、内存及进程数等资源方面，限定用户在单一容器中的可用配额，来防止恶意的无限资源申请给整体系统带来的破坏。<br>镜像及制作管理</p>
-<h5 id="2-对容器的镜像来源进行审核。"><a href="#2-对容器的镜像来源进行审核。" class="headerlink" title="2.对容器的镜像来源进行审核。"></a>2.对容器的镜像来源进行审核。</h5><p>容器镜像制作的简化让用户可以轻而易举的创建自定义的应用镜像，但制作的应用程序千差万别，功能完整性和测试完整性参差不齐。这让用户镜像的产生面临存在众多漏洞的风险，因此需要对镜像的制作过程尽量规范化，对放置的应用程序尽量做到测试完备并符合安全标准，从源头上减少漏洞镜像的生成。而在创建容器过程中，避免使用不受信任的镜像及应用程序，采用标准及合格厂商如时速云的镜像服务mirror，从而保证容器运行时的正规及安全。</p>
-<h5 id="3-日志安全审计及升级补丁"><a href="#3-日志安全审计及升级补丁" class="headerlink" title="3.日志安全审计及升级补丁"></a>3.日志安全审计及升级补丁</h5><p>对容器及系统中宿主机进行定期安全检查及漏洞补丁升级。定期针对容器及所在宿主机的网络环境进行渗透安全测试，及时发现可疑容器或危险服务端口。对主机内核及原始镜像进行定时更新，及时修补公开漏洞。在应用层次，收集及检测容器的安全日志，统计监督应用的运行过程，及时发现服务异常。</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;本周我主要做的工作有，看了几篇论文，主要还是了解现在云取证的一些情况和了解了一下docker这个新兴的技术在云计算中的应用和使用问题，印象比较深的有几篇云取证综述的论文。Cloud forensics State-of-the-art and future directio
     
     </summary>
     
