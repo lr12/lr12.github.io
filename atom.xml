@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-11-10T02:57:29.476Z</updated>
+  <updated>2017-11-10T02:59:23.444Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -16,16 +16,20 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>面向服务的体系架构(SOA)</title>
+    <title>面向服务的体系架构-SOA(第一章)</title>
     <link href="http://yoursite.com/2017/11/10/%E9%9D%A2%E5%90%91%E6%9C%8D%E5%8A%A1%E7%9A%84%E4%BD%93%E7%B3%BB%E6%9E%B6%E6%9E%84-SOA/"/>
     <id>http://yoursite.com/2017/11/10/面向服务的体系架构-SOA/</id>
     <published>2017-11-10T02:57:29.000Z</published>
-    <updated>2017-11-10T02:57:29.476Z</updated>
+    <updated>2017-11-10T02:59:23.444Z</updated>
     
     <summary type="html">
     
     </summary>
     
+      <category term="大型分布式网站架构" scheme="http://yoursite.com/categories/%E5%A4%A7%E5%9E%8B%E5%88%86%E5%B8%83%E5%BC%8F%E7%BD%91%E7%AB%99%E6%9E%B6%E6%9E%84/"/>
+    
+    
+      <category term="大型分布式网站架构设计与实践读书笔记" scheme="http://yoursite.com/tags/%E5%A4%A7%E5%9E%8B%E5%88%86%E5%B8%83%E5%BC%8F%E7%BD%91%E7%AB%99%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E8%B7%B5%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
     
   </entry>
   
