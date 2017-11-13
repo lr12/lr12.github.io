@@ -92,14 +92,17 @@
 
 
 
+<meta name="description" content="伴随着业务体系的发展，系统拆分变成了不可避免的事，由此演变成了垂直应用架构体系。但是随着垂直应用的增多，达到一定的规模，应用之间的相互交互、相互调用不可避免。否则，不同系统之间存在着重复的业务，容易形成信息孤岛，重复造轮子。此时相对核心的业务会被抽出来，作为单独的系统对外提供服务，达成业务之间相互复用，系统也因此演变为分布式应用架构体系。基于http协议之间的系统间的RPC，具有使用灵活、实现便捷">
 <meta name="keywords" content="大型分布式网站架构设计与实践读书笔记">
 <meta property="og:type" content="article">
 <meta property="og:title" content="面向服务的体系架构-SOA(第一章)">
 <meta property="og:url" content="http://yoursite.com/2017/11/10/面向服务的体系架构-SOA/index.html">
 <meta property="og:site_name" content="博客">
-<meta property="og:updated_time" content="2017-11-10T02:59:23.444Z">
+<meta property="og:description" content="伴随着业务体系的发展，系统拆分变成了不可避免的事，由此演变成了垂直应用架构体系。但是随着垂直应用的增多，达到一定的规模，应用之间的相互交互、相互调用不可避免。否则，不同系统之间存在着重复的业务，容易形成信息孤岛，重复造轮子。此时相对核心的业务会被抽出来，作为单独的系统对外提供服务，达成业务之间相互复用，系统也因此演变为分布式应用架构体系。基于http协议之间的系统间的RPC，具有使用灵活、实现便捷">
+<meta property="og:updated_time" content="2017-11-12T01:44:03.987Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="面向服务的体系架构-SOA(第一章)">
+<meta name="twitter:description" content="伴随着业务体系的发展，系统拆分变成了不可避免的事，由此演变成了垂直应用架构体系。但是随着垂直应用的增多，达到一定的规模，应用之间的相互交互、相互调用不可避免。否则，不同系统之间存在着重复的业务，容易形成信息孤岛，重复造轮子。此时相对核心的业务会被抽出来，作为单独的系统对外提供服务，达成业务之间相互复用，系统也因此演变为分布式应用架构体系。基于http协议之间的系统间的RPC，具有使用灵活、实现便捷">
 
 
 
@@ -359,7 +362,11 @@
       
 
       
-        
+        <p>伴随着业务体系的发展，系统拆分变成了不可避免的事，由此演变成了垂直应用架构体系。但是随着垂直应用的增多，达到一定的规模，应用之间的相互交互、相互调用不可避免。否则，不同系统之间存在着重复的业务，容易形成信息孤岛，重复造轮子。此时相对核心的业务会被抽出来，作为单独的系统对外提供服务，达成业务之间相互复用，系统也因此演变为分布式应用架构体系。<br>基于http协议之间的系统间的RPC，具有使用灵活、实现便捷、开放且天生支持异构平台间的调用等多个优点。与之对应的是tcp协议的实现版本，效率更高，实现更复杂，但由于协议和标准不同，很难跨平台和企业间的通信。</p>
+<h2 id="基于TCP协议的RPC"><a href="#基于TCP协议的RPC" class="headerlink" title="基于TCP协议的RPC"></a>基于TCP协议的RPC</h2><h3 id="RPC名词解释"><a href="#RPC名词解释" class="headerlink" title="RPC名词解释"></a>RPC名词解释</h3><p>remote process call，远程过程调用，拥有着RMI、webservice等诸多成熟的方案。RPC将原来的本地调用转变为调用远端的服务器上的方法。<br>RPC的实现包括客户端和服务器端，即服务的调用方和服务提供方。服务调用方发送RPC请求到服务提供方，服务提供方根据调用方提供的参数执行请求方法，将执行结果返回给调用方。其中参数和返回结果序列化。</p>
+<h3 id="对象的序列化"><a href="#对象的序列化" class="headerlink" title="对象的序列化"></a>对象的序列化</h3><p>将对象转成二进制流的过程称为对象的序列化<br>将二进制流转成对象的过程称为对象的反序列化<br>对象的序列化和反序列化有很多成熟的方案：Google protocol Buffers协议、java内置的序列化方式、Hessian、json以及xml。</p>
+<h3 id="基于TCP实现的RPC"><a href="#基于TCP实现的RPC" class="headerlink" title="基于TCP实现的RPC"></a>基于TCP实现的RPC</h3><p>基于java socket的api，能够实现简单的RPC调用。</p>
+
       
     </div>
 
@@ -411,6 +418,10 @@
 
           <div class="post-nav-prev post-nav-item">
             
+              <a href="/2017/11/13/logstash配置/" rel="prev" title="logstash同步数据库">
+                logstash同步数据库 <i class="fa fa-chevron-right"></i>
+              </a>
+            
           </div>
         </div>
       
@@ -456,8 +467,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg"
@@ -472,7 +492,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">25</span>
+                <span class="site-state-item-count">26</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -526,6 +546,22 @@
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#基于TCP协议的RPC"><span class="nav-number">1.</span> <span class="nav-text">基于TCP协议的RPC</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RPC名词解释"><span class="nav-number">1.1.</span> <span class="nav-text">RPC名词解释</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#对象的序列化"><span class="nav-number">1.2.</span> <span class="nav-text">对象的序列化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#基于TCP实现的RPC"><span class="nav-number">1.3.</span> <span class="nav-text">基于TCP实现的RPC</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
