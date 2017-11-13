@@ -74,7 +74,7 @@
 <link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="logstash," />
 
 
 
@@ -93,12 +93,13 @@
 
 
 <meta name="description" content="安装mysql安装logstash下载地址1https://artifacts.elastic.co/downloads/logstash/logstash-5.5.1.zip 准备MySQL的驱动在lib下新建mysqldriver文件夹，并将mysql-connector-java-5.1.25.jar拷贝到mysqldriver文件夹中。 准备Logstash的配置文件在config下新建m">
+<meta name="keywords" content="logstash">
 <meta property="og:type" content="article">
 <meta property="og:title" content="logstash同步数据库">
 <meta property="og:url" content="http://yoursite.com/2017/11/13/logstash配置/index.html">
 <meta property="og:site_name" content="博客">
 <meta property="og:description" content="安装mysql安装logstash下载地址1https://artifacts.elastic.co/downloads/logstash/logstash-5.5.1.zip 准备MySQL的驱动在lib下新建mysqldriver文件夹，并将mysql-connector-java-5.1.25.jar拷贝到mysqldriver文件夹中。 准备Logstash的配置文件在config下新建m">
-<meta property="og:updated_time" content="2017-11-13T12:07:18.409Z">
+<meta property="og:updated_time" content="2017-11-13T12:14:18.607Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="logstash同步数据库">
 <meta name="twitter:description" content="安装mysql安装logstash下载地址1https://artifacts.elastic.co/downloads/logstash/logstash-5.5.1.zip 准备MySQL的驱动在lib下新建mysqldriver文件夹，并将mysql-connector-java-5.1.25.jar拷贝到mysqldriver文件夹中。 准备Logstash的配置文件在config下新建m">
@@ -315,6 +316,28 @@
           </span>
 
           
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/elasticSearch/" itemprop="url" rel="index">
+                    <span itemprop="name">elasticSearch</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
 
           
             
@@ -341,7 +364,7 @@
       
         <h2 id="安装mysql"><a href="#安装mysql" class="headerlink" title="安装mysql"></a>安装mysql</h2><h2 id="安装logstash"><a href="#安装logstash" class="headerlink" title="安装logstash"></a>安装logstash</h2><p>下载地址<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">https://artifacts.elastic.co/downloads/logstash/logstash-5.5.1.zip</div></pre></td></tr></table></figure></p>
 <h3 id="准备MySQL的驱动"><a href="#准备MySQL的驱动" class="headerlink" title="准备MySQL的驱动"></a>准备MySQL的驱动</h3><p>在lib下新建mysqldriver文件夹，并将mysql-connector-java-5.1.25.jar拷贝到mysqldriver文件夹中。</p>
-<h3 id="准备Logstash的配置文件"><a href="#准备Logstash的配置文件" class="headerlink" title="准备Logstash的配置文件"></a>准备Logstash的配置文件</h3><p>在config下新建mysql.conf文件，编辑内容如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div></pre></td><td class="code"><pre><div class="line">input &#123;</div><div class="line">    jdbc &#123;</div><div class="line">        jdbc_driver_library =&gt; <span class="string">"D:/logstash-5.5.1/lib/mysqldriver/mysql-connector-java-5.1.25.jar"</span></div><div class="line">        jdbc_driver_class =&gt; <span class="string">"com.mysql.jdbc.Driver"</span></div><div class="line">        jdbc_connection_string =&gt; <span class="string">"jdbc:mysql://localhost:3306/forelk?autoReconnect=true&amp;useSSL=false"</span></div><div class="line">        jdbc_user =&gt; <span class="string">"root"</span></div><div class="line">        jdbc_password =&gt; <span class="string">"123456"</span></div><div class="line">        schedule =&gt; <span class="string">"* * * * *"</span></div><div class="line">        jdbc_default_timezone =&gt; <span class="string">"Asia/Shanghai"</span></div><div class="line">        statement =&gt; <span class="string">"SELECT * FROM pub_sjjhpt_fwjlb;"</span></div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">output &#123;</div><div class="line">    elasticsearch &#123;</div><div class="line">        index =&gt; <span class="string">"sjjhpt"</span></div><div class="line">        document_type =&gt; <span class="string">"fwjlb"</span></div><div class="line">        document_id =&gt; <span class="string">"%&#123;jkid&#125;"</span></div><div class="line">        hosts =&gt; [<span class="string">"localhost:9200"</span>]</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">参数说明：</div><div class="line">jdbc_driver_library：</div><div class="line">数据库驱动路径，这里我填写的是绝对路径，可自行尝试相对路径；</div><div class="line">jdbc_driver_class：</div><div class="line">驱动名称；</div><div class="line">jdbc_connection_string：</div><div class="line">数据库的连接字符串；</div><div class="line">forelk为数据库名；</div><div class="line">?autoReconnect=<span class="literal">true</span>&amp;useSSL=<span class="literal">false</span>自动重连并禁用SSL；</div><div class="line">jdbc_user：</div><div class="line">数据库用户名；</div><div class="line">jdbc_password：</div><div class="line">数据库密码；</div><div class="line">schedule：</div><div class="line">重复执行导入任务的时间间隔；</div><div class="line">jdbc_default_timezone：</div><div class="line">默认时区设置；</div><div class="line">statement：</div><div class="line">导入的表（查询SQL，可以过滤数据）</div><div class="line">index:</div><div class="line">索引名称（类似数据库名称）；</div><div class="line">document_type：</div><div class="line">类型名称（类似数据库表名）；</div><div class="line">document_id：</div><div class="line">类似主键；</div><div class="line">hosts：</div><div class="line">要导入到的Elasticsearch所在的主机；</div></pre></td></tr></table></figure></p>
+<h3 id="准备Logstash的配置文件"><a href="#准备Logstash的配置文件" class="headerlink" title="准备Logstash的配置文件"></a>准备Logstash的配置文件</h3><p>在config下新建mysql.conf文件，编辑内容如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div></pre></td><td class="code"><pre><div class="line">input &#123;</div><div class="line">    jdbc &#123;</div><div class="line">        jdbc_driver_library =&gt; <span class="string">"D:/logstash-5.5.1/lib/mysqldriver/mysql-connector-java-5.1.25.jar"</span></div><div class="line">        jdbc_driver_class =&gt; <span class="string">"com.mysql.jdbc.Driver"</span></div><div class="line">        jdbc_connection_string =&gt; <span class="string">"jdbc:mysql://localhost:3306/sjjhpt?autoReconnect=true&amp;useSSL=false"</span></div><div class="line">        jdbc_user =&gt; <span class="string">"root"</span></div><div class="line">        jdbc_password =&gt; <span class="string">"123456"</span></div><div class="line">        schedule =&gt; <span class="string">"* * * * *"</span></div><div class="line">        jdbc_default_timezone =&gt; <span class="string">"Asia/Shanghai"</span></div><div class="line">        statement =&gt; <span class="string">"SELECT * FROM pub_sjjhpt_fwjlb;"</span></div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">output &#123;</div><div class="line">    elasticsearch &#123;</div><div class="line">        index =&gt; <span class="string">"sjjhpt"</span></div><div class="line">        document_type =&gt; <span class="string">"fwjlb"</span></div><div class="line">        document_id =&gt; <span class="string">"%&#123;id&#125;"</span></div><div class="line">        hosts =&gt; [<span class="string">"localhost:9200"</span>]</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">参数说明：</div><div class="line">jdbc_driver_library：</div><div class="line">数据库驱动路径，这里我填写的是绝对路径，可自行尝试相对路径；</div><div class="line">jdbc_driver_class：</div><div class="line">驱动名称；</div><div class="line">jdbc_connection_string：</div><div class="line">数据库的连接字符串；</div><div class="line">forelk为数据库名；</div><div class="line">?autoReconnect=<span class="literal">true</span>&amp;useSSL=<span class="literal">false</span>自动重连并禁用SSL；</div><div class="line">jdbc_user：</div><div class="line">数据库用户名；</div><div class="line">jdbc_password：</div><div class="line">数据库密码；</div><div class="line">schedule：</div><div class="line">重复执行导入任务的时间间隔；</div><div class="line">jdbc_default_timezone：</div><div class="line">默认时区设置；</div><div class="line">statement：</div><div class="line">导入的表（查询SQL，可以过滤数据）</div><div class="line">index:</div><div class="line">索引名称（类似数据库名称）；</div><div class="line">document_type：</div><div class="line">类型名称（类似数据库表名）；</div><div class="line">document_id：</div><div class="line">类似主键；</div><div class="line">hosts：</div><div class="line">要导入到的Elasticsearch所在的主机；</div></pre></td></tr></table></figure></p>
 <h3 id="执行导入"><a href="#执行导入" class="headerlink" title="执行导入"></a>执行导入</h3><p>首先启动elasticsearch，然后在logstash目录下Shift+鼠标右键，选择在此处打开命令窗口(W),输入命令<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">bin\logstash <span class="_">-f</span> config\mysql.conf</div></pre></td></tr></table></figure></p>
 <h3 id="执行查询"><a href="#执行查询" class="headerlink" title="执行查询"></a>执行查询</h3><p>可以启动head插件查看也可以通过kibana</p>
 
@@ -370,6 +393,12 @@
     </div>
 
     <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/logstash/" rel="tag"># logstash</a>
+          
+        </div>
       
 
       
@@ -471,7 +500,7 @@
             
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
-                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-count">6</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -482,7 +511,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-count">10</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
