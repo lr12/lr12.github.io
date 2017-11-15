@@ -363,7 +363,11 @@
       
         
           
-            <h2 id="文档"><a href="#文档" class="headerlink" title="文档"></a>文档</h2><h3 id="文档元数据"><a href="#文档元数据" class="headerlink" title="文档元数据"></a>文档元数据</h3><p>_index 文档存储的地方；_type文档代表的对象的类；_id 文档的唯一标识*</p>
+            <h2 id="文档"><a href="#文档" class="headerlink" title="文档"></a>文档</h2><p>文档元数据如下<br>_index 文档存储的地方；_type文档代表的对象的类；_id 文档的唯一标识*</p>
+<h3 id="index"><a href="#index" class="headerlink" title="_index"></a>_index</h3><p>索引(index)类似于关系型数据库里的”数据库”——它是我们存储和索引关联数据的地方。索引名必须是全部小写，不能以下划线开头，不能包含逗号.</p>
+<h3 id="type"><a href="#type" class="headerlink" title="_type"></a>_type</h3><p>在Elasticsearch中，我们使用相同类型(type)的文档表示相同的”事物”，类似关系型数据库中的表，因为他们的数据结构也是相同的。每个类型(type)都有自己的映射(mapping)或者结构定义，就像传统数据库表中的列一样。所有类型下的文档被存储在同一个索引下，但是类型的映射(mapping)会告诉Elasticsearch不同的文档如何被索引._type 的名字可以是大写或小写，不能包含下划线或逗号。</p>
+<h3 id="id"><a href="#id" class="headerlink" title="_id"></a>_id</h3><p>唯一标识一个文档，如果不指定，es自动生成</p>
+<h2 id="索引文档"><a href="#索引文档" class="headerlink" title="索引文档"></a>索引文档</h2><p>自动生成的id一般是22个字节长的uuid<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">PUT _index/_type/_id</div><div class="line">&#123;</div><div class="line"><span class="string">"field"</span>:<span class="string">"value"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 
           
         
