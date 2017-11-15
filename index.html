@@ -273,6 +273,139 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/15/elasticsearch权威后续/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="李睿">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/11/15/elasticsearch权威后续/" itemprop="url">elasticsearch权威后续</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-15T21:44:09+08:00">
+                2017-11-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/elasticSearch/" itemprop="url" rel="index">
+                    <span itemprop="name">elasticSearch</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/15/elasticSearch数据/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -387,7 +520,9 @@
 <h3 id="更新和冲突"><a href="#更新和冲突" class="headerlink" title="更新和冲突"></a>更新和冲突</h3><p>这些可以通过 retry_on_conflict  参数设置重试次数来自动完成，这样 update  操作将会在发生错误前重试——这个值默认为0。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">POST /website/pageviews/1/_update?retry_on_conflict=5</div><div class="line">&#123;</div><div class="line"><span class="string">"script"</span> : <span class="string">"ctx._source.views+=1"</span>,</div><div class="line"><span class="string">"upsert"</span>: &#123;</div><div class="line"><span class="string">"views"</span>: 0</div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <h2 id="mget"><a href="#mget" class="headerlink" title="mget"></a>mget</h2><p>检索多个文档<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">GET /_mget</div><div class="line">&#123;</div><div class="line"><span class="string">"docs"</span> : [</div><div class="line">&#123;</div><div class="line"><span class="string">"_index"</span> : <span class="string">"website"</span>,</div><div class="line"><span class="string">"_type"</span> : <span class="string">"blog"</span>,</div><div class="line"><span class="string">"_id"</span> : 2</div><div class="line">&#125;,</div><div class="line">&#123;</div><div class="line"><span class="string">"_index"</span> : <span class="string">"website"</span>,</div><div class="line"><span class="string">"_type"</span> : <span class="string">"pageviews"</span>,</div><div class="line"><span class="string">"_id"</span> : 1,</div><div class="line"><span class="string">"_source"</span>: <span class="string">"views"</span></div><div class="line">&#125;</div><div class="line">]</div><div class="line">&#125;</div><div class="line">//如果你想检索的文档在同一个 _index  中（甚至在同一个 _type  中），你就可以在URL中定义一个默认的 /_index  或者 /_index/_type  </div><div class="line">GET /website/blog/_mget</div><div class="line">&#123;</div><div class="line"><span class="string">"docs"</span> : [</div><div class="line">&#123; <span class="string">"_id"</span> : 2 &#125;,</div><div class="line">&#123; <span class="string">"_type"</span> : <span class="string">"pageviews"</span>, <span class="string">"_id"</span> : 1 &#125;</div><div class="line">]</div><div class="line">&#125;</div><div class="line">//如果所有文档具有相同 _index  和 _type  ，你可以通过简单的 ids  数组来代替完整的 docs 数组</div><div class="line">GET /website/blog/_mget</div><div class="line">&#123;</div><div class="line"><span class="string">"ids"</span> : [ <span class="string">"2"</span>, <span class="string">"1"</span> ]</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <h2 id="批量"><a href="#批量" class="headerlink" title="批量"></a>批量</h2><p>bulk  API允许我们使用单一请求来实现多个文档的 create  、 index  、 update  或 delete  。这对索引类似于日志活动这样的数据流非常有用，它们可以以成百上千的数据为一个批次按序进行索引。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&#123; action: &#123; metadata &#125;&#125;\n</div><div class="line">&#123; request body &#125;\n</div><div class="line">&#123; action: &#123; metadata &#125;&#125;\n</div><div class="line">&#123; request body &#125;\n</div></pre></td></tr></table></figure></p>
-<p>注意：1.每行必须以 “\n”  符号结尾，包括最后一行。这些都是作为每行有效的分离而做的标记；2.每一行的数据不能包含未被转义的换行符，它们会干扰分析——这意味着JSON不能被美化打印<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">POST /_bulk</div><div class="line">&#123; <span class="string">"delete"</span>: &#123; <span class="string">"_index"</span>: <span class="string">"website"</span>, <span class="string">"_type"</span>: <span class="string">"blog"</span>, <span class="string">"_id"</span>: <span class="string">"123"</span> &#125;&#125; &lt;1&gt;</div><div class="line">&#123; <span class="string">"create"</span>: &#123; <span class="string">"_index"</span>: <span class="string">"website"</span>, <span class="string">"_type"</span>: <span class="string">"blog"</span>, <span class="string">"_id"</span>: <span class="string">"123"</span> &#125;&#125;</div><div class="line">&#123; <span class="string">"title"</span>: <span class="string">"My first blog post"</span> &#125;</div><div class="line">&#123; <span class="string">"index"</span>: &#123; <span class="string">"_index"</span>: <span class="string">"website"</span>, <span class="string">"_type"</span>: <span class="string">"blog"</span> &#125;&#125;</div><div class="line">&#123; <span class="string">"title"</span>: <span class="string">"My second blog post"</span> &#125;</div><div class="line">&#123; <span class="string">"update"</span>: &#123; <span class="string">"_index"</span>: <span class="string">"website"</span>, <span class="string">"_type"</span>: <span class="string">"blog"</span>, <span class="string">"_id"</span>: <span class="string">"123"</span>, <span class="string">"_retry_on_conflict"</span> : 3&#125; &#125;</div><div class="line">&#123; <span class="string">"doc"</span> : &#123;<span class="string">"title"</span> : <span class="string">"My updated blog post"</span>&#125; &#125;</div></pre></td></tr></table></figure></p>
+<p>注意：1.每行必须以 “\n”  符号结尾，包括最后一行。这些都是作为每行有效的分离而做的标记；2.每一行的数据不能包含未被转义的换行符，它们会干扰分析——这意味着JSON不能被美化打印<br>action: create（创建、若存在则报错）、index（创建或替换）、update（更新）、delete（删除文档）<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">POST /_bulk</div><div class="line">&#123; <span class="string">"delete"</span>: &#123; <span class="string">"_index"</span>: <span class="string">"website"</span>, <span class="string">"_type"</span>: <span class="string">"blog"</span>, <span class="string">"_id"</span>: <span class="string">"123"</span> &#125;&#125; &lt;1&gt;</div><div class="line">&#123; <span class="string">"create"</span>: &#123; <span class="string">"_index"</span>: <span class="string">"website"</span>, <span class="string">"_type"</span>: <span class="string">"blog"</span>, <span class="string">"_id"</span>: <span class="string">"123"</span> &#125;&#125;</div><div class="line">&#123; <span class="string">"title"</span>: <span class="string">"My first blog post"</span> &#125;</div><div class="line">&#123; <span class="string">"index"</span>: &#123; <span class="string">"_index"</span>: <span class="string">"website"</span>, <span class="string">"_type"</span>: <span class="string">"blog"</span> &#125;&#125;</div><div class="line">&#123; <span class="string">"title"</span>: <span class="string">"My second blog post"</span> &#125;</div><div class="line">&#123; <span class="string">"update"</span>: &#123; <span class="string">"_index"</span>: <span class="string">"website"</span>, <span class="string">"_type"</span>: <span class="string">"blog"</span>, <span class="string">"_id"</span>: <span class="string">"123"</span>, <span class="string">"_retry_on_conflict"</span> : 3&#125; &#125;</div><div class="line">&#123; <span class="string">"doc"</span> : &#123;<span class="string">"title"</span> : <span class="string">"My updated blog post"</span>&#125; &#125;</div></pre></td></tr></table></figure></p>
+<p>当然，你可以指定index和type，当下面指定时会覆盖掉<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">POST /website/_bulk</div><div class="line">&#123; <span class="string">"index"</span>: &#123; <span class="string">"_type"</span>: <span class="string">"log"</span> &#125;&#125;</div><div class="line">&#123; <span class="string">"event"</span>: <span class="string">"User logged in"</span> &#125;</div><div class="line"></div><div class="line">POST /website/<span class="built_in">log</span>/_bulk</div><div class="line">&#123; <span class="string">"index"</span>: &#123;&#125;&#125;</div><div class="line">&#123; <span class="string">"event"</span>: <span class="string">"User logged in"</span> &#125;</div><div class="line">&#123; <span class="string">"index"</span>: &#123; <span class="string">"_type"</span>: <span class="string">"blog"</span> &#125;&#125;</div><div class="line">&#123; <span class="string">"title"</span>: <span class="string">"Overriding the default type"</span> &#125;</div></pre></td></tr></table></figure></p>
+<p>批量最好的批次在5Mb~15Mb</p>
 
           
         
@@ -1598,147 +1733,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/01/hbase简介/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="李睿">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/01/hbase简介/" itemprop="url">hbase简介(第一章)</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-01T09:38:49+08:00">
-                2017-11-01
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/hbase/" itemprop="url" rel="index">
-                    <span itemprop="name">hbase</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="海量数据的黎明"><a href="#海量数据的黎明" class="headerlink" title="海量数据的黎明"></a>海量数据的黎明</h2><p>hadoop项目有两个模块：HDFS和MapReduce。Hadoop擅长存储任意的、半结构化数据，可以帮助用户分析数据时决定如何解释这些数据，同时允许用户随时更改数据分类的方式；一旦用户更新了算法，只需要重新分析数据。Hadoop是现有数据库的一个补充，提供了数据存储无限的空间，并且针对大文件存储、批量访问和流式访问做了优化。<br>列式存储数据库，以列为单位聚合数据，然后将列值顺序存入磁盘，而行式数据库则是连续存储整行。<br>1.优点是：查询时只有涉及到的列会被读取；投影(projection)很高效；任何列都能作为索引。缺点：选择完成时，被选择的列要重新组装；INSERT/UPDATE比较麻烦。<br>2.更好的进行数据压缩：通过字典表压缩数据。经过字典表进行数据压缩后，表中的字符串才都变成数字了，比如我们的材料名可以用一张材料表，这样子在列存储就可以根据id来关联材料。<br>3.查询性能<br>我们能根据列查询结果通过为运算（&amp;或者|）进行结果合并，加快速度<br>关键步骤如下：<br>1.去字典表里找到字符串对应数字(只进行一次字符串比较)。<br>2.用数字去列表里匹配，匹配上的位置设为1。<br>3.把不同列的匹配结果进行位运算得到符合所有条件的记录下标。<br>4.使用这个下标组装出最终的结果集。<br>Hbase以列式存储的格式存储数据，传统的列式存储比较适合实时存储数据的场景，Hbase比较适合键值对的数据存取或者有序的数据存取。</p>
-<h2 id="关系数据库系统的问题"><a href="#关系数据库系统的问题" class="headerlink" title="关系数据库系统的问题"></a>关系数据库系统的问题</h2><p>数据量大时，索引量也大到足以让数据库的性能直线下降。最后能够提供的查询也只剩下主键查询，最后的采取的方案就是数据分区，也就是分库分表。</p>
-<h2 id="非关系型数据库系统"><a href="#非关系型数据库系统" class="headerlink" title="非关系型数据库系统"></a>非关系型数据库系统</h2><h3 id="维度"><a href="#维度" class="headerlink" title="维度"></a>维度</h3><p>包括数据模型、存储模型、一致性模型、物理模型、读写性能、辅助索引、故障处理、压缩、负载均衡、原子操作的读修改写、加锁等待死锁</p>
-<h3 id="可扩展性"><a href="#可扩展性" class="headerlink" title="可扩展性"></a>可扩展性</h3><h3 id="数据库的范式和反范式"><a href="#数据库的范式和反范式" class="headerlink" title="数据库的范式和反范式"></a>数据库的范式和反范式</h3><h2 id="Hbase结构"><a href="#Hbase结构" class="headerlink" title="Hbase结构"></a>Hbase结构</h2><h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><h3 id="表、行、列和单元格"><a href="#表、行、列和单元格" class="headerlink" title="表、行、列和单元格"></a>表、行、列和单元格</h3><p>最基本的单位是列，一列或者多列构成一行，并由唯一的行健来确定存储。反过来，一个表中有若干行，其中每列可能有多个版本，在每个单元格中存储了不同值。行序是按照字典顺序进行排序的，意思是从左到右一次对比每一个键。关于排序：排列顺序如果跟预期的不一样，需要补键，比如  row-1 永远小于 row-2，无论后面是什么，将始终按照这个顺序排列。行健总是唯一的，否则你就是在更新同一行。行健可以是任意的字节数组，但它不一定是人直接可读。<br>一行由若干列组成，若干列构成一个列族，有助于构建语义边界，还有助于给他们设置某些特性（压缩），或者指示他们存储在内存中。一个列族所有列存储在HFile。<br>常用的引用列的格式为family：qualifier，qualifier是任意字节数组。一个列族没有列的数量限制，可以有数百万列。列值没有类型和长度的限制。NUll值在Hbase不占任何空间。<br>每一列的值或者单元格都有时间戳，不同时间戳区分不同的版本值，同一个单元格的不同版本值按照时间戳降序排序，访问时候优先读取最新的值。这样优化使得新值比老值更容易读到。用户可以指定每个值能保存的最大版本数，此外还支持谓词删除（LSM树）。<br>Hbase是一个稀疏的、分布式的、持久化的、多维的映射、由行健列键和时间戳索引。数据存储模式：(Table,RowKey,Family,Column,TimeStamp)-&gt;value</p>
-<h3 id="自动分区"><a href="#自动分区" class="headerlink" title="自动分区"></a>自动分区</h3><p>Hbase中扩展和负载均衡的基本单元是region，region本质是以行键排序的连续存储的区间。如果region太大，系统会动态拆分，相反会合并region，减少存储文件数量。<br>一张表初始化只有一个region，用户不断插入数据，当数据量超过配置的最大值，会在中间键处将这个region拆分成两个大致相等的region。每一个region只能由一台regionServer加载，而一台RegionServer可以同时加载多个region。（每台regionServer1加载的最佳数量是10~1000，每个region最佳大小是1GB~2GB）。当某个region服务器由于负载过大等原因导致不可用时，系统会将该region转到其他服务器上。</p>
-<h3 id="存储API"><a href="#存储API" class="headerlink" title="存储API"></a>存储API</h3><p>API提供了建表、删表、增加列族、删除列族、修改表、修改列族元数据（压缩，设置块大小）、行键值的增加，删除，查找<br>scan可以限定返回的列或者返回的版本数，可以设置过滤器。系统支持单行事务，进一步实现单行键下存储的数据的 读-修改-写（read-modify-write）序列。单元格的值可以当计数器用，并且支持原子更新，意味着这个计数器可以在一个操作中实现读写，客户端可以基于此实现一个全局强一致的计数器。协处理器(coprocessor): 可以在服务器的地址空间执行来自客户端的代码。用于实现轻量级的批处理作业，或者使用表达式分析或者汇总数据。通过包装器可以将表转换成MapReduce的输入输出目标</p>
-<h3 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h3><p>数据存储在存储文件中，称为HFile，HFile存储的是经过排序的键值映射结构。文件内部由连续的块组成，块的索引信息放在尾部，当打开HFile并加载在内存中，索引信息会优先加载到内存中，每个块的大小为64k。每个HFile都有一个块索引，通过一个磁盘查询就可以实现查询，存储文件写在HDFS中。每次更新数据，都会将数据记录在提交日志中，然后在将数据写入内存memstore,一旦内存超过一定的大小，就会移除内存，作为HFile写入磁盘。移除内存后，就会丢弃提交日志，只保留未持久化的提交日志。数据移出memstore，丢弃提交日志。采用滚动memstore可以实现不阻塞系统读写，即用空的新memstore获取更新数据，将旧的满的memstore转换成一个文件，由于memstore中的数据本来就排序好了，所以存储的时候不用再次排序。删除是在做个删除标记，让客户端无法读取到值。<br>HFile过多的时候有管家机制来处理，合并有两种类型：<br>minor合并：多个小文件合并成一个大文件，由于是多路归并所以速度快<br>major压缩合并：将region中一个列族的若干个HFile重写为一个新HFile。合并扫描所有键值对，顺序重写所有数据，重写数据的过程中会略过做了删除标记的数据。断言删除此时生效。<br>master 负责负载均衡，将繁忙服务器中的region移到负载轻的服务器中。还提供元数据的管理，例如创建表和创建列族。<br>region服务器负责为他们提供的Region提供读写功能<br>数十亿行<em>数百万列</em>数千个版本=TB级别或者PB级别的存储</p>
-<h2 id="Hbase：Hadoop数据库"><a href="#Hbase：Hadoop数据库" class="headerlink" title="Hbase：Hadoop数据库"></a>Hbase：Hadoop数据库</h2><h3 id="命名"><a href="#命名" class="headerlink" title="命名"></a>命名</h3><h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>Hbase是一个分布式的、持久性的、强一致性的存储系统，具有近似最优的写性能和出色的读性能。它充分利用磁盘空间，支持特定列族切换可选压缩算法。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1788,7 +1782,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-count">30</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
