@@ -99,12 +99,12 @@
 <meta property="og:url" content="http://yoursite.com/2017/11/15/elasticsearch权威后续/index.html">
 <meta property="og:site_name" content="博客">
 <meta property="og:description" content="分布式增删改查路由1shard=hash(routing)%number_of_primary_shards routing是一个字符串，默认是_id；这也就解释了主分片的数量只能在创建索引时定义且不能修改：如果主分片的数量在未来改变了，所有先前的路由值就失效了，文档也就永远找不到了 分片交互我们能够发送请求给集群中任意一个节点。每个节点都有能力处理任意请求。每个节点都知道任意文档所在的节点，所以">
-<meta property="og:image" content="http://yoursite.com/img/test.png">
-<meta property="og:updated_time" content="2017-11-16T03:14:20.159Z">
+<meta property="og:image" content="http://yoursite.com/2017/11/15/elasticsearch权威后续/img/test.png">
+<meta property="og:updated_time" content="2017-11-16T03:16:51.443Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="elasticsearch权威后续">
 <meta name="twitter:description" content="分布式增删改查路由1shard=hash(routing)%number_of_primary_shards routing是一个字符串，默认是_id；这也就解释了主分片的数量只能在创建索引时定义且不能修改：如果主分片的数量在未来改变了，所有先前的路由值就失效了，文档也就永远找不到了 分片交互我们能够发送请求给集群中任意一个节点。每个节点都有能力处理任意请求。每个节点都知道任意文档所在的节点，所以">
-<meta name="twitter:image" content="http://yoursite.com/img/test.png">
+<meta name="twitter:image" content="http://yoursite.com/2017/11/15/elasticsearch权威后续/img/test.png">
 
 
 
@@ -371,7 +371,7 @@
 <ul>
 <li>客户端给 Node 1  发送新建、索引或删除请求。</li>
 <li>节点使用文档的_id  确定文档属于分片 0  。它转发请求到 Node 3  ，分片 0  位于这个节点上</li>
-<li>Node 3  在主分片上执行请求，如果成功，它转发请求到相应的位于 Node 1  和 Node 2  的复制节点上当所有的复制节点报告成功,Node 3报告成功到请求的节点，请求的节点再报告给客户端。客户端接收到成功响应的时候，文档的修改已经被应用于主分片和所有的复制分片。你的修改生效了。<h3 id="replication（注意在ElasticSearch-5-0开始被废弃）"><a href="#replication（注意在ElasticSearch-5-0开始被废弃）" class="headerlink" title="replication（注意在ElasticSearch 5.0开始被废弃）"></a>replication（注意在ElasticSearch 5.0开始被废弃）</h3>复制默认的值是 sync。这将导致主分片得到复制分片的成功响应后才返回。<br>如果你设置 replication为 async，请求在主分片上被执行后就会返回给客户端。它依旧会转发请求给复制节点，但你将不知道复制节点成功与否。<h3 id="consistency（注意在ElasticSearch-5-0开始被废弃）"><a href="#consistency（注意在ElasticSearch-5-0开始被废弃）" class="headerlink" title="consistency（注意在ElasticSearch 5.0开始被废弃）"></a>consistency（注意在ElasticSearch 5.0开始被废弃）</h3>默认主分片在尝试写入时需要<strong>规定数量(quorum)或过半的分片（可以是主节点或复制节点）可用。这是防止数据被写入到错的网络分区</strong>。规定的数量计算公式如下：<br>int( (primary + number_of_replicas) / 2 ) + 1<br>consistency允许的值为one（只有一个主分片），all（所有主分片和复制分片）或者默认的quorum或过半分片。<br>注意number_of_replicas是在索引中的的设置，用来定义复制分片的数量，而不是现在活动的复制节点的数量。如果你定义了索引有3个复制节点，那规定数量是：int( (primary + 3 replicas) / 2 ) + 1 = 3<br>但如果你只有2个节点，那你的活动分片不够规定数量，也就不能索引或删除任何文档。<br>注意: 新索引默认有1个复制分片，这意味着为了满足quorum的要求需要两个活动的分片。当然，这个默认设置将阻止我们在单一节点集群中进行操作。为了避开这个问题，规定数量只有在number_of_replicas大于一时才生效。<br><img src="/img/test.png" alt="logo"></li>
+<li>Node 3  在主分片上执行请求，如果成功，它转发请求到相应的位于 Node 1  和 Node 2  的复制节点上当所有的复制节点报告成功,Node 3报告成功到请求的节点，请求的节点再报告给客户端。客户端接收到成功响应的时候，文档的修改已经被应用于主分片和所有的复制分片。你的修改生效了。<h3 id="replication（注意在ElasticSearch-5-0开始被废弃）"><a href="#replication（注意在ElasticSearch-5-0开始被废弃）" class="headerlink" title="replication（注意在ElasticSearch 5.0开始被废弃）"></a>replication（注意在ElasticSearch 5.0开始被废弃）</h3>复制默认的值是 sync。这将导致主分片得到复制分片的成功响应后才返回。<br>如果你设置 replication为 async，请求在主分片上被执行后就会返回给客户端。它依旧会转发请求给复制节点，但你将不知道复制节点成功与否。<h3 id="consistency（注意在ElasticSearch-5-0开始被废弃）"><a href="#consistency（注意在ElasticSearch-5-0开始被废弃）" class="headerlink" title="consistency（注意在ElasticSearch 5.0开始被废弃）"></a>consistency（注意在ElasticSearch 5.0开始被废弃）</h3>默认主分片在尝试写入时需要<strong>规定数量(quorum)或过半的分片（可以是主节点或复制节点）可用。这是防止数据被写入到错的网络分区</strong>。规定的数量计算公式如下：<br>int( (primary + number_of_replicas) / 2 ) + 1<br>consistency允许的值为one（只有一个主分片），all（所有主分片和复制分片）或者默认的quorum或过半分片。<br>注意number_of_replicas是在索引中的的设置，用来定义复制分片的数量，而不是现在活动的复制节点的数量。如果你定义了索引有3个复制节点，那规定数量是：int( (primary + 3 replicas) / 2 ) + 1 = 3<br>但如果你只有2个节点，那你的活动分片不够规定数量，也就不能索引或删除任何文档。<br>注意: 新索引默认有1个复制分片，这意味着为了满足quorum的要求需要两个活动的分片。当然，这个默认设置将阻止我们在单一节点集群中进行操作。为了避开这个问题，规定数量只有在number_of_replicas大于一时才生效。<br><img src="./img/test.png" alt="test"></li>
 </ul>
 
       
