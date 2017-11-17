@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-11-17T07:54:52.887Z</updated>
+  <updated>2017-11-17T08:24:10.054Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2017/11/15/elasticsearch%E6%9D%83%E5%A8%81%E5%90%8E%E7%BB%AD/"/>
     <id>http://yoursite.com/2017/11/15/elasticsearch权威后续/</id>
     <published>2017-11-15T13:44:09.000Z</published>
-    <updated>2017-11-17T07:54:52.887Z</updated>
+    <updated>2017-11-17T08:24:10.054Z</updated>
     
     <content type="html"><![CDATA[<h1 id="分布式增删改查"><a href="#分布式增删改查" class="headerlink" title="分布式增删改查"></a>分布式增删改查</h1><h2 id="路由"><a href="#路由" class="headerlink" title="路由"></a>路由</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">shard=<span class="built_in">hash</span>(routing)%number_of_primary_shards</div></pre></td></tr></table></figure>
 <p>routing是一个字符串，默认是_id；这也就解释了主分片的数量只能在创建索引时定义且不能修改：如果主分片的数量在未来改变了，所有先前的路由值就失效了，文档也就永远找不到了</p>
@@ -120,14 +120,16 @@
 <td>Date</td>
 <td>date</td>
 </tr>
+</tbody>
+</table>
+<table>
+<thead>
 <tr>
-<td>JSON type</td>
-<td>field type</td>
+<th>JSON type</th>
+<th>field type</th>
 </tr>
-<tr>
-<td>-</td>
-<td>-</td>
-</tr>
+</thead>
+<tbody>
 <tr>
 <td>Boolean:true,false</td>
 <td>“boolean”</td>
@@ -189,7 +191,9 @@
 <h2 id="结构化查询-1"><a href="#结构化查询-1" class="headerlink" title="结构化查询"></a>结构化查询</h2><p>使用结构化查询，你需要传递query参数<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">/_search POST</div><div class="line">&#123;</div><div class="line">  &quot;query&quot;: your_query_here</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <h3 id="空查询"><a href="#空查询" class="headerlink" title="空查询"></a>空查询</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">/_search POST</div><div class="line">&#123;</div><div class="line">  <span class="string">"query"</span>: &#123;</div><div class="line">       <span class="string">"match_all"</span>:&#123;</div><div class="line"></div><div class="line">       &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <h3 id="查询子句"><a href="#查询子句" class="headerlink" title="查询子句"></a>查询子句</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line"> QUERY_NAME: &#123;</div><div class="line"> ARGUMENT: VALUE</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line">GET /_search</div><div class="line">&#123;</div><div class="line">  <span class="string">"query"</span>: &#123;</div><div class="line">  <span class="string">"match"</span>: &#123;</div><div class="line">  <span class="string">"tweet"</span>: <span class="string">"elasticsearch"</span></div><div class="line">  &#125;</div><div class="line"> &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="合并多字句"><a href="#合并多字句" class="headerlink" title="合并多字句"></a>合并多字句</h3>]]></content>
+<h3 id="合并多字句"><a href="#合并多字句" class="headerlink" title="合并多字句"></a>合并多字句</h3><p>复合子句(compound)用以合并其他的子句。bool子句允许你合并其他的合法子句，无论是must，must_not还是should<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line"><span class="string">"bool"</span>: &#123;</div><div class="line"> <span class="string">"must"</span>: &#123; <span class="string">"match"</span>: &#123; <span class="string">"email"</span>: <span class="string">"business opportunity"</span> &#125;&#125;,</div><div class="line"><span class="string">"should"</span>: [</div><div class="line">&#123; <span class="string">"match"</span>: &#123; <span class="string">"starred"</span>: <span class="literal">true</span> &#125;&#125;,</div><div class="line">&#123; <span class="string">"bool"</span>: &#123;</div><div class="line"><span class="string">"must"</span>: &#123; <span class="string">"folder"</span>: <span class="string">"inbox"</span> &#125;&#125;,</div><div class="line"><span class="string">"must_not"</span>: &#123; <span class="string">"spam"</span>: <span class="literal">true</span> &#125;&#125;</div><div class="line">&#125;&#125;</div><div class="line">],</div><div class="line"><span class="string">"minimum_should_match"</span>: 1</div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="查询与过滤"><a href="#查询与过滤" class="headerlink" title="查询与过滤"></a>查询与过滤</h2><p>一条查询语句会计算每个文档与查询语句的相关性，会给出一个相关性评分_score并且按照相关性对匹配到的文档进行排序。这种评分方式非常适用于一个没有完全配置结果的全文本搜索。</p>
+]]></content>
     
     <summary type="html">
     
