@@ -398,13 +398,139 @@
 <li>客户端向Node1发送mget请求。</li>
 <li>Node1为每个分片构建一个多条数据检索请求，然后转发到这些请求所需的主分片或复制分片上。当所有回复被接收，Node1构建响应并返回给客户端</li>
 </ol>
-<p>bulk  执行多个create、index、delete和update请求的顺序步骤：</p>
+<p>bulk执行多个create、index、delete和update请求的顺序步骤：</p>
 <ol>
 <li>客户端向Node1发送bulk请求。</li>
 <li>Node1为每个分片构建批量请求，然后转发到这些请求所需的主分片上。</li>
 <li>主分片一个接一个的按序执行操作。当一个操作执行完，主分片转发新文档（或者删除部分）给对应的复制节点，然后执行下一个操作。复制节点为报告所有操作完成，节点报告给请求节点，请求节点整理响应并返回给客户端。</li>
 </ol>
-
+<p>这里我们可以解释bulk的格式，而不是包装成json格式请求：意味着我们需要解析JSON为数组（包括文档数据，可能非常大）、检查每个请求决定应该到哪个分片上、为每个分片创建一个请求的数组、序列化这些数组为内部传输格式、发送请求到每个分片。</p>
+<h1 id="搜索"><a href="#搜索" class="headerlink" title="搜索"></a>搜索</h1><table>
+<thead>
+<tr>
+<th>概念</th>
+<th style="text-align:right">解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>mappings(映射)</td>
+<td style="text-align:right">数据在每个字段中的解释说明</td>
+</tr>
+<tr>
+<td>analysis(分析)</td>
+<td style="text-align:right">全文是如何处理的可以被搜索的</td>
+</tr>
+<tr>
+<td>领域特定语句查询(query DSL)</td>
+<td style="text-align:right">Elasticsearch使用的灵活的、强大的查询语言</td>
+</tr>
+</tbody>
+</table>
+<h2 id="空搜索"><a href="#空搜索" class="headerlink" title="空搜索"></a>空搜索</h2><p>没有指定任何的查询条件，只返回集群索引中的所有文档<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GET /_search</div></pre></td></tr></table></figure></p>
+<h2 id="多索引和多类别"><a href="#多索引和多类别" class="headerlink" title="多索引和多类别"></a>多索引和多类别</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">/_search  //在所有索引的所有类型中搜索</div><div class="line">/gb/_search //在索引gb的所有类型中搜索</div><div class="line">/gb,us/_search //在索引gb us的所有类型中搜索</div><div class="line">/g*,u*/_search //在索引g或u开头的所有类型中搜索</div><div class="line">/gb/user/_search //在索引 gb的类型user中搜索</div><div class="line">/gb,us/user,tweet/_search //在gb、us的user和tweet类型中搜索</div><div class="line">/_all/user,tweet/_search //在user和tweet类型中搜索</div></pre></td></tr></table></figure>
+<h2 id="分页"><a href="#分页" class="headerlink" title="分页"></a>分页</h2><p>size默认为10 from默认为0<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">GET /_search?size=5</div><div class="line">GET /_search?size=5&amp;from=5</div><div class="line">GET /_search?size=5&amp;from=10</div></pre></td></tr></table></figure></p>
+<p>注意：现在假设我们请求第1000页——结果10001到10010。工作方式都相同，不同的是每个分片都必须产生顶端的10010个结果。然后请求节点排序这50050个结果并丢弃50040个！你可以看到在分布式系统中，排序结果的花费随着分页的深入而成倍增长</p>
+<h1 id="映射分析"><a href="#映射分析" class="headerlink" title="映射分析"></a>映射分析</h1><h2 id="确切值和全文文本"><a href="#确切值和全文文本" class="headerlink" title="确切值和全文文本"></a>确切值和全文文本</h2><p>确切值是确定的，正如它的名字一样。比如一个date或用户ID，也可以包含更多的字符串比如username或email地址。全文文本，从另一个角度来说是文本化的数据(常常以人类的语言书写)，比如一片推文(Twitter的文章)或邮件正文<br>确切值是很容易查询的，因为结果是二进制的 – 要么匹配，要么不匹配。</p>
+<h2 id="分析和分析器"><a href="#分析和分析器" class="headerlink" title="分析和分析器"></a>分析和分析器</h2><p>分析(analysis)是这样一个过程：<br>首先，表征化一个文本块为适用于倒排索引单独的词(term)<br>然后标准化这些词为标准形式，提高它们的“可搜索性”或“查全率”</p>
+<h2 id="映射"><a href="#映射" class="headerlink" title="映射"></a>映射</h2><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>标识的数据类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>String</td>
+<td>String</td>
+</tr>
+<tr>
+<td>whole number</td>
+<td>byte、short、integer、long</td>
+</tr>
+<tr>
+<td>floating point</td>
+<td>float、double</td>
+</tr>
+<tr>
+<td>Boolean</td>
+<td>boolean</td>
+</tr>
+<tr>
+<td>Date</td>
+<td>date</td>
+</tr>
+<tr>
+<td>JSON type</td>
+<td>field type</td>
+</tr>
+<tr>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>Boolean:true,false</td>
+<td>“boolean”</td>
+</tr>
+<tr>
+<td>whole number:123</td>
+<td>“long”</td>
+</tr>
+<tr>
+<td>floating point:123.45</td>
+<td>“double”</td>
+</tr>
+<tr>
+<td>String:”123”</td>
+<td>“string”</td>
+</tr>
+<tr>
+<td>string valid date:”2016-05-01”</td>
+<td>date”</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>这意味着，如果你索引一个带引号的数字—— “123”  ，它将被映射为 “string”  类型，而不是 “long”  类型。然而，如果字段已经被映射为 “long”  类型，Elasticsearch将尝试转换字符串为long，并在转换失败时会抛出异常。</p>
+</blockquote>
+<h3 id="查看映射"><a href="#查看映射" class="headerlink" title="查看映射"></a>查看映射</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">get sjjhpt/_mapping/fwjbl</div></pre></td></tr></table></figure>
+<h3 id="index"><a href="#index" class="headerlink" title="index"></a>index</h3><table>
+<thead>
+<tr>
+<th>值</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>analyzed</td>
+<td>首先分析这个字符串，然后索引。换言之，以全文形式索引此字段。</td>
+</tr>
+<tr>
+<td>not_analyzed</td>
+<td>索引这个字段，使之可以被搜索，但是索引内容和指定值一样。不分析此字段</td>
+</tr>
+<tr>
+<td>no</td>
+<td>不索引这个字段。这个字段不能为搜索到</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line"> <span class="string">"userid"</span>:&#123;</div><div class="line">     <span class="string">"type"</span>:<span class="string">"string"</span>,</div><div class="line">     <span class="string">"index"</span>:<span class="string">"not_analyzed"</span></div><div class="line"></div><div class="line"> &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<blockquote>
+<p>其他简单类型——long、double、date等等——也接受index参数，但相应的值只能是 no和not_analyzed,它们的值不能被分析</p>
+</blockquote>
+<h3 id="更新映射"><a href="#更新映射" class="headerlink" title="更新映射"></a>更新映射</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">PUT /gb/_mapping/tweet</div><div class="line">&#123;</div><div class="line"><span class="string">"properties"</span> : &#123;</div><div class="line"><span class="string">"tag"</span> :&#123;</div><div class="line"><span class="string">"type"</span> : <span class="string">"string"</span>,</div><div class="line"><span class="string">"index"</span>: <span class="string">"not_analyzed"</span></div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="复合核心字段类型"><a href="#复合核心字段类型" class="headerlink" title="复合核心字段类型"></a>复合核心字段类型</h2><h3 id="多值字段"><a href="#多值字段" class="headerlink" title="多值字段"></a>多值字段</h3><p>数组：{ “tag”: [ “search”, “nosql” ]}<br>对于数组不需要特殊的映射。任何一个字段可以包含零个、一个或多个值，同样对于全文字段将被分析并产生多个词。这意味着数组中所有值必须为同一类型。你不能把日期和字符窜混合。如果你创建一个新字段，这个字段索引了一个数组，Elasticsearch将使用第一个值的类型来确定这个新字段的类型。</p>
+<h3 id="空字段"><a href="#空字段" class="headerlink" title="空字段"></a>空字段</h3><p>Lucene没法存放null值，所以一个null值的字段被认为是空字段。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="string">"empty_string"</span>: <span class="string">""</span>,</div><div class="line"><span class="string">"null_value"</span>: null,</div><div class="line"><span class="string">"empty_array"</span>: [],</div><div class="line"><span class="string">"array_with_null_value"</span>: [ null ]</div></pre></td></tr></table></figure></p>
+<h3 id="多层对象"><a href="#多层对象" class="headerlink" title="多层对象"></a>多层对象</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">      <span class="string">"gb"</span>: &#123;</div><div class="line">      <span class="string">"tweet"</span>: &#123;</div><div class="line">      <span class="string">"properties"</span>: &#123;</div><div class="line">      <span class="string">"tweet"</span>: &#123; <span class="string">"type"</span>: <span class="string">"string"</span> &#125;,</div><div class="line">      <span class="string">"user"</span>: &#123;</div><div class="line">      <span class="string">"type"</span>: <span class="string">"object"</span>,</div><div class="line">      <span class="string">"properties"</span>: &#123;</div><div class="line">      <span class="string">"id"</span>: &#123; <span class="string">"type"</span>: <span class="string">"string"</span> &#125;,</div><div class="line">      <span class="string">"gender"</span>: &#123; <span class="string">"type"</span>: <span class="string">"string"</span> &#125;,</div><div class="line">      <span class="string">"age"</span>: &#123; <span class="string">"type"</span>: <span class="string">"long"</span> &#125;,</div><div class="line">      <span class="string">"name"</span>: &#123;</div><div class="line">      <span class="string">"type"</span>: <span class="string">"object"</span>,</div><div class="line">      <span class="string">"properties"</span>: &#123;</div><div class="line">      <span class="string">"full"</span>: &#123; <span class="string">"type"</span>: <span class="string">"string"</span> &#125;,</div><div class="line">      <span class="string">"first"</span>: &#123; <span class="string">"type"</span>: <span class="string">"string"</span> &#125;,</div><div class="line">      <span class="string">"last"</span>: &#123; <span class="string">"type"</span>: <span class="string">"string"</span> &#125;</div><div class="line">       &#125;</div><div class="line">        &#125;</div><div class="line">        &#125;</div><div class="line">       &#125;</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>多层对像user的first，我们需要制定他的完整路径，像”user.name.first”或者tweet.user.name.first，而对于lucene，我们不能检索user或者user.name,我们不能检索复杂的结构体.</p>
+<h1 id="结构化查询"><a href="#结构化查询" class="headerlink" title="结构化查询"></a>结构化查询</h1><h2 id="请求体查询"><a href="#请求体查询" class="headerlink" title="请求体查询"></a>请求体查询</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">POST /_search</div><div class="line">&#123;</div><div class="line"><span class="string">"from"</span>: 30,</div><div class="line"><span class="string">"size"</span>: 10</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="结构化查询-1"><a href="#结构化查询-1" class="headerlink" title="结构化查询"></a>结构化查询</h2><p>使用结构化查询，你需要传递query参数<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">/_search POST</div><div class="line">&#123;</div><div class="line">  &quot;query&quot;: your_query_here</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="空查询"><a href="#空查询" class="headerlink" title="空查询"></a>空查询</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">/_search POST</div><div class="line">&#123;</div><div class="line">  <span class="string">"query"</span>: &#123;</div><div class="line">       <span class="string">"match_all"</span>:&#123;</div><div class="line"></div><div class="line">       &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="查询子句"><a href="#查询子句" class="headerlink" title="查询子句"></a>查询子句</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line"> QUERY_NAME: &#123;</div><div class="line"> ARGUMENT: VALUE</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line">GET /_search</div><div class="line">&#123;</div><div class="line">  <span class="string">"query"</span>: &#123;</div><div class="line">  <span class="string">"match"</span>: &#123;</div><div class="line">  <span class="string">"tweet"</span>: <span class="string">"elasticsearch"</span></div><div class="line">  &#125;</div><div class="line"> &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="合并多字句"><a href="#合并多字句" class="headerlink" title="合并多字句"></a>合并多字句</h3>
           
         
       
