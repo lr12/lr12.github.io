@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-11-24T15:18:02.045Z</updated>
+  <updated>2017-11-24T16:17:42.488Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -16,11 +16,11 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>dubbo 功能介绍</title>
-    <link href="http://yoursite.com/2017/11/24/dubbo-%E5%8A%9F%E8%83%BD%E4%BB%8B%E7%BB%8D/"/>
-    <id>http://yoursite.com/2017/11/24/dubbo-功能介绍/</id>
+    <title>dubbo功能介绍</title>
+    <link href="http://yoursite.com/2017/11/24/dubbo%E5%8A%9F%E8%83%BD%E4%BB%8B%E7%BB%8D/"/>
+    <id>http://yoursite.com/2017/11/24/dubbo功能介绍/</id>
     <published>2017-11-24T14:53:33.000Z</published>
-    <updated>2017-11-24T15:18:02.045Z</updated>
+    <updated>2017-11-24T16:17:42.488Z</updated>
     
     <content type="html"><![CDATA[<h1 id="dubbo简要介绍"><a href="#dubbo简要介绍" class="headerlink" title="dubbo简要介绍"></a>dubbo简要介绍</h1><h2 id="dubbo是什么"><a href="#dubbo是什么" class="headerlink" title="dubbo是什么"></a>dubbo是什么</h2><p>它是分布式服务框架，高性能和透明化的RPC远程服务调用方案；SOA服务治理方案</p>
 <h2 id="如何使用dubbo"><a href="#如何使用dubbo" class="headerlink" title="如何使用dubbo"></a>如何使用dubbo</h2><p>本地服务<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;bean id=<span class="string">"xxxService"</span> class=<span class="string">"xxxServiceImpl"</span> /&gt;</div></pre></td></tr></table></figure></p>
@@ -28,6 +28,7 @@
 <h2 id="dubbo能做什么"><a href="#dubbo能做什么" class="headerlink" title="dubbo能做什么"></a>dubbo能做什么</h2><h3 id="透明化的远程调用"><a href="#透明化的远程调用" class="headerlink" title="透明化的远程调用"></a>透明化的远程调用</h3><p>就像调用本地方法一样调用远程方法；只需简单配置，没有任何API侵入。</p>
 <h3 id="软负载均衡和容错机制"><a href="#软负载均衡和容错机制" class="headerlink" title="软负载均衡和容错机制"></a>软负载均衡和容错机制</h3><p>可在内网替代F5等硬件负载均衡器</p>
 <h3 id="服务自动注册与发现"><a href="#服务自动注册与发现" class="headerlink" title="服务自动注册与发现"></a>服务自动注册与发现</h3><p>不再需要写死服务提供方地址，注册中心基于接口名查询服务提供者的ip地址，并且能够平滑添加和删除服务提供者。</p>
+<h2 id="dubbo基本原理"><a href="#dubbo基本原理" class="headerlink" title="dubbo基本原理"></a>dubbo基本原理</h2><p><img src="/2017/11/24/dubbo功能介绍/dubbo基本原理.png" alt="dubbo基本原理"></p>
 ]]></content>
     
     <summary type="html">
