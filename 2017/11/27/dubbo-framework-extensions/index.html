@@ -92,14 +92,28 @@
 
 
 
+<meta name="description" content="frameworklayers modules SPIIOC&amp;amp;AOP对于扩展实现IOC依赖注入功能：举例来说：接口A，实现者A1、A2。接口B，实现者B1、B2。现在实现者A1含有setB()方法，会自动注入一个接口B的实现者，此时注入B1还是B2呢？都不是，而是注入一个动态生成的接口B的实现者B$Adpative，该实现者能够根据参数的不同，自动引用B1或者B2来完成相应的功能.对扩展">
 <meta name="keywords" content="dubbo">
 <meta property="og:type" content="article">
 <meta property="og:title" content="dubbo_framework_extensions">
 <meta property="og:url" content="http://yoursite.com/2017/11/27/dubbo-framework-extensions/index.html">
 <meta property="og:site_name" content="博客">
-<meta property="og:updated_time" content="2017-11-27T02:47:06.113Z">
+<meta property="og:description" content="frameworklayers modules SPIIOC&amp;amp;AOP对于扩展实现IOC依赖注入功能：举例来说：接口A，实现者A1、A2。接口B，实现者B1、B2。现在实现者A1含有setB()方法，会自动注入一个接口B的实现者，此时注入B1还是B2呢？都不是，而是注入一个动态生成的接口B的实现者B$Adpative，该实现者能够根据参数的不同，自动引用B1或者B2来完成相应的功能.对扩展">
+<meta property="og:image" content="http://yoursite.com/2017/11/27/dubbo-framework-extensions/do.png">
+<meta property="og:image" content="http://yoursite.com/2017/11/27/dubbo-framework-extensions/framework1.png">
+<meta property="og:image" content="http://yoursite.com/2017/11/27/dubbo-framework-extensions/extension.png">
+<meta property="og:image" content="http://yoursite.com/2017/11/27/dubbo-framework-extensions/modules.png">
+<meta property="og:image" content="http://yoursite.com/2017/11/27/dubbo-framework-extensions/protocol.png">
+<meta property="og:image" content="http://yoursite.com/2017/11/27/dubbo-framework-extensions/filter.png">
+<meta property="og:image" content="http://yoursite.com/2017/11/27/dubbo-framework-extensions/proxyFactory.png">
+<meta property="og:image" content="http://yoursite.com/2017/11/27/dubbo-framework-extensions/javassist.png">
+<meta property="og:image" content="http://yoursite.com/2017/11/27/dubbo-framework-extensions/cluster.png">
+<meta property="og:image" content="http://yoursite.com/2017/11/27/dubbo-framework-extensions/remoting.png">
+<meta property="og:updated_time" content="2017-11-29T09:12:20.774Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="dubbo_framework_extensions">
+<meta name="twitter:description" content="frameworklayers modules SPIIOC&amp;amp;AOP对于扩展实现IOC依赖注入功能：举例来说：接口A，实现者A1、A2。接口B，实现者B1、B2。现在实现者A1含有setB()方法，会自动注入一个接口B的实现者，此时注入B1还是B2呢？都不是，而是注入一个动态生成的接口B的实现者B$Adpative，该实现者能够根据参数的不同，自动引用B1或者B2来完成相应的功能.对扩展">
+<meta name="twitter:image" content="http://yoursite.com/2017/11/27/dubbo-framework-extensions/do.png">
 
 
 
@@ -359,7 +373,17 @@
       
 
       
-        
+        <p><img src="/2017/11/27/dubbo-framework-extensions/do.png" alt="do"></p>
+<h2 id="framework"><a href="#framework" class="headerlink" title="framework"></a>framework</h2><h3 id="layers"><a href="#layers" class="headerlink" title="layers"></a>layers</h3><p><img src="/2017/11/27/dubbo-framework-extensions/framework1.png" alt="do"><br><img src="/2017/11/27/dubbo-framework-extensions/extension.png" alt="do"></p>
+<h3 id="modules"><a href="#modules" class="headerlink" title="modules"></a>modules</h3><p><img src="/2017/11/27/dubbo-framework-extensions/modules.png" alt="do"></p>
+<h2 id="SPI"><a href="#SPI" class="headerlink" title="SPI"></a>SPI</h2><h3 id="IOC-amp-AOP"><a href="#IOC-amp-AOP" class="headerlink" title="IOC&amp;AOP"></a>IOC&amp;AOP</h3><p>对于扩展实现IOC依赖注入功能：<br>举例来说：接口A，实现者A1、A2。接口B，实现者B1、B2。<br>现在实现者A1含有setB()方法，会自动注入一个接口B的实现者，此时注入B1还是B2呢？都不是，而是注入一个动态生成的接口B的实现者B$Adpative，该实现者能够根据参数的不同，自动引用B1或者B2来完成相应的功能.对扩展采用装饰器模式进行功能增强，类似AOP实现的功能.<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">//IOC</div><div class="line">public XxxCluster implements Cluster &#123;</div><div class="line">   private LoadBalance loadbalance;</div><div class="line">   public void <span class="built_in">set</span>LoadBalance(LoadBalance loadbalance) &#123;</div><div class="line">       this.loadbalance = loadbalance;</div><div class="line">     &#125;</div><div class="line">&#125;</div><div class="line">//AOP</div><div class="line">public XxxCluster implements Cluster &#123;</div><div class="line">   private Cluster cluster;</div><div class="line">   public XxxCluster(Cluster cluster) &#123;</div><div class="line">      this.cluster = cluster;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><img src="/2017/11/27/dubbo-framework-extensions/protocol.png" alt="protocol"><br><img src="/2017/11/27/dubbo-framework-extensions/filter.png" alt=""><br><img src="/2017/11/27/dubbo-framework-extensions/proxyFactory.png" alt=""><br><img src="/2017/11/27/dubbo-framework-extensions/javassist.png" alt=""><br><img src="/2017/11/27/dubbo-framework-extensions/cluster.png" alt=""><br><img src="/2017/11/27/dubbo-framework-extensions/remoting.png" alt=""></p>
+<h2 id="API"><a href="#API" class="headerlink" title="API"></a>API</h2><h3 id="config"><a href="#config" class="headerlink" title="config"></a>config</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">//Application shared</div><div class="line">&lt;dubbo:application name=<span class="string">"xxx"</span> /&gt;</div><div class="line">&lt;dubbo:registry address=<span class="string">"127.0.0.1"</span> /&gt;</div><div class="line">//provider</div><div class="line">&lt;dubbo:protocol name=<span class="string">"dubbo"</span> port=<span class="string">"7777"</span> /&gt;</div><div class="line">&lt;dubbo:service interface=<span class="string">"xxxx"</span> /&gt;</div><div class="line">&lt;dubbo:provider protocol=<span class="string">"dubbo"</span> /&gt;</div><div class="line">//consumer</div><div class="line">&lt;dubbo:reference interface=<span class="string">"xxxx"</span> /&gt;</div><div class="line">&lt;dubbo:consumer timeout /&gt;</div></pre></td></tr></table></figure>
+<h3 id="config-type"><a href="#config-type" class="headerlink" title="config type"></a>config type</h3><ul>
+<li>Service Identification<br>group<br>version<br>interface</li>
+<li>Service Governance<br>deprecated<br>application</li>
+</ul>
+
       
     </div>
 
@@ -411,8 +435,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2017/11/27/es全文搜索/" rel="prev" title="es全文搜索">
-                es全文搜索 <i class="fa fa-chevron-right"></i>
+              <a href="/2017/11/27/es全文搜索/" rel="prev" title="elasticsearch深入搜索">
+                elasticsearch深入搜索 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -460,8 +484,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg"
@@ -530,6 +563,22 @@
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#framework"><span class="nav-number">1.</span> <span class="nav-text">framework</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#layers"><span class="nav-number">1.1.</span> <span class="nav-text">layers</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#modules"><span class="nav-number">1.2.</span> <span class="nav-text">modules</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SPI"><span class="nav-number">2.</span> <span class="nav-text">SPI</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#IOC-amp-AOP"><span class="nav-number">2.1.</span> <span class="nav-text">IOC&AOP</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#API"><span class="nav-number">3.</span> <span class="nav-text">API</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#config"><span class="nav-number">3.1.</span> <span class="nav-text">config</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#config-type"><span class="nav-number">3.2.</span> <span class="nav-text">config type</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
