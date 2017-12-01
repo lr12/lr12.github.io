@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-12-01T06:52:17.005Z</updated>
+  <updated>2017-12-01T15:38:58.127Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2017/12/01/%E9%AB%98%E6%80%A7%E8%83%BD%E7%BD%91%E7%BB%9C%E9%80%9A%E8%AE%AF/"/>
     <id>http://yoursite.com/2017/12/01/高性能网络通讯/</id>
     <published>2017-12-01T01:31:02.000Z</published>
-    <updated>2017-12-01T06:52:17.005Z</updated>
+    <updated>2017-12-01T15:38:58.127Z</updated>
     
     <content type="html"><![CDATA[<h2 id="简单的RPC调用问题"><a href="#简单的RPC调用问题" class="headerlink" title="简单的RPC调用问题"></a>简单的RPC调用问题</h2><h3 id="简单的远程调用"><a href="#简单的远程调用" class="headerlink" title="简单的远程调用"></a>简单的远程调用</h3><h4 id="客户端调用"><a href="#客户端调用" class="headerlink" title="客户端调用"></a>客户端调用</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">HelloService helloService=getProxy(HelloService.class,<span class="string">"127.0.0.1"</span>,<span class="string">"2580"</span>);</div><div class="line">System.out.println(helloService.sayHello(<span class="string">"hi, charles"</span>));</div><div class="line">Public &lt;T&gt; T getProxy(Class&lt;T&gt; interfaceClass, String host, int port)&#123;</div><div class="line"><span class="built_in">return</span> (T) Proxy.newProxyInstance(interfaceClass.getClassLoader(), new</div><div class="line">Class&lt;?&gt;[] &#123;interfaceClass&#125;,</div><div class="line">new <span class="function"><span class="title">InvocationHandler</span></span>() &#123;</div><div class="line">public Object invoke(Object proxy, Method method, Object[]</div><div class="line">arguments) throws Throwable &#123;</div><div class="line">Socket socket = new Socket(host, port);</div><div class="line">ObjectOutputStream output = new</div><div class="line">ObjectOutputStream(socket.getOutputStream());</div><div class="line">output.writeUTF(method.getName());</div><div class="line">output.writeObject(method.getParameterTypes());</div><div class="line">output.writeObject(arguments);</div><div class="line">ObjectInputStream input = new</div><div class="line">ObjectInputStream(socket.getInputStream());</div><div class="line"><span class="built_in">return</span> input.readObject();&#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
 <h4 id="服务器端调用"><a href="#服务器端调用" class="headerlink" title="服务器端调用"></a>服务器端调用</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">ServerSocket server = new ServerSocket(port);</div><div class="line"><span class="keyword">while</span>(<span class="literal">true</span>)&#123;</div><div class="line">   final Socket socket= server.accept();</div><div class="line">   new Thread(new Runnable(</div><div class="line">     public void <span class="function"><span class="title">run</span></span>()&#123;</div><div class="line">       ObjectInputStream input=new ObjectInputStream(socket.getInputStream());</div><div class="line">       String methodName=input.readUTF();</div><div class="line">       Class&lt;?&gt;[] parameterTypes = (Class&lt;?&gt;[])input.readObject();</div><div class="line">       Object[] arguments = (Object[])input.readObject();</div><div class="line">       ObjectOutputStream output = new</div><div class="line">       ObjectOutputStream(socket.getOutputStream());</div><div class="line">       Method method = service.getClass().getMethod(methodName,</div><div class="line">       parameterTypes);</div><div class="line">       Object result = method.invoke(service, arguments);</div><div class="line">       output.writeObject(result);</div><div class="line">     &#125;</div><div class="line">   )).start();</div><div class="line">&#125;</div><div class="line">Public String sysHello(String input)&#123;</div><div class="line">  <span class="built_in">return</span> input+<span class="string">":wellcome."</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
@@ -36,6 +36,52 @@
 <li>线程；当接收到数据时，如何分发数据进行处理</li>
 </ol>
 <p><img src="/2017/12/01/高性能网络通讯/dataProtocol.png" alt=""><br><img src="/2017/12/01/高性能网络通讯/dataFlow.png" alt=""><br><img src="/2017/12/01/高性能网络通讯/dubbohead.png" alt=""><br><img src="/2017/12/01/高性能网络通讯/datahead.png" alt=""></p>
+<h3 id="data-Header"><a href="#data-Header" class="headerlink" title="data Header"></a>data Header</h3><p>magic code<br>多协议支持<br>Telnet<br>兼容<br>Long id vs id轮转<br>同步转异步<br>过期策略+id轮转<br>扩展header（拥塞控制&amp;response header增加服务器状态）</p>
+<h4 id="同步转异步"><a href="#同步转异步" class="headerlink" title="同步转异步"></a>同步转异步</h4><p>并行发起多个请求，但只使用一个线程<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">xxxService.find();</div><div class="line">Future&lt;Xxx&gt; future=RpcContext.getContext().getFuture();</div></pre></td></tr></table></figure></p>
+<p><img src="/2017/12/01/高性能网络通讯/asy.png" alt=""></p>
+<h4 id="body序列化"><a href="#body序列化" class="headerlink" title="body序列化"></a>body序列化</h4><p>数据大小（传输速度）<br>序列化和反序列速度(CPU资源)<br>兼容性和易用性<br><img src="/2017/12/01/高性能网络通讯/序列化.png" alt=""><br><img src="/2017/12/01/高性能网络通讯/size_dfl.png" alt=""></p>
+<ul>
+<li>远程服务调用时间主要消耗<br>网络开销主要是数据包大小<br>生产环境某应用容量测试</li>
+<li>dubbo序列化主要优化目标：<br>减少数据包大小<br>提高序列化反序列化性能</li>
+</ul>
+<h2 id="IO-model"><a href="#IO-model" class="headerlink" title="IO model"></a>IO model</h2><p>IO Model、NIO、TCP选项、IRQ</p>
+<h3 id="IO模型"><a href="#IO模型" class="headerlink" title="IO模型"></a>IO模型</h3><p>IO请求分为两个阶段：<br>等待数据就绪；从内存缓存区拷贝数据到进程缓存区<br>Unix5种IO模型：<br>阻塞IO、非阻塞IO、多路复用IO、信号驱动IO、异步IO<br><img src="/2017/12/01/高性能网络通讯/io.png" alt=""></p>
+<h3 id="NIO的好处"><a href="#NIO的好处" class="headerlink" title="NIO的好处"></a>NIO的好处</h3><ul>
+<li>事件驱动模型，避免多线程和单线程处理多任务。</li>
+<li>IO读写不再阻塞，而是返回0.</li>
+<li>基于block的传输，比基于流的传输更高效</li>
+<li>更高级的IO函数，zero-copy</li>
+<li>IO多路复用大大提高了java网络应用的可伸缩性和实用性</li>
+</ul>
+<h3 id="NIO-reactor模式"><a href="#NIO-reactor模式" class="headerlink" title="NIO reactor模式"></a>NIO reactor模式</h3><ul>
+<li>NIO网络框架典型模式</li>
+<li>核心组件<br>同步事件多路复用器(event loop 事件分离)<br>分发器（事件派发，可以多线程）<br>请求处理（事件处理，业务代码）</li>
+<li>mina netty都是此模式的实现</li>
+</ul>
+<p><img src="/2017/12/01/高性能网络通讯/reactor.png" alt=""></p>
+<h3 id="NIO优化-TCP选项"><a href="#NIO优化-TCP选项" class="headerlink" title="NIO优化-TCP选项"></a>NIO优化-TCP选项</h3><p>合理设置tcp/ip在某些时候可以起到显著的效果</p>
+<h3 id="SO-RCVBUF和SO-SNDBUF"><a href="#SO-RCVBUF和SO-SNDBUF" class="headerlink" title="SO_RCVBUF和SO_SNDBUF"></a>SO_RCVBUF和SO_SNDBUF</h3><ul>
+<li>Socket缓冲区至少应该是连接的MSS的四倍，MSS=MTU+40，一般以太网的MTU等于1500字节，MSS：最大分段大小，MTU：最大传输单元</li>
+<li>在以太网上4k是不够的，增加到16k，吞吐量增加40%</li>
+<li>对于一次性发送大量数据的应用，增加发送缓冲区到48k、64k才是可能唯一有效提高性能的方式。为了最大化性能，发送缓冲区可能至少要跟BDP（带宽延迟乘积）一样大小。</li>
+<li>对于大量接收数据的应用，提高接收缓冲区，能减少发送端的阻塞。</li>
+<li>如果应用既发送大量数据，也接收大量数据，recvbuffer和send buffer应该同时增加</li>
+</ul>
+<h3 id="带宽延迟乘积–BDP"><a href="#带宽延迟乘积–BDP" class="headerlink" title="带宽延迟乘积–BDP"></a>带宽延迟乘积–BDP</h3><p>为了优化TCP 吞吐量（假设为合理的无差错传输路径），发送端应该发送足够的数据包以填满发送端和接收端之间的逻辑管道。<br>逻辑管道的容量计算：BDP= 带宽x RTT</p>
+<h3 id="Nagle算法"><a href="#Nagle算法" class="headerlink" title="Nagle算法"></a>Nagle算法</h3><p>nagle算法通过将缓冲区的小封包自动相连，组成较大的封包，阻止大量小封包的发送阻塞网络，从而提高网络应用效率。<br>实时性要求较高的应用，需要关闭算法，否则响应时间会受影响。</p>
+<h3 id="SO-KeepAlive"><a href="#SO-KeepAlive" class="headerlink" title="SO_KeepAlive"></a>SO_KeepAlive</h3><p>Socket.setKeepAlive(boolean)<br>这是TCP层，而非HTTP协议的keep-alive概念,默认一般为false，用于TCP连接保活，默认间<br>隔2个小时.TCP心跳间隔是全局设置，建议在应用层做心跳</p>
+<h3 id="软中断"><a href="#软中断" class="headerlink" title="软中断"></a>软中断</h3><p>软中断此时都是运行在在硬件中断相应的cpu上。<br>如果始终是cpu0相应网卡的硬件中断，那么始终都是cpu0在处理软中断，而此时cpu1就被浪费了，因为无法并行的执行多个软中断。</p>
+<h3 id="RPS"><a href="#RPS" class="headerlink" title="RPS"></a>RPS</h3><p>RPS (Receive Packet Steering) 基本原理<br>– 根据数据包的源地址，目的地址以及目的和源端口，计算出一个hash值，然后根据这个hash值来选择软中断运行的cpu，<br>– 从上层来看，也就是说将每个连接和cpu绑定，并通过这个hash值，来均衡软中断在多个cpu上。</p>
+<h2 id="线程模型"><a href="#线程模型" class="headerlink" title="线程模型"></a>线程模型</h2><h3 id="线程模型内容"><a href="#线程模型内容" class="headerlink" title="线程模型内容"></a>线程模型内容</h3><ul>
+<li>Reactor线程模型</li>
+<li>序列化线程</li>
+<li>业务线程派发策略</li>
+</ul>
+<h3 id="Reator单线程模型"><a href="#Reator单线程模型" class="headerlink" title="Reator单线程模型"></a>Reator单线程模型</h3><p><img src="/2017/12/01/高性能网络通讯/reactor单线程.png" alt=""></p>
+<h3 id="Reactor多线程模型"><a href="#Reactor多线程模型" class="headerlink" title="Reactor多线程模型"></a>Reactor多线程模型</h3><p><img src="/2017/12/01/高性能网络通讯/reactor多线程.png" alt=""></p>
+<h3 id="线程派发策略"><a href="#线程派发策略" class="headerlink" title="线程派发策略"></a>线程派发策略</h3><p>五个事件：连接建立（Connection）、连接断开（Disconnection）、消息已接受(MessageReceived)、消息已发送（sent）、异常（Exception  caught）<br>派发策略：1.五个事件共享一个线程池；2.Connection和disconnect使用独立的线程池，size为1；3.全部不派发线程池，IO线程处理</p>
+<h3 id="线程池大小"><a href="#线程池大小" class="headerlink" title="线程池大小"></a>线程池大小</h3><h4 id="demo1"><a href="#demo1" class="headerlink" title="demo1"></a>demo1</h4><p>有这样一个模块<br>cpu 计算时间 18ms （ running ）<br>查询数据库，网络 io 时间 80ms （ waiting ）<br>解析结果 2ms 如果服务器 2CPU ，大家看看这里多少线程合适<br>充分利用cpu资源：<br>线程数量=100/20<em>2=10<br>从CPU角度而言<br>线程数量=（cpu时间+cpu等待时间）/cpu时间</em>cpu数量</p>
+<h4 id="demo2"><a href="#demo2" class="headerlink" title="demo2"></a>demo2</h4><p>有这样一个模块：<br>线程同步锁 ( 数据库事务锁 )50ms<br>cpu 时间 18ms<br>查询数据库，网络 io 时间 80ms<br>解析结果 2ms  如果服务器有 2 个 CPU ，这个模块线程多少合适？<br>CPU计算为瓶颈，计算线程数量<br>线程数=(18 + 2 + 50 + 80) / 20 <em> 2 = 15<br>以线程同步锁为瓶颈，计算线程数<br>线程数=(50 + 18 + 2 + 80) / 50 </em> 1/1 = 3<br>公式一：<br>线程数量= （线程总时间/ 瓶颈资源时间）<em>  瓶颈资源的线程并行数<br>准确的讲<br>瓶颈资源的线程并行数= 瓶颈资源的总份数/ 单次请求占用瓶颈资源的份数<br>约束：<br>在计算的时候，对同一类资源的消耗时间进行合并<br>公式二：<br>QPS=1000/线程总时间</em>线程数<br>注意：如果线程数不够，则QPS减少。线程本身也要消耗资源，如果线程太多，同样QPS会下降。</p>
 ]]></content>
     
     <summary type="html">
