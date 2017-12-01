@@ -273,6 +273,162 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/07/hbase架构/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="李睿">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/11/07/hbase架构/" itemprop="url">hbase架构</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-07T22:19:10+08:00">
+                2017-11-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/hbase/" itemprop="url" rel="index">
+                    <span itemprop="name">hbase</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="数据查找和存储"><a href="#数据查找和存储" class="headerlink" title="数据查找和存储"></a>数据查找和存储</h2><h3 id="B-树"><a href="#B-树" class="headerlink" title="B+树"></a>B+树</h3><p>B+树的性质使得能够对主键进行高效的插入、查找以及删除，B+树远好于二叉树的数据划分，大大减少查询特定主键所需要的IO。此外，B+树能够提供高效的范围扫描，由于叶节点相互连接且主键有序，扫描时避免了耗时的遍历树的操作。在很多关系型数据库中，都把该数据结构用做索引。<br>当添加新的索引时，可能会使得页表满了拆分成两个页表，若页表不在一块，在进行范围查询时，需要读取不在一块的页表甚至很远的页表，因此我们需要优化该表，使用optimize table，将B+顺序写，使得范围查找时加快。</p>
+<h3 id="LSM树-Log-Structured-Merge"><a href="#LSM树-Log-Structured-Merge" class="headerlink" title="LSM树(Log Structured Merge)"></a>LSM树(Log Structured Merge)</h3><p>输入数据首先存储在日志文件中，这些文件的完全有序，当有日志文件被修改时，对应的更新会保存在内存中，来加速查询。在经历数次数据进行修改后，内存逐渐被占满后，LSM树会把有序的键数据对写入磁盘，同时创建一个新的数据存储文件，并且内存中的数据可以丢弃。存储文件组织与B树相似，不过其为磁盘顺序读取做了优化，所有节点都是满的并按页存储，修改数据文件通过滚动合并完成。如果数据量过于庞大，磁盘中的树相应地也会很大，导致的后果是合并的速度会变慢。一个解决方法是建立各个层次的树，低层次的树都比上一层次的树数据集大。假设内存中的树为c0, 磁盘中的树按照层次一次为c1, c2, c3, … ck-1, ck。合并的顺序是(c0, c1), (c1, c2)…(ck-1, ck)。<br>查询时先查找内存中的存储，然后在查找磁盘文件。删除是一种特殊的更改，当删除标记被存储后，查找时会跳过被删除的键。当页被重写时，有删除标记的键会被丢掉。后台运维可以设定一个TTL，在TTL后，检查时间戳，然后重写丢弃过期的记录。<br><strong>B+树与LSM树对比</strong><br>在没有太多修改（插入或者删除）时，B+树表现得很好，因为这些修改要求执行高性能的优化操作以保证查询能在有限的时间内完成。在任意位置添加的数据规模越大，速度越快，这些页成为碎片的速度越快，最后用户写入的速度比优化重写速度更快，导致碎片化。因而只能多次随机io，导致建立索引速度变慢。<br>LSM树使用日志文件内存存储将随机写变为顺序写，因此也能保证稳定的插入速率，由于读写独立，所以不会存在冲突。由于存储数据布局更优，查询一个键需要的磁盘寻道次数在一个可预测的范围，并且读取与改建连续任意数量的记录都不会引发额外的磁盘寻道。一般来说，有几个存储文件，最多几次寻道。</p>
+<h2 id="存储"><a href="#存储" class="headerlink" title="存储"></a>存储</h2><p>Hbase主要处理两种文件：1.预写文件(write ahead file,WAL);2.实际数据文件，由HRegionServer管理。基本流程是：客户端首先联系Zookeeper子集群（quorum）查找行健，通过Zookeeper获取含有-ROOT-的region服务器名来完成。通过含有-ROOT-的region服务器可以查询到含有.meta表中对应的region服务器名。这两处内容会被缓存。最终通过.meta服务器获取客户端查询的行键所在region服务器名。一旦知道数据所在的位置，Hbase会缓存信息，后面客户端就不需要查询.meta.</p>
+<h3 id="写路径"><a href="#写路径" class="headerlink" title="写路径"></a>写路径</h3><p>当用户向HregionServer发起HTable.put(Put)请求时，其会交给对应的region来处理。第一步是要决定数据是否需要写到HLog类实现的预写日志中，一旦数据被写入WAL中，数据就会放到Memstore中，同时还会检查memstore是否已经满了，如果满了，就会将请求刷新到磁盘里。刷新请求由另外一个RegionServer的线程处理，它会把数据写成HDFS中的一个新HFile，同时保存最后写的序号。</p>
+<h3 id="文件"><a href="#文件" class="headerlink" title="文件"></a>文件</h3><ul>
+<li>根级文件<br>一个region服务器所有region共享一个对应的子目录，在Hbase根目录下命名为logs的目录</li>
+<li>表级文件<br>每张表都有自己的目录，其位于文件系统中的hbase根目录下，每张表包括一个名为.tableinfo的顶层文件</li>
+<li>region级文件<br>每张表的目录里面，每个列族都有单独一个目录。</li>
+<li>region拆分<br>region存储文件增长超过配置的大小就会一分为二</li>
+<li>region合并<br>合并会把磁盘文件合并成数量更少的体积更大的文件<h3 id="HFile格式"><a href="#HFile格式" class="headerlink" title="HFile格式"></a>HFile格式</h3>存储Hbase的数据，分为Trailer、MetaIndex、DataIndex、FileInfo、Data，Data一般存放Magic和keyvalue，keyvalue可以采用压缩算法压缩数据。<h3 id="keyvalue格式"><a href="#keyvalue格式" class="headerlink" title="keyvalue格式"></a>keyvalue格式</h3>keyvalue的格式：KeyLength、ValueLength、(RowLength、Row、ColumnFamilyLength、ColumnFamily、ColumnQualifier、TimeStamp、KeyType)、value,括号部分是key，可以转化为java实例，就可以通过get方法获取属性。<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">System.out.println(<span class="string">"family:"</span> + Bytes.toString(kv.getFamily()));</div><div class="line">System.out.println(<span class="string">"qualifier:"</span> + Bytes.toString(kv.getQualifier()));</div><div class="line">System.out.println(<span class="string">"value:"</span> + Bytes.toString(kv.getValue()));</div><div class="line">System.out.println(<span class="string">"Timestamp:"</span> + kv.getTimestamp());</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="WAL"><a href="#WAL" class="headerlink" title="WAL"></a>WAL</h2><p>region服务器会将数据保存在内存中，直到积攒足够多的数据刷新到磁盘，但是存储在磁盘中的数据是不稳定的，例如断电时候就会数据丢失，比较常见的解决方案是预写日志(WAL):每次更新都会写入日志，只有当写入成功才会通知客户端操作成功。</p>
+<h3 id="HLog"><a href="#HLog" class="headerlink" title="HLog"></a>HLog</h3><p>实现WAL类叫做HLog，当region收到更新操作，就直接把数据保存到一个共享的WAL实例中。</p>
+<h3 id="HLog-key"><a href="#HLog-key" class="headerlink" title="HLog key"></a>HLog key</h3><p>存储keyvalue的归属，即region和表名，信息存储在HLogKey中。还存储了序列号，每一条的记录都是递增的，还记录了写入到日志的时间戳。</p>
+<h3 id="WalEdit"><a href="#WalEdit" class="headerlink" title="WalEdit"></a>WalEdit</h3><p>每一个修改都会被封装为WalEdit实例。</p>
+<h3 id="LogSyncer"><a href="#LogSyncer" class="headerlink" title="LogSyncer"></a>LogSyncer</h3><p>延迟日志刷写标记，如果设置为false，每一次编辑发送到服务器，都会调用写日志的sync。</p>
+<h3 id="LogRoller"><a href="#LogRoller" class="headerlink" title="LogRoller"></a>LogRoller</h3><p>在特定时间内滚动日志</p>
+<h2 id="读路径"><a href="#读路径" class="headerlink" title="读路径"></a>读路径</h2><p>Hbase的每个列族使用多个存储文件进行数据存储。后台合并将小文件写入到大文件减少文件的数目。墓碑标记是可以标记一个单元格，多个单元格，一整行。</p>
+<h2 id="region查找"><a href="#region查找" class="headerlink" title="region查找"></a>region查找</h2><p>为了让客户端查找到包含特定主键的region，Hbase提供两张目录表，一张-ROOT-和.META.。-ROOT-用来查询所有.META.表中region的位置。Hbase的设计时只有一个root region，从而保证类似于B+树结构的三层查找：第一层是Zookeeper中包含root region位置信息的节点。第二层是从-ROOT-中查找对应meta region位置。第三层是从.META.表中查找用户表中对应region的位置。</p>
+<h2 id="region的生命周期"><a href="#region的生命周期" class="headerlink" title="region的生命周期"></a>region的生命周期</h2><p>offline、pending open、opening、open、pending close、closing、closed、splitting</p>
+<h2 id="Zookeeper"><a href="#Zookeeper" class="headerlink" title="Zookeeper"></a>Zookeeper</h2><p>主要功能有跟踪region服务器、保存root region地址。</p>
+<h2 id="复制"><a href="#复制" class="headerlink" title="复制"></a>复制</h2><p>Hbase最基本的架构师主推送，一个主集群可以将数据复制到任意数目的从集群。所有的WALEdits都会被复制以保证原子性。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/05/慕课网java/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1645,175 +1801,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/21/服务框架/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="李睿">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/10/21/服务框架/" itemprop="url">服务框架（第四章）</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-21T19:56:11+08:00">
-                2017-10-21
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/大型网站中间件/" itemprop="url" rel="index">
-                    <span itemprop="name">大型网站中间件</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="网站功能持续丰富后的困境与应对"><a href="#网站功能持续丰富后的困境与应对" class="headerlink" title="网站功能持续丰富后的困境与应对"></a>网站功能持续丰富后的困境与应对</h2><p>网站的功能主要集中在几个大应用上，而且这些应用都直接访问底层的服务，例如数据库、缓存、搜索引擎、分布式存储。随着网站规模扩大，开发人的增多，每个应用变得复杂、臃肿。</p>
-<h3 id="把应用拆小"><a href="#把应用拆小" class="headerlink" title="把应用拆小"></a>把应用拆小</h3><p>把庞大的应用拆成多个。这样的好处是相对较快的完成，但是仍然存在一些问题。一方面是数据库的连接数的压力还在，其次是代码的重复问题。</p>
-<h3 id="服务化方案"><a href="#服务化方案" class="headerlink" title="服务化方案"></a>服务化方案</h3><p>我们在原来的应用和底层的数据库、缓存系统、文件系统等系统之间增加了服务层。</p>
-<h2 id="服务框架的设计和实现"><a href="#服务框架的设计和实现" class="headerlink" title="服务框架的设计和实现"></a>服务框架的设计和实现</h2><h3 id="应用从集中式走向分布式所遇到的问题"><a href="#应用从集中式走向分布式所遇到的问题" class="headerlink" title="应用从集中式走向分布式所遇到的问题"></a>应用从集中式走向分布式所遇到的问题</h3><p>要把单层Web应用的结构改为多层的、有服务层的结构的时，很多人不会直接做一个通用的服务框架，而是为当前要用的服务做一个RPC的功能，为服务使用者提供相关的客户端。而当提供的服务的集群多于一个小时，通用的服务框架就非常重要。服务化会使得把本地调用变为远程调用。研发人员关注的是提高易用性和降低性能损失这两方面。<br>在单机单进程中，程序只需要将寄存器地址改为相应的入口地址就好，而在多机之间，我们需要对调用的请求信息进行编码，然后传给远程的节点，解码后再进行真正的调用。寻址路由是为了让调用方确定哪个实例被调用的，实际定位是指被调用的机器找到对应的实例来进行方法调用，从而实现功能。</p>
-<h3 id="通过示例看服务框架原型"><a href="#通过示例看服务框架原型" class="headerlink" title="通过示例看服务框架原型"></a>通过示例看服务框架原型</h3><p>服务框架即包含调用方的逻辑，又包含服务端的逻辑的一个实现。</p>
-<h4 id="单机方式"><a href="#单机方式" class="headerlink" title="单机方式"></a>单机方式</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">public class Calculator&#123;</div><div class="line">     public int add(int a,int b)&#123;</div><div class="line">       <span class="built_in">return</span> a+b;</div><div class="line">     &#125;</div><div class="line"></div><div class="line">&#125;</div><div class="line">Calculator calculator =new Calculator();</div><div class="line">calculator.add(2,3);</div></pre></td></tr></table></figure>
-<h4 id="实现远程服务的调用客户端"><a href="#实现远程服务的调用客户端" class="headerlink" title="实现远程服务的调用客户端"></a>实现远程服务的调用客户端</h4><p>以单机为例，我们希望实现这个服务的方式和当前的做法一样<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">public int add(int a,int b)&#123;</div><div class="line"></div><div class="line">  //获取可用服务列表</div><div class="line">  List&lt;String&gt; l=getAvailableServiceAddresses(<span class="string">"Calculator.add"</span>);</div><div class="line">  //获取调用服务的目标机器</div><div class="line">  String address=chooseTarget();</div><div class="line">  //建立连接</div><div class="line">  Socket socket=new Socket(address);</div><div class="line">  //请求序列化</div><div class="line">  byte[] request=getRequest(a,b);</div><div class="line">  //发送请求</div><div class="line">  socket.getOuputStream().write(request);</div><div class="line">  //接受结果</div><div class="line">  byte[] response=new byte[1024];</div><div class="line">  socket.getInputStream().read(response);</div><div class="line">  int result=getResult(response);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>接下来我们解析这段代码，首先是获取服务机器的地址列表，并且从可用的服务地址列表中选取一个要调用的目标机器。<br>如果我们采取的LVS或者硬件负载均衡方案，那么getAvailableServiceAddresses获取的就是获取LVS或者硬件负载均衡器的地址和端口，并且choosTarget会直接返回地址和端口。<br>如果我们采取名称服务，那么getAvailableServiceAddresses返回的是当前的服务的地址列表，参数值用来定位服务，这个一般用做key的服务名字一般采用接口的全名，也就是全限类名，也可以用类名加版本号。<br>如果我们采用规则解析，这种方式更多应用在有状态的场景上。像数据这种状态要求很高的场景，或者缓存这种尽量要有状态的场景，都会用到规则服务器的方式来解决寻址问题。在无状态的场景，则不太用规则服务器的方式处理。<br>构造请求数据包其实就是把对象变为二进制数据，也就是java的序列化。请求后，我们需要等待远程服务的执行和结果的返回，收到结果后，我们会对数据进行java1反序列化，等到结果。</p>
-<h4 id="实现服务端"><a href="#实现服务端" class="headerlink" title="实现服务端"></a>实现服务端</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">public void <span class="function"><span class="title">eventHandler</span></span>()&#123;</div><div class="line">  <span class="keyword">while</span>(<span class="literal">true</span>)&#123;</div><div class="line">    byte[] requestData=receiveRequest();</div><div class="line">    Request request=getRequest(requestData);</div><div class="line">    Object service=getServiceByNameAndVersion(request.getServiceName(),request.getServiceVersion());</div><div class="line">    Object result=callService(service,request.getMethodName(),request.getArgs());</div><div class="line">    byte[] data=getResult(result);</div><div class="line">    request.socket.getOuputStream.write(data);</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>在这段伪代码中，我们需要持续接受请求并进行响应，收到的数据也需要反序列化。在这里，我们关注服务的名称、服务的版本号、调用的方法名称和参数以及调用的连接。当我们拿到请求对象后，我们需要本地定位具体的服务，我们会有个服务注册表，我们可以动态发布服务。得到服务实例后，我们会服务调用，一般通过反射来调用，然后序列化结果，传输给客户端。</p>
-<h3 id="服务调用端的设计和实现"><a href="#服务调用端的设计和实现" class="headerlink" title="服务调用端的设计和实现"></a>服务调用端的设计和实现</h3><p>调用过程是调用发起、寻址路由、协议适配/序列化、网络传输、反序列化/协议解析、得到结果返回调用方。</p>
-<h4 id="从代码的角度看如何使用服务框架"><a href="#从代码的角度看如何使用服务框架" class="headerlink" title="从代码的角度看如何使用服务框架"></a>从代码的角度看如何使用服务框架</h4><p>客户端的引入是我们首先需要解决的问题，大多数的java开发都会使用spring作为容器。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&lt;bean id=<span class="string">"calculator"</span> class=<span class="string">"ConsumerBean"</span>&gt;</div><div class="line">&lt;property name=<span class="string">"interfaceName"</span>&gt;</div><div class="line">&lt;/property&gt;</div><div class="line">&lt;property name=<span class="string">"version"</span>&gt;</div><div class="line">&lt;/property&gt;</div><div class="line">&lt;property name=<span class="string">"group"</span>&gt;</div><div class="line">&lt;/property&gt;</div><div class="line">&lt;/bean&gt;</div></pre></td></tr></table></figure></p>
-<p>以上是简单的版本的服务框架，我们先看三个基础的属性</p>
-<h5 id="interfaceName"><a href="#interfaceName" class="headerlink" title="interfaceName"></a>interfaceName</h5><p>接口名称，在进程远程通信时ConsumerBean必须要知道调用的接口是哪一个，然后才能生成这个接口的代理，以供本地调用。</p>
-<h5 id="version"><a href="#version" class="headerlink" title="version"></a>version</h5><p>版本号，在实际场景中，接口的变化是可能的。如果直接变化，那么要求所有使用的地方一起修改，一起升级。解决问题的方式有两种，一种是需要修改方法的参数或者返回值，也就是新增一个方法，保持原来方法不变，不过在过渡阶段导致代码臃肿，并且方法名不好取名。第二种是通过版本号进行隔离。</p>
-<h5 id="group"><a href="#group" class="headerlink" title="group"></a>group</h5><p>分组。分组属性的好处是如果对同一个接口的远程调用有很多机器，那么我们可以把远程机器分组，然后调用者可以选择不同分组调用，这样就可以把不同调用者对同一服务进行隔离。</p>
-<h4 id="运行期服务框架与应用和容器的关系"><a href="#运行期服务框架与应用和容器的关系" class="headerlink" title="运行期服务框架与应用和容器的关系"></a>运行期服务框架与应用和容器的关系</h4><p>有两个比较重要的问题需要解决：1.服务框架本身的部署方式问题；2.实现服务框架所依赖的一些外部包和应用自身依赖的jar包冲突。<br>首先是部署方式；一种方案是把服务框架作为应用的一个依赖包并与应用进行打包。通过这个方式，服务框架就变为应用的一个库，并随应用启动。存在的问题是，如果要升级服务框架，就需要更新应用本身；并且服务框架也没办法接管classloader，也没办法做到隔离和包的实现替换工作。<br>另一种方案是把服务框架作为容器的一部分，那么服务框架就变为一个容器提供远程调用和远程服务的功能。<br>Jar包冲突问题，应用和服务框架的jar包版本冲突；将服务框架的自身用的类和应用用的类都控制在User-defined class loader级别上，这样就实现了相互间的隔离。web容器对多个web应用的处理以及OSGI对bundle处理采用了类似的方法。我们可以看下类加载器的层级关系，最上到下依次是bootstrap class loader($JAVA_HOME/jre/lib/rt.jar)、Extension class Loader($JAVA_HOME/jre/lib/ext/rt.jar)、System class loader($CLASSPATH)、user defined class loader</p>
-<h3 id="服务调用者和服务提供者之间通信方式的选择"><a href="#服务调用者和服务提供者之间通信方式的选择" class="headerlink" title="服务调用者和服务提供者之间通信方式的选择"></a>服务调用者和服务提供者之间通信方式的选择</h3><p>服务框架是为了把本地对象之间的方法调用变为远程过程调用，，这就涉及到远程通信问题。</p>
-<h4 id="远程通信遇到的问题"><a href="#远程通信遇到的问题" class="headerlink" title="远程通信遇到的问题"></a>远程通信遇到的问题</h4><p>最初的路由寻址过程是把远程的IP和端口号写死在代码中，但是如果是一个集群这种方式就满足不了</p>
-<h4 id="采用透明代理与调用者、服务提供者直连的解决方案"><a href="#采用透明代理与调用者、服务提供者直连的解决方案" class="headerlink" title="采用透明代理与调用者、服务提供者直连的解决方案"></a>采用透明代理与调用者、服务提供者直连的解决方案</h4><p>这里面我们通过两种方式，一种是中间代理，另一种是服务注册查找中心；服务注册查找中心只是提供可用的服务提供者列表，调用者会缓存下来地址，然后当地址列表发生改变时在去向中心获取。当客户端拿到地址后，如何对当次进行调用就是路由要做的事情，我们首先要考虑的是集群的负载均衡的实现，比如轮询、随机、权重等方式，可以参考硬件负载均衡机器或者LVS或者HAProxy策略。</p>
-<h4 id="引入基于接口、方法、参数的的路由"><a href="#引入基于接口、方法、参数的的路由" class="headerlink" title="引入基于接口、方法、参数的的路由"></a>引入基于接口、方法、参数的的路由</h4><p>一般用接口作为服务的粒度，一个服务也就是一个接口的远程实现。假设服务提供两个接口，分别是接口A，接口B，每个服务又提供了两个方法。一般来说一个请求对应一个线程，而总线程数量有一个限制，一旦并发请求过多，其余的就必须要等待。假设某个方法执行的时间很慢，那么很快如果很多线程请求该方法，那么在进入这个方法时，一旦达到瓶颈值，那么其他线程就在等待。我们可以有两种解决方案，增加机器数，可以减少分到单台机器的请求数。也就是增加资源保证系统的能力超出需要；第二种方案是隔离这些资源，从而使得快慢不同重量级别不同的方法互不影响。而分流策略可以让请求服务A的请求全部在右上方机器，请求服务B的请求全部在右下方机器。我们负载均衡的策略的具体实现是先获取服务框架的规则后进行路由处理，也就是根据服务定位提供服务集群的地址，然后在与接口路由规则中的地址做个交集，得到的地址在进行负载均衡算法，最后得到一个可用的地址进行调用。但是基于接口并未解决这个问题，因为A服务的方法一的瓶颈会影响A服务的方法而，这时我们路由规则可以基于接口名加方法，什么可以基于方法名加方法加参数</p>
-<h3 id="多机房场景"><a href="#多机房场景" class="headerlink" title="多机房场景"></a>多机房场景</h3><h3 id="服务调用端的流控处理"><a href="#服务调用端的流控处理" class="headerlink" title="服务调用端的流控处理"></a>服务调用端的流控处理</h3><p>流量控制是为了保证系统的稳定性。我们有两种控制方式，一种是01开关，完全打开和完全不打开；另外一种设定一个固定值，表示每秒可以进行请求的次数。超过这个请求数的就拒接对远程的请求。我们可以从两个维度进行控制：1.根据服务端的接口、方法进行控制；也就是根据不同接口设置不同阈值，这是为了使服务端的不同接口、方法之间的负载不互相影响；根据来源做控制，也就是对同样的接口对不同来源设置不同的限制。</p>
-<h3 id="序列化和反序列处理"><a href="#序列化和反序列处理" class="headerlink" title="序列化和反序列处理"></a>序列化和反序列处理</h3><p>对于Java的序列化，需要考虑三个问题：1.跨语言问题；2.序列化和反序列化的性能开销；3.序列化后的长度；我们可以考虑xml或者json作为序列化方式。</p>
-<h3 id="网络通信实现选择"><a href="#网络通信实现选择" class="headerlink" title="网络通信实现选择"></a>网络通信实现选择</h3><p>通信方式有BIO、NIO和AIO，BIO是阻塞IO，是一个连接消耗一个线程，但是消耗大。如果是NIO，那么客户端和服务器端之间的连接是可以复用的，而不是一个连接消耗一个线程。我们希望通过一个连接来进行多个并发请求操作。类比公路的职能，每条公路允许多辆汽车行驶而不是只有一辆汽车行驶。NIO提供的是非阻塞方式的IO，需要对外提供的是类似阻塞的同步远程请求方式。我们增加了IO线程，数据队列，通信对象队列，和定时任务。</p>
-<h3 id="支持异步服务的调用方式"><a href="#支持异步服务的调用方式" class="headerlink" title="支持异步服务的调用方式"></a>支持异步服务的调用方式</h3><h4 id="oneWay"><a href="#oneWay" class="headerlink" title="oneWay"></a>oneWay</h4><p>oneWay是只管发送不管结果，只需要把要发送的数据放入数据队列，然后继续下面的操作。oneway不关心对方是否收到数据，也不关心返回值。</p>
-<h4 id="callback"><a href="#callback" class="headerlink" title="callback"></a>callback</h4><p>这种方式下，请求方发送后会继续执行下面操作，等对方响应会进行一个回调</p>
-<h4 id="Future"><a href="#Future" class="headerlink" title="Future"></a>Future</h4><p>把数据写入队列，把future写入队列，通过future获取结果</p>
-<h4 id="可靠的异步"><a href="#可靠的异步" class="headerlink" title="可靠的异步"></a>可靠的异步</h4><p>通过消息中间件</p>
-<h3 id="使用Future对远程服务调用的优化"><a href="#使用Future对远程服务调用的优化" class="headerlink" title="使用Future对远程服务调用的优化"></a>使用Future对远程服务调用的优化</h3><p>如果我们在一个请求处理中调用多个远程服务，如果采用同步的方式，那么总时间是全部请求时间求和，如果我们仍然按照顺序把服务的请求依次发给各个服务，但是请求过去后并不等待结果，而是在最后服务发出去后在等待，这样总时间变为单个远程服务时间的最大值。但是这有个前提，所有的服务并没有依赖关系，所以他们可以一起等。</p>
-<h2 id="服务端的设计和实现"><a href="#服务端的设计和实现" class="headerlink" title="服务端的设计和实现"></a>服务端的设计和实现</h2><h3 id="如何暴露远程服务"><a href="#如何暴露远程服务" class="headerlink" title="如何暴露远程服务"></a>如何暴露远程服务</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">&lt;bean id=<span class="string">"calculator"</span> class=<span class="string">"ProviderBean"</span>&gt;</div><div class="line">&lt;property name=<span class="string">"interfaceName"</span>&gt;</div><div class="line">&lt;/property&gt;</div><div class="line">&lt;property name=<span class="string">"target"</span>&gt;</div><div class="line">&lt;/property&gt;</div><div class="line">&lt;property name=<span class="string">"version"</span>&gt;</div><div class="line">&lt;/property&gt;</div><div class="line">&lt;property name=<span class="string">"group"</span>&gt;</div><div class="line">&lt;/property&gt;</div><div class="line">&lt;/bean&gt;</div></pre></td></tr></table></figure>
-<p>服务端提供的是providerBean，而客户端提供的是ConsumerBean。providerBean的职能是服务需要注册到服务查找中心后才能被服务调用者发现，所以providerBean需要将自己所代表的服务注册到服务注册查找中心。也需要在本机注册服务和对应服务的实例。</p>
-<h3 id="服务端对请求处理的流程"><a href="#服务端对请求处理的流程" class="headerlink" title="服务端对请求处理的流程"></a>服务端对请求处理的流程</h3><p>服务框架启动时需要监听端口号，并且等待调用的请求。当服务注册好，监听端口号也准备好，就只需等待服务调用的请求进来。请求处理流程是：网络通信层、协议解析/反序列化、定位服务、调用服务。</p>
-<h3 id="执行不同服务的线程池隔离"><a href="#执行不同服务的线程池隔离" class="headerlink" title="执行不同服务的线程池隔离"></a>执行不同服务的线程池隔离</h3><h3 id="服务提供者的流控处理"><a href="#服务提供者的流控处理" class="headerlink" title="服务提供者的流控处理"></a>服务提供者的流控处理</h3><p>在服务提供者看来，不同来源的服务调用者、0-1开关、限制具体数值的QPS方式都需要实现。对不同调用者进行升级，确保优先级高的服务调用者被优先调用</p>
-<h3 id="服务升级"><a href="#服务升级" class="headerlink" title="服务升级"></a>服务升级</h3><h4 id="增加方法"><a href="#增加方法" class="headerlink" title="增加方法"></a>增加方法</h4><h4 id="修改调用参数列表"><a href="#修改调用参数列表" class="headerlink" title="修改调用参数列表"></a>修改调用参数列表</h4><p>1.对原来的方法的代码进行修改<br>2.通过版本号来解决<br>3.在设计的方法上考虑参数的扩展。但是不可行，通过map不直观</p>
-<h2 id="实战的优化"><a href="#实战的优化" class="headerlink" title="实战的优化"></a>实战的优化</h2><h3 id="服务的拆分"><a href="#服务的拆分" class="headerlink" title="服务的拆分"></a>服务的拆分</h3><h3 id="服务的粒度"><a href="#服务的粒度" class="headerlink" title="服务的粒度"></a>服务的粒度</h3><h3 id="优雅和实用的平衡"><a href="#优雅和实用的平衡" class="headerlink" title="优雅和实用的平衡"></a>优雅和实用的平衡</h3><p>最上层是服务调用者，如果服务调用者调用服务十分频繁，可以写入缓存。没有在调用服务提供者，服务提供者先访问本地缓存，没有在访问数据库</p>
-<h3 id="分布式环境下的请求合并"><a href="#分布式环境下的请求合并" class="headerlink" title="分布式环境下的请求合并"></a>分布式环境下的请求合并</h3><p>对于热点数据的处理，如果可以进行一些任务的合并问题，就会明显降低整个系统的负载。首先可以通过缓存，减少数据的读取和计算的工作量。还可以解析完参数，检查是否有线程在在计算相同的数据，如果有，等待结果；没有，进行计算。分布式环境下会涉及到多节点，如果使用分布式锁，则会有额外的开销。但是我们可以使用路由策略，相同参数的服务发送到同一台服务提供者。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1863,7 +1850,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">33</span>
+                <span class="site-state-item-count">34</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
