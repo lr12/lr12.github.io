@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-12-01T01:31:02.998Z</updated>
+  <updated>2017-12-01T06:52:17.005Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,12 +20,34 @@
     <link href="http://yoursite.com/2017/12/01/%E9%AB%98%E6%80%A7%E8%83%BD%E7%BD%91%E7%BB%9C%E9%80%9A%E8%AE%AF/"/>
     <id>http://yoursite.com/2017/12/01/高性能网络通讯/</id>
     <published>2017-12-01T01:31:02.000Z</published>
-    <updated>2017-12-01T01:31:02.998Z</updated>
+    <updated>2017-12-01T06:52:17.005Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="简单的RPC调用问题"><a href="#简单的RPC调用问题" class="headerlink" title="简单的RPC调用问题"></a>简单的RPC调用问题</h2><h3 id="简单的远程调用"><a href="#简单的远程调用" class="headerlink" title="简单的远程调用"></a>简单的远程调用</h3><h4 id="客户端调用"><a href="#客户端调用" class="headerlink" title="客户端调用"></a>客户端调用</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">HelloService helloService=getProxy(HelloService.class,<span class="string">"127.0.0.1"</span>,<span class="string">"2580"</span>);</div><div class="line">System.out.println(helloService.sayHello(<span class="string">"hi, charles"</span>));</div><div class="line">Public &lt;T&gt; T getProxy(Class&lt;T&gt; interfaceClass, String host, int port)&#123;</div><div class="line"><span class="built_in">return</span> (T) Proxy.newProxyInstance(interfaceClass.getClassLoader(), new</div><div class="line">Class&lt;?&gt;[] &#123;interfaceClass&#125;,</div><div class="line">new <span class="function"><span class="title">InvocationHandler</span></span>() &#123;</div><div class="line">public Object invoke(Object proxy, Method method, Object[]</div><div class="line">arguments) throws Throwable &#123;</div><div class="line">Socket socket = new Socket(host, port);</div><div class="line">ObjectOutputStream output = new</div><div class="line">ObjectOutputStream(socket.getOutputStream());</div><div class="line">output.writeUTF(method.getName());</div><div class="line">output.writeObject(method.getParameterTypes());</div><div class="line">output.writeObject(arguments);</div><div class="line">ObjectInputStream input = new</div><div class="line">ObjectInputStream(socket.getInputStream());</div><div class="line"><span class="built_in">return</span> input.readObject();&#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<h4 id="服务器端调用"><a href="#服务器端调用" class="headerlink" title="服务器端调用"></a>服务器端调用</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">ServerSocket server = new ServerSocket(port);</div><div class="line"><span class="keyword">while</span>(<span class="literal">true</span>)&#123;</div><div class="line">   final Socket socket= server.accept();</div><div class="line">   new Thread(new Runnable(</div><div class="line">     public void <span class="function"><span class="title">run</span></span>()&#123;</div><div class="line">       ObjectInputStream input=new ObjectInputStream(socket.getInputStream());</div><div class="line">       String methodName=input.readUTF();</div><div class="line">       Class&lt;?&gt;[] parameterTypes = (Class&lt;?&gt;[])input.readObject();</div><div class="line">       Object[] arguments = (Object[])input.readObject();</div><div class="line">       ObjectOutputStream output = new</div><div class="line">       ObjectOutputStream(socket.getOutputStream());</div><div class="line">       Method method = service.getClass().getMethod(methodName,</div><div class="line">       parameterTypes);</div><div class="line">       Object result = method.invoke(service, arguments);</div><div class="line">       output.writeObject(result);</div><div class="line">     &#125;</div><div class="line">   )).start();</div><div class="line">&#125;</div><div class="line">Public String sysHello(String input)&#123;</div><div class="line">  <span class="built_in">return</span> input+<span class="string">":wellcome."</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><ol>
+<li>网络传输方式：BIO</li>
+<li>序列化方式：java序列化</li>
+<li>线程模型：每次连接每线程</li>
+<li>jdk代理</li>
+</ol>
+<h3 id="三个主题"><a href="#三个主题" class="headerlink" title="三个主题"></a>三个主题</h3><ol>
+<li>协议；用什么数据格式进行传输。双方的约定</li>
+<li>传输；用什么样的通道将数据发送给对方</li>
+<li>线程；当接收到数据时，如何分发数据进行处理</li>
+</ol>
+<p><img src="/2017/12/01/高性能网络通讯/dataProtocol.png" alt=""><br><img src="/2017/12/01/高性能网络通讯/dataFlow.png" alt=""><br><img src="/2017/12/01/高性能网络通讯/dubbohead.png" alt=""><br><img src="/2017/12/01/高性能网络通讯/datahead.png" alt=""></p>
+]]></content>
     
     <summary type="html">
     
+      &lt;h2 id=&quot;简单的RPC调用问题&quot;&gt;&lt;a href=&quot;#简单的RPC调用问题&quot; class=&quot;headerlink&quot; title=&quot;简单的RPC调用问题&quot;&gt;&lt;/a&gt;简单的RPC调用问题&lt;/h2&gt;&lt;h3 id=&quot;简单的远程调用&quot;&gt;&lt;a href=&quot;#简单的远程调用&quot; class
+    
     </summary>
     
+      <category term="dubbo" scheme="http://yoursite.com/categories/dubbo/"/>
+    
+    
+      <category term="dubbo" scheme="http://yoursite.com/tags/dubbo/"/>
     
   </entry>
   
