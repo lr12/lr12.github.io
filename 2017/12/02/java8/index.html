@@ -74,7 +74,7 @@
 <link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="elasticSearch权威入门指南," />
+  <meta name="keywords" content="java8," />
 
 
 
@@ -92,17 +92,14 @@
 
 
 
-<meta name="description" content="一个节点就是一个elasticsearch实例，一个集群由一个或者多个节点组成，具有相同的cluster.name，它们协同工作，分享数据和负载。集群中的一个节点选举称为master，将临时管理集群级别的一些变更，例如新建、删除索引、增加或移除节点。主节点不参与文档级别的变更或搜索，意味着在流量增长时，master不会成为瓶颈。 集群健康集群健康分为三种：red、yellow、green,gree">
-<meta name="keywords" content="elasticSearch权威入门指南">
+<meta name="keywords" content="java8">
 <meta property="og:type" content="article">
-<meta property="og:title" content="分布式集群">
-<meta property="og:url" content="http://yoursite.com/2017/11/14/分布式集群/index.html">
+<meta property="og:title" content="java8">
+<meta property="og:url" content="http://yoursite.com/2017/12/02/java8/index.html">
 <meta property="og:site_name" content="博客">
-<meta property="og:description" content="一个节点就是一个elasticsearch实例，一个集群由一个或者多个节点组成，具有相同的cluster.name，它们协同工作，分享数据和负载。集群中的一个节点选举称为master，将临时管理集群级别的一些变更，例如新建、删除索引、增加或移除节点。主节点不参与文档级别的变更或搜索，意味着在流量增长时，master不会成为瓶颈。 集群健康集群健康分为三种：red、yellow、green,gree">
-<meta property="og:updated_time" content="2017-11-14T14:31:21.187Z">
+<meta property="og:updated_time" content="2017-12-02T07:23:32.751Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="分布式集群">
-<meta name="twitter:description" content="一个节点就是一个elasticsearch实例，一个集群由一个或者多个节点组成，具有相同的cluster.name，它们协同工作，分享数据和负载。集群中的一个节点选举称为master，将临时管理集群级别的一些变更，例如新建、删除索引、增加或移除节点。主节点不参与文档级别的变更或搜索，意味着在流量增长时，master不会成为瓶颈。 集群健康集群健康分为三种：red、yellow、green,gree">
+<meta name="twitter:title" content="java8">
 
 
 
@@ -130,13 +127,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2017/11/14/分布式集群/"/>
+  <link rel="canonical" href="http://yoursite.com/2017/12/02/java8/"/>
 
 
 
 
 
-  <title>分布式集群 | 博客</title>
+  <title>java8 | 博客</title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -276,7 +273,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/14/分布式集群/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/02/java8/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="李睿">
@@ -293,7 +290,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">分布式集群</h1>
+          <h1 class="post-title" itemprop="name headline">java8</h1>
         
 
         <div class="post-meta">
@@ -305,8 +302,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-14T21:22:00+08:00">
-                2017-11-14
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-02T15:22:38+08:00">
+                2017-12-02
               </time>
             
 
@@ -328,8 +325,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/elasticSearch/" itemprop="url" rel="index">
-                    <span itemprop="name">elasticSearch</span>
+                  <a href="/categories/java基础/" itemprop="url" rel="index">
+                    <span itemprop="name">java基础</span>
                   </a>
                 </span>
 
@@ -362,14 +359,7 @@
       
 
       
-        <p>一个节点就是一个elasticsearch实例，一个集群由一个或者多个节点组成，具有相同的cluster.name，它们协同工作，分享数据和负载。<br>集群中的一个节点选举称为master，将临时管理集群级别的一些变更，<strong>例如新建、删除索引、增加或移除节点。主节点不参与文档级别的变更或搜索，意味着在流量增长时，master不会成为瓶颈。</strong></p>
-<h2 id="集群健康"><a href="#集群健康" class="headerlink" title="集群健康"></a>集群健康</h2><p>集群健康分为三种：red、yellow、green,green代表所有的主分片和复制分片都可用，yellow代表所有主要分片可用，但是不是所有复制分片可用，red代表不是所有主分片可用<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GET _cluster/health</div></pre></td></tr></table></figure></p>
-<h2 id="添加索引"><a href="#添加索引" class="headerlink" title="添加索引"></a>添加索引</h2><p>索引是用来指向一个或者多个分片的逻辑命名空间，一个分片是一个最小级别工作单元。分片可以是主分片或者复制分片，索引的每一个文档属于一个主分片，主分片的数量决定了索引最终存储的数量。复制分片是主分片的一个副本，可以防止硬件故障导致的数据丢失，同时提供读请求。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">PUT /sjjhpt</div><div class="line">//创建三个主分片，一个副本</div><div class="line">&#123;</div><div class="line">  <span class="string">"settings"</span>:&#123;</div><div class="line">     <span class="string">"number_of_shards"</span>:3,</div><div class="line">     <span class="string">"number_of_replicas"</span>: 1.</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h2 id="增加故障转移"><a href="#增加故障转移" class="headerlink" title="增加故障转移"></a>增加故障转移</h2><p>在单一节点运行会有单点故障的风险，要防止单点故障，要启动另外一个节点。文档首先会在主分片中存储，然后并发复制到其他复制分片，确保主分片和复制分片都会被检索。</p>
-<h2 id="横向扩展"><a href="#横向扩展" class="headerlink" title="横向扩展"></a>横向扩展</h2><p>可以增加节点数，最多节点数为(主分片个数)* (副本数量+1)</p>
-<h2 id="更多扩展"><a href="#更多扩展" class="headerlink" title="更多扩展"></a>更多扩展</h2><p>当然，只是有更多的复制分片在同样数量的节点上并不能提高我们的性能，因为每个分片都要访问更小比重的节点资源（译者注：大部分请求都聚集到了分片少的节点，导致一个节点吞吐量太大，反而降低性能）。你需要增加硬件来提高吞吐量。<br>不过这些额外的复制节点意味着我们有更多的冗余：通过以上对接点的设置，我们更够承受两个节点故障而不丢失数据.</p>
-<h2 id="应对故障"><a href="#应对故障" class="headerlink" title="应对故障"></a>应对故障</h2><p>当主节点故障后，会重新选举主节点，如果主分片不能正常工作，重新选举的主节点会提升副本分片为主分片</p>
-
+        
       
     </div>
 
@@ -398,7 +388,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/elasticSearch权威入门指南/" rel="tag"># elasticSearch权威入门指南</a>
+            <a href="/tags/java8/" rel="tag"># java8</a>
           
         </div>
       
@@ -411,8 +401,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/11/14/elasticsearch入门/" rel="next" title="elasticsearch入门">
-                <i class="fa fa-chevron-left"></i> elasticsearch入门
+              <a href="/2017/12/01/高性能网络通讯/" rel="next" title="高性能网络通讯">
+                <i class="fa fa-chevron-left"></i> 高性能网络通讯
               </a>
             
           </div>
@@ -420,10 +410,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/11/15/elasticSearch数据/" rel="prev" title="elasticSearch数据">
-                elasticSearch数据 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -470,17 +456,8 @@
       
 
       
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
-            文章目录
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview">
-            站点概览
-          </li>
-        </ul>
-      
 
-      <section class="site-overview sidebar-panel">
+      <section class="site-overview sidebar-panel sidebar-panel-active">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg"
@@ -549,22 +526,6 @@
 
       </section>
 
-      
-      <!--noindex-->
-        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-              
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#集群健康"><span class="nav-number">1.</span> <span class="nav-text">集群健康</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#添加索引"><span class="nav-number">2.</span> <span class="nav-text">添加索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#增加故障转移"><span class="nav-number">3.</span> <span class="nav-text">增加故障转移</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#横向扩展"><span class="nav-number">4.</span> <span class="nav-text">横向扩展</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#更多扩展"><span class="nav-number">5.</span> <span class="nav-text">更多扩展</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#应对故障"><span class="nav-number">6.</span> <span class="nav-text">应对故障</span></a></li></ol></div>
-            
-
-          </div>
-        </section>
-      <!--/noindex-->
       
 
       
