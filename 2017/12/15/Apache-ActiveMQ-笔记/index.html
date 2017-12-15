@@ -74,7 +74,7 @@
 <link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="云取证," />
+  <meta name="keywords" content="ActiveMQ," />
 
 
 
@@ -92,17 +92,17 @@
 
 
 
-<meta name="description" content="本周我主要做的工作有，对云取证综述文章以及一些分析文章看了一些。接下来谈谈阅读Impact of Cloud Computing on Traditional Digital Forensic Investigations 的理解。 文章首先提出云取证的困难在于因为多个客户的日志记录和数据可能位于同一位置，也可能分布在不断变化的主机和数据中心集合中。如果有没有合同承诺支持具体形式的调查，那么调查和">
-<meta name="keywords" content="云取证">
+<meta name="description" content="消息中间件面向消息的中间件：Message-oriented Middleware, MOM基本功能：将信息以消息的形式，从一个应用程序传送到另一个或多个应用程序。主要特点：  消息异步接受，类似手机短信的行为，消息发送者不需要等待消息接受者的响应，减少软件多系统集成的耦合度。 消息可靠接收，确保消息在中间件可靠保存，只有接收方收到后才删除消息，多个消息也可以组成原子事务。  JMSjava me">
+<meta name="keywords" content="ActiveMQ">
 <meta property="og:type" content="article">
-<meta property="og:title" content="云取证第三周周报">
-<meta property="og:url" content="http://yoursite.com/2017/06/04/云取证第三周周报/index.html">
+<meta property="og:title" content="Apache ActiveMQ 笔记一">
+<meta property="og:url" content="http://yoursite.com/2017/12/15/Apache-ActiveMQ-笔记/index.html">
 <meta property="og:site_name" content="博客">
-<meta property="og:description" content="本周我主要做的工作有，对云取证综述文章以及一些分析文章看了一些。接下来谈谈阅读Impact of Cloud Computing on Traditional Digital Forensic Investigations 的理解。 文章首先提出云取证的困难在于因为多个客户的日志记录和数据可能位于同一位置，也可能分布在不断变化的主机和数据中心集合中。如果有没有合同承诺支持具体形式的调查，那么调查和">
-<meta property="og:updated_time" content="2017-06-13T08:07:42.694Z">
+<meta property="og:description" content="消息中间件面向消息的中间件：Message-oriented Middleware, MOM基本功能：将信息以消息的形式，从一个应用程序传送到另一个或多个应用程序。主要特点：  消息异步接受，类似手机短信的行为，消息发送者不需要等待消息接受者的响应，减少软件多系统集成的耦合度。 消息可靠接收，确保消息在中间件可靠保存，只有接收方收到后才删除消息，多个消息也可以组成原子事务。  JMSjava me">
+<meta property="og:updated_time" content="2017-12-15T03:25:26.265Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="云取证第三周周报">
-<meta name="twitter:description" content="本周我主要做的工作有，对云取证综述文章以及一些分析文章看了一些。接下来谈谈阅读Impact of Cloud Computing on Traditional Digital Forensic Investigations 的理解。 文章首先提出云取证的困难在于因为多个客户的日志记录和数据可能位于同一位置，也可能分布在不断变化的主机和数据中心集合中。如果有没有合同承诺支持具体形式的调查，那么调查和">
+<meta name="twitter:title" content="Apache ActiveMQ 笔记一">
+<meta name="twitter:description" content="消息中间件面向消息的中间件：Message-oriented Middleware, MOM基本功能：将信息以消息的形式，从一个应用程序传送到另一个或多个应用程序。主要特点：  消息异步接受，类似手机短信的行为，消息发送者不需要等待消息接受者的响应，减少软件多系统集成的耦合度。 消息可靠接收，确保消息在中间件可靠保存，只有接收方收到后才删除消息，多个消息也可以组成原子事务。  JMSjava me">
 
 
 
@@ -130,13 +130,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2017/06/04/云取证第三周周报/"/>
+  <link rel="canonical" href="http://yoursite.com/2017/12/15/Apache-ActiveMQ-笔记/"/>
 
 
 
 
 
-  <title>云取证第三周周报 | 博客</title>
+  <title>Apache ActiveMQ 笔记一 | 博客</title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -276,7 +276,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/04/云取证第三周周报/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/15/Apache-ActiveMQ-笔记/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="李睿">
@@ -293,7 +293,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">云取证第三周周报</h1>
+          <h1 class="post-title" itemprop="name headline">Apache ActiveMQ 笔记一</h1>
         
 
         <div class="post-meta">
@@ -305,8 +305,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-04T20:44:36+08:00">
-                2017-06-04
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-15T09:52:52+08:00">
+                2017-12-15
               </time>
             
 
@@ -315,6 +315,28 @@
             
           </span>
 
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/消息中间件/" itemprop="url" rel="index">
+                    <span itemprop="name">消息中间件</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
           
 
           
@@ -340,11 +362,20 @@
       
 
       
-        <p>本周我主要做的工作有，对云取证综述文章以及一些分析文章看了一些。接下来谈谈阅读Impact of Cloud Computing on Traditional Digital Forensic Investigations 的理解。</p>
-<p>文章首先提出云取证的困难在于因为多个客户的日志记录和数据可能位于同一位置，也可能分布在不断变化的主机和数据中心集合中。如果有没有合同承诺支持具体形式的调查，那么调查和发现请求可能是不可能的。数字证据本身就非常脆弱。不正确的处理或检查可能会更改，损坏或毁坏。为此，必须采取预防措施来记录，收集，保存和检查此类证据。<strong>而在这点上我的一个想法是，能不能比如根据取得的证据例如云环境日志来复现操作顺序来达到重现犯罪现场进行案情重组的过程。比如说在初始环境1，经过若干步操作，变成环境2，环境2通过逆向操作，恢复成还原环境1，在还原过程中，其实也是对云攻击过程的一个模拟复原。当然这一切的假设都是建立在该云服务的的操作是可逆的。而在还原过程中，有利于对云攻击进行分析。</strong></p>
-<p>紧接着，描述一系列有关取证的一些分析手段。例如传统的取证方法允许调查人员从实验室环境的相对安全性中抓取设备并进行调查。这在数字取证领域被称为“死亡分析”。还有一些比较高端的是，调查人员可能使用的最常见的工具包括：Guidance Software [11]的EnCase，Access Data [12]的取证工具包和Helix3 [13]，这是一个开源工具包。还有很多其他的，尽管三个突出显示的是最常用的和行业接受的工具[8]。这些工具非常强大，可以查找证据价值的文物，即使嫌疑人已经删除了被认为是妥协的数据。电子发现和现场取证是数字取证学的两个不断发展的领域，调查人员可以增加他们的武器组合来打击电子犯罪。<strong>这里，我在想是不是可以通过对这几个工具进行了解一下他们的分析方法。</strong></p>
-<p>接着，描述了一系列攻击，如黑客攻击，分布式拒绝服务（DDOS）攻击，网络钓鱼，制药，恶意软件，病毒，特洛伊木马，间谍软件和蠕虫的分发。分布式拒绝服务(DDoS:Distributed Denial of Service)攻击指借助于客户/服务器技术，将多个计算机联合起来作为攻击平台，对一个或多个目标发动DDoS攻击，从而成倍地提高拒绝服务攻击的威力。通常，攻击者使用一个偷窃帐号将DDoS主控程序安装在一个计算机上，在一个设定的时间主控程序将与大量代理程序通讯，代理程序已经被安装在网络上的许多计算机上。代理程序收到指令时就发动攻击。利用客户/服务器技术，主控程序能在几秒钟内激活成百上千次代理程序的运行。基于现在攻击手段如此多和复杂，云计算问题服务级别协议（SLA）必须是强大的。<strong>然而在网上搜了下，现有应对DDOS已经有比较成熟的技术和方案。</strong></p>
-<p>同时看了些关于云取证的一些分析方法，印象比较深刻的是。<strong>有一个使用Hadoop进行日志分析，使用K均值算法针对大数据量进行聚类，找出离群值，IP地址统计方法。汇总日志（存储到HDFS）,先是预处理（转成固定格式），使用MR进行处理分析（分析方法通过K-Means类似的数据挖掘手段），形成可视化结果。</strong></p>
+        <h1 id="消息中间件"><a href="#消息中间件" class="headerlink" title="消息中间件"></a>消息中间件</h1><p>面向消息的中间件：Message-oriented Middleware, MOM<br>基本功能：将信息以消息的形式，从一个应用程序传送到另一个或多个应用程序。<br>主要特点：</p>
+<ul>
+<li>消息异步接受，类似手机短信的行为，消息发送者不需要等待消息接受者的响应，减少软件多系统集成的耦合度。</li>
+<li>消息可靠接收，确保消息在中间件可靠保存，只有接收方收到后才删除消息，多个消息也可以组成原子事务。</li>
+</ul>
+<h2 id="JMS"><a href="#JMS" class="headerlink" title="JMS"></a>JMS</h2><p>java message service</p>
+<h3 id="JMS规范"><a href="#JMS规范" class="headerlink" title="JMS规范"></a>JMS规范</h3><p>java消息服务定义了java中访问消息中间件的接口。JMS只是接口，并没有实现，实现JMS的接口的消息中间件称为JMS Provider，例如ActiveMQ。</p>
+<h3 id="术语"><a href="#术语" class="headerlink" title="术语"></a>术语</h3><p>JMS Provider：实现JMS接口的消息中间件<br>PTP：point to point，即点对点模型<br>pub/sub：publish/subscribe，即发布/订阅消息模型<br>Queue：队列目标<br>Topic：主题目标<br>ConnectionFactory：连接工厂，JMS用它来创建连接<br>Connection：JMS客户端到JMS provider的连接<br>Destination：消息的目的地<br>Session：会话，一个发送或接收消息的线程<br>MessageProducer：由session对象创建用来发送消息的对象<br>MessageConsumer：由session对象创建用来接收消息的对象<br>Acknowledge：签收<br>Transaction：事务</p>
+<h3 id="JMS编程模型"><a href="#JMS编程模型" class="headerlink" title="JMS编程模型"></a>JMS编程模型</h3><p>在 JMS 编程模型中，JMS 客户端（组件或应用程序）通过 JMS 消息服务交换消息。消息生产者将消息发送至消息服务，消息消费者则从消息服务接收这些消息。这些消息传送操作是使用一组实现 JMS 应用编程接口 (API) 的对象 （由 JMS Provide 提供）来执行的。<br>在 JMS 编程模型中，JMS 客户端使用 ConnectionFactory 对象创建一个连接，向消息服务发送消息以及从消息服务接收消息均是通过此连接来进行。Connection是客户端与消息服务的活动连接。创建连接时，将分配通信资源以及验证客户端。这是一个相当重要的对象，大多数客户端均使用一个连接来进行所有的消息传送。连接用于创建会话。Session 是一个用于生成和使用消息的单线程上下文。它用于创建发送的生产者和接收消息的消费者，并为所发送的消息定义发送顺序。会话通过大量确认选项或通过事务来支持可靠传送。客户端使用 MessageProducer 向指定的物理目标 （在 API 中表示为目标身份对象）发送消息。<br>生产者可指定一个默认传送模式（持久性消息与非持久性消息）、优先级和有效期值，以控制生产者向物理目标发送的所有消息。同样，客户端使用 MessageConsumer 对象从指定的物理目标（在 API 中表示为目标对象）接收消息。消费者可使用消息选择器，借助它，消息服务可以只向消费者发送与选择标准匹配的那些消息。消费者可以支持同步或异步消息接收。异步使用可通过向消费者注册 MessageListener 来实现。当会话线程调用 MessageListener 对象的 onMessage 方法时，客户端将使用消息。</p>
+<h3 id="JMS编程域"><a href="#JMS编程域" class="headerlink" title="JMS编程域"></a>JMS编程域</h3><p>JMS接收两种截然不同的消息传送模型PTP和Pub/Sub</p>
+<ul>
+<li>PTP<br>消息从一个生产者传送给一个消费者。在此传送模型中，目标是一个队列。消息首先传送到队列目标，然后根据队列传送策略，从该队列将消息传送到这队列进行注册的某一个消费者，一次只传送一条消息。可以向队列目标发送消息的生产者的数量没有限制，但每条消息只能发送至、并由一个消费者成功使用。如果没有已经向队列目标注册的消费者，队列将保留它收到的消息，并在某个消费者向该队列进行注册时将消息传送给该消费者。</li>
+<li>Pub/Sub<br>消息从一个生产者传送至任意数量的消费者。在此传送模型中，目标是一个主题。消息首先被传送至主题目标，然后传送至所有已订阅此主题的活动消费者。可以向主题目标发送消息的生产者的数量没有限制，并且每个消息可以发送至任意数量的订阅消费者。主题目标也支持持久订阅的概念。持久订阅表示消费者已向主题目标进行注册，但在消息传送时此消费者可以处于非活动状态。当此消费者再次处于活动状态时，它将接收此信息。如果没有已经向主题目标注册的消费者，主题不保留其接收到的消息，除非有非活动消费者注册了持久订阅</li>
+</ul>
 
       
     </div>
@@ -374,7 +405,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/云取证/" rel="tag"># 云取证</a>
+            <a href="/tags/ActiveMQ/" rel="tag"># ActiveMQ</a>
           
         </div>
       
@@ -387,8 +418,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/05/01/云取证第二周周报/" rel="next" title="云取证第二周周报">
-                <i class="fa fa-chevron-left"></i> 云取证第二周周报
+              <a href="/2017/12/06/设计模式之禅/" rel="next" title="设计模式之禅">
+                <i class="fa fa-chevron-left"></i> 设计模式之禅
               </a>
             
           </div>
@@ -396,10 +427,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/06/11/云取证第四周周报/" rel="prev" title="云取证第四周周报">
-                云取证第四周周报 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -446,8 +473,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg"
@@ -516,6 +552,22 @@
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#消息中间件"><span class="nav-number">1.</span> <span class="nav-text">消息中间件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#JMS"><span class="nav-number">1.1.</span> <span class="nav-text">JMS</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#JMS规范"><span class="nav-number">1.1.1.</span> <span class="nav-text">JMS规范</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#术语"><span class="nav-number">1.1.2.</span> <span class="nav-text">术语</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JMS编程模型"><span class="nav-number">1.1.3.</span> <span class="nav-text">JMS编程模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JMS编程域"><span class="nav-number">1.1.4.</span> <span class="nav-text">JMS编程域</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
