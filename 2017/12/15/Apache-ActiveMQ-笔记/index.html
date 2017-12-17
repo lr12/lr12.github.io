@@ -99,10 +99,12 @@
 <meta property="og:url" content="http://yoursite.com/2017/12/15/Apache-ActiveMQ-笔记/index.html">
 <meta property="og:site_name" content="博客">
 <meta property="og:description" content="消息中间件面向消息的中间件：Message-oriented Middleware, MOM基本功能：将信息以消息的形式，从一个应用程序传送到另一个或多个应用程序。主要特点：  消息异步接受，类似手机短信的行为，消息发送者不需要等待消息接受者的响应，减少软件多系统集成的耦合度。 消息可靠接收，确保消息在中间件可靠保存，只有接收方收到后才删除消息，多个消息也可以组成原子事务。  JMSjava me">
-<meta property="og:updated_time" content="2017-12-15T03:25:26.265Z">
+<meta property="og:image" content="http://yoursite.com/2017/12/15/Apache-ActiveMQ-笔记/jms消息结构.png">
+<meta property="og:updated_time" content="2017-12-17T07:02:52.097Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Apache ActiveMQ 笔记一">
 <meta name="twitter:description" content="消息中间件面向消息的中间件：Message-oriented Middleware, MOM基本功能：将信息以消息的形式，从一个应用程序传送到另一个或多个应用程序。主要特点：  消息异步接受，类似手机短信的行为，消息发送者不需要等待消息接受者的响应，减少软件多系统集成的耦合度。 消息可靠接收，确保消息在中间件可靠保存，只有接收方收到后才删除消息，多个消息也可以组成原子事务。  JMSjava me">
+<meta name="twitter:image" content="http://yoursite.com/2017/12/15/Apache-ActiveMQ-笔记/jms消息结构.png">
 
 
 
@@ -374,8 +376,27 @@
 <h3 id="JMS编程域"><a href="#JMS编程域" class="headerlink" title="JMS编程域"></a>JMS编程域</h3><p>JMS接收两种截然不同的消息传送模型PTP和Pub/Sub</p>
 <ul>
 <li>PTP<br>消息从一个生产者传送给一个消费者。在此传送模型中，目标是一个队列。消息首先传送到队列目标，然后根据队列传送策略，从该队列将消息传送到这队列进行注册的某一个消费者，一次只传送一条消息。可以向队列目标发送消息的生产者的数量没有限制，但每条消息只能发送至、并由一个消费者成功使用。如果没有已经向队列目标注册的消费者，队列将保留它收到的消息，并在某个消费者向该队列进行注册时将消息传送给该消费者。</li>
-<li>Pub/Sub<br>消息从一个生产者传送至任意数量的消费者。在此传送模型中，目标是一个主题。消息首先被传送至主题目标，然后传送至所有已订阅此主题的活动消费者。可以向主题目标发送消息的生产者的数量没有限制，并且每个消息可以发送至任意数量的订阅消费者。主题目标也支持持久订阅的概念。持久订阅表示消费者已向主题目标进行注册，但在消息传送时此消费者可以处于非活动状态。当此消费者再次处于活动状态时，它将接收此信息。如果没有已经向主题目标注册的消费者，主题不保留其接收到的消息，除非有非活动消费者注册了持久订阅</li>
+<li>Pub/Sub<br>消息从一个生产者传送至任意数量的消费者。在此传送模型中，目标是一个主题。消息首先被传送至主题目标，然后传送至所有已订阅此主题的活动消费者。可以向主题目标发送消息的生产者的数量没有限制，并且每个消息可以发送至任意数量的订阅消费者。主题目标也支持持久订阅的概念。持久订阅表示消费者已向主题目标进行注册，但在消息传送时此消费者可以处于非活动状态。当此消费者再次处于活动状态时，它将接收此信息。如果没有已经向主题目标注册的消费者，主题不保留其接收到的消息，除非有非活动消费者注册了持久订阅<h2 id="JMS消息结构"><a href="#JMS消息结构" class="headerlink" title="JMS消息结构"></a>JMS消息结构</h2>JMS消息由消息头、属性和消息体组成<h3 id="消息头"><a href="#消息头" class="headerlink" title="消息头"></a>消息头</h3>消息头包含消息的识别信息和路由信息，消息头包含一些标准的属性如JMSDestination、JMSMessageID<br>JMSDestination<br><img src="/2017/12/15/Apache-ActiveMQ-笔记/jms消息结构.png" alt=""><br>JMSDestination(自动)：消息发送的目的地主要指Queue和Topic<br>JMSDeliveryMode（自动）：传送模式有两种模式：持久模式和非持久模式，一条持久性消息应该被传递一次仅仅一次，这就意味着如果JMS提供者出现故障，该消息不会丢失，它会在服务器恢复之后再次传递。<br>JMSExpiration（自动）：消息过期时间，等于Destination 的send 方法的timeToLive值加上发送时刻的GMT 时间值。如果timeToLive值等于零则JMSExpiration 被设为零，表示该消息永不过期。如果发送后，在消息过期时间之后消息还没有被发送到目的地，则该消息被清除<br>JMSPriority(自动):消息优先级， 从 0-9 十个级别，0-4 是普通消息，5-9 是加急消息。JMS 不要求JMS Provider严格按照这十个优先级发送消息，但必须保证加急消息要先于普通消息到达。默认是4级。<br>JMSMessageID（自动）：唯一识别每个消息的标识，由JMS Provider 产生。<br>JMSTimestamp（自动）：一个JMS Provider在调用send()方法时自动设置的。它是消息被发送和消费者实际接收的时间差。自动分配。<br>JMSCorrelationID（开发者设置）：用来连接到另外一个消息，典型的应用是在回复消息中连接到原消息。在大多数情况下，JMSCorrelationID用于将一条消息标记为对 JMSMessageID标示的上一条消息的应答，不过，JMSCorrelationID可以是任何值，不仅仅是JMSMessageID。<br>JMSReplyTo（开发者设置）：提供本消息回复消息的目的地址。<br>JMSType（开发者设置）：消息类型的识别符。由开发者设置<br>JMSRedelivered(自动)：如果一个客户端收到一个设置了JMSRedelivered属性的消息，则表示可能客户端曾经在早些时候收到过该消息，但并没有签收 (acknowledged)。如果该消息被重新传送，JMSRedelivered=true反之，JMSRedelivered =false。<h3 id="消息体"><a href="#消息体" class="headerlink" title="消息体"></a>消息体</h3>TextMessage:java.lang.String 对象，如xml 文件内容<br>MapMessage:名/值对的集合，名是String 对象，值类型可以是Java 任何基本类型。<br>ByteMessage:字节流<br>StreamMessage：java输入输出流<br>ObjectMessage：java中可序列化对象<h3 id="消息属性"><a href="#消息属性" class="headerlink" title="消息属性"></a>消息属性</h3><h4 id="应用程序特定的属性"><a href="#应用程序特定的属性" class="headerlink" title="应用程序特定的属性"></a>应用程序特定的属性</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">TextMessage message=session.createTextMessage();</div><div class="line">message.setStringProperty(<span class="string">"username"</span>,username);</div></pre></td></tr></table></figure>
+</li>
 </ul>
+<h4 id="JMS定义的属性"><a href="#JMS定义的属性" class="headerlink" title="JMS定义的属性"></a>JMS定义的属性</h4><table>
+<thead>
+<tr>
+<th>名字</th>
+<th>类型</th>
+<th>设置者</th>
+<th>用法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>JMSXUserID</td>
+<td>String</td>
+<td>发送时提供商设置</td>
+<td>发送时的用户标识</td>
+</tr>
+</tbody>
+</table>
 
       
     </div>
@@ -562,7 +583,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#消息中间件"><span class="nav-number">1.</span> <span class="nav-text">消息中间件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#JMS"><span class="nav-number">1.1.</span> <span class="nav-text">JMS</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#JMS规范"><span class="nav-number">1.1.1.</span> <span class="nav-text">JMS规范</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#术语"><span class="nav-number">1.1.2.</span> <span class="nav-text">术语</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JMS编程模型"><span class="nav-number">1.1.3.</span> <span class="nav-text">JMS编程模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JMS编程域"><span class="nav-number">1.1.4.</span> <span class="nav-text">JMS编程域</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#消息中间件"><span class="nav-number">1.</span> <span class="nav-text">消息中间件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#JMS"><span class="nav-number">1.1.</span> <span class="nav-text">JMS</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#JMS规范"><span class="nav-number">1.1.1.</span> <span class="nav-text">JMS规范</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#术语"><span class="nav-number">1.1.2.</span> <span class="nav-text">术语</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JMS编程模型"><span class="nav-number">1.1.3.</span> <span class="nav-text">JMS编程模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JMS编程域"><span class="nav-number">1.1.4.</span> <span class="nav-text">JMS编程域</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JMS消息结构"><span class="nav-number">1.2.</span> <span class="nav-text">JMS消息结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#消息头"><span class="nav-number">1.2.1.</span> <span class="nav-text">消息头</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#消息体"><span class="nav-number">1.2.2.</span> <span class="nav-text">消息体</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#消息属性"><span class="nav-number">1.2.3.</span> <span class="nav-text">消息属性</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#应用程序特定的属性"><span class="nav-number">1.2.3.1.</span> <span class="nav-text">应用程序特定的属性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#JMS定义的属性"><span class="nav-number">1.2.3.2.</span> <span class="nav-text">JMS定义的属性</span></a></li></ol></li></ol></li></ol></li></ol></div>
             
 
           </div>
