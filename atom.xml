@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-12-17T07:02:52.097Z</updated>
+  <updated>2017-12-17T07:06:31.116Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2017/12/15/Apache-ActiveMQ-%E7%AC%94%E8%AE%B0/"/>
     <id>http://yoursite.com/2017/12/15/Apache-ActiveMQ-笔记/</id>
     <published>2017-12-15T01:52:52.000Z</published>
-    <updated>2017-12-17T07:02:52.097Z</updated>
+    <updated>2017-12-17T07:06:31.116Z</updated>
     
     <content type="html"><![CDATA[<h1 id="消息中间件"><a href="#消息中间件" class="headerlink" title="消息中间件"></a>消息中间件</h1><p>面向消息的中间件：Message-oriented Middleware, MOM<br>基本功能：将信息以消息的形式，从一个应用程序传送到另一个或多个应用程序。<br>主要特点：</p>
 <ul>
@@ -52,6 +52,12 @@
 <td>String</td>
 <td>发送时提供商设置</td>
 <td>发送时的用户标识</td>
+</tr>
+<tr>
+<td>JMSXAppID</td>
+<td>String</td>
+<td>发送时提供商设置</td>
+<td>发送消息的应用标识</td>
 </tr>
 </tbody>
 </table>

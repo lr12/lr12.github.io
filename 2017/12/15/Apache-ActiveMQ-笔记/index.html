@@ -100,7 +100,7 @@
 <meta property="og:site_name" content="博客">
 <meta property="og:description" content="消息中间件面向消息的中间件：Message-oriented Middleware, MOM基本功能：将信息以消息的形式，从一个应用程序传送到另一个或多个应用程序。主要特点：  消息异步接受，类似手机短信的行为，消息发送者不需要等待消息接受者的响应，减少软件多系统集成的耦合度。 消息可靠接收，确保消息在中间件可靠保存，只有接收方收到后才删除消息，多个消息也可以组成原子事务。  JMSjava me">
 <meta property="og:image" content="http://yoursite.com/2017/12/15/Apache-ActiveMQ-笔记/jms消息结构.png">
-<meta property="og:updated_time" content="2017-12-17T07:02:52.097Z">
+<meta property="og:updated_time" content="2017-12-17T07:06:31.116Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Apache ActiveMQ 笔记一">
 <meta name="twitter:description" content="消息中间件面向消息的中间件：Message-oriented Middleware, MOM基本功能：将信息以消息的形式，从一个应用程序传送到另一个或多个应用程序。主要特点：  消息异步接受，类似手机短信的行为，消息发送者不需要等待消息接受者的响应，减少软件多系统集成的耦合度。 消息可靠接收，确保消息在中间件可靠保存，只有接收方收到后才删除消息，多个消息也可以组成原子事务。  JMSjava me">
@@ -394,6 +394,12 @@
 <td>String</td>
 <td>发送时提供商设置</td>
 <td>发送时的用户标识</td>
+</tr>
+<tr>
+<td>JMSXAppID</td>
+<td>String</td>
+<td>发送时提供商设置</td>
+<td>发送消息的应用标识</td>
 </tr>
 </tbody>
 </table>
