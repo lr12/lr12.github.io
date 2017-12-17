@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-12-17T11:26:18.980Z</updated>
+  <updated>2017-12-17T11:38:09.096Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2017/12/15/Apache-ActiveMQ-%E7%AC%94%E8%AE%B0/"/>
     <id>http://yoursite.com/2017/12/15/Apache-ActiveMQ-笔记/</id>
     <published>2017-12-15T01:52:52.000Z</published>
-    <updated>2017-12-17T11:26:18.980Z</updated>
+    <updated>2017-12-17T11:38:09.096Z</updated>
     
     <content type="html"><![CDATA[<h1 id="消息中间件"><a href="#消息中间件" class="headerlink" title="消息中间件"></a>消息中间件</h1><p>面向消息的中间件：Message-oriented Middleware, MOM<br>基本功能：将信息以消息的形式，从一个应用程序传送到另一个或多个应用程序。<br>主要特点：</p>
 <ul>
@@ -120,6 +120,7 @@
 </li>
 </ul>
 <h2 id="PTP模型"><a href="#PTP模型" class="headerlink" title="PTP模型"></a>PTP模型</h2><p>PTP(Point-to-Point)模型是基于队列的，生产者发消息到队列，消费者从队列接收消息，队列的存在使得消息的异步传输成为可能。<br>名称|描述<br>-|-<br>ConnectionFactory|客户端用 ConnectionFactory 创建Connection对象<br>Connection|一个到JMS provider的连接<br>Session|客户端用session创建Message、Producer、Consumer。如果在session关闭时有一些消息已经收到但还未被签收，当消费者下次再连接到相同队列时，会被再次接收。<br>Destination(Queue或TemporaryQueue)|此处的目标为队列，队列由队列名识别。临时队列只能由创建它的Connection 所创建的消费者消费，但是任何生产者都可向临时队列发送消息。<br>MessageProducer|客户端用MessageProducer发送消息到队列中<br>MessageConsumer|客户端用MessageConsumer 接收队列中的消息， 如果用户在receive方法中设定了消息选择条件，那么不符合条件的消息会留在队列中，不会被接收到。<br>可靠性|队列可以长久地保存消息直到消费者收到消息。消费者不需要因为担心消息会丢失而时刻和队列保持激活的连接状态，充分体现了异步传输模式的优势。</p>
+<h2 id="PUB-SUB模型"><a href="#PUB-SUB模型" class="headerlink" title="PUB/SUB模型"></a>PUB/SUB模型</h2><p>JMS Pub/Sub 模型定义了如何向一个内容节点发布和订阅消息，这些节点被称作主题。主题可以被认为是消息的传输中介，发布者(publisher)发布消息到主题，订阅者(subscribe) 从主题订阅消息。主题使得消息订阅者和消息发布者保持互相独立，不需要接触即可保证消息的传送。<br>名称|描述<br>-|-<br>订阅(subscription)|消息订阅分为非持久订阅和持久订阅，非持久订阅只有当客户端处于激活状态，也就是和JMSProvider 保持连接状态才能收到发送到某个主题的消息，而当客户端处于离线状态，这个时间段发到主题的消息将会丢失，永远不会收到。持久订阅时，客户端向JMS 注册一个识别自己身份的ID，当这个客户端处于离线时，JMS Provider 会为这个ID 保存所有发送到主题的消息，当客户再次连接到JMS Provider 时， 会根据自己的ID 得到所有当自己处于离线时发送到主题的消息<br>ConnectionFactory|客户端用 ConnectionFactory 创建Connection对象<br>Connection|一个到JMS provider的连接<br>Session|客户端用Session 创建MessageProducer 和MessageConsumer 对象。它还提供持久订阅主题，或使用unsubscribe 方法取消消息的持久订阅。<br>Destination(Topic和TemporaryTopic)| 客户端用 Session 创建Destination 对象。此处的目标为主题，主题由主题名识别。临时主题只能由创建它的Connection 所创建的消费者消费。临时主题不能提供持久订阅功能。JMS 没有给出主题的组织和层次结构的定义，由JMS Provider 自己定义。<br>MessageProducer|客户端用MessageProducer发送消息到主题中<br>MessageConsumer|客户端用MessageConsumer 接收主题中的消息， 如果用户在receive方法中设定了消息选择条件，那么不符合条件的消息会留在队列中，不会被接收到。<br>恢复和重新派送|非持久订阅状态下，不能恢复或重新派送一个未签收的消息。只有持久订阅才能恢复或重新派送一个未签收的消息。<br>可靠性|当所有的消息必须被接收，则用持久订阅模式。当丢失消息能够被容忍，则用非持久订阅模式。</p>
 ]]></content>
     
     <summary type="html">
