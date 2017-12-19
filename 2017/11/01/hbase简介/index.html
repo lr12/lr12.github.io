@@ -99,7 +99,7 @@
 <meta property="og:url" content="http://yoursite.com/2017/11/01/hbase简介/index.html">
 <meta property="og:site_name" content="博客">
 <meta property="og:description" content="海量数据的黎明hadoop项目有两个模块：HDFS和MapReduce。Hadoop擅长存储任意的、半结构化数据，可以帮助用户分析数据时决定如何解释这些数据，同时允许用户随时更改数据分类的方式；一旦用户更新了算法，只需要重新分析数据。Hadoop是现有数据库的一个补充，提供了数据存储无限的空间，并且针对大文件存储、批量访问和流式访问做了优化。列式存储数据库，以列为单位聚合数据，然后将列值顺序存入磁">
-<meta property="og:updated_time" content="2017-11-02T02:11:44.082Z">
+<meta property="og:updated_time" content="2017-12-19T08:56:08.622Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="hbase简介(第一章)">
 <meta name="twitter:description" content="海量数据的黎明hadoop项目有两个模块：HDFS和MapReduce。Hadoop擅长存储任意的、半结构化数据，可以帮助用户分析数据时决定如何解释这些数据，同时允许用户随时更改数据分类的方式；一旦用户更新了算法，只需要重新分析数据。Hadoop是现有数据库的一个补充，提供了数据存储无限的空间，并且针对大文件存储、批量访问和流式访问做了优化。列式存储数据库，以列为单位聚合数据，然后将列值顺序存入磁">
@@ -369,7 +369,7 @@
 <h3 id="自动分区"><a href="#自动分区" class="headerlink" title="自动分区"></a>自动分区</h3><p>Hbase中扩展和负载均衡的基本单元是region，region本质是以行键排序的连续存储的区间。如果region太大，系统会动态拆分，相反会合并region，减少存储文件数量。<br>一张表初始化只有一个region，用户不断插入数据，当数据量超过配置的最大值，会在中间键处将这个region拆分成两个大致相等的region。每一个region只能由一台regionServer加载，而一台RegionServer可以同时加载多个region。（每台regionServer1加载的最佳数量是10~1000，每个region最佳大小是1GB~2GB）。当某个region服务器由于负载过大等原因导致不可用时，系统会将该region转到其他服务器上。</p>
 <h3 id="存储API"><a href="#存储API" class="headerlink" title="存储API"></a>存储API</h3><p>API提供了建表、删表、增加列族、删除列族、修改表、修改列族元数据（压缩，设置块大小）、行键值的增加，删除，查找<br>scan可以限定返回的列或者返回的版本数，可以设置过滤器。系统支持单行事务，进一步实现单行键下存储的数据的 读-修改-写（read-modify-write）序列。单元格的值可以当计数器用，并且支持原子更新，意味着这个计数器可以在一个操作中实现读写，客户端可以基于此实现一个全局强一致的计数器。协处理器(coprocessor): 可以在服务器的地址空间执行来自客户端的代码。用于实现轻量级的批处理作业，或者使用表达式分析或者汇总数据。通过包装器可以将表转换成MapReduce的输入输出目标</p>
 <h3 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h3><p>数据存储在存储文件中，称为HFile，HFile存储的是经过排序的键值映射结构。文件内部由连续的块组成，块的索引信息放在尾部，当打开HFile并加载在内存中，索引信息会优先加载到内存中，每个块的大小为64k。每个HFile都有一个块索引，通过一个磁盘查询就可以实现查询，存储文件写在HDFS中。每次更新数据，都会将数据记录在提交日志中，然后在将数据写入内存memstore,一旦内存超过一定的大小，就会移除内存，作为HFile写入磁盘。移除内存后，就会丢弃提交日志，只保留未持久化的提交日志。数据移出memstore，丢弃提交日志。采用滚动memstore可以实现不阻塞系统读写，即用空的新memstore获取更新数据，将旧的满的memstore转换成一个文件，由于memstore中的数据本来就排序好了，所以存储的时候不用再次排序。删除是在做个删除标记，让客户端无法读取到值。<br>HFile过多的时候有管家机制来处理，合并有两种类型：<br>minor合并：多个小文件合并成一个大文件，由于是多路归并所以速度快<br>major压缩合并：将region中一个列族的若干个HFile重写为一个新HFile。合并扫描所有键值对，顺序重写所有数据，重写数据的过程中会略过做了删除标记的数据。断言删除此时生效。<br>master 负责负载均衡，将繁忙服务器中的region移到负载轻的服务器中。还提供元数据的管理，例如创建表和创建列族。<br>region服务器负责为他们提供的Region提供读写功能<br>数十亿行<em>数百万列</em>数千个版本=TB级别或者PB级别的存储</p>
-<h2 id="Hbase：Hadoop数据库"><a href="#Hbase：Hadoop数据库" class="headerlink" title="Hbase：Hadoop数据库"></a>Hbase：Hadoop数据库</h2><h3 id="命名"><a href="#命名" class="headerlink" title="命名"></a>命名</h3><h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>Hbase是一个分布式的、持久性的、强一致性的存储系统，具有近似最优的写性能和出色的读性能。它充分利用磁盘空间，支持特定列族切换可选压缩算法。</p>
+<h2 id="Hbase：Hadoop数据库"><a href="#Hbase：Hadoop数据库" class="headerlink" title="Hbase：Hadoop数据库"></a>Hbase：Hadoop数据库</h2><h3 id="命名"><a href="#命名" class="headerlink" title="命名"></a>命名</h3><h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>Hbase是一个分布式的、持久性的、强一致性的存储系统，具有近似最优的写性能和出色的读性能。它充分利用磁盘空间，支持特定列族切换可选压缩算法。Hbase支持行原子性</p>
 
       
     </div>
