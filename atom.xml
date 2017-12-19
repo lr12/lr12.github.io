@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-12-19T15:07:38.737Z</updated>
+  <updated>2017-12-19T15:08:48.421Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -16,16 +16,20 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>activemq先进特性</title>
+    <title>activemq先进特性和优化性能</title>
     <link href="http://yoursite.com/2017/12/19/activemq%E5%85%88%E8%BF%9B%E7%89%B9%E6%80%A7/"/>
     <id>http://yoursite.com/2017/12/19/activemq先进特性/</id>
     <published>2017-12-19T15:07:38.000Z</published>
-    <updated>2017-12-19T15:07:38.737Z</updated>
+    <updated>2017-12-19T15:08:48.421Z</updated>
     
     <summary type="html">
     
     </summary>
     
+      <category term="消息中间件" scheme="http://yoursite.com/categories/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/"/>
+    
+    
+      <category term="ActiveMQ" scheme="http://yoursite.com/tags/ActiveMQ/"/>
     
   </entry>
   
