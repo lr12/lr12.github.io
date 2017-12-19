@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-12-19T12:52:09.727Z</updated>
+  <updated>2017-12-19T13:16:11.406Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2017/12/15/Apache-ActiveMQ-%E7%AC%94%E8%AE%B0/"/>
     <id>http://yoursite.com/2017/12/15/Apache-ActiveMQ-笔记/</id>
     <published>2017-12-15T01:52:52.000Z</published>
-    <updated>2017-12-19T12:52:09.727Z</updated>
+    <updated>2017-12-19T13:16:11.406Z</updated>
     
     <content type="html"><![CDATA[<h1 id="消息中间件"><a href="#消息中间件" class="headerlink" title="消息中间件"></a>消息中间件</h1><p>面向消息的中间件：Message-oriented Middleware, MOM<br>基本功能：将信息以消息的形式，从一个应用程序传送到另一个或多个应用程序。<br>主要特点：</p>
 <ul>
@@ -302,7 +302,10 @@
 <p>如果 Master 失败，则它释放独有锁，其他 Slaver 则获取独有锁.其它 Slaver 立即获得独有锁后此时它将变成 Master，并且启动所有的传输链接。同时，Client 将停止链接之前的 Master 和将会轮询链接到其他可以利用的 Broker 即新 Master。</p>
 <h3 id="share-file-master-slave集群"><a href="#share-file-master-slave集群" class="headerlink" title="share file master/slave集群"></a>share file master/slave集群</h3><p>希望基于相同的存储目录下运行多个 Broker，首先，该 Broker Master 会首先获得排它锁。如果该 Master Broker 死掉了会释放掉排它锁，则其它的 Slave Broker会替换它。Slave 是一个轮询的从 Master 那里获得排它锁。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&lt;broker useJmx=<span class="string">"false"</span> xmlns=<span class="string">"http://activemq.org/config/1.0"</span>&gt;</div><div class="line">&lt;persistenceAdapter&gt;</div><div class="line">&lt;journaledJDBC dataDirectory=<span class="string">"/sharedFileSystem/broker"</span>/&gt;</div><div class="line">&lt;/persistenceAdapter&gt;</div></pre></td></tr></table></figure></p>
 <p>如果你使用 SAN 或者共享文件系统，那么你可以使用 Shared File System Master Slave。基本上，你可以运行多个 broker，这些 broker 共享数据目录。当第一个 broker 得到文件上的排他锁之后，其它的 broker 便会在循环中等待获得这把锁。客户端使用 failover transport 来连接到可用的 broker。当 master broker 失效的时候会释放这把锁，这时候其中一个 slave broker 会得到这把锁从而成为master broker。</p>
-]]></content>
+<h2 id="network-of-brokers-存储和转发集群"><a href="#network-of-brokers-存储和转发集群" class="headerlink" title="network of brokers (存储和转发集群)"></a>network of brokers (存储和转发集群)</h2><h3 id="单向传递"><a href="#单向传递" class="headerlink" title="单向传递"></a>单向传递</h3><p>ActiveMQ默认的两个broker链接是单方向的，brokerA可以消费brokerB的消息<br><img src="/2017/12/15/Apache-ActiveMQ-笔记/单向broker.png" alt=""></p>
+<h3 id="双向传递"><a href="#双向传递" class="headerlink" title="双向传递"></a>双向传递</h3><p><img src="/2017/12/15/Apache-ActiveMQ-笔记/双向broker.png" alt=""><br><img src="/2017/12/15/Apache-ActiveMQ-笔记/扩展broker.png" alt=""><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&lt;networkConnectors&gt;</div><div class="line">&lt;networkConnector uri=<span class="string">"static://(tcp://backoffice:61617)"</span> name=<span class="string">"brdge"</span> duplex=<span class="string">"true"</span> ConduitSubscriptions=<span class="string">"true"</span>&gt;</div><div class="line">&lt;/networkConnector&gt;</div><div class="line">&lt;/networkConnectors&gt;</div></pre></td></tr></table></figure></p>
+<p>Duplex=”true”表示双发可以通信.<br>ConduitSubscriptions=“false”表示每个 Consumer 上都会收到所有的发送的消息。<br>Name=“bridge”默认的。</p>
+<h3 id="Broker连接"><a href="#Broker连接" class="headerlink" title="Broker连接"></a>Broker连接</h3>]]></content>
     
     <summary type="html">
     
