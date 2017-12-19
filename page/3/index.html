@@ -273,6 +273,175 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/31/elasticSearch初步了解/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="李睿">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/10/31/elasticSearch初步了解/" itemprop="url">elasticSearch入门</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-31T23:10:46+08:00">
+                2017-10-31
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/elasticSearch/" itemprop="url" rel="index">
+                    <span itemprop="name">elasticSearch</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="elasticSearch简介"><a href="#elasticSearch简介" class="headerlink" title="elasticSearch简介"></a>elasticSearch简介</h2><p>1.基于Apache Lucene构建的开源搜索引擎<br>2.基于java编写，提供简单易用的Resful API<br>3.轻松的横向扩展，可支持PB级别的结构化和非结构化的数据处理</p>
+<h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><p>1.海量数据分析引擎<br>2.站内搜索引擎<br>3.数据仓库<br>备注应用：github站内搜索、维基百科、百度实时日志监控</p>
+<h2 id="版本问题"><a href="#版本问题" class="headerlink" title="版本问题"></a>版本问题</h2><p>版本历史 1.x-&gt;2.x-&gt;5.x</p>
+<h2 id="安装head插件"><a href="#安装head插件" class="headerlink" title="安装head插件"></a>安装head插件</h2><p>安装elasticsearch-head,github地址：<a href="https://github.com/mobz/elasticsearch-head.git，然后进行npm" target="_blank" rel="external">https://github.com/mobz/elasticsearch-head.git，然后进行npm</a> install，在启动head插件（npm run start），<a href="http://localhost:9100。" target="_blank" rel="external">http://localhost:9100。</a><br>同时更改elasticsearch.yml，新增以下内容支持跨域<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">http.cors.enabled: <span class="literal">true</span></div><div class="line">http.cors.allow-origin: <span class="string">"*"</span></div></pre></td></tr></table></figure></p>
+<h2 id="集群的搭建"><a href="#集群的搭建" class="headerlink" title="集群的搭建"></a>集群的搭建</h2><p>举个例子，三个节点<br>master节点配置如下，在elasticsearch.yml修改<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">cluster.name: lili</div><div class="line">node.name: master</div><div class="line">node.master: <span class="literal">true</span></div><div class="line">network.host: 127.0.0.1</div></pre></td></tr></table></figure></p>
+<p>slave节点的配置如下，在elasticsearch.yml修改<br>master节点配置如下，在elasticsearch.yml修改<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">cluster.name: lili</div><div class="line">node.name: slave1</div><div class="line">network.host: 127.0.0.1</div><div class="line">http.port: 8200</div><div class="line">discovery.zen.ping.unicast.hosts: [<span class="string">"127.0.0.1"</span>]</div></pre></td></tr></table></figure></p>
+<h2 id="集群和节点"><a href="#集群和节点" class="headerlink" title="集群和节点"></a>集群和节点</h2><p>集群有节点组成，每个集群有唯一的名字。 一个节点只是集群的一部分，节点通过集群名字加入集群</p>
+<ul>
+<li>索引(database)<br>含有相同属性的文档集合</li>
+<li>类型(table)<br>索引可以定义一个或者多个类型，文档必须属于一个类型</li>
+<li>文档(row)<br>文档是可以被索引的基本数据单位</li>
+<li>分片<br>每个索引都有多个分片，每个分片是lucene索引</li>
+<li>备份<br>拷贝一份分片就完成了分片的备份<br>备注：es默认五个分片一个备份<h2 id="es的基本用法"><a href="#es的基本用法" class="headerlink" title="es的基本用法"></a>es的基本用法</h2></li>
+<li>api的基本格式：http://<ip>:<port>/&lt;索引&gt;/&lt;类型&gt;/&lt;文档id&gt;</port></ip></li>
+<li>常用的动词有：GET/PUT/POST/DELETE<h3 id="创建索引"><a href="#创建索引" class="headerlink" title="创建索引"></a>创建索引</h3>在head插件创建索引<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">//localhost:9200:book put请求</div><div class="line">&#123;</div><div class="line">  <span class="string">"novel"</span>: &#123;</div><div class="line">    <span class="string">"properties"</span>: &#123;</div><div class="line">      <span class="string">"title"</span>: &#123;</div><div class="line">        <span class="string">"type"</span>: <span class="string">"text"</span></div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>使用postman插件，可视化插件<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">//localhost:9200:people put请求</div><div class="line">&#123;</div><div class="line">	<span class="string">"settings"</span>:&#123;</div><div class="line">		<span class="string">"number_of_shards"</span>:3,</div><div class="line">		<span class="string">"number_of_replicas"</span>:1</div><div class="line">	&#125;,</div><div class="line">	<span class="string">"mappings"</span>:&#123;</div><div class="line">		<span class="string">"man"</span>:&#123;</div><div class="line">			<span class="string">"properties"</span>:&#123;</div><div class="line">				<span class="string">"name"</span>:&#123;</div><div class="line">					<span class="string">"type"</span>:<span class="string">"text"</span></div><div class="line">				&#125;,</div><div class="line">			    <span class="string">"country"</span>:&#123;</div><div class="line">			    	<span class="string">"type"</span>:<span class="string">"keyword"</span></div><div class="line">			    &#125;,</div><div class="line">			    <span class="string">"age"</span>:&#123;</div><div class="line">			    	<span class="string">"type"</span>:<span class="string">"integer"</span></div><div class="line">			    &#125;,</div><div class="line">			    <span class="string">"date"</span>:&#123;</div><div class="line">			    	<span class="string">"type"</span>:<span class="string">"date"</span>,</div><div class="line">			    	<span class="string">"format"</span>:<span class="string">"yyyy-MM-dd HH:mm:ss"</span></div><div class="line">			    &#125;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="插入索引"><a href="#插入索引" class="headerlink" title="插入索引"></a>插入索引</h3><ul>
+<li><p>指定文档id插入</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">//127.0.0.1:9200/people/man/1 Put请求</div><div class="line">&#123;</div><div class="line">	<span class="string">"name"</span>:<span class="string">"lirui"</span>,</div><div class="line">	<span class="string">"country"</span>: <span class="string">"china"</span>,</div><div class="line">	<span class="string">"age"</span>: 24,</div><div class="line">	<span class="string">"date"</span>: <span class="string">"2000-09-01 11:00:23"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>自动产生文档id插入</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">//127.0.0.1:9200/people/man POST请求</div><div class="line">&#123;</div><div class="line">	<span class="string">"name"</span>:<span class="string">"李睿"</span>,</div><div class="line">	<span class="string">"country"</span>: <span class="string">"china"</span>,</div><div class="line">	<span class="string">"age"</span>: 25,</div><div class="line">	<span class="string">"date"</span>: <span class="string">"2000-06-01 11:00:23"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="修改文档"><a href="#修改文档" class="headerlink" title="修改文档"></a>修改文档</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">//127.0.0.1:9200/people/man/1/_update POST请求</div><div class="line">  &#123;</div><div class="line">  	<span class="string">"doc"</span>:&#123;</div><div class="line">       <span class="string">"name"</span>:<span class="string">"kobe_brant"</span></div><div class="line">    &#125;</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<h3 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h3><h4 id="删除文档"><a href="#删除文档" class="headerlink" title="删除文档"></a>删除文档</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">//127.0.0.1:9200/people/man/1/ DELETE请求</div></pre></td></tr></table></figure>
+<h4 id="删除索引"><a href="#删除索引" class="headerlink" title="删除索引"></a>删除索引</h4><p>使用head插件删除索引或者<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">//127.0.0.1:9200/people/ DELETE请求</div></pre></td></tr></table></figure></p>
+<h3 id="查询文档"><a href="#查询文档" class="headerlink" title="查询文档"></a>查询文档</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">//127.0.0.1:9200/people/_search POST</div><div class="line">//查询全部</div><div class="line">&#123;</div><div class="line">  <span class="string">"query"</span>:&#123;</div><div class="line">    <span class="string">"match_all"</span>:&#123;&#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line">//针对查询</div><div class="line">&#123;</div><div class="line">  <span class="string">"query"</span>:&#123;</div><div class="line">    <span class="string">"match"</span>:&#123;<span class="string">"name"</span>:<span class="string">"kobe"</span>&#125;</div><div class="line">  &#125;,</div><div class="line">  <span class="string">"sort"</span>:[</div><div class="line">    	   &#123;</div><div class="line">    	   	<span class="string">"date"</span>:&#123;</div><div class="line">    	   	  <span class="string">"order"</span>:<span class="string">"desc"</span></div><div class="line">    	   &#125;</div><div class="line">    	   &#125;</div><div class="line">    	]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="聚合函数"><a href="#聚合函数" class="headerlink" title="聚合函数"></a>聚合函数</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">	<span class="string">"aggs"</span>:&#123;</div><div class="line">		<span class="string">"group_by_name"</span>:&#123;</div><div class="line">			<span class="string">"terms"</span>:&#123;</div><div class="line">				<span class="string">"field"</span>:<span class="string">"country"</span></div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="高级查询"><a href="#高级查询" class="headerlink" title="高级查询"></a>高级查询</h3><ul>
+<li>子条件查询<br>特定字段查询所指的特定值<h4 id="query-context"><a href="#query-context" class="headerlink" title="query context"></a>query context</h4>查询过程中，除了判断文档是否满足条件外，es会计算一个_sore来标识匹配程度<br>分为全文本查询（文本类型数据）和字段级别查询（结构化数据如数字、日期）<h4 id="filter-context"><a href="#filter-context" class="headerlink" title="filter context"></a>filter context</h4>在查询时只需要判断文档是否满足条件，只有Yes或者No。</li>
+<li>复合条件查询<br>以一定逻辑组合子条件查询<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  <span class="string">"query"</span>:&#123;</div><div class="line">    <span class="string">"bool"</span>:&#123;</div><div class="line">      <span class="string">"should"</span>:[&#123;</div><div class="line">         <span class="string">"match"</span>:&#123;</div><div class="line">           <span class="string">"author"</span>:<span class="string">"瓦力"</span></div><div class="line">         &#125;</div><div class="line">       &#125;,</div><div class="line">       &#123;</div><div class="line">          <span class="string">"match"</span>:&#123;</div><div class="line">            <span class="string">"title"</span>:<span class="string">"瓦力"</span></div><div class="line">          &#125;</div><div class="line">        &#125;</div><div class="line">      ],</div><div class="line">    <span class="string">"filter"</span>:[</div><div class="line">      &#123;</div><div class="line">        <span class="string">"term"</span>:&#123;</div><div class="line">          <span class="string">"word_count"</span>:1000</div><div class="line">        &#125;</div><div class="line">      &#125;</div><div class="line">    ]</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/29/构建大型网站的其他要素/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1657,123 +1826,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/29/云取证第七周周报/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="李睿">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/29/云取证第七周周报/" itemprop="url">云取证第七周周报</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-29T19:54:30+08:00">
-                2017-06-29
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>本周主要看了一些云安全综述的文章，云计算安全研究、云计算_系统实例与研究现状、Dependability in the Cloud: Challenges and Opportunitie、The Challenge of Cloud Control。</p>
-<p>云计算安全研究主要讲云计算的趋势、云安全挑战、云安全现状、云计算安全框架的建议、云安全的技术研究。这里面我觉得这几点是比较重要的，例如云安全的挑战和云计算安全关键技术研究。<br>首先在于云安全的挑战，在于以下三点：1.建立以数据安全和隐私保护为主要目标的云安全技术框架，具体体现在：云计算服务计算模式所引发的安全问题、云计算的动态虚拟化管理方式引发的安全问题、 云计算中多层服务模式引发的安全问题；2.建立以安全目标验证、安全服务等级测评为核心的云计算安全标准及其测评体系；3.建立可控的云计算安全监管体系，具体体现在：实现基于云计算的安全攻击的快速识别、预警与防护；实现云计算内容监控的难度；识别并防止基于云计算的密码类犯罪活动。<br>接着是云计算安全关键技术研究，主要有以下几点：1.可信访问控制；2.密文检索与处理；3.数据存在与可使用性证明；4.数据隐私保护；5.虚拟安全技术；6.云资源访问控制；7.可信云计算；</p>
-<p>云计算:系统实例与研究现状主要讲了针对云计算这样一个范畴综述了当前云计算所采用的技术,剖析其背后的技术含义以及当前云计算参与企业所采用的云计算实现方案。现有的云计算实现使用的技术体现了以下 3 个方面的特征:1) 硬件基础设施架构在大规模的廉价服务器集群之上.2) 应用程序与底层服务协作开发,最大限度地利用资源.3) 通过多个廉价服务器之间的冗余,使用软件获得高可用性.这里面讲了一下几个项目：清华大学透明计算平台、Google的云计算平台、IBM“蓝云”计算平台、Amazon的弹性计算云。.从平台技术构建来看,云计算具有3 个基本特征,即系统建立在大规模的廉价服务器集群之上,通过基础设施与上层应用程序的协同构建以达到最大效率利用硬件资源的目的,以及通过软件的方法容忍多个节点的错误.通过云计算对这 3 个方面基本特征的体现,达到了分布式系统两个方面的目标,即系统的可扩展性和可靠性。</p>
-<p>Dependability in the Cloud: Challenges and Opportunitie主要讲了几个比较流行的问题，监控大量应用程序的能力可以使“人群智慧”方法提供更强大的安全性，其方式与网络提供商能够进行蠕虫和DDoS攻击相同，其中一些例子如下：几个大型云基础架构提供商的环境不仅增加了影响大量应用程序的103次共模中断的风险，而且为攻击者提供了高度可见的目标。社区驱动的网站，如主要云提供商的跟踪中断，并记录了过去两年影响数百个互联网站点的一些中断和安全漏洞。从事广泛的行为，并采用不同程度的最佳做法可以暴露云应用提高风险水平。例如，2008年4月26日，亚马逊的弹性云（EC2）在几个实例中出现了中断，原因是单个客户应用了一大批异常的防火墙规则，同时实例化了大量实例引发亚马逊分布式防火墙中的性能下降错误。</p>
-<p>The Challenge of Cloud Control主要讨论了资源优化云数据中心的一些主要挑战。我们提出了一个称为云控制的新研究领域，这是一系列云管理问题的控制理论方法，旨在将当今的静态和能耗云数据中心转变为自我管理，动态和可靠的基础设施。<br>第一个挑战是性能模型，这对设计和开发至关重要稳健的控制系统。值得注意的是，云数据中心的规模大大增加，工作量动态变化比以前的电信和互联网系统多。服务器系统上的以前的结果表明，可以使用黑匣子方法和相当简单的队列模型或使用流模型。第二个挑战是服务准入控制，这在本质上是长期容量规划，控制系统根据预期的利润决定是否接受服务。此外，弹性控制器应该为正在运行的应用程序分配足够的资源，以提供可接受的QoS，同时避免昂贵的过度配置。这些解决方案分为三大类：基于机器学习算法的解决方案，基于控制理论的解决方案和基于统计工作负载分析的解决方案。此外，还有一些VM安置问题需要解决，以确定哪些部署新的VM以及要关闭的VM 。鉴于云的动态性质，随着需求和供应的变化随着时间的推移发生重大变化，VM布局决策需要频繁更新。最近关于重新布置的工作包括通过限制可以同时迁移的VM数量来实现VM迁移和性能转向的性能建模。其他动态方法包括使用随机整数规划来处理不确定性和遗传算法，以减少负载波动时的重新迁移。另一个挑战是提供云服务的大型数据中心不仅具有购买设备的成本，而且能源成本大幅提高，这意味着能源优化将至关重要。</p>
-<p>首先，服务准入控制器决定是否接受弹性服务，随着时间的推移可能会有很大的变化。云提供商必须确定要承认的最佳服务数量，以最大限度地发挥其效用（收入，利用率等），而不会危及已提供服务的服务水平协议（SLA）。服务增加了云基础设施的随机负载。因此，需要接纳管制计划，以评估新服务的长期影响，具体取决于他们估计的工作量。第二，弹性控制系统的目标是分配足够的所谓的计算单位（CU），以便符合某些控制目标，以系统的性能期望为目标。我们提出定义CU术语，以便满足能力需求的要求，这与维护虚拟机的定义无关。后续的CU将被映射到合适的VM。如果假定系统状态和工作负荷可以用一定的精度来估计，则控制器设计基本上成为随机的最优控制问题。第三，VM布局控制器都执行从CU到适当的VM集的映射，以在本地或远程数据中心运行，并确定物理机器上的虚拟机的打包。在将VM分配到数据中心内的PM之前，我们考虑从CU到VM和从VM到数据中心的映射。可以制定的这些容量分配（分配）问题，例如作为限制线性问题，用于优化成本受制于容量和可能的其他约束，从而实现特定的负载平衡亲和力和抗亲和力的客观或要求（例如，在同一数据中心（或主机）中，而不是在相同的数据中心）。第四，数据中心能源优化器模型，优化机房定位决策的机房能量温度相互作用。能量优化将需要一个网络身体的看法。最后，整体管理系统监控整个系统的行为，并优化管理工具在整体数据中心管理目标方面的协同运作。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1823,7 +1875,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">38</span>
+                <span class="site-state-item-count">39</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

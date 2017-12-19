@@ -92,17 +92,19 @@
 
 
 
-<meta name="description" content="##">
+<meta name="description" content="垂直扩展垂直扩展是一种用于增加单个ActiveMQ broker可以处理的连接数（因此增加负载）的技术。默认情况下，ActiveMQ broker设计为尽可能高效地移动消息，以确保低延迟和良好的性能。但是我们可以做一些配置调整，以确保ActiveMQ broker可以处理大量的并发连接和大量的队列。默认情况下，ActiveMQ将使用阻塞I/O来处理传输连接。 这导致每个连接使用一个线程。 我们可以">
 <meta name="keywords" content="ActiveMQ">
 <meta property="og:type" content="article">
 <meta property="og:title" content="为大量并发应用程序部署ActiveMQ">
 <meta property="og:url" content="http://yoursite.com/2017/12/19/为大量并发应用程序部署ActiveMQ/index.html">
 <meta property="og:site_name" content="博客">
-<meta property="og:description" content="##">
-<meta property="og:updated_time" content="2017-12-19T13:50:22.406Z">
+<meta property="og:description" content="垂直扩展垂直扩展是一种用于增加单个ActiveMQ broker可以处理的连接数（因此增加负载）的技术。默认情况下，ActiveMQ broker设计为尽可能高效地移动消息，以确保低延迟和良好的性能。但是我们可以做一些配置调整，以确保ActiveMQ broker可以处理大量的并发连接和大量的队列。默认情况下，ActiveMQ将使用阻塞I/O来处理传输连接。 这导致每个连接使用一个线程。 我们可以">
+<meta property="og:image" content="http://yoursite.com/2017/12/19/为大量并发应用程序部署ActiveMQ/流量分区.png">
+<meta property="og:updated_time" content="2017-12-19T14:57:15.196Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="为大量并发应用程序部署ActiveMQ">
-<meta name="twitter:description" content="##">
+<meta name="twitter:description" content="垂直扩展垂直扩展是一种用于增加单个ActiveMQ broker可以处理的连接数（因此增加负载）的技术。默认情况下，ActiveMQ broker设计为尽可能高效地移动消息，以确保低延迟和良好的性能。但是我们可以做一些配置调整，以确保ActiveMQ broker可以处理大量的并发连接和大量的队列。默认情况下，ActiveMQ将使用阻塞I/O来处理传输连接。 这导致每个连接使用一个线程。 我们可以">
+<meta name="twitter:image" content="http://yoursite.com/2017/12/19/为大量并发应用程序部署ActiveMQ/流量分区.png">
 
 
 
@@ -362,7 +364,18 @@
       
 
       
-        <p>##</p>
+        <h2 id="垂直扩展"><a href="#垂直扩展" class="headerlink" title="垂直扩展"></a>垂直扩展</h2><p>垂直扩展是一种用于增加单个ActiveMQ broker可以处理的连接数（因此增加负载）的技术。默认情况下，ActiveMQ broker设计为尽可能高效地移动消息，以确保低延迟和良好的性能。但是我们可以做一些配置调整，以确保ActiveMQ broker可以处理大量的并发连接和大量的队列。<br>默认情况下，ActiveMQ将使用阻塞I/O来处理传输连接。 这导致每个连接使用一个线程。 我们可以在ActiveMQ broker上使用非阻塞I/O（而客户端上仍然使用默认传输）来减少使用的线程数。broker的非阻塞I/O配置如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&lt;broker&gt;</div><div class="line">    &lt;transportConnectors&gt;</div><div class="line">        &lt;transportConnector name=<span class="string">"nio"</span> uri=<span class="string">"nio://localhost:61616"</span>/&gt;</div><div class="line">    &lt;/transportConnectors&gt;</div><div class="line">&lt;/broker&gt;</div></pre></td></tr></table></figure></p>
+<p>除了每个连接使用一个线程来阻塞I/O外，ActiveMQ broker可以使用线程为每个客户端连接分派消息。可以通过将名为org.apache.activemq.UseDedicatedTaskRunner的系统属性设置为false，让ActiveMQ使用线程池。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ACTIVEMQ_OPTS=<span class="string">"-Dorg.apache.activemq.UseDedicatedTaskRunner=false"</span></div></pre></td></tr></table></figure></p>
+<p>确保ActiveMQ broker具有足够的内存来处理大量并发连接有两步过程。<br>首先，需要确保启动ActiveMQ broker的JVM配置了足够的内存<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ACTIVEMQ_OPTS=<span class="string">"-Xmx1024M \-Dorg.apache.activemq.UseDedicatedTaskRunner=false"</span></div></pre></td></tr></table></figure></p>
+<p>确保专门为ActiveMQ broker在JVM配置适当的内存量。此调整通过&lt; system-Usage &gt;元素的limit属性进行。（最好从512MB开始，如果测试不够再往上加）<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">&lt;systemUsage&gt;</div><div class="line">    &lt;systemUsage&gt;</div><div class="line">        &lt;memoryUsage&gt;</div><div class="line">            &lt;memoryUsage <span class="built_in">limit</span>=<span class="string">"512 mb"</span>/&gt;</div><div class="line">        &lt;/memoryUsage&gt;</div><div class="line">        &lt;storeUsage&gt;</div><div class="line">            &lt;storeUsage <span class="built_in">limit</span>=<span class="string">"10 gb"</span> name=<span class="string">"foo"</span>/&gt;</div><div class="line">        &lt;/storeUsage&gt;</div><div class="line">        &lt;tempUsage&gt;</div><div class="line">            &lt;tempUsage <span class="built_in">limit</span>=<span class="string">"1 gb"</span>/&gt;</div><div class="line">        &lt;/tempUsage&gt;</div><div class="line">    &lt;/systemUsage&gt;</div><div class="line">&lt;/systemUsage&gt;</div></pre></td></tr></table></figure></p>
+<p>还应该降低每一个连接的CPU负载，如果使用的OpenWire连接方式，禁用紧密编码，否则会使得CPU过度紧张。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">String uri = <span class="string">"failover://(tcp://localhost:61616?"</span> + <span class="string">" wireFormat.tightEncodingEnabled=false)"</span>;</div><div class="line">ConnectionFactory cf = new ActiveMQConnectionFactory(uri);</div></pre></td></tr></table></figure></p>
+<p>前面研究的是broker怎么调整去处理数千个连接，下面开始研究的是怎么调整broker去处理数千个队列。<br>默认队列配置使用单独的线程来将消息从消息存储区分页到队列中，以便分发给感兴趣的消息消费者。 对于大量队列，建议通过为所有队列启用optimize-Dispatch属性来禁用此功能，<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&lt;destinationPolicy&gt;</div><div class="line">    &lt;policyMap&gt;</div><div class="line">        &lt;policyEntries&gt;</div><div class="line">            &lt;policyEntry queue=<span class="string">"&gt;"</span> optimizedDispatch=<span class="string">"true"</span>/&gt;</div><div class="line">        &lt;/policyEntries&gt;</div><div class="line">    &lt;/policyMap&gt;</div><div class="line">&lt;/destinationPolicy&gt;</div></pre></td></tr></table></figure></p>
+<p>为了确保不仅可以扩展到数千个连接，而且还可以扩展到数万个队列，使用JDBC消息存储库或更新和更快的KahaDB消息存储库。 KahaDB默认情况下在ActiveMQ中启用。</p>
+<p>到目前为止，我们已经考虑了扩展连接，减少线程使用，并选择正确的消息存储。 调整用于扩展的ActiveMQ的示例配置如以下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">&lt;broker xmlns=<span class="string">"http://activemq.apache.org/schema/core"</span> brokerName=<span class="string">"amq-broker"</span> dataDirectory=<span class="string">"<span class="variable">$&#123;activemq.base&#125;</span>/data"</span>&gt;</div><div class="line">    &lt;persistenceAdapter&gt;</div><div class="line">        &lt;kahaDB directory=<span class="string">"<span class="variable">$&#123;activemq.base&#125;</span>/data"</span> journalMaxFileLength=<span class="string">"32mb"</span>/&gt;</div><div class="line">    &lt;/persistenceAdapter&gt;</div><div class="line">    &lt;destinationPolicy&gt;</div><div class="line">        &lt;policyMap&gt;</div><div class="line">            &lt;policyEntries&gt;</div><div class="line">                &lt;policyEntry queue=<span class="string">"&amp;gt;"</span> optimizedDispatch=<span class="string">"true"</span>/&gt;</div><div class="line">            &lt;/policyEntries&gt;</div><div class="line">        &lt;/policyMap&gt;</div><div class="line">    &lt;/destinationPolicy&gt;</div><div class="line">    &lt;systemUsage&gt;</div><div class="line">        &lt;systemUsage&gt;</div><div class="line">            &lt;memoryUsage&gt;</div><div class="line">                &lt;memoryUsage <span class="built_in">limit</span>=<span class="string">"512 mb"</span>/&gt;</div><div class="line">            &lt;/memoryUsage&gt;</div><div class="line">            &lt;storeUsage&gt;</div><div class="line">                &lt;storeUsage <span class="built_in">limit</span>=<span class="string">"10 gb"</span> name=<span class="string">"foo"</span>/&gt;</div><div class="line">            &lt;/storeUsage&gt;</div><div class="line">            &lt;tempUsage&gt;</div><div class="line">                &lt;tempUsage <span class="built_in">limit</span>=<span class="string">"1 gb"</span>/&gt;</div><div class="line">            &lt;/tempUsage&gt;</div><div class="line">        &lt;/systemUsage&gt;</div><div class="line">    &lt;/systemUsage&gt;</div><div class="line">    &lt;transportConnectors&gt;</div><div class="line">        &lt;transportConnector name=<span class="string">"openwire"</span> uri=<span class="string">"nio://localhost:61616"</span>/&gt;</div><div class="line">    &lt;/transportConnectors&gt;</div><div class="line">&lt;/broker&gt;</div></pre></td></tr></table></figure></p>
+<h2 id="水平扩展"><a href="#水平扩展" class="headerlink" title="水平扩展"></a>水平扩展</h2><p>除了扩展单个broker之外，还可以使用networks来增加可用于应用程序的ActiveMQ broker的数量。 由于networks会自动将消息传递给具有感兴趣的消费者的连接broker，因此可以将客户端配置为连接到一个broker集群，随机选择一个来连接<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">failover://(tcp://broker1:61616,tcp://broker2:61616)?randomize=<span class="literal">true</span></div></pre></td></tr></table></figure></p>
+<p>为了确保队列或持久主题订阅者的消息不会在broker上孤立，需要将network配置为使用dynamicOnly和低网络prefetchSize<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&lt;networkConnector uri=<span class="string">"static://(tcp://remotehost:61617)"</span></div><div class="line">    name=<span class="string">"bridge"</span></div><div class="line">    dynamicOnly=<span class="string">"true"</span></div><div class="line">    prefetchSize=<span class="string">"1"</span>&gt;</div><div class="line">&lt;/networkConnector&gt;</div></pre></td></tr></table></figure></p>
+<p>使用network进行水平扩展会带来更多的延迟，因为潜在的消息必须在分发给消费者之前通过多个broker。</p>
+<h2 id="流量分区"><a href="#流量分区" class="headerlink" title="流量分区"></a>流量分区</h2><p>客户端流量分割是垂直和水平分割的混合。 通常不使用network，因为客户端应用程序决定什么流量应该到哪个broker上。 客户端应用程序必须维护多个JMS连接，并决定哪些JMS连接应用于哪些目标。<br>不直接使用network connection的优点是，减少在brokers之间转发消息的开销。 需要平衡这与导致典型应用程序的额外复杂性<br><img src="/2017/12/19/为大量并发应用程序部署ActiveMQ/流量分区.png" alt=""></p>
 
       
     </div>
@@ -415,6 +428,10 @@
 
           <div class="post-nav-prev post-nav-item">
             
+              <a href="/2017/12/19/activemq先进特性/" rel="prev" title="activemq先进特性">
+                activemq先进特性 <i class="fa fa-chevron-right"></i>
+              </a>
+            
           </div>
         </div>
       
@@ -460,8 +477,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg"
@@ -476,7 +502,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">38</span>
+                <span class="site-state-item-count">39</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -530,6 +556,22 @@
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#垂直扩展"><span class="nav-number">1.</span> <span class="nav-text">垂直扩展</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#水平扩展"><span class="nav-number">2.</span> <span class="nav-text">水平扩展</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#流量分区"><span class="nav-number">3.</span> <span class="nav-text">流量分区</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
