@@ -315,6 +315,28 @@
           </span>
 
           
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/消息中间件/" itemprop="url" rel="index">
+                    <span itemprop="name">消息中间件</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
 
           
             
@@ -341,7 +363,15 @@
       
         
           
-            
+            <h2 id="持久化和非持久化传递"><a href="#持久化和非持久化传递" class="headerlink" title="持久化和非持久化传递"></a>持久化和非持久化传递</h2><h3 id="持久化消息"><a href="#持久化消息" class="headerlink" title="持久化消息"></a>持久化消息</h3><p>这是 ActiveMQ 的默认传送模式，此模式保证这些消息只被传送一次和成功使用一次。对于这些消息，可靠性是优先考虑的因素。可靠性的另一个重要方面是确保持久性消息传送至目标后，消息服务在向消费者传送它们之前不会丢失这些消息。这意味着在持久性消息传送至目标时，消息服务将其放入持久性数据存储。如果消息服务由于某种原因导致失败，它可以恢复此消息并将此消息传送至相应的消费者。虽然这样增加了消息传送的开销，但却增加了可靠性。</p>
+<h3 id="非持久化消息"><a href="#非持久化消息" class="headerlink" title="非持久化消息"></a>非持久化消息</h3><p>保证这些消息最多被传送一次。对于这些消息，可靠性并非主要的考虑因素。此模式并不要求持久性的数据存储，也不保证消息服务由于某种原因导致失败后消息不会丢失。<br>Non-persistent 传递消息比 Persistents 传递消息速度更快，原因如下：<br>Non-persistent 发送消息是异步的， Producer 不需要等待 Consumer 的 receipt消息。<br>Persisting 传递消息是需要把消息存储起来。然后在传递，这样很慢 。</p>
+<h2 id="超快回应消息"><a href="#超快回应消息" class="headerlink" title="超快回应消息"></a>超快回应消息</h2><p>内嵌 broker</p>
+<h2 id="Transactions"><a href="#Transactions" class="headerlink" title="Transactions"></a>Transactions</h2><p>Transaction 比 Non-transaction 的性能高</p>
+<h2 id="Tuning-the-OpenWire-protocol"><a href="#Tuning-the-OpenWire-protocol" class="headerlink" title="Tuning the OpenWire protocol"></a>Tuning the OpenWire protocol</h2><p>跨语言协议</p>
+<h2 id="uning-the-TCP-Transport"><a href="#uning-the-TCP-Transport" class="headerlink" title="uning the TCP Transport"></a>uning the TCP Transport</h2><p>TCP 协议是 ActiveMQ 使用最常见的协议。<br>有以下两点影响 TCP 协议性能：<br>1) socketBufferSize=缓存，默认是 65536。<br>2) tcpNoDelay=默认是 false，</p>
+<h2 id="优化消息消费者"><a href="#优化消息消费者" class="headerlink" title="优化消息消费者"></a>优化消息消费者</h2><h3 id="Prefetch-Limit"><a href="#Prefetch-Limit" class="headerlink" title="Prefetch Limit"></a>Prefetch Limit</h3><p>ActiveMQ 默认的 prefetch 大小不同的：<br>Queue Consumer 默认大小=1000<br>Queue Browser Consumer 默认大小=500<br>Persistent Topic Consumer 默认大小=100<br>Non-persistent Topic Consumer 默认大小=32766</p>
+<h3 id="Delivery-and-Acknowledgement-of-messages"><a href="#Delivery-and-Acknowledgement-of-messages" class="headerlink" title="Delivery and Acknowledgement of messages"></a>Delivery and Acknowledgement of messages</h3><p>建议使用 Session.DUPS_ACKNOWLEDGE。<br>JMS 消息只有在被确认之后，才认为已经被成功地消费了。消息的成功消费通常包含三个阶段：客户接收消息、客户处理消息和消息被确认。在事务性会话中，当一个事务被提交的时候，确认自动发生。在非事务性会话中， 消息何时被确认取决于创建会话时的应答模式 （acknowledgement mode） 。<br>该参数有以下三个可选值：<br>Session.AUTO_ACKNOWLEDGE。当客户成功的从 receive 方法返回的时候，或者从MessageListener.onMessage 方法成功返回的时候，会话自动确认客户收到的消息<br>Sessiion.TRANSACTION。用 session.commit()回执确认。<br>Session.CLIENT_ACKNOWLEDGE。客户通过消息的 acknowledge 方法确认消息。需要注意的是，在这种模式中，确认是在会话层上进行：确认一个被消费的消息将自动确认所有已被会话消费的消息。例如，如果一个消息消费者消费了 10 个消息，然后确认第 5 个消息，那么所有 10 个消息都被确认。<br>Session.DUPS_ACKNOWLEDGE。该选择只是会话迟钝第确认消息的提交。当消息到达一定数量后，才开始消费该消息。如果 JMS provider 失败，那么可能会导致一些重复的消息。如果是重复的消息，那么 JMS provider 必须把消息头的 JMSRedelivered 字段设置为 true。</p>
+
           
         
       
