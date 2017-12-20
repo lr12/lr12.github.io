@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-12-20T13:27:02.250Z</updated>
+  <updated>2017-12-20T14:25:04.953Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -16,11 +16,25 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>优化ActiveMQ性能</title>
+    <link href="http://yoursite.com/2017/12/20/%E4%BC%98%E5%8C%96ActiveMQ%E6%80%A7%E8%83%BD/"/>
+    <id>http://yoursite.com/2017/12/20/优化ActiveMQ性能/</id>
+    <published>2017-12-20T14:25:04.000Z</published>
+    <updated>2017-12-20T14:25:04.953Z</updated>
+    
+    <summary type="html">
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
     <title>activemq先进特性和优化性能</title>
     <link href="http://yoursite.com/2017/12/19/activemq%E5%85%88%E8%BF%9B%E7%89%B9%E6%80%A7/"/>
     <id>http://yoursite.com/2017/12/19/activemq先进特性/</id>
     <published>2017-12-19T15:07:38.000Z</published>
-    <updated>2017-12-20T13:27:02.250Z</updated>
+    <updated>2017-12-20T14:24:32.840Z</updated>
     
     <content type="html"><![CDATA[<h1 id="先进特性"><a href="#先进特性" class="headerlink" title="先进特性"></a>先进特性</h1><h2 id="Destination-Features"><a href="#Destination-Features" class="headerlink" title="Destination Features"></a>Destination Features</h2><h3 id="Composite-Destinations"><a href="#Composite-Destinations" class="headerlink" title="Composite Destinations"></a>Composite Destinations</h3><p>ActiveMQ 支持 composite destinations。它允许用一个虚拟的destination 代表多个 destinations。例如你可以通过 composite destinations 在一个操作中同时向 12 个 queue 发送消息。在 composite destinations 中，多个 destination之间采用”,”分割。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">Queue queue =  new ActiveMQQueue(<span class="string">"FOO.A,FOO.B,FOO.C"</span>)</div><div class="line">&lt;destinationInterceptors&gt;</div><div class="line"> &lt;virtualDestinat ionInterceptor&gt;</div><div class="line"> &lt;virtualDestinations&gt;</div><div class="line"> &lt;compositeQueue name=<span class="string">"MY.QUEUE"</span>&gt;</div><div class="line"> &lt;forwardTo&gt;</div><div class="line"> &lt;queue physicalName=<span class="string">"FOO"</span>  /&gt;</div><div class="line"> &lt;topic physicalName=<span class="string">"BAR"</span>  /&gt;</div><div class="line"> &lt;/forwardTo&gt;</div><div class="line"> &lt;/compositeQueue&gt;</div><div class="line"> &lt;/virtualDestinations&gt;</div><div class="line"> &lt;/virtualDestinationInterceptor&gt;</div><div class="line">&lt;/destinationInterceptors&gt;</div></pre></td></tr></table></figure></p>
 <h3 id="mirrored-Queues"><a href="#mirrored-Queues" class="headerlink" title="mirrored Queues"></a>mirrored Queues</h3><p>每个queue中的消息只能被一个 consumer 消费。然而，有时候你可能希望能够监视生产者和消费者之间的消息流。你可以通过使用 Virtual Destinations 来建立一个 virtual queue 来把消息转发到多个 queues 中。但是 为系统中每个queue 都进行如此的配置可能会很麻烦。<br>ActiveMQ支持 Mirrored Queues。Broker 会把发送到某个 queue 的所有消息转发到一个名称类似的 topic，因此监控程序可以订阅这个 mirrored queue topic。为了启用Mirrored Queues，首先要将 BrokerService 的useMirroredQueues属性设置成  true ，然后可以通过destinationInterceptors设置其它属性，如mirror topic的前缀，缺省是”VirtualTopic.Mirror.” 。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">&lt;broker xmlns=<span class="string">"http://activemq.org/config/1.0"</span> brokerName=<span class="string">"MirroredQueuesBroker1"</span> useMirroredQueues=<span class="string">"true"</span>&gt; &gt;</div><div class="line"> &lt;transportConnectors&gt;</div><div class="line"> &lt;transportConnector uri=<span class="string">"tcp://localhost:61616"</span> /&gt;</div><div class="line"> &lt;/transportConnectors&gt;</div><div class="line"> &lt;destinationInterceptors&gt;</div><div class="line"> &lt;mirroredQueue copyMessage = <span class="string">"true"</span> prefix=<span class="string">"Mirror.Topic"</span> /&gt;</div><div class="line"> &lt;/destinationInterceptors&gt;</div><div class="line">&lt;/broker&gt;</div><div class="line">BrokerService answer = new BrokerService();</div><div class="line">answer.setUseMirroredQueues(<span class="literal">true</span>);</div><div class="line">answer.setPersistent(isPersistent());</div><div class="line">answer.addConnector(<span class="built_in">bind</span>Address);</div><div class="line"><span class="built_in">return</span> answer;</div></pre></td></tr></table></figure></p>
@@ -43,6 +57,21 @@
 <h3 id="Message-Group"><a href="#Message-Group" class="headerlink" title="Message Group"></a>Message Group</h3><p>它是 Exclusive Consumer功能的增强。逻辑上，Message Groups 可以看成是一种并发的 Exclusive Consumer。跟所有的消息都由唯一的 consumer 处理不同，JMS 消息属性JMSXGroupID 被用来区分 message group。Message Groups 特性保证所有具有相同 JMSXGroupID 的消息会被分发到相同的 consumer（只要这个consumer保持active）。另外一方面，Message Groups 特性也是一种负载均衡的机制。在一个消息被分发到 consumer 之前，broker 首先检查消息 JMSXGroupID属性。如果存在，那么 broker 会检查是否有某个consumer 拥有这个 message group。如果没有，那么 broker 会选择一个consumer，并将它关联到这个message group。此后，这个 consumer 会接收这个 message group 的所有消息，直到：<br>1.Consumer 被关闭。<br>2.Message group被关闭。通过发送一个消息，并设置这个消息的JMSXGroupSeq为-1</p>
 <h4 id="创建一个message-groups"><a href="#创建一个message-groups" class="headerlink" title="创建一个message groups"></a>创建一个message groups</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">message.setStringProperty(<span class="string">"JMSXGroupID"</span>,<span class="string">"GroupA"</span>);</div></pre></td></tr></table></figure>
 <h4 id="关闭一个message-groups"><a href="#关闭一个message-groups" class="headerlink" title="关闭一个message groups"></a>关闭一个message groups</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">message.setStringProperty(<span class="string">"JMSXGroupID"</span>,<span class="string">"GroupA"</span>);</div><div class="line">message.setIntProperty(<span class="string">"JMSXGroupSeq"</span>, -1);</div></pre></td></tr></table></figure>
+<h3 id="JMS-Selectors"><a href="#JMS-Selectors" class="headerlink" title="JMS Selectors"></a>JMS Selectors</h3><p>JMS Selectors 用于在订阅中，基于消息属性和 Xpath 语法对进行消息的过滤</p>
+<h3 id="消息重发与死信管理"><a href="#消息重发与死信管理" class="headerlink" title="消息重发与死信管理"></a>消息重发与死信管理</h3><p>出现以下情况时，消息会被redelivered（重发）:</p>
+<ul>
+<li>使用一个事务session，并且调用了rollback方法.</li>
+<li>一个事务session，关闭之前调用了commit.</li>
+<li>在session中使用CLIENT_ACKNOWLEDGE签收模式，并且调用了Session.recover方法.<br>当消息试图被传递的次数是配置中 maximumRedeliveries 属性的值时，那么，broker 会任何该消息是一个死消息，并被把该消息发送到死队列中。默认，aciaveMQ 中死队列被声明为“ActivemMQ.DLQ” ，所有不能消费的消息被传递到该死队列中。<br>有时需要直接删除过期的消息而不需要发送到死队列中,xml可以使用属性processExpired=false来设置。<br>存放非持久消息到死队列中;默认情况下，Activemq 不会把非持久的死消息发送到死队列中。如果你想把非持久的消息发送到死队列中，需要设置属性processNonPersistent=“true”<h3 id="consumer-priority"><a href="#consumer-priority" class="headerlink" title="consumer priority"></a>consumer priority</h3>JMS JMSPriority 定义了十个消息优先级值， 0 是最低的优先级， 9 是最高的优先级。另外，客户端应当将0‐4 看作普通优先级，5‐9 看作加急优先级。<br>Consumer 的 Priority 的划分为 0~127 个级别，127 是最高的级别，0 是最低<br>的也是 ActiveMQ 默认的。<br>这种配置可以是 Broker 根据 Consumer 的优先级来发送消息先到较高的优先级的 Consumer 上，如果某个较高的 Consumer 的缓存预先被消息装载慢，则Broker 会把消息发送到仅次于它优先级的 Consumer 上.<h3 id="slow-consumer-handling"><a href="#slow-consumer-handling" class="headerlink" title="slow consumer handling"></a>slow consumer handling</h3>ActiveMQ通过prefetch机制来提高性能，这意味这客户端的内存里可能会缓存一定数量的消息。缓存消息的数量由prefetch limit来控制。当某个consumer的prefetch buffer已经达到上限，那么broker不会再向consumer分发消息，直到consumer向broker发送消息的确认。<h3 id="consumer-dispatcher-Async"><a href="#consumer-dispatcher-Async" class="headerlink" title="consumer dispatcher Async"></a>consumer dispatcher Async</h3>在 activemq4.0 以后， 你肯能选择 broker 执行同步或异步的方法消息给消费者。<br>默认是 true<h3 id="Retroactive-Consumer"><a href="#Retroactive-Consumer" class="headerlink" title="Retroactive Consumer"></a>Retroactive Consumer</h3>消费者回溯消息</li>
+</ul>
+<ol>
+<li>这种策略限制在基于一个静态的计数中对于主题 （Topic） 消息缓存的数量。</li>
+<li>这种策略限制在内存使用量中对于主题（Topic）消息缓存的数量</li>
+<li>仅仅保持发送到主题（Topic）的最后一个消息。</li>
+<li>不保存主题消息，不需要任何配置</li>
+<li>基于一个 JMS 属性选择器应用到所有的消息来设置其消息缓存的大小</li>
+<li>基于应用到每个消息的过期时间来限制其消息缓存数量。提示这种消息的生命周期时间来源于消息发送者设置其 timeToLive 参数。</li>
+</ol>
 ]]></content>
     
     <summary type="html">
@@ -1699,38 +1728,6 @@
     <summary type="html">
     
       &lt;h2 id=&quot;CRUD操作&quot;&gt;&lt;a href=&quot;#CRUD操作&quot; class=&quot;headerlink&quot; title=&quot;CRUD操作&quot;&gt;&lt;/a&gt;CRUD操作&lt;/h2&gt;&lt;figure class=&quot;highlight bash&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutt
-    
-    </summary>
-    
-      <category term="hbase" scheme="http://yoursite.com/categories/hbase/"/>
-    
-    
-      <category term="hbase权威指南" scheme="http://yoursite.com/tags/hbase%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97/"/>
-    
-      <category term="分布式" scheme="http://yoursite.com/tags/%E5%88%86%E5%B8%83%E5%BC%8F/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>hbase简介(第一章)</title>
-    <link href="http://yoursite.com/2017/11/01/hbase%E7%AE%80%E4%BB%8B/"/>
-    <id>http://yoursite.com/2017/11/01/hbase简介/</id>
-    <published>2017-11-01T01:38:49.000Z</published>
-    <updated>2017-12-19T08:56:08.622Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="海量数据的黎明"><a href="#海量数据的黎明" class="headerlink" title="海量数据的黎明"></a>海量数据的黎明</h2><p>hadoop项目有两个模块：HDFS和MapReduce。Hadoop擅长存储任意的、半结构化数据，可以帮助用户分析数据时决定如何解释这些数据，同时允许用户随时更改数据分类的方式；一旦用户更新了算法，只需要重新分析数据。Hadoop是现有数据库的一个补充，提供了数据存储无限的空间，并且针对大文件存储、批量访问和流式访问做了优化。<br>列式存储数据库，以列为单位聚合数据，然后将列值顺序存入磁盘，而行式数据库则是连续存储整行。<br>1.优点是：查询时只有涉及到的列会被读取；投影(projection)很高效；任何列都能作为索引。缺点：选择完成时，被选择的列要重新组装；INSERT/UPDATE比较麻烦。<br>2.更好的进行数据压缩：通过字典表压缩数据。经过字典表进行数据压缩后，表中的字符串才都变成数字了，比如我们的材料名可以用一张材料表，这样子在列存储就可以根据id来关联材料。<br>3.查询性能<br>我们能根据列查询结果通过为运算（&amp;或者|）进行结果合并，加快速度<br>关键步骤如下：<br>1.去字典表里找到字符串对应数字(只进行一次字符串比较)。<br>2.用数字去列表里匹配，匹配上的位置设为1。<br>3.把不同列的匹配结果进行位运算得到符合所有条件的记录下标。<br>4.使用这个下标组装出最终的结果集。<br>Hbase以列式存储的格式存储数据，传统的列式存储比较适合实时存储数据的场景，Hbase比较适合键值对的数据存取或者有序的数据存取。</p>
-<h2 id="关系数据库系统的问题"><a href="#关系数据库系统的问题" class="headerlink" title="关系数据库系统的问题"></a>关系数据库系统的问题</h2><p>数据量大时，索引量也大到足以让数据库的性能直线下降。最后能够提供的查询也只剩下主键查询，最后的采取的方案就是数据分区，也就是分库分表。</p>
-<h2 id="非关系型数据库系统"><a href="#非关系型数据库系统" class="headerlink" title="非关系型数据库系统"></a>非关系型数据库系统</h2><h3 id="维度"><a href="#维度" class="headerlink" title="维度"></a>维度</h3><p>包括数据模型、存储模型、一致性模型、物理模型、读写性能、辅助索引、故障处理、压缩、负载均衡、原子操作的读修改写、加锁等待死锁</p>
-<h3 id="可扩展性"><a href="#可扩展性" class="headerlink" title="可扩展性"></a>可扩展性</h3><h3 id="数据库的范式和反范式"><a href="#数据库的范式和反范式" class="headerlink" title="数据库的范式和反范式"></a>数据库的范式和反范式</h3><h2 id="Hbase结构"><a href="#Hbase结构" class="headerlink" title="Hbase结构"></a>Hbase结构</h2><h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><h3 id="表、行、列和单元格"><a href="#表、行、列和单元格" class="headerlink" title="表、行、列和单元格"></a>表、行、列和单元格</h3><p>最基本的单位是列，一列或者多列构成一行，并由唯一的行健来确定存储。反过来，一个表中有若干行，其中每列可能有多个版本，在每个单元格中存储了不同值。行序是按照字典顺序进行排序的，意思是从左到右一次对比每一个键。关于排序：排列顺序如果跟预期的不一样，需要补键，比如  row-1 永远小于 row-2，无论后面是什么，将始终按照这个顺序排列。行健总是唯一的，否则你就是在更新同一行。行健可以是任意的字节数组，但它不一定是人直接可读。<br>一行由若干列组成，若干列构成一个列族，有助于构建语义边界，还有助于给他们设置某些特性（压缩），或者指示他们存储在内存中。一个列族所有列存储在HFile。<br>常用的引用列的格式为family：qualifier，qualifier是任意字节数组。一个列族没有列的数量限制，可以有数百万列。列值没有类型和长度的限制。NUll值在Hbase不占任何空间。<br>每一列的值或者单元格都有时间戳，不同时间戳区分不同的版本值，同一个单元格的不同版本值按照时间戳降序排序，访问时候优先读取最新的值。这样优化使得新值比老值更容易读到。用户可以指定每个值能保存的最大版本数，此外还支持谓词删除（LSM树）。<br>Hbase是一个稀疏的、分布式的、持久化的、多维的映射、由行健列键和时间戳索引。数据存储模式：(Table,RowKey,Family,Column,TimeStamp)-&gt;value</p>
-<h3 id="自动分区"><a href="#自动分区" class="headerlink" title="自动分区"></a>自动分区</h3><p>Hbase中扩展和负载均衡的基本单元是region，region本质是以行键排序的连续存储的区间。如果region太大，系统会动态拆分，相反会合并region，减少存储文件数量。<br>一张表初始化只有一个region，用户不断插入数据，当数据量超过配置的最大值，会在中间键处将这个region拆分成两个大致相等的region。每一个region只能由一台regionServer加载，而一台RegionServer可以同时加载多个region。（每台regionServer1加载的最佳数量是10~1000，每个region最佳大小是1GB~2GB）。当某个region服务器由于负载过大等原因导致不可用时，系统会将该region转到其他服务器上。</p>
-<h3 id="存储API"><a href="#存储API" class="headerlink" title="存储API"></a>存储API</h3><p>API提供了建表、删表、增加列族、删除列族、修改表、修改列族元数据（压缩，设置块大小）、行键值的增加，删除，查找<br>scan可以限定返回的列或者返回的版本数，可以设置过滤器。系统支持单行事务，进一步实现单行键下存储的数据的 读-修改-写（read-modify-write）序列。单元格的值可以当计数器用，并且支持原子更新，意味着这个计数器可以在一个操作中实现读写，客户端可以基于此实现一个全局强一致的计数器。协处理器(coprocessor): 可以在服务器的地址空间执行来自客户端的代码。用于实现轻量级的批处理作业，或者使用表达式分析或者汇总数据。通过包装器可以将表转换成MapReduce的输入输出目标</p>
-<h3 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h3><p>数据存储在存储文件中，称为HFile，HFile存储的是经过排序的键值映射结构。文件内部由连续的块组成，块的索引信息放在尾部，当打开HFile并加载在内存中，索引信息会优先加载到内存中，每个块的大小为64k。每个HFile都有一个块索引，通过一个磁盘查询就可以实现查询，存储文件写在HDFS中。每次更新数据，都会将数据记录在提交日志中，然后在将数据写入内存memstore,一旦内存超过一定的大小，就会移除内存，作为HFile写入磁盘。移除内存后，就会丢弃提交日志，只保留未持久化的提交日志。数据移出memstore，丢弃提交日志。采用滚动memstore可以实现不阻塞系统读写，即用空的新memstore获取更新数据，将旧的满的memstore转换成一个文件，由于memstore中的数据本来就排序好了，所以存储的时候不用再次排序。删除是在做个删除标记，让客户端无法读取到值。<br>HFile过多的时候有管家机制来处理，合并有两种类型：<br>minor合并：多个小文件合并成一个大文件，由于是多路归并所以速度快<br>major压缩合并：将region中一个列族的若干个HFile重写为一个新HFile。合并扫描所有键值对，顺序重写所有数据，重写数据的过程中会略过做了删除标记的数据。断言删除此时生效。<br>master 负责负载均衡，将繁忙服务器中的region移到负载轻的服务器中。还提供元数据的管理，例如创建表和创建列族。<br>region服务器负责为他们提供的Region提供读写功能<br>数十亿行<em>数百万列</em>数千个版本=TB级别或者PB级别的存储</p>
-<h2 id="Hbase：Hadoop数据库"><a href="#Hbase：Hadoop数据库" class="headerlink" title="Hbase：Hadoop数据库"></a>Hbase：Hadoop数据库</h2><h3 id="命名"><a href="#命名" class="headerlink" title="命名"></a>命名</h3><h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>Hbase是一个分布式的、持久性的、强一致性的存储系统，具有近似最优的写性能和出色的读性能。它充分利用磁盘空间，支持特定列族切换可选压缩算法。Hbase支持行原子性</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;海量数据的黎明&quot;&gt;&lt;a href=&quot;#海量数据的黎明&quot; class=&quot;headerlink&quot; title=&quot;海量数据的黎明&quot;&gt;&lt;/a&gt;海量数据的黎明&lt;/h2&gt;&lt;p&gt;hadoop项目有两个模块：HDFS和MapReduce。Hadoop擅长存储任意的、半结构化数据，
     
     </summary>
     
