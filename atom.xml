@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-12-21T02:10:51.439Z</updated>
+  <updated>2017-12-21T09:36:25.217Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -16,16 +16,41 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>面向服务的体系架构-SOA</title>
+    <title>面向服务的体系架构-SOA(第一章)</title>
     <link href="http://yoursite.com/2017/12/21/%E9%9D%A2%E5%90%91%E6%9C%8D%E5%8A%A1%E7%9A%84%E4%BD%93%E7%B3%BB%E6%9E%B6%E6%9E%84-SOA/"/>
     <id>http://yoursite.com/2017/12/21/面向服务的体系架构-SOA/</id>
-    <published>2017-12-21T02:10:51.000Z</published>
-    <updated>2017-12-21T02:10:51.439Z</updated>
+    <published>2017-12-21T02:57:29.000Z</published>
+    <updated>2017-12-21T09:36:25.217Z</updated>
+    
+    <content type="html"><![CDATA[<p>伴随着业务体系的发展，系统拆分变成了不可避免的事，由此演变成了垂直应用架构体系。但是随着垂直应用的增多，达到一定的规模，应用之间的相互交互、相互调用不可避免。否则，不同系统之间存在着重复的业务，容易形成信息孤岛，重复造轮子。此时相对核心的业务会被抽出来，作为单独的系统对外提供服务，达成业务之间相互复用，系统也因此演变为分布式应用架构体系。<br>基于http协议之间的系统间的RPC，具有使用灵活、实现便捷、开放且天生支持异构平台间的调用等多个优点。与之对应的是tcp协议的实现版本，效率更高，实现更复杂，但由于协议和标准不同，很难跨平台和企业间的通信。</p>
+<h2 id="基于TCP协议的RPC"><a href="#基于TCP协议的RPC" class="headerlink" title="基于TCP协议的RPC"></a>基于TCP协议的RPC</h2><h3 id="RPC名词解释"><a href="#RPC名词解释" class="headerlink" title="RPC名词解释"></a>RPC名词解释</h3><p>remote process call，远程过程调用，拥有着RMI、webservice等诸多成熟的方案。RPC将原来的本地调用转变为调用远端的服务器上的方法。<br>RPC的实现包括客户端和服务器端，即服务的调用方和服务提供方。服务调用方发送RPC请求到服务提供方，服务提供方根据调用方提供的参数执行请求方法，将执行结果返回给调用方。其中参数和返回结果序列化。</p>
+<h3 id="对象的序列化"><a href="#对象的序列化" class="headerlink" title="对象的序列化"></a>对象的序列化</h3><p>将对象转成二进制流的过程称为对象的序列化<br>将二进制流转成对象的过程称为对象的反序列化<br>对象的序列化和反序列化有很多成熟的方案：Google protocol Buffers协议、java内置的序列化方式、Hessian、json以及xml。</p>
+<h3 id="基于TCP实现的RPC"><a href="#基于TCP实现的RPC" class="headerlink" title="基于TCP实现的RPC"></a>基于TCP实现的RPC</h3><p>基于java socket的api，能够实现简单的RPC调用。</p>
+<h2 id="基于http协议的RPC"><a href="#基于http协议的RPC" class="headerlink" title="基于http协议的RPC"></a>基于http协议的RPC</h2><h3 id="http协议栈"><a href="#http协议栈" class="headerlink" title="http协议栈"></a>http协议栈</h3><p>Http是Hypertext Transfer Protocol（超文本传输协议）的缩写，当今采用的版本主要是http1.1。<br>http属于应用层，构建在tcp和ip协议之上，处于tcp/ip协议的最顶层，它不需要处理下层协议间诸如丢包补发、握手及数据分段和重新组装的细节。<br><img src="/2017/12/21/面向服务的体系架构-SOA/协议.png" alt=""></p>
+<h3 id="http请求与响应"><a href="#http请求与响应" class="headerlink" title="http请求与响应"></a>http请求与响应</h3><p><img src="面向服务的体系架构-SOA/http请求.png" alt=""></p>
+<h3 id="通过HttpClient发送http请求"><a href="#通过HttpClient发送http请求" class="headerlink" title="通过HttpClient发送http请求"></a>通过HttpClient发送http请求</h3><h3 id="使用Http协议的优势"><a href="#使用Http协议的优势" class="headerlink" title="使用Http协议的优势"></a>使用Http协议的优势</h3><p>基于http协议的，很多成熟的开源web容器已经帮助解决了很多问题，如tomcat、jboss、Apache，这使得开发人员将更多的精力集中在业务的实现而非处理底层细节。<br>但http也有其劣势的一面，相同内容信息，http协议传输用的字节数肯定比tcp用的字节数更多，同等网络下，效率也比较低，信息传输用的时间更长。</p>
+<h3 id="Json和xml"><a href="#Json和xml" class="headerlink" title="Json和xml"></a>Json和xml</h3><h4 id="json"><a href="#json" class="headerlink" title="json"></a>json</h4><p>json是一种轻量级的数据交换语言，以文字为基础，易于阅读。将对象序列化为json格式，可以在网络上很方便的传输，且各个平台几乎都拥有成熟的工具，能很快地将json反序列化为其对应语言的所需要的格式。<br>使用jackson包</p>
+<h4 id="xml"><a href="#xml" class="headerlink" title="xml"></a>xml</h4><p>xml的全称是可扩展标记语言（extensible markup language），可以标记数据、定义数据类型，是允许用户对自己的标记语言进行定义，用于标记电子文件使其具有结构性的源语言。xml提供统一的方法来描述和交换独立于应用程序和供应商的结构化数据，非常适合web传输。<br>可以使用xstream包</p>
+<h3 id="restful和RPC"><a href="#restful和RPC" class="headerlink" title="restful和RPC"></a>restful和RPC</h3><p>主流url链接风格主要有两种：一种是RPC风格，另一种是Rest风格。</p>
+<h4 id="RPC风格"><a href="#RPC风格" class="headerlink" title="RPC风格"></a>RPC风格</h4><p>RPC的风格是直接在http请求参数标明需要远程调用的服务接口名称、服务参数即可<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">http://hostname/provider.do?service=xxx.sayHello&amp;arg1=xxx</div></pre></td></tr></table></figure></p>
+<h4 id="Rest风格"><a href="#Rest风格" class="headerlink" title="Rest风格"></a>Rest风格</h4><p>Rest是Representation state transform，表现层状态转移。<br>在表现层状态转移过程中，表现层指的是资源的表现层，资源是网络的实体，是一张图片、一首歌曲、一段文本，你可以用url进行访问。资源通过表现层呈现出来，比如图片通过png表现，文本通过html表现。访问一个资源，需要客户端和服务器端进行一定的交互，势必涉及数据和状态的变化，http是无状态协议，因此所有的状态都保存在服务器端。如果客户端想要操作服务端，必须通过某种手段，这种手段就是http协议的集中操作方式，如GET、PUT、POST、DELETE。这便是rest原则的思想，符合rest原则设计的就是restful风格。<br>restful风格就是通过http请求对应的GET、POST、PUT、DELETE方法，完成对应的CRUD操作。<br><img src="/2017/12/21/面向服务的体系架构-SOA/restful.png" alt=""></p>
+<h3 id="基于http协议的RPC实现"><a href="#基于http协议的RPC实现" class="headerlink" title="基于http协议的RPC实现"></a>基于http协议的RPC实现</h3><p>类似我开发的数据交换平台的http接口</p>
+<h2 id="服务的路由和负载均衡"><a href="#服务的路由和负载均衡" class="headerlink" title="服务的路由和负载均衡"></a>服务的路由和负载均衡</h2><h3 id="服务化的演变"><a href="#服务化的演变" class="headerlink" title="服务化的演变"></a>服务化的演变</h3><p>分布式应用架构体系对于业务逻辑复用的需求十分强烈，上层应用都想借用已有的底层服务，来搭建更多、更丰富的应用。公共的业务被拆分出来，形成可共用的服务，最大程度的保障了代码和逻辑的复用，避免重复建设，这种设计也称SOA。<br>SOA架构中，服务消费者通过服务名称，在众多服务中找到要调用的服务的地址列表，称为服务的路由。<br><img src="/2017/12/21/面向服务的体系架构-SOA/服务路由.png" alt=""><br>对于负载比较高的服务来说，往往对应着多台服务器的集群，在请求到来时，为了将请求均衡地分配到后端服务器，负载均衡服务器将从服务对应的地址列表中，通过相应的负载均衡算法和规则，选择一台服务器进行访问，这个过程称为服务的负载均衡。<br>当服务的规模比较小时，可以采用硬编码的方式将服务地址和配置写在代码中，通过编码的方式来解决服务的路由和负载均衡问题，也可以通过传统的硬件负载均衡设备如F5或者采用LVS或者Nginx等软件解决方案，通过相关配置来解决服务的路由和负载均衡问题。<br>当服务越来越多，规模越来越大时，对应的机器数量也越来越大，单靠人工来管理和维护服务和地址的配置信息也越来越困难，依赖单点设备或者使用LVS、Nginx等软件方案进行路由和负载均衡调度，单点问题也开始出现，一旦服务路由和负载均衡服务器宕机，依赖它的所有服务均将失效。<br>此时需要一个能够动态注册和获取服务信息的地方，来统一管理服务名称和其对应的服务器列表信息，称之为服务配置中心。服务在启动时将其服务名、服务器地址注册到配置中心，服务消费者通过服务配置中心获取需要获取服务的机器列表，通过相应的负载均衡列表，选取其中一台服务器进行调用。当服务器进行宕机或者下线时，相应的机器需要能够动态地从服务配置中心里面移除，并通知相应的服务消费者。在这个过程中，服务消费者只有第一次调用需要查询服务配置中心，然后将查询的信息缓存到本地，后面的调用直接使用本地缓存的服务地址信息列表，知道服务的地址列表更新，这种无中心化的结构解决了之前负载均衡的设备导致的单点问题。<br>基于zookeeper的的持久节点和非持久节点，我们能够近乎实时地感觉到后端服务器的状态。通过集群间的zab协议，使得服务配置信息能够保持一致，zookeeper本身的容错和leader选举机制，保障了扩容性。<br><img src="/2017/12/21/面向服务的体系架构-SOA/zookeeper负载均衡.png" alt=""></p>
+<h3 id="负载均衡算法"><a href="#负载均衡算法" class="headerlink" title="负载均衡算法"></a>负载均衡算法</h3><h4 id="轮询法"><a href="#轮询法" class="headerlink" title="轮询法"></a>轮询法</h4><p>将请求按顺序轮流的分配到后端服务器，它均衡地对待后端每一台服务器，而不关心服务器实际的连接数和当前的系统负载</p>
+<h4 id="随机法"><a href="#随机法" class="headerlink" title="随机法"></a>随机法</h4><p>通过系统函数，根据后端服务器列表大小值来随机选取一台访问</p>
+<h4 id="源地址哈希表"><a href="#源地址哈希表" class="headerlink" title="源地址哈希表"></a>源地址哈希表</h4><p>获取客户端访问的ip地址值，通过哈希函数计算得到一个数值，用该数值对服务器列表大小进行取模运算，得到的结果就是要访问的服务器序号。同一ip地址的客户端当服务器的列表不变时，它每次都会映射到同一台后端服务器访问。</p>
+<h4 id="加权轮询"><a href="#加权轮询" class="headerlink" title="加权轮询"></a>加权轮询</h4>]]></content>
     
     <summary type="html">
     
+      &lt;p&gt;伴随着业务体系的发展，系统拆分变成了不可避免的事，由此演变成了垂直应用架构体系。但是随着垂直应用的增多，达到一定的规模，应用之间的相互交互、相互调用不可避免。否则，不同系统之间存在着重复的业务，容易形成信息孤岛，重复造轮子。此时相对核心的业务会被抽出来，作为单独的系统对外提
+    
     </summary>
     
+      <category term="大型分布式网站架构" scheme="http://yoursite.com/categories/%E5%A4%A7%E5%9E%8B%E5%88%86%E5%B8%83%E5%BC%8F%E7%BD%91%E7%AB%99%E6%9E%B6%E6%9E%84/"/>
+    
+    
+      <category term="大型分布式网站架构设计与实践读书笔记" scheme="http://yoursite.com/tags/%E5%A4%A7%E5%9E%8B%E5%88%86%E5%B8%83%E5%BC%8F%E7%BD%91%E7%AB%99%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E8%B7%B5%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
     
   </entry>
   
