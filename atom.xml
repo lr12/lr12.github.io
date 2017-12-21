@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-12-21T12:29:42.972Z</updated>
+  <updated>2017-12-21T14:48:02.696Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2017/12/21/%E9%9D%A2%E5%90%91%E6%9C%8D%E5%8A%A1%E7%9A%84%E4%BD%93%E7%B3%BB%E6%9E%B6%E6%9E%84-SOA/"/>
     <id>http://yoursite.com/2017/12/21/面向服务的体系架构-SOA/</id>
     <published>2017-12-21T02:57:29.000Z</published>
-    <updated>2017-12-21T12:29:42.972Z</updated>
+    <updated>2017-12-21T14:48:02.696Z</updated>
     
     <content type="html"><![CDATA[<p>伴随着业务体系的发展，系统拆分变成了不可避免的事，由此演变成了垂直应用架构体系。但是随着垂直应用的增多，达到一定的规模，应用之间的相互交互、相互调用不可避免。否则，不同系统之间存在着重复的业务，容易形成信息孤岛，重复造轮子。此时相对核心的业务会被抽出来，作为单独的系统对外提供服务，达成业务之间相互复用，系统也因此演变为分布式应用架构体系。<br>基于http协议之间的系统间的RPC，具有使用灵活、实现便捷、开放且天生支持异构平台间的调用等多个优点。与之对应的是tcp协议的实现版本，效率更高，实现更复杂，但由于协议和标准不同，很难跨平台和企业间的通信。</p>
 <h2 id="基于TCP协议的RPC"><a href="#基于TCP协议的RPC" class="headerlink" title="基于TCP协议的RPC"></a>基于TCP协议的RPC</h2><h3 id="RPC名词解释"><a href="#RPC名词解释" class="headerlink" title="RPC名词解释"></a>RPC名词解释</h3><p>remote process call，远程过程调用，拥有着RMI、webservice等诸多成熟的方案。RPC将原来的本地调用转变为调用远端的服务器上的方法。<br>RPC的实现包括客户端和服务器端，即服务的调用方和服务提供方。服务调用方发送RPC请求到服务提供方，服务提供方根据调用方提供的参数执行请求方法，将执行结果返回给调用方。其中参数和返回结果序列化。</p>
@@ -42,6 +42,9 @@
 <h4 id="加权轮询法"><a href="#加权轮询法" class="headerlink" title="加权轮询法"></a>加权轮询法</h4><p>不同的后端服务器可能机器的配置和当前系统的负载并不相同，因此他们的抗压能力也不尽相同。给配置高负载低的机器配置更高的权重，让其处理更多的请求，给配置低负载高的配置更低的权重，降低其系统的负载，</p>
 <h4 id="加权随机法"><a href="#加权随机法" class="headerlink" title="加权随机法"></a>加权随机法</h4><h4 id="最小连接数法"><a href="#最小连接数法" class="headerlink" title="最小连接数法"></a>最小连接数法</h4><p>最小连接数算法比较灵活和智能，由于后端的服务器不尽相同，对于请求的处理有快有慢，它根据后端服务器当前连接的情况，动态的选取当前积压连接数最小的服务器来处理当前请求，尽可能提高后端服务器的利用效率，将负载合理地分流给每一台机器。</p>
 <h3 id="动态配置规则"><a href="#动态配置规则" class="headerlink" title="动态配置规则"></a>动态配置规则</h3><p>把这部分代码剥离出来，采用动态配置规则，使用groovy脚本语言直接编译成java的class字节码，运行在java虚拟机上。</p>
+<h3 id="zookeeper介绍和环境搭建"><a href="#zookeeper介绍和环境搭建" class="headerlink" title="zookeeper介绍和环境搭建"></a>zookeeper介绍和环境搭建</h3><h3 id="zk的api使用"><a href="#zk的api使用" class="headerlink" title="zk的api使用"></a>zk的api使用</h3><h3 id="zkclient的使用"><a href="#zkclient的使用" class="headerlink" title="zkclient的使用"></a>zkclient的使用</h3><p>github源码：<a href="https://github.com/sgroschupf/zkclient.git" target="_blank" rel="external">https://github.com/sgroschupf/zkclient.git</a></p>
+<h3 id="路由和负载均衡的实现"><a href="#路由和负载均衡的实现" class="headerlink" title="路由和负载均衡的实现"></a>路由和负载均衡的实现</h3><p>通过注册相应的watcher，服务消费者能够第一时间获知服务提供者机器信息的变更。利用其znode的特点和watcher机制，将其作为动态注册和获取服务信息的配置中心。<br><img src="/2017/12/21/面向服务的体系架构-SOA/服务配置节点树.png" alt=""><br>配置中心分三层，根节点为用来聚集服务的节点，通过它可以查询到所有服务，而节点名称挂载的是服务提供者提供的服务地址，服务消费者通过负载均衡算法选择其中一个地址发起远程调用。根节点和服务名称采用的是zk的持久化节点，服务提供者的地址节点是zk的非持久化节点，一旦服务器宕机或者下线，节点就会消失。<br><img src="/2017/12/21/面向服务的体系架构-SOA/zk节点.png" alt=""><br>增加一层，用来表示节点类型，每个服务包含两种节点类型，即consumer和provider，当服务消费者启动时，即在服务配置中心里，在其调用的所有服务的consumer节点下增加自己的机器地址，只需要后台监控程序解析出对应服务的consumer节点的子节点，便能清楚的知道某一服务被哪些机器消费了。</p>
+<h2 id="http服务网关"><a href="#http服务网关" class="headerlink" title="http服务网关"></a>http服务网关</h2><p><img src="/2017/12/21/面向服务的体系架构-SOA/网关1.png" alt=""><br>gateway外部各种app的http请求，完成相应的权限和安全验证，当验证通过，根据传过的服务名称，到服务配置中心找到相应的服务名称节点，并加载对应服务提供者提供的地址列表，通过前面的负载均衡算法选取机器发起远程调用，将客户端参数传到服务端。服务提供方根据传入的参数，给出响应，当gateway收到响应后，再将响应返回给App<br>一方面通过网关可以很好解决安全问题，在恶意请求或者非授权请求到达后端会进行拦截。另一方面网关可以通过服务的路由进行负载均衡<br><img src="/2017/12/21/面向服务的体系架构-SOA/网关集群.png" alt=""></p>
 ]]></content>
     
     <summary type="html">
