@@ -914,11 +914,13 @@
 <li>对一个字段进行排序</li>
 <li>对一个字段进行聚合</li>
 <li>某些过滤，比如地理位置过滤</li>
-<li>某些与字段相关的脚本计算<br>这会消耗掉很多内存，尤其是大量的字符串数据 – string字段可能包含很多不同的值，比如邮件内容。 值得庆幸的是，内存不足是可以通过横向扩展解决的，我们可以增加更多的节点到集群。<h1 id="分布式搜索"><a href="#分布式搜索" class="headerlink" title="分布式搜索"></a>分布式搜索</h1>一个CRUD操作只处理一个单独的文档。文档的唯一性由 _index  ,  _type  和 routing-value  （通常默认是该文档的 _id  ）的组合来确定。这意味着我们可以准确知道集群中的哪个分片持有这个文档。但如果针对复杂的搜索模型，由于不知道哪个文档会匹配查询（文档可能存放在集群中的任意分片上）。一个搜索不得不通过查询每一个我们感兴趣的索引的分片副本，来看是否含有任何匹配的文档。搜索的执行过程分两个阶段，称为查询然后取回（query then fetch）<h2 id="查询阶段"><a href="#查询阶段" class="headerlink" title="查询阶段"></a>查询阶段</h2>在初始化查询阶段，查询被向索引中的每个分片或者副本广播，每个分片会在本地执行搜索并建立匹配文档的优先队列。<blockquote>
+<li>某些与字段相关的脚本计算<br>这会消耗掉很多内存，尤其是大量的字符串数据 – string字段可能包含很多不同的值，比如邮件内容。 值得庆幸的是，内存不足是可以通过横向扩展解决的，我们可以增加更多的节点到集群。</li>
+</ol>
+<h1 id="分布式搜索"><a href="#分布式搜索" class="headerlink" title="分布式搜索"></a>分布式搜索</h1><p>一个CRUD操作只处理一个单独的文档。文档的唯一性由 _index  ,  _type  和 routing-value  （通常默认是该文档的 _id  ）的组合来确定。这意味着我们可以准确知道集群中的哪个分片持有这个文档。但如果针对复杂的搜索模型，由于不知道哪个文档会匹配查询（文档可能存放在集群中的任意分片上）。一个搜索不得不通过查询每一个我们感兴趣的索引的分片副本，来看是否含有任何匹配的文档。搜索的执行过程分两个阶段，称为查询然后取回（query then fetch）</p>
+<h2 id="查询阶段"><a href="#查询阶段" class="headerlink" title="查询阶段"></a>查询阶段</h2><p>在初始化查询阶段，查询被向索引中的每个分片或者副本广播，每个分片会在本地执行搜索并建立匹配文档的优先队列。</p>
+<blockquote>
 <p>优先队列<br>一个优先队列（priority queue is）只是一个存有前n个（top-n）匹配document的有序列表。这个优先队列的大小由分页参数from和size决定。例如，下面这个例子中的搜索请求要求优先队列要能够容纳100个document</p>
 </blockquote>
-</li>
-</ol>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">GET /_search</div><div class="line">&#123;</div><div class="line"><span class="string">"from"</span>: 90,</div><div class="line"><span class="string">"size"</span>: 10</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>查询阶段包含以下三步：<br>1.客户端发送一个search给node3，node3创建一个from+size的空优先队列；<br>2.node3转发请求到索引中每个分片的原本或者副本，每个分片在本地执行这个查询并且将结果放到一个from+size的优先队列里；<br>3.每个分片返回documentid和它优先队列里所有document的排序值给协调节点node3.协调节点node3把这些值合并到自己的优先队列产生全局排列的结果<br>当一个搜索请求被发送到一个节点node时，这个节点就成了协调节点，这个节点工作是向所有相关的分片广播搜索请求并把他们的响应整合成全局的有序结果集。<br>第一步是向索引里的每个节点的分片副本广播请求。就像document的 GET  请求一样，搜索请求可以被每个分片的原本或任意副本处理。对于后续请求，协调节点会轮询所有的分片副本以分摊负载。<br>每一个分片在本地执行查询和建立一个长度为 from+size  的有序优先队列——这个长度意味着它自己的结果数量就足够满足全局的请求要求。分片返回一个轻量级的结果列表给协调节点。只包含documentID值和排序需要用到的值，例如 _score。</p>
 <h2 id="取回阶段"><a href="#取回阶段" class="headerlink" title="取回阶段"></a>取回阶段</h2><p>分布式搜索取回阶段如下：<br>1.协调节点需要辨别哪个document需要取回，并且向相关分片发送GET请求。<br>2.每个分片加载document并根据需要丰富他，然后再将document返回给协调节点。<br>3.一旦所有的document都被取回，协调节点会将结果返回给客户端<br>分片加载document主体—— _source  field。如果需要，还会根据元数据丰富结果和高亮搜索片断。一旦协调节点收到所有结果，会将它们汇集到单一的回答响应里，这个响应将会返回给客户端。  </p>
