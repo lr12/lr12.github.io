@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-12-25T06:49:37.475Z</updated>
+  <updated>2017-12-25T08:23:13.032Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2017/12/21/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F%E5%9F%BA%E7%A1%80%E8%AE%BE%E6%96%BD/"/>
     <id>http://yoursite.com/2017/12/21/分布式系统基础设施/</id>
     <published>2017-12-21T15:01:53.000Z</published>
-    <updated>2017-12-25T06:49:37.475Z</updated>
+    <updated>2017-12-25T08:23:13.032Z</updated>
     
     <content type="html"><![CDATA[<h2 id="分布式缓存"><a href="#分布式缓存" class="headerlink" title="分布式缓存"></a>分布式缓存</h2><p>在高并发环境下，大量的读、写请求涌向数据库，磁盘的读写速度与内存显然不在一个量级，从减轻数据库的压力和提高系统响应两个角度来考虑，一般都会在数据库层加一层缓存。由于单台机器的内存资源和承载有限，并且如果大量使用本地缓存，也会使相同数据被不同的节点存储多份，对内存资源造成较大的浪费，因此催生出分布式缓存。分布式缓存的经典代表是memcache，最经典的场景是分布式session。</p>
 <h3 id="memchache简介及安装"><a href="#memchache简介及安装" class="headerlink" title="memchache简介及安装"></a>memchache简介及安装</h3><p>memcache使用key-value的形式存储和访问数据，在内存中维护一张巨大的hashtable，使得数据查询的时间复杂度降低到O(1),保证高性能的访问。内存的空间是有限的，当内存没有足够空间存储新的数据，memcache就会使用LRU算法，将最近步长访问的数据淘汰掉，以腾出新的空间存放。memcache支持的数据格式多样化，通过对象序列化转成二进制数据，又可以通过反序列化还原原有对象。<br>windows安装：[<a href="http://kimi.it/258.html" target="_blank" rel="external">http://kimi.it/258.html</a>]<br>linux安装：[<a href="http://kimi.it/257.html" target="_blank" rel="external">http://kimi.it/257.html</a>]<br>备注：windows安装要在管理员命令行安装</p>
@@ -51,7 +51,7 @@
 <li>高亮</li>
 <li>中文分词（推荐ik-analyer）</li>
 <li>索引优化<br>Lucene索引是由段组成，每个段可能有多个索引文件，即每个段包含一个或者多个document；段结构可以使lucene很好的支持增量索引，新增的document将被添加到新的索引段当中。但是越来越多的段被添加到索引当中，索引文件也越来越多。但是操作系统打开文件的句柄数是有限的。lucene在执行搜索时，分别搜索每一段，然后将结果合并，这样查询的性能会降低。<br>为了提高查询性能，当索引段到达一个上限后，Lucene会自动进行索引段的优化，将索引段合并成一个，以提高查询性能，并减少打开文件句柄数量。但是索引段合并需要大量的io操作，使得查询性能受损。我们可以每隔一段时间对索引进行一次全量的重建操作，以将增量更新所生成的索引段合并。</li>
-<li>分布式扩展<br>搜索应用的大部分场景都能接受一定的时间延迟，可以采用最终一致性。<br>索引读写分离架构：<br><img src="/2017/12/21/分布式系统基础设施/lucene读写分离.png" alt=""><br>每份query server保存一份完整的索引，该索引由dump server周期性生成，并进行索引段的合并，索引生成好后推送到每台query server进行替换，这样避免集群索引dump对后端存储造成的压力。当然对于增量索引的更新，dump server可以异步更新推送到每台query server。对于前端应用中，通过对请求进行哈希，将请求均衡地分布到集群的每台服务器。<br>索引切分架构：<br><img src="/2017/12/21/分布式系统基础设施/lucene切分.png" alt=""><br>单机对索引的存储能力有限，随着索引数量的增加，索引的速度也会下降，此时索引本身已经成为系统的瓶颈，这时需要对索引进行切分，将索引分布到各个集群机器上，提高查询性能，降低存储压力。<br>merge server将索引分发给index server，最后将查询结果合并，返回给client应用。<h3 id="es和solr的优缺点"><a href="#es和solr的优缺点" class="headerlink" title="es和solr的优缺点"></a>es和solr的优缺点</h3>[<a href="http://www.cnblogs.com/chowmin/articles/4629220.html" target="_blank" rel="external">http://www.cnblogs.com/chowmin/articles/4629220.html</a>]</li>
+<li>分布式扩展<br>搜索应用的大部分场景都能接受一定的时间延迟，可以采用最终一致性。<br>索引读写分离架构：<br><img src="/2017/12/21/分布式系统基础设施/lucene读写分离.png" alt=""><br>每份query server保存一份完整的索引，该索引由dump server周期性生成，并进行索引段的合并，索引生成好后推送到每台query server进行替换，这样避免集群索引dump对后端存储造成的压力。当然对于增量索引的更新，dump server可以异步更新推送到每台query server。对于前端应用中，通过对请求进行哈希，将请求均衡地分布到集群的每台服务器。<br>索引切分架构：<br><img src="/2017/12/21/分布式系统基础设施/lucene切分.png" alt=""><br>单机对索引的存储能力有限，随着索引数量的增加，索引的速度也会下降，此时索引本身已经成为系统的瓶颈，这时需要对索引进行切分，将索引分布到各个集群机器上，提高查询性能，降低存储压力。<br>merge server将索引分发给index server，最后将查询结果合并，返回给client应用。但是这有时候会导致排序和真实的结果会存在不一样。<br>综合两种架构：<br><img src="/2017/12/21/分布式系统基础设施/lucene综合.png" alt=""><h3 id="solr"><a href="#solr" class="headerlink" title="solr"></a>solr</h3>安装配置：[<a href="http://blog.csdn.net/jack__ming/article/details/72615162" target="_blank" rel="external">http://blog.csdn.net/jack__ming/article/details/72615162</a>]<h3 id="es和solr的优缺点"><a href="#es和solr的优缺点" class="headerlink" title="es和solr的优缺点"></a>es和solr的优缺点</h3>[<a href="http://www.cnblogs.com/chowmin/articles/4629220.html" target="_blank" rel="external">http://www.cnblogs.com/chowmin/articles/4629220.html</a>]</li>
 </ol>
 ]]></content>
     
