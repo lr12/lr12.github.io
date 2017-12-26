@@ -74,7 +74,7 @@
 <link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="云取证," />
+  <meta name="keywords" content="java并发," />
 
 
 
@@ -92,17 +92,17 @@
 
 
 
-<meta name="description" content="本周我主要做的工作有，看了几篇论文，主要还是了解现在云取证的一些情况和了解了一下docker这个新兴的技术在云计算中的应用和使用问题，印象比较深的有几篇云取证综述的论文。Cloud forensics State-of-the-art and future directions、cloud computing and digital forensics这两篇。 首先是Cloud forensics">
-<meta name="keywords" content="云取证">
+<meta name="description" content="并发编程的挑战上下文切换即使是单核也支持多线程执行代码，cpu通过给每个线程分配cpu时间片来实现这个机制。时间片是cpu分配给每个线程的时间，因为时间片非常短，所以cpu通过不停地切换线程执行，让我们感觉多个线程是同时执行，时间片一般是几十毫秒。CPU通过时间片分配算法来循环执行任务，当前任务执行一个时间片后会切换到下一个任务。但是，在切换前会保存上一个任务的状态，以便下次切换回这个任务时，可以">
+<meta name="keywords" content="java并发">
 <meta property="og:type" content="article">
-<meta property="og:title" content="云取证第二周周报">
-<meta property="og:url" content="http://yoursite.com/2017/05/01/云取证第二周周报/index.html">
+<meta property="og:title" content="java并发编程前三章">
+<meta property="og:url" content="http://yoursite.com/2017/12/26/java并发编程前三章/index.html">
 <meta property="og:site_name" content="博客">
-<meta property="og:description" content="本周我主要做的工作有，看了几篇论文，主要还是了解现在云取证的一些情况和了解了一下docker这个新兴的技术在云计算中的应用和使用问题，印象比较深的有几篇云取证综述的论文。Cloud forensics State-of-the-art and future directions、cloud computing and digital forensics这两篇。 首先是Cloud forensics">
-<meta property="og:updated_time" content="2017-12-23T02:15:59.412Z">
+<meta property="og:description" content="并发编程的挑战上下文切换即使是单核也支持多线程执行代码，cpu通过给每个线程分配cpu时间片来实现这个机制。时间片是cpu分配给每个线程的时间，因为时间片非常短，所以cpu通过不停地切换线程执行，让我们感觉多个线程是同时执行，时间片一般是几十毫秒。CPU通过时间片分配算法来循环执行任务，当前任务执行一个时间片后会切换到下一个任务。但是，在切换前会保存上一个任务的状态，以便下次切换回这个任务时，可以">
+<meta property="og:updated_time" content="2017-12-26T13:46:38.853Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="云取证第二周周报">
-<meta name="twitter:description" content="本周我主要做的工作有，看了几篇论文，主要还是了解现在云取证的一些情况和了解了一下docker这个新兴的技术在云计算中的应用和使用问题，印象比较深的有几篇云取证综述的论文。Cloud forensics State-of-the-art and future directions、cloud computing and digital forensics这两篇。 首先是Cloud forensics">
+<meta name="twitter:title" content="java并发编程前三章">
+<meta name="twitter:description" content="并发编程的挑战上下文切换即使是单核也支持多线程执行代码，cpu通过给每个线程分配cpu时间片来实现这个机制。时间片是cpu分配给每个线程的时间，因为时间片非常短，所以cpu通过不停地切换线程执行，让我们感觉多个线程是同时执行，时间片一般是几十毫秒。CPU通过时间片分配算法来循环执行任务，当前任务执行一个时间片后会切换到下一个任务。但是，在切换前会保存上一个任务的状态，以便下次切换回这个任务时，可以">
 
 
 
@@ -130,13 +130,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2017/05/01/云取证第二周周报/"/>
+  <link rel="canonical" href="http://yoursite.com/2017/12/26/java并发编程前三章/"/>
 
 
 
 
 
-  <title>云取证第二周周报 | 博客</title>
+  <title>java并发编程前三章 | 博客</title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -276,7 +276,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/05/01/云取证第二周周报/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/26/java并发编程前三章/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="李睿">
@@ -293,7 +293,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">云取证第二周周报</h1>
+          <h1 class="post-title" itemprop="name headline">java并发编程前三章</h1>
         
 
         <div class="post-meta">
@@ -305,8 +305,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-01T18:56:11+08:00">
-                2017-05-01
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-26T17:08:19+08:00">
+                2017-12-26
               </time>
             
 
@@ -328,8 +328,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/云取证/" itemprop="url" rel="index">
-                    <span itemprop="name">云取证</span>
+                  <a href="/categories/java并发编程艺术读书笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">java并发编程艺术读书笔记</span>
                   </a>
                 </span>
 
@@ -362,13 +362,15 @@
       
 
       
-        <p>本周我主要做的工作有，看了几篇论文，主要还是了解现在云取证的一些情况和了解了一下docker这个新兴的技术在云计算中的应用和使用问题，印象比较深的有几篇云取证综述的论文。Cloud forensics State-of-the-art and future directions、cloud computing and digital forensics这两篇。</p>
-<p>首先是Cloud forensics State-of-the-art and future directions。本论文主要讲的是在现有阶段下云取证的研究进展所面临的的挑战以及移动云取证的一些研究。首先文章开篇讲了在，美国国家标准与技术研究在“NIST云计算取证科学挑战”草案中，这致力于报告这一新兴调查领域的最新进展和最新进展。而在这里，接受率仅为15.4%。这侧面反应了这个评审的难度，也说明现在的挑战还是很大。其次是在新工具的使用上，文章只是提到了促进多节点Hadoop集群中的取证调查，但并没有进行展开讨论。以此为例引出了如果没有开发根本的新工具和能力，取证专家将面临越来越多的困难和成本。因此，今天的数字侦探不仅与罪犯进行军备竞赛，而且还与未来计算机系统的开发者进行了斗争。文章最后提到移动（云）取证是一个未被研究的主题，特别是从提供高级安全性的设备中获取数据，不仅可以用于静态数据（现在已经在所有智能移动设备中变得司空见惯），而且还通过高级加密的数据。NIST IR 8006将挑战分为九组，涉及架构，数据收集，分析，反取证，事件首次响应者，角色管理，法律话题，标准和培训等问题。我的体会是，首先这篇论文也算是我的看的入门第一篇论文，首先在现在云取证面临的挑战是非常大的，不仅在于理论研究还在于新技术的取证工具。文章最后提到的移动云取证现在还是一个比较新的主题，可以算是一个小小备选方案（但我上周和学长们简单交流了下，他们说现在移动云取证几乎该挖的坑都挖完了，所以在这边还是有分歧，有可能跟时间有问题或者跟看的问题角度有关）。</p>
-<p>其次是cloud computing and digital forensics（云取证和数字取证）。这篇论文令我印象深的有这么几点：1.日志这一取证的手段。在网络入侵的情况下，受害者组织普遍存在于准备阶段，为了保护数字犯罪现场，关闭整个网络极少可行。因此，有用的证据可能不再可用，可能难以收集，也许完全不可接触，或者可能没有以法定的方式保存。例如，各种类型的日志在网络入侵调查中可能是非常有价值的，但是许多组织不会收集这些日志或不保留日志超过几天，或者不以确保其完整性的方式存储日志。这给我的体会是可以结合一个场景，将日志这个功能进行完善分析。2. 取证方法的分析，涉及哦取证技术；网络取证工具，内存取证方法和数据库取证方法。里面提到了计算机和智能手机云存储服务留下的痕迹的取证分析，是智能手机中碎片闪存页面的取证分析技术。Fasan和Olivier提出了一种重建存储在数据库中的数字证据的可靠方法（参见“数据库重建算法的正确性证明”）。这是一个重要的话题，因为更多的证据存储在数据库中，包括在云环境中，使得可以将很多证据得以保存，便于以后排查原因入侵者等因素。</p>
-<p>关于Docker的研究。Docker 是一个开源的应用容器引擎，让开发者可以打包他们的应用以及依赖包到一个可移植的容器中，然后发布到任何流行的 Linux 机器上，也可以实现虚拟化。容器是完全使用沙箱机制，相互之间不会有任何接口。docker的出现极大了加快了PAAS的发展，企业私有PAAS构建蓬勃发展起来。可以看到PAAS核心是解决软件代码完成后部署运行运维到监控的所有事情。基于Docker的PaaS平台现在逐渐成为主流。关于docker的安全问题有：</p>
-<h5 id="1-权限及资源限制。"><a href="#1-权限及资源限制。" class="headerlink" title="1.    权限及资源限制。"></a>1.    权限及资源限制。</h5><p>限制用户运行特权及访问资源。对于多租户应用，不同的容器共享同一主机的资源和环境，普通用户权限的恶意提升将会使宿主主机完全处于被非法操控的险境，而对于用户的合法操作，大量的资源申请也会将主机推向崩溃的编译。因此，有必要对用户权限进行限定，避免根权限的赋予，进而减少主机暴露的攻击面和潜力。同时，在CPU、内存及进程数等资源方面，限定用户在单一容器中的可用配额，来防止恶意的无限资源申请给整体系统带来的破坏。<br>镜像及制作管理</p>
-<h5 id="2-对容器的镜像来源进行审核。"><a href="#2-对容器的镜像来源进行审核。" class="headerlink" title="2.对容器的镜像来源进行审核。"></a>2.对容器的镜像来源进行审核。</h5><p>容器镜像制作的简化让用户可以轻而易举的创建自定义的应用镜像，但制作的应用程序千差万别，功能完整性和测试完整性参差不齐。这让用户镜像的产生面临存在众多漏洞的风险，因此需要对镜像的制作过程尽量规范化，对放置的应用程序尽量做到测试完备并符合安全标准，从源头上减少漏洞镜像的生成。而在创建容器过程中，避免使用不受信任的镜像及应用程序，采用标准及合格厂商如时速云的镜像服务mirror，从而保证容器运行时的正规及安全。</p>
-<h5 id="3-日志安全审计及升级补丁"><a href="#3-日志安全审计及升级补丁" class="headerlink" title="3.日志安全审计及升级补丁"></a>3.日志安全审计及升级补丁</h5><p>对容器及系统中宿主机进行定期安全检查及漏洞补丁升级。定期针对容器及所在宿主机的网络环境进行渗透安全测试，及时发现可疑容器或危险服务端口。对主机内核及原始镜像进行定时更新，及时修补公开漏洞。在应用层次，收集及检测容器的安全日志，统计监督应用的运行过程，及时发现服务异常。</p>
+        <h1 id="并发编程的挑战"><a href="#并发编程的挑战" class="headerlink" title="并发编程的挑战"></a>并发编程的挑战</h1><h2 id="上下文切换"><a href="#上下文切换" class="headerlink" title="上下文切换"></a>上下文切换</h2><p>即使是单核也支持多线程执行代码，cpu通过给每个线程分配cpu时间片来实现这个机制。时间片是cpu分配给每个线程的时间，因为时间片非常短，所以cpu通过不停地切换线程执行，让我们感觉多个线程是同时执行，时间片一般是几十毫秒。<br>CPU通过时间片分配算法来循环执行任务，当前任务执行一个时间片后会切换到下一个任务。但是，在切换前会保存上一个任务的状态，以便下次切换回这个任务时，可以再加载这个任务的状态。所以任务从保存到再加载的过程就是一次上下文切换。</p>
+<h3 id="多线程一定快吗"><a href="#多线程一定快吗" class="headerlink" title="多线程一定快吗"></a>多线程一定快吗</h3><p>当并发执行累加操作不超过百万次时，速度会比串行执行累加操作要慢。那么，为什么并发执行的速度会比串行慢呢？这是因为线程有创建和上下文切换的开销。</p>
+<h3 id="测试上下文切换的次数"><a href="#测试上下文切换的次数" class="headerlink" title="测试上下文切换的次数"></a>测试上下文切换的次数</h3><p>使用Lmbench3可以测量上下文切换的时长，使用vmstat可以测量上下文切换的次数。</p>
+<h3 id="如何减少上下文切换"><a href="#如何减少上下文切换" class="headerlink" title="如何减少上下文切换"></a>如何减少上下文切换</h3><p>减少上下文切换的方法有无锁并发编程、CAS算法、使用最少线程和使用协程。<br>·无锁并发编程。多线程竞争锁时，会引起上下文切换，所以多线程处理数据时，可以用一些办法来避免使用锁，如将数据的ID按照Hash算法取模分段，不同的线程处理不同段的数据。<br>·CAS算法。Java的Atomic包使用CAS算法来更新数据，而不需要加锁。<br>·使用最少线程。避免创建不需要的线程，比如任务很少，但是创建了很多线程来处理，这样会造成大量线程都处于等待状态。<br>·协程：在单线程里实现多任务的调度，并在单线程里维持多个任务间的切换。</p>
+<h3 id="减少上下文切换实战"><a href="#减少上下文切换实战" class="headerlink" title="减少上下文切换实战"></a>减少上下文切换实战</h3><p>第一步用jstack命令dump线程信息<br>第二步统计所有线程分别处于什么状态<br>第三步打开dump文件查看处于waiting的线程在做什么<br>第四步根据查看发现很多线程都在waiting，调整线程池配置<br>第五步重启服务器再统计</p>
+<h2 id="死锁"><a href="#死锁" class="headerlink" title="死锁"></a>死锁</h2><p>避免死锁的方法：<br>避免一个线程同时获得多个锁；<br>避免一个锁内同时占用多个资源，尽量保证一个锁只占用一个资源<br>尝试使用定时锁来代替内部锁机制,lock.tryLock(timeout)<br>对于数据库操作，加锁和解锁必须在一个数据库的连接里，否则会出现解锁失败的现象</p>
+<h2 id="资源限制的挑战"><a href="#资源限制的挑战" class="headerlink" title="资源限制的挑战"></a>资源限制的挑战</h2><h3 id="什么是资源限制"><a href="#什么是资源限制" class="headerlink" title="什么是资源限制"></a>什么是资源限制</h3><p>资源限制是指在进行并发编程时，程序的执行速度受限于计算机硬件资源或者软件资源。例如带宽的上传下载速度、硬盘读写速度和cpu的处理速度。软件资源限制有数据库连接数和socket的连接数</p>
+<h3 id="资源限制带来的问题"><a href="#资源限制带来的问题" class="headerlink" title="资源限制带来的问题"></a>资源限制带来的问题</h3><p>资源限制引发的问题导致并发可能不会加快，反而变慢，原因在于增加了上下文的切换和资源调度的时间</p>
+<h3 id="如何解决资源限制问题"><a href="#如何解决资源限制问题" class="headerlink" title="如何解决资源限制问题"></a>如何解决资源限制问题</h3><p>对于硬件资源限制，可以考虑使用集群并行执行程序。</p>
 
       
     </div>
@@ -398,7 +400,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/云取证/" rel="tag"># 云取证</a>
+            <a href="/tags/java并发/" rel="tag"># java并发</a>
           
         </div>
       
@@ -411,8 +413,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/04/25/云取证第一周周报/" rel="next" title="云取证第一周周报">
-                <i class="fa fa-chevron-left"></i> 云取证第一周周报
+              <a href="/2017/12/21/分布式系统基础设施/" rel="next" title="分布式系统基础设施">
+                <i class="fa fa-chevron-left"></i> 分布式系统基础设施
               </a>
             
           </div>
@@ -420,10 +422,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/06/04/云取证第三周周报/" rel="prev" title="云取证第三周周报">
-                云取证第三周周报 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -559,7 +557,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-权限及资源限制。"><span class="nav-number">1.</span> <span class="nav-text">1.    权限及资源限制。</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-对容器的镜像来源进行审核。"><span class="nav-number">2.</span> <span class="nav-text">2.对容器的镜像来源进行审核。</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-日志安全审计及升级补丁"><span class="nav-number">3.</span> <span class="nav-text">3.日志安全审计及升级补丁</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#并发编程的挑战"><span class="nav-number">1.</span> <span class="nav-text">并发编程的挑战</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#上下文切换"><span class="nav-number">1.1.</span> <span class="nav-text">上下文切换</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#多线程一定快吗"><span class="nav-number">1.1.1.</span> <span class="nav-text">多线程一定快吗</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#测试上下文切换的次数"><span class="nav-number">1.1.2.</span> <span class="nav-text">测试上下文切换的次数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何减少上下文切换"><span class="nav-number">1.1.3.</span> <span class="nav-text">如何减少上下文切换</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#减少上下文切换实战"><span class="nav-number">1.1.4.</span> <span class="nav-text">减少上下文切换实战</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#死锁"><span class="nav-number">1.2.</span> <span class="nav-text">死锁</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#资源限制的挑战"><span class="nav-number">1.3.</span> <span class="nav-text">资源限制的挑战</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#什么是资源限制"><span class="nav-number">1.3.1.</span> <span class="nav-text">什么是资源限制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#资源限制带来的问题"><span class="nav-number">1.3.2.</span> <span class="nav-text">资源限制带来的问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何解决资源限制问题"><span class="nav-number">1.3.3.</span> <span class="nav-text">如何解决资源限制问题</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>
