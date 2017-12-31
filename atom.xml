@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-12-31T07:08:16.838Z</updated>
+  <updated>2017-12-31T07:26:18.268Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,24 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>java并发编程4~6</title>
+    <link href="http://yoursite.com/2017/12/31/java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B4-6/"/>
+    <id>http://yoursite.com/2017/12/31/java并发编程4-6/</id>
+    <published>2017-12-31T07:25:57.000Z</published>
+    <updated>2017-12-31T07:26:18.268Z</updated>
+    
+    <summary type="html">
+    
+    </summary>
+    
+      <category term="java并发编程艺术读书笔记" scheme="http://yoursite.com/categories/java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E8%89%BA%E6%9C%AF%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="java并发" scheme="http://yoursite.com/tags/java%E5%B9%B6%E5%8F%91/"/>
+    
+  </entry>
   
   <entry>
     <title>java并发编程前三章</title>
@@ -1878,34 +1896,6 @@
       <category term="hbase权威指南" scheme="http://yoursite.com/tags/hbase%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97/"/>
     
       <category term="分布式" scheme="http://yoursite.com/tags/%E5%88%86%E5%B8%83%E5%BC%8F/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>慕课网java</title>
-    <link href="http://yoursite.com/2017/11/05/%E6%85%95%E8%AF%BE%E7%BD%91java/"/>
-    <id>http://yoursite.com/2017/11/05/慕课网java/</id>
-    <published>2017-11-05T00:49:22.000Z</published>
-    <updated>2017-11-05T09:08:00.867Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="操作系统"><a href="#操作系统" class="headerlink" title="操作系统"></a>操作系统</h2><h2 id="网络"><a href="#网络" class="headerlink" title="网络"></a>网络</h2><h2 id="数据库"><a href="#数据库" class="headerlink" title="数据库"></a>数据库</h2><h2 id="程序设计语言基础"><a href="#程序设计语言基础" class="headerlink" title="程序设计语言基础"></a>程序设计语言基础</h2><h2 id="编码技巧"><a href="#编码技巧" class="headerlink" title="编码技巧"></a>编码技巧</h2><h2 id="面向对象"><a href="#面向对象" class="headerlink" title="面向对象"></a>面向对象</h2><h3 id="面向对象不可变性"><a href="#面向对象不可变性" class="headerlink" title="面向对象不可变性"></a>面向对象不可变性</h3><p>final关键字<br>类申明：类不可集成<br>函数申明：函数不可在派生类重写<br>变量申明：变量不可指向其他对象，但是变量指向对象的内容可以改变<br>习惯性常量 static final 一般大写<br>实现不可变性：<br>1.final关键字无法保证不可变性<br>2.从接口的定义上，类的实现上保证不可变性（例如通过暴露部分变量的接口只能获取部分变量，而不能获取整个类的实例，String类的substring方法和replace方法，都不会改变自身的内容，都是new）<br>3.Collections.unmodifiableXXX(例如：list=Collections.unmodifiable(new ArrayList&lt;&gt;(t)))，编译通过，运行add会抛异常</p>
-<h3 id="泛型"><a href="#泛型" class="headerlink" title="泛型"></a>泛型</h3><p>Java 泛型的参数只可以代表类，不能代表个别对象。由于 Java 泛型的类型参数之实际类型在编译时会被消除，所以无法在运行时得知其类型参数的类型。Java 编译器在编译泛型时会自动加入类型转换的编码，故运行速度不会因为使用泛型而加快。<br>从List到List<t><br>规定类型只能是类型T，但是实现无所谓T是什么类型。<br>从List到List<t>语法<br>List<string> list=new ArrayList&lt;&gt;();//1.7<br>List<integer> list=LinkedList.of(1,2,3);<br>List<string> list=LinkedList.newEmptyList();<br>java Type erasure<br>1.早期java没有泛型；2.为了兼容性，在运行时将所有泛型擦除<br>运行时：List、List<string>、List<integer>没有区别<br>covariance<br>ArrayList<integer>是List<integer>,但是List<integer>不是List<object><br>将List<integer>转化成List<object>:<br>new ArrayList<object>(intList)或者List<object>(List) intList（危险，先要明确目的为什么转）</object></object></object></integer></object></integer></integer></integer></integer></string></string></integer></string></t></t></p>
-<h3 id="虚函数表"><a href="#虚函数表" class="headerlink" title="虚函数表"></a>虚函数表</h3><h2 id="高级知识点"><a href="#高级知识点" class="headerlink" title="高级知识点"></a>高级知识点</h2><h3 id="并行计算"><a href="#并行计算" class="headerlink" title="并行计算"></a>并行计算</h3><p>并行计算的方法：<br>把数据拆分到每个节点<br>每个节点并行的计算结果<br>把结果汇总<br>k路归并排序。把数据切分成k份，每份内部进行排序（可以用快排或者归并），然后进行k路归并，可以用k最小堆，PriorityQueue,从数据源拿数据需要使用缓存，读一段，可以考虑Iterable接口<br>Iterable<t> merge(List<iterable<t> sortedData&gt;)<br>Iterable接口的next方法，如果缓存区空，读取一段数据到缓存，给出缓存区第一个元素，缓存区元素大小（可配置）</iterable<t></t></p>
-<h3 id="多线程"><a href="#多线程" class="headerlink" title="多线程"></a>多线程</h3><p>死锁条件：<br>1.互斥等待<br>2.hold and wait<br>3.循环等待<br>4.无法剥夺的等待<br>解决：<br>1.一次性获取所有资源；2.顺序获取资源（根据资源某个标识顺序加锁）；3.加入超时机制</p>
-<h3 id="线程池"><a href="#线程池" class="headerlink" title="线程池"></a>线程池</h3><p>创建线程开销大<br>线程池：预先建立好线程，等待任务派发。</p>
-<h4 id="线程池参数"><a href="#线程池参数" class="headerlink" title="线程池参数"></a>线程池参数</h4><p>corePoolSize：线程池初始线程的数量<br>maximumPoolSize：线程中最大允许数量<br>KeepAliveTime：超出corePoolSize的线程如果等待时间超过这个时间就会被回收<br>TimeUnit:时间单位，毫秒、秒微秒，描述KeepAliveTime<br>BlockingQueue<runnable>:<br>资源的连接问题：例如数据库的连接，虽然对象被回收但是资源依然不释放。</runnable></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;操作系统&quot;&gt;&lt;a href=&quot;#操作系统&quot; class=&quot;headerlink&quot; title=&quot;操作系统&quot;&gt;&lt;/a&gt;操作系统&lt;/h2&gt;&lt;h2 id=&quot;网络&quot;&gt;&lt;a href=&quot;#网络&quot; class=&quot;headerlink&quot; title=&quot;网络&quot;&gt;&lt;/a&gt;网络&lt;/h
-    
-    </summary>
-    
-      <category term="java" scheme="http://yoursite.com/categories/java/"/>
-    
-    
-      <category term="java视频" scheme="http://yoursite.com/tags/java%E8%A7%86%E9%A2%91/"/>
     
   </entry>
   
