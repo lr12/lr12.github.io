@@ -100,7 +100,7 @@
 <meta property="og:site_name" content="博客">
 <meta property="og:description" content="java并发编程基础线程简介什么是线程资源分配的最小单元是进程，线程是CPU调度的最小单位。现代操作系统调度的最小单元是线程，也叫轻量级进程，在一个进程里可以创建多个线程，这些线程都拥有各自的计数器、堆栈和局部变量等属性，并且能够访问共享的内存变量。 为什么使用多线程 更多的处理器核心 更快的响应时间 更好的编程模型  线程的优先级现在操作系统采用时分的形式调用调度运行的程序，操作系统会分出一个个">
 <meta property="og:image" content="http://yoursite.com/2017/12/31/java并发编程4-6/java线程状态变迁.png">
-<meta property="og:updated_time" content="2017-12-31T08:57:49.478Z">
+<meta property="og:updated_time" content="2017-12-31T12:38:54.126Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="java并发编程4~6">
 <meta name="twitter:description" content="java并发编程基础线程简介什么是线程资源分配的最小单元是进程，线程是CPU调度的最小单位。现代操作系统调度的最小单元是线程，也叫轻量级进程，在一个进程里可以创建多个线程，这些线程都拥有各自的计数器、堆栈和局部变量等属性，并且能够访问共享的内存变量。 为什么使用多线程 更多的处理器核心 更快的响应时间 更好的编程模型  线程的优先级现在操作系统采用时分的形式调用调度运行的程序，操作系统会分出一个个">
@@ -408,6 +408,10 @@
 </table>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">jps <span class="_">-l</span></div><div class="line">jstack pid//查看线程情况</div></pre></td></tr></table></figure>
 <p><img src="/2017/12/31/java并发编程4-6/java线程状态变迁.png" alt=""><br>注意　Java将操作系统中的运行和就绪两个状态合并称为运行状态。阻塞状态是线程阻塞在进入synchronized关键字修饰的方法或代码块（获取锁）时的状态，但是阻塞在java.concurrent包中Lock接口的线程状态却是等待状态，因为java.concurrent包中Lock接口对于阻塞的实现均使用了LockSupport类中的相关方法。</p>
+<h3 id="Daemon线程"><a href="#Daemon线程" class="headerlink" title="Daemon线程"></a>Daemon线程</h3><p>Daemon线程是一种支持型线程，因为它主要被用作程序中后台调度以及支持性工作。这意味着，当一个java虚拟机不存在非Daemon线程时，java虚拟机将会退出。可以通过调用Thread.setDaemon(true)将线程设置为Daemon线程。<br>Daemon线程被用作完成支持性工作，但是在Java虚拟机退出时Daemon线程中的finally块并不一定会执行。</p>
+<h2 id="启动和终止线程"><a href="#启动和终止线程" class="headerlink" title="启动和终止线程"></a>启动和终止线程</h2><h3 id="构造线程"><a href="#构造线程" class="headerlink" title="构造线程"></a>构造线程</h3><p>在运行线程之前首先要构造一个线程对象，线程对象在构造的时候需要提供线程所需要的属性，如线程所属的线程组、线程优先级、是否是Daemon线程等信息。</p>
+<h3 id="启动线程"><a href="#启动线程" class="headerlink" title="启动线程"></a>启动线程</h3><p>线程对象在初始化完成之后，调用start()方法就可以启动这个线程。线程start()方法的含义是：当前线程（即parent线程）同步告知Java虚拟机，只要线程规划器空闲，应立即启动调用start()方法的线程。</p>
+<p>###</p>
 
       
     </div>
@@ -594,7 +598,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#java并发编程基础"><span class="nav-number">1.</span> <span class="nav-text">java并发编程基础</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#线程简介"><span class="nav-number">1.1.</span> <span class="nav-text">线程简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#什么是线程"><span class="nav-number">1.1.1.</span> <span class="nav-text">什么是线程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么使用多线程"><span class="nav-number">1.1.2.</span> <span class="nav-text">为什么使用多线程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#线程的优先级"><span class="nav-number">1.1.3.</span> <span class="nav-text">线程的优先级</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#线程的状态"><span class="nav-number">1.1.4.</span> <span class="nav-text">线程的状态</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#java并发编程基础"><span class="nav-number">1.</span> <span class="nav-text">java并发编程基础</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#线程简介"><span class="nav-number">1.1.</span> <span class="nav-text">线程简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#什么是线程"><span class="nav-number">1.1.1.</span> <span class="nav-text">什么是线程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么使用多线程"><span class="nav-number">1.1.2.</span> <span class="nav-text">为什么使用多线程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#线程的优先级"><span class="nav-number">1.1.3.</span> <span class="nav-text">线程的优先级</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#线程的状态"><span class="nav-number">1.1.4.</span> <span class="nav-text">线程的状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Daemon线程"><span class="nav-number">1.1.5.</span> <span class="nav-text">Daemon线程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#启动和终止线程"><span class="nav-number">1.2.</span> <span class="nav-text">启动和终止线程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#构造线程"><span class="nav-number">1.2.1.</span> <span class="nav-text">构造线程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动线程"><span class="nav-number">1.2.2.</span> <span class="nav-text">启动线程</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>

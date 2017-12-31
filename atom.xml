@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-12-31T08:57:49.478Z</updated>
+  <updated>2017-12-31T12:38:54.126Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2017/12/31/java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B4-6/"/>
     <id>http://yoursite.com/2017/12/31/java并发编程4-6/</id>
     <published>2017-12-31T07:25:57.000Z</published>
-    <updated>2017-12-31T08:57:49.478Z</updated>
+    <updated>2017-12-31T12:38:54.126Z</updated>
     
     <content type="html"><![CDATA[<h1 id="java并发编程基础"><a href="#java并发编程基础" class="headerlink" title="java并发编程基础"></a>java并发编程基础</h1><h2 id="线程简介"><a href="#线程简介" class="headerlink" title="线程简介"></a>线程简介</h2><h3 id="什么是线程"><a href="#什么是线程" class="headerlink" title="什么是线程"></a>什么是线程</h3><p>资源分配的最小单元是进程，线程是CPU调度的最小单位。现代操作系统调度的最小单元是线程，也叫轻量级进程，在一个进程里可以创建多个线程，这些线程都拥有各自的计数器、堆栈和局部变量等属性，并且能够访问共享的内存变量。</p>
 <h3 id="为什么使用多线程"><a href="#为什么使用多线程" class="headerlink" title="为什么使用多线程"></a>为什么使用多线程</h3><ul>
@@ -66,6 +66,10 @@
 </table>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">jps <span class="_">-l</span></div><div class="line">jstack pid//查看线程情况</div></pre></td></tr></table></figure>
 <p><img src="/2017/12/31/java并发编程4-6/java线程状态变迁.png" alt=""><br>注意　Java将操作系统中的运行和就绪两个状态合并称为运行状态。阻塞状态是线程阻塞在进入synchronized关键字修饰的方法或代码块（获取锁）时的状态，但是阻塞在java.concurrent包中Lock接口的线程状态却是等待状态，因为java.concurrent包中Lock接口对于阻塞的实现均使用了LockSupport类中的相关方法。</p>
+<h3 id="Daemon线程"><a href="#Daemon线程" class="headerlink" title="Daemon线程"></a>Daemon线程</h3><p>Daemon线程是一种支持型线程，因为它主要被用作程序中后台调度以及支持性工作。这意味着，当一个java虚拟机不存在非Daemon线程时，java虚拟机将会退出。可以通过调用Thread.setDaemon(true)将线程设置为Daemon线程。<br>Daemon线程被用作完成支持性工作，但是在Java虚拟机退出时Daemon线程中的finally块并不一定会执行。</p>
+<h2 id="启动和终止线程"><a href="#启动和终止线程" class="headerlink" title="启动和终止线程"></a>启动和终止线程</h2><h3 id="构造线程"><a href="#构造线程" class="headerlink" title="构造线程"></a>构造线程</h3><p>在运行线程之前首先要构造一个线程对象，线程对象在构造的时候需要提供线程所需要的属性，如线程所属的线程组、线程优先级、是否是Daemon线程等信息。</p>
+<h3 id="启动线程"><a href="#启动线程" class="headerlink" title="启动线程"></a>启动线程</h3><p>线程对象在初始化完成之后，调用start()方法就可以启动这个线程。线程start()方法的含义是：当前线程（即parent线程）同步告知Java虚拟机，只要线程规划器空闲，应立即启动调用start()方法的线程。</p>
+<p>###</p>
 ]]></content>
     
     <summary type="html">
