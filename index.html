@@ -370,6 +370,43 @@
 <li>更好的编程模型</li>
 </ul>
 <h3 id="线程的优先级"><a href="#线程的优先级" class="headerlink" title="线程的优先级"></a>线程的优先级</h3><p>现在操作系统采用时分的形式调用调度运行的程序，操作系统会分出一个个时间片，线程会分配到若干时间片，当线程时间片用完了就会发生线程调度，等待下次分配。线程分配到的时间片多少也就决定了线程使用处理器资源的多少，而线程优先级就是决定线程需要多或者少分配一些处理器资源的线程属性。<br>Java线程中，通过一个整型成员变量priority来控制优先级，优先级的范围从1~10，在线程构建的时候可以通过setPriority(int)方法来修改优先级，默认优先级是5，优先级高的线程分配时间片的数量要多于优先级低的线程。设置线程优先级时，针对频繁阻塞（休眠或者I/O操作）的线程需要设置较高优先级，而偏重计算（需要较多CPU时间或者偏运算）的线程则设置较低的优先级，确保处理器不会被独占。<br>线程优先级不能作为程序正确性的依赖，因为操作系统可以完全不用理会Java线程对于优先级的设定。</p>
+<h3 id="线程的状态"><a href="#线程的状态" class="headerlink" title="线程的状态"></a>线程的状态</h3><p>java线程在运行的生命周期可能处于6中不同的状态，在给定的一个时刻线程只能处于其中一个状态</p>
+<table>
+<thead>
+<tr>
+<th>状态名称</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NEW</td>
+<td>初始状态，线程被构建，但是还没有调用start方法</td>
+</tr>
+<tr>
+<td>RUNNABLE</td>
+<td>运行状态，java线程将操作系统中的就绪和运行两种状态笼统地称作运行中</td>
+</tr>
+<tr>
+<td>BLOCKED</td>
+<td>阻塞状态，表示线程阻塞于锁</td>
+</tr>
+<tr>
+<td>WAITTING</td>
+<td>等待状态，表示线程进入等待状态，进入该状态表示当前线程需要等待其他线程做出一些特定的动作（如通知或者中断）</td>
+</tr>
+<tr>
+<td>TIME_WAITTING</td>
+<td>超时等待状态，该状态不同于WAITTING，它是可以在指定的时间返回</td>
+</tr>
+<tr>
+<td>TERMINATED</td>
+<td>终止状态，表示当前线程已经执行完毕</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">jps <span class="_">-l</span></div><div class="line">jstack pid//查看线程情况</div></pre></td></tr></table></figure>
+<p><img src="/2017/12/31/java并发编程4-6/java线程状态变迁.png" alt=""><br>注意　Java将操作系统中的运行和就绪两个状态合并称为运行状态。阻塞状态是线程阻塞在进入synchronized关键字修饰的方法或代码块（获取锁）时的状态，但是阻塞在java.concurrent包中Lock接口的线程状态却是等待状态，因为java.concurrent包中Lock接口对于阻塞的实现均使用了LockSupport类中的相关方法。</p>
 
           
         
