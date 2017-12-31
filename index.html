@@ -410,7 +410,34 @@
 <h3 id="Daemon线程"><a href="#Daemon线程" class="headerlink" title="Daemon线程"></a>Daemon线程</h3><p>Daemon线程是一种支持型线程，因为它主要被用作程序中后台调度以及支持性工作。这意味着，当一个java虚拟机不存在非Daemon线程时，java虚拟机将会退出。可以通过调用Thread.setDaemon(true)将线程设置为Daemon线程。<br>Daemon线程被用作完成支持性工作，但是在Java虚拟机退出时Daemon线程中的finally块并不一定会执行。</p>
 <h2 id="启动和终止线程"><a href="#启动和终止线程" class="headerlink" title="启动和终止线程"></a>启动和终止线程</h2><h3 id="构造线程"><a href="#构造线程" class="headerlink" title="构造线程"></a>构造线程</h3><p>在运行线程之前首先要构造一个线程对象，线程对象在构造的时候需要提供线程所需要的属性，如线程所属的线程组、线程优先级、是否是Daemon线程等信息。</p>
 <h3 id="启动线程"><a href="#启动线程" class="headerlink" title="启动线程"></a>启动线程</h3><p>线程对象在初始化完成之后，调用start()方法就可以启动这个线程。线程start()方法的含义是：当前线程（即parent线程）同步告知Java虚拟机，只要线程规划器空闲，应立即启动调用start()方法的线程。</p>
-<p>###</p>
+<h3 id="理解中断"><a href="#理解中断" class="headerlink" title="理解中断"></a>理解中断</h3><p>中断可以理解为线程的一个标记位，它表示一个运行中的线程是否被其他线程进行了中断操作。中断好比其他线程对该线程打了招呼，其他线程调用了该线程的interrupt方法对其进行了中断。<br>线程通过检查自身是否被中断进行响应，通过调用isInterrupted来判断是否被中断，也可以调用静态方法Thread.interrupted对当前线程进行复位。如果该线程已经处于终结状态，即使该线程被中断过，在调用该线程对象的isInterrupted()时依旧会返回false。<br>从Java的API中可以看到，许多声明抛出InterruptedException的方法（例如Thread.sleep(long millis)方法）这些方法在抛出InterruptedException之前，Java虚拟机会先将该线程的中断标识位清除，然后抛出InterruptedException，此时调用isInterrupted()方法将会返回false。</p>
+<h3 id="过期的suspend、resume、stop"><a href="#过期的suspend、resume、stop" class="headerlink" title="过期的suspend、resume、stop"></a>过期的suspend、resume、stop</h3><p>suspend()、resume()和stop()方法完成了线程的暂停、恢复和终止工作，而且非常“人性化”。但是这些API是过期的，也就是不建议使用的。<br>不建议使用的原因主要有：以suspend()方法为例，在调用后，线程不会释放已经占有的资源（比如锁），而是占有着资源进入睡眠状态，这样容易引发死锁问题。同样，stop()方法在终结一个线程时不会保证线程的资源正常释放，通常是没有给予线程完成资源释放工作的机会，因此会导致程序可能工作在不确定状态下。</p>
+<h3 id="安全地终止线程"><a href="#安全地终止线程" class="headerlink" title="安全地终止线程"></a>安全地终止线程</h3><p>而中断操作是一种简便的线程间交互方式，而这种交互方式最适合用来取消或停止任务。除了中断以外，还可以利用一个boolean变量来控制是否需要停止任务并终止该线程。</p>
+<h2 id="线程间通信"><a href="#线程间通信" class="headerlink" title="线程间通信"></a>线程间通信</h2><h3 id="volatile和synchronize关键字"><a href="#volatile和synchronize关键字" class="headerlink" title="volatile和synchronize关键字"></a>volatile和synchronize关键字</h3><p>关键字volatile可以用来修饰字段（成员变量），就是告知程序任何对该变量的访问均需要从共享内存中获取，而对它的改变必须同步刷新回共享内存，它能保证所有线程对变量访问的可见性。<br>关键字synchronized可以修饰方法或者以同步块的形式来进行使用，它主要确保多个线程在同一个时刻，只能有一个线程处于方法或者同步块中，它保证了线程对变量访问的可见性和排他性。</p>
+<h3 id="等待-通知机制"><a href="#等待-通知机制" class="headerlink" title="等待/通知机制"></a>等待/通知机制</h3><p>一个线程修改了一个对象的值，而另一个线程感知到了变化，然后进行相应的操作，整个过程开始于一个线程，而最终执行又是另一个线程。<br>简单的办法是让消费者线程不断地循环检查变量是否符合预期，如下面代码所示，在while循环中设置不满足的条件，如果条件满足则退出while循环，从而完成消费者的工作。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">while</span>(value != desire) &#123;</div><div class="line">Thread.sleep(1000);</div><div class="line">&#125;</div><div class="line"><span class="keyword">do</span>Something();</div></pre></td></tr></table></figure></p>
+<p>1）难以确保及时性。在睡眠时，基本不消耗处理器资源，但是如果睡得过久，就不能及时<br>发现条件已经变化，也就是及时性难以保证。<br>2）难以降低开销。如果降低睡眠的时间，比如休眠1毫秒，这样消费者能更加迅速地发现<br>条件变化，但是却可能消耗更多的处理器资源，造成了无端的浪费。<br>Java通过内置的等待/通知机制能够很好地解决这个矛盾并实现所需的功能。<br><img src="/2017/12/31/java并发编程4-6/通知机制.png" alt=""><br>等待/通知机制，是指一个线程A调用了对象O的wait()方法进入等待状态，而另一个线程B调用了对象O的notify()或者notifyAll()方法，线程A收到通知后从对象O的wait()方法返回，进而执行后续操作。上述两个线程通过对象O来完成交互，而对象上的wait()和notify/notifyAll()的关系就如同开关信号一样，用来完成等待方和通知方之间的交互工作。<br>wait、notify和notifyAll注意细节：</p>
+<ul>
+<li>使用wait、notify、notifyAll时需要先对对象加锁</li>
+<li>调用wait后，线程状态由RUNNING变为WAITING，并将当前线程放到等待队列中</li>
+<li>notify和notifyAll调用后，等待线程不会从wait返回，需要等待notify和notifyAll释放锁后，等待线程才有机会从wait中返回。</li>
+<li>notify方法将等待队列中的一个线程从等待队列中移出到同步队列，notifyAll是将等待队列中的所有线程移到同步队列中，被移动的线程从waiting变为blocked。</li>
+<li>从wait方法中返回前提是获得调用对象锁</li>
+</ul>
+<p><img src="/2017/12/31/java并发编程4-6/wait_notify.png" alt=""></p>
+<h3 id="等待通知的经典范式"><a href="#等待通知的经典范式" class="headerlink" title="等待通知的经典范式"></a>等待通知的经典范式</h3><p>该范式分为两个部分：分别针对等待方和通知方</p>
+<h4 id="等待方"><a href="#等待方" class="headerlink" title="等待方"></a>等待方</h4><p>等待方遵守如下规则：</p>
+<ol>
+<li>获取对象的锁</li>
+<li>如果不满足条件，那么调用对象的wait方法，被通知后仍然检查条件</li>
+<li>条件满足则执行对应的逻辑</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">synchronized(对象)&#123;</div><div class="line">  <span class="keyword">while</span>(条件不满足)&#123;</div><div class="line">    对象.wait();</div><div class="line">  &#125;</div><div class="line">  对应的处理逻辑</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="通知方"><a href="#通知方" class="headerlink" title="通知方"></a>通知方</h4><ol>
+<li>获得对象的锁</li>
+<li>改变条件</li>
+<li>通知所有等待在对象上的线程<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">synchronized(对象)&#123;</div><div class="line">  改变条件</div><div class="line">  对象.notifyAll();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
 
           
         
