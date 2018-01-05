@@ -273,6 +273,310 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/02/java8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="李睿">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/02/java8/" itemprop="url">java8</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-02T15:22:38+08:00">
+                2017-12-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java基础/" itemprop="url" rel="index">
+                    <span itemprop="name">java基础</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h1><p>java8新特性：Lambda（匿名函数）、流、默认方法</p>
+<h2 id="java中的函数"><a href="#java中的函数" class="headerlink" title="java中的函数"></a>java中的函数</h2><p>java8新增函数作为值的一种新形式。</p>
+<h3 id="方法和-Lambda-作为一等公民"><a href="#方法和-Lambda-作为一等公民" class="headerlink" title="方法和 Lambda 作为一等公民"></a>方法和 Lambda 作为一等公民</h3><p>Java 8的第一个新功能是方法引用。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"> File[] hiddenFiles= new File(<span class="string">"."</span>).listFiles(new <span class="function"><span class="title">FileFilter</span></span>()&#123;</div><div class="line">     public boolean accept(File file)&#123;</div><div class="line">         <span class="built_in">return</span> file.isHidden();</div><div class="line">     &#125;</div><div class="line"> &#125;);</div><div class="line"></div><div class="line">File[] hiddenFiles1 = new File(<span class="string">"."</span>).listFiles(File::isHidden);</div></pre></td></tr></table></figure></p>
+<h3 id="传递代码"><a href="#传递代码" class="headerlink" title="传递代码"></a>传递代码</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">public static boolean isGreenApple(Apple apple)&#123;</div><div class="line">		<span class="built_in">return</span> apple.color.equals(<span class="string">"green"</span>);</div><div class="line">	&#125;</div><div class="line">	public static boolean isHeavy(Apple apple)&#123;</div><div class="line">		<span class="built_in">return</span> apple.weight&gt;150;</div><div class="line">	&#125;</div><div class="line">	public static List&lt;Apple&gt; filterApple(List&lt;Apple&gt; list,Predicate&lt;Apple&gt; p)&#123;</div><div class="line">		List&lt;Apple&gt; result=new ArrayList&lt;&gt;();</div><div class="line">		<span class="keyword">for</span>(Apple apple:list)&#123;</div><div class="line">			<span class="keyword">if</span>(p.test(apple))</div><div class="line">			result.add(apple);</div><div class="line">		&#125;</div><div class="line">		<span class="built_in">return</span> result;</div><div class="line">	&#125;</div><div class="line">	public static void main(String[] args)&#123;</div><div class="line">		List&lt;Apple&gt; list=new ArrayList&lt;Apple&gt;();</div><div class="line">		list.add(new Apple(150, <span class="string">"red"</span>));</div><div class="line">		filterApple(list, AppleExample::isHeavy);</div><div class="line">	&#125;</div></pre></td></tr></table></figure>
+<h3 id="从传递方法到Lambda"><a href="#从传递方法到Lambda" class="headerlink" title="从传递方法到Lambda"></a>从传递方法到Lambda</h3><p>不过Java 8也解决了这个问题，它引入了一套新记法（匿名函数或Lambda）<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">filterApple(inventory, (Apple a) -&gt; <span class="string">"green"</span>.equals(a.getColor()) );</div><div class="line">filterApple(inventory, (Apple a) -&gt; a.weight &gt; 150 );</div></pre></td></tr></table></figure></p>
+<h2 id="流"><a href="#流" class="headerlink" title="流"></a>流</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Map&lt;Currency, List&lt;Transaction&gt;&gt; transactionsByCurrencies =</div><div class="line">transactions.stream()</div><div class="line">.filter((Transaction t) -&gt; t.getPrice() &gt; 1000)</div><div class="line">.collect(groupingBy(Transaction::getCurrency));</div></pre></td></tr></table></figure>
+<p>Stream允许并提倡并行处理一个 Stream 中的元素。虽然可能乍看上去有点儿怪，但筛选一个 Collection （filterApples 应用在一个List 上）的最快方法常常是将其转换为 Stream ，进行并行处理，然后再转换回 List<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">//顺序处理</div><div class="line">List&lt;Apple&gt; heavyApples =inventory.stream().filter((Apple a) -&gt; a.getWeight() &gt; 150).collect(toList());</div><div class="line">//并行处理</div><div class="line">List&lt;Apple&gt; heavyApples =inventory.parallelStream().filter((Apple a) -&gt; a.getWeight() &gt; 150).collect(toList());</div></pre></td></tr></table></figure></p>
+<p>库会负责分块，即把大的流分成几个小的流，以便并行处理。其次，流提供的这个几乎免费的并行，只有在传递给 filter 之类的库方法的方法不会互动（比方说有可变的共享对象）时才能工作。</p>
+<h2 id="默认方法"><a href="#默认方法" class="headerlink" title="默认方法"></a>默认方法</h2><p>Java 8的解决方法就是打破最后一环——接口如今可以包含实现类没有提供实现的方法签名<br>了！那谁来实现它呢？缺失的方法主体随接口提供了（因此就有了默认实现） ，而不是由实现类提供。<br>这就给接口设计者提供了一个扩充接口的方式，而不会破坏现有的代码。Java 8在接口声明<br>中使用新的 default 关键字来表示这一点。例如，在Java 8里，你现在可以直接对 List 调用 sort 方法。它是用Java 8  List 接口中如下所示的默认方法实现的，它会调用 Collections.sort 静态方法：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">default void sort(Comparator&lt;? super E&gt; c) &#123;</div><div class="line">Collections.sort(this, c);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这意味着 List 的任何实体类都不需要显式实现 sort ，而在以前的Java版本中，除非提供了sort 的实现，否则这些实体类在重新编译时都会失败。</p>
+<h1 id="通过行为参数化传递代码"><a href="#通过行为参数化传递代码" class="headerlink" title="通过行为参数化传递代码"></a>通过行为参数化传递代码</h1><h2 id="应对不断变化的需求"><a href="#应对不断变化的需求" class="headerlink" title="应对不断变化的需求"></a>应对不断变化的需求</h2><h3 id="初试牛刀：筛选绿苹果"><a href="#初试牛刀：筛选绿苹果" class="headerlink" title="初试牛刀：筛选绿苹果"></a>初试牛刀：筛选绿苹果</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">public static List&lt;Apple&gt; filterGreenApples(List&lt;Apple&gt; inventory) &#123;</div><div class="line">  List&lt;Apple&gt; result = new ArrayList&lt;Apple&gt;();</div><div class="line">  <span class="keyword">for</span>(Apple apple: inventory)&#123;</div><div class="line">    <span class="keyword">if</span>(<span class="string">"green"</span>.equals(apple.getColor() ) &#123;</div><div class="line">     result.add(apple);</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  <span class="built_in">return</span> result;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="把颜色作为参数"><a href="#把颜色作为参数" class="headerlink" title="把颜色作为参数"></a>把颜色作为参数</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">public static List&lt;Apple&gt; filterGreenApples(List&lt;Apple&gt; inventory,String color) &#123;</div><div class="line">  List&lt;Apple&gt; result = new ArrayList&lt;Apple&gt;();</div><div class="line">  <span class="keyword">for</span>(Apple apple: inventory)&#123;</div><div class="line">    <span class="keyword">if</span>(color.equals(apple.getColor() ) &#123;</div><div class="line">     result.add(apple);</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  <span class="built_in">return</span> result;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="第三次尝试对属性做筛选"><a href="#第三次尝试对属性做筛选" class="headerlink" title="第三次尝试对属性做筛选"></a>第三次尝试对属性做筛选</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">public static List&lt;Apple&gt; filterApples(List&lt;Apple&gt; inventory, String color,int weight, boolean flag) &#123;</div><div class="line">  List&lt;Apple&gt; result = new ArrayList&lt;Apple&gt;();</div><div class="line">  <span class="keyword">for</span> (Apple apple: inventory)&#123;</div><div class="line">    <span class="keyword">if</span>((flag&amp;&amp;apple.getColor().equals(color))||(!flag&amp;&amp;apple.getWeight()&gt;150))&#123;</div><div class="line">      result.add(apple);</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  <span class="built_in">return</span> result;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="行为参数化"><a href="#行为参数化" class="headerlink" title="行为参数化"></a>行为参数化</h2><p>1.传递代码/行为，<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">public static List&lt;Apple&gt; filterApples(List&lt;Apple&gt;inventory, ApplePredicate p)&#123;</div><div class="line">  List&lt;Apple&gt; result = new ArrayList&lt;&gt;();</div><div class="line">  <span class="keyword">for</span>(Apple apple: inventory)&#123;</div><div class="line">   <span class="keyword">if</span>(p.test(apple))&#123;</div><div class="line">      result.add(apple);</div><div class="line">   &#125;</div><div class="line">  &#125;</div><div class="line"> <span class="built_in">return</span> result;</div><div class="line">&#125;</div><div class="line">public class AppleRedAndHeavyPredicate implements ApplePredicate&#123;</div><div class="line">  public boolean <span class="built_in">test</span>(Apple apple)&#123;</div><div class="line">    <span class="built_in">return</span> <span class="string">"red"</span>.equals(apple.getColor())&amp;&amp; apple.getWeight() &gt; 150;</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line">public static void <span class="function"><span class="title">test</span></span>()&#123;</div><div class="line">  ApplePredicate p=new AppleRedAndHeavyPredicate();</div><div class="line">  List&lt;Apple&gt; redAndHeavyApples = filterApples(inventory, p);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>2.多种行为，一种参数<br>行为参数化的好处在于你可以把迭代要筛选的集合的逻辑与对集合中每个元素应用的行为区分开来。这样你可以重复使用同一个方法，给它不同的行为来达到不同的目的。<br><img src="/2017/12/02/java8/行为参数化.PNG" alt=""></p>
+<h2 id="对付啰嗦"><a href="#对付啰嗦" class="headerlink" title="对付啰嗦"></a>对付啰嗦</h2><p>当要把新的行为传递给filterApples方法的时候，你不得不声明好几个实现 ApplePredicate接口的类，然后实例化好几个只会提到一次的ApplePredicate对象.</p>
+<h3 id="使用匿名类"><a href="#使用匿名类" class="headerlink" title="使用匿名类"></a>使用匿名类</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">List&lt;Apple&gt; redApples = filterApples(inventory, new <span class="function"><span class="title">ApplePredicate</span></span>() &#123;</div><div class="line">  public boolean <span class="built_in">test</span>(Apple apple)&#123;</div><div class="line">    <span class="built_in">return</span> <span class="string">"red"</span>.equals(apple.getColor());</div><div class="line">  &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<p>匿名类在GUI经常用到，但是有缺点：1.很笨重；2.用起来费解。</p>
+<h3 id="使用Lambda表达式"><a href="#使用Lambda表达式" class="headerlink" title="使用Lambda表达式"></a>使用Lambda表达式</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">List&lt;Apple&gt; result=filterApples(list,(Apple a)-&gt;<span class="string">"red"</span>.equals(a.color));</div></pre></td></tr></table></figure>
+<p><img src="/2017/12/02/java8/参数化和值参数化.PNG" alt=""></p>
+<h3 id="List抽象化"><a href="#List抽象化" class="headerlink" title="List抽象化"></a>List抽象化</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">public interface Predicate&lt;T&gt;&#123;</div><div class="line">   boolean <span class="built_in">test</span>(T t);</div><div class="line">&#125;</div><div class="line">public static &lt;T&gt; List&lt;T&gt; filter(List&lt;T&gt; list,Predicate&lt;T&gt; p)&#123;</div><div class="line">   List&lt;T&gt; result=new ArrayList&lt;T&gt;();</div><div class="line">   <span class="keyword">for</span>(T t:list)&#123;</div><div class="line">     <span class="keyword">if</span>(p.test(t))&#123;</div><div class="line">       result.add(t);</div><div class="line">     &#125;</div><div class="line">   &#125;</div><div class="line">   <span class="built_in">return</span> result;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="真实的例子"><a href="#真实的例子" class="headerlink" title="真实的例子"></a>真实的例子</h2><h3 id="使用Comparator排序"><a href="#使用Comparator排序" class="headerlink" title="使用Comparator排序"></a>使用Comparator排序</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">inventory.sort((Apple a,Apple b)-&gt; a.getWeight().compareTo(b.getWeight()));</div></pre></td></tr></table></figure>
+<h3 id="用runnable执行代码块"><a href="#用runnable执行代码块" class="headerlink" title="用runnable执行代码块"></a>用runnable执行代码块</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Thread t=new Thread(()-&gt;System.out.println(<span class="string">"Hello world"</span>));</div></pre></td></tr></table></figure>
+<h3 id="GUI例子"><a href="#GUI例子" class="headerlink" title="GUI例子"></a>GUI例子</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">button.setOnAction((ActionEvent event)-&gt;lable.setText(<span class="string">"hello"</span>));</div></pre></td></tr></table></figure>
+<h1 id="Lambda表达式"><a href="#Lambda表达式" class="headerlink" title="Lambda表达式"></a>Lambda表达式</h1><h2 id="Lambda管中窥豹"><a href="#Lambda管中窥豹" class="headerlink" title="Lambda管中窥豹"></a>Lambda管中窥豹</h2><p>Lambda表达式理解为简洁地表示可传递的匿名函数的一种方式：没有名称、有参数列表函数主体、返回类型、可能还会有可抛出的异常列表。<br>特点：<br>匿名：不像普通方法有明确的名称：写得少而想得多<br>函数：Lambda函数不像方法那样属于某个特定的类。但和方法一样，有参数列表，函数主体，返回类型，还可能有可抛出的异常列表。<br>传递：Lambda表达式可作为参数传递给方法或者存储在变量中<br>简洁：无需像匿名类写很多模板代码<br><img src="/2017/12/02/java8/Lambda表达式.png" alt=""><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">//有效Lambda表达式</div><div class="line">(String s)-&gt; s.length()</div><div class="line">(Apple a)-&gt; a.weigth&gt;150</div><div class="line">(int x,int y)-&gt;&#123;</div><div class="line">   System.out.println(<span class="string">"result:"</span>);</div><div class="line">   System.out.println(x+y);</div><div class="line">&#125;</div><div class="line">()-&gt;42</div><div class="line">(Apple a1,Apple a2)-&gt; a1.getWeight().compareTo(a2.getWeight())</div></pre></td></tr></table></figure></p>
+<p>Lambda语法：(parameters)-&gt;expression或者(parameters)-&gt;{statements;}</p>
+<h3 id="案例"><a href="#案例" class="headerlink" title="案例"></a>案例</h3><p>布尔表达式：(List<string> list)-&gt; list.isEmpty()<br>创建一个对象:()-&gt;new Apple(10):<br>消费一个对象:(Apple a)-&gt;{System.out.println(a.getWeight());}<br>从一个对象中选择或选取:(String s)-&gt; s.length()<br>组合两个值:(int a,int b)-&gt;a*b<br>三比较两个对象:(Apple a1,Apple a2)-&gt; a1.getWeight.compareTo(12.getWeight())</string></p>
+<h2 id="在哪里以及如何使用Lambda"><a href="#在哪里以及如何使用Lambda" class="headerlink" title="在哪里以及如何使用Lambda"></a>在哪里以及如何使用Lambda</h2><h3 id="函数式接口"><a href="#函数式接口" class="headerlink" title="函数式接口"></a>函数式接口</h3><p>函数式接口就是只定义一个抽象方法的接口<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">public interface Runnable&#123;</div><div class="line">  public void run();</div><div class="line">&#125;</div><div class="line">public interface Comparator&lt;T&gt;&#123;</div><div class="line">  public int compare(T o1,T o2);</div><div class="line">&#125;</div><div class="line">public interface Callable&lt;T&gt;&#123;</div><div class="line">  public T call();</div><div class="line">&#125;</div><div class="line">public interface PrivilegedAction&lt;V&gt;&#123;</div><div class="line">  V run();</div><div class="line">&#125;</div><div class="line">public interface ActionListener extends EventListener&#123;</div><div class="line">  void actionPerformed(ActionEvent e);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>Lambda表达式允许你直接以内联的形式为函数式接口的抽象方法提供实现，并把整个表达式作为函数式接口的实例（具体说来，是函数式接口一个具体实现的实例）。你用匿名内部类也可以完成同样的事情，只不过比较笨拙：需要提供一个实现，然后再直接内联将它实例化。</p>
+<h3 id="函数描述符"><a href="#函数描述符" class="headerlink" title="函数描述符"></a>函数描述符</h3><p>函数式接口的抽象方法的签名基本上就是Lambda表达式的签名。我们将这种抽象方法叫做函数描述符。例如runnable接口是()-&gt;void.<br>如果你用@FunctionalInterface 定义了一个接口，而它却不是函数式接口的话，编译器将返回一个提示原因的错误。@FunctionalInter-face不是必需的，但对于为此设计的接口而言,使用它是比较好的做法。它就像是@Override标注表示方法被重写了.</p>
+<h2 id="环绕执行模式"><a href="#环绕执行模式" class="headerlink" title="环绕执行模式"></a>环绕执行模式</h2><p>通过一个例子，看看在实践中如何利用Lambda和行为参数化来让代码更为灵活。资源处理（例如处理文件或数据库）时一个常见的模式就是打开一个资源，做一些处理，然后关闭资源。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">public static String processFile() throws IOException &#123;</div><div class="line">  try (BufferedReader br =new BufferedReader(new FileReader(<span class="string">"data.txt"</span>))) &#123;</div><div class="line">    <span class="built_in">return</span> br.readLine();</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="行为参数化-1"><a href="#行为参数化-1" class="headerlink" title="行为参数化"></a>行为参数化</h3><p>你只能读文件的第一行。如果你想要返回头两行？<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">String result = processFile((BufferedReader br) -&gt;br.readLine() + br.readLine());</div></pre></td></tr></table></figure></p>
+<h3 id="使用函数式接口传递行为"><a href="#使用函数式接口传递行为" class="headerlink" title="使用函数式接口传递行为"></a>使用函数式接口传递行为</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">@FunctionalInterface</div><div class="line">public class BufferedReaderProcessor&#123;</div><div class="line">  String process(BufferedReader reader) throws IOException;</div><div class="line">&#125;</div><div class="line">public static String processFile(BufferedReaderProcessor p) throws IOException&#123;</div><div class="line">  ...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="执行一个行为"><a href="#执行一个行为" class="headerlink" title="执行一个行为"></a>执行一个行为</h3><p>任何 BufferedReader -&gt; String 形式的Lambda都可以作为参数来传递，因为它们符合BufferedReaderProcessor 接口中定义的 process 方法的签名。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">public static String processFile(BufferedReaderProcessor p) throws</div><div class="line">IOException &#123;</div><div class="line">  try (BufferedReader br =</div><div class="line">      new BufferedReader(new FileReader(<span class="string">"data.txt"</span>))) &#123;</div><div class="line">      <span class="built_in">return</span> p.process(br);</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="传递Lambda"><a href="#传递Lambda" class="headerlink" title="传递Lambda"></a>传递Lambda</h3><p>现在你就可以通过传递不同的Lambda重用processFile方法，并以不同的方式处理文件了。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">String oneLine=processFile((BufferedReader br)-&gt; br.readLine());</div><div class="line">String twoLine= processFile((BufferedReader br)-&gt; br.readLine()+br.readLine());</div></pre></td></tr></table></figure></p>
+<h2 id="使用函数式接口"><a href="#使用函数式接口" class="headerlink" title="使用函数式接口"></a>使用函数式接口</h2><p>java Api已经有几个函数式接口，比如Comparable、Runnable和Callable。</p>
+<h3 id="Predicate"><a href="#Predicate" class="headerlink" title="Predicate"></a>Predicate</h3><p>java.util.function.Predicate<t> 接口定义了一个名叫test的抽象方法，它接受泛型T对象并返回一个boolean这恰恰和你先前创建的一样，现在就可以直接使用了。在你需要表示一个涉及类型T的布尔表达式时，就可以使用这个接口。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">@FunctionalInterface</div><div class="line">public interface Predicate&lt;T&gt;&#123;</div><div class="line">    boolean <span class="built_in">test</span>(T t);</div><div class="line">&#125;</div><div class="line">public static &lt;T&gt; List&lt;T&gt; filter(List&lt;T&gt; list, Predicate&lt;T&gt; p) &#123;</div><div class="line"> List&lt;T&gt; results = new ArrayList&lt;&gt;();</div><div class="line">   <span class="keyword">for</span>(T s: list)&#123;</div><div class="line">     <span class="keyword">if</span>(p.test(s))&#123;</div><div class="line">       results.add(s);</div><div class="line">     &#125;</div><div class="line">   &#125;</div><div class="line"> <span class="built_in">return</span> results;</div><div class="line">&#125;</div><div class="line">Predicate&lt;String&gt; nonEmptyStringPredicate = (String s) -&gt;!s.isEmpty();</div><div class="line">List&lt;String&gt; nonEmpty = filter(listOfStrings,nonEmptyStringPredicate);</div></pre></td></tr></table></figure></t></p>
+<h3 id="Consumer"><a href="#Consumer" class="headerlink" title="Consumer"></a>Consumer</h3><p>java.util.Consumer<t>定义了一个名为accept的抽象方法，它接受泛型T的对象，没有返回（void）。你如果需要访问类型T的对象，并对其执行某些操作，就可以使用<br>这个接口。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">@FunctionalInterface</div><div class="line">public interface Consumer&lt;T&gt;&#123;</div><div class="line">   void accept(T t);</div><div class="line">&#125;</div><div class="line">public static &lt;T&gt; void <span class="keyword">for</span>Each(List&lt;T&gt; list, Consumer&lt;T&gt; c)&#123;</div><div class="line">   <span class="keyword">for</span>(T i: list)&#123;</div><div class="line">       c.accept(i);</div><div class="line">   &#125;</div><div class="line">&#125;  </div><div class="line"><span class="keyword">for</span>Each(Arrays.asList(1,2,3,4,5),(Integer i)-&gt;System.out.println(i));</div></pre></td></tr></table></figure></t></p>
+<h3 id="Function"><a href="#Function" class="headerlink" title="Function"></a>Function</h3><p>java.util.function.Function<t, r=""> 接口定义了一个叫作apply的方法，它接受一个泛型T的对象，并返回一个泛型R的对象。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">@FunctionalInterface</div><div class="line">public interface Function&lt;T,R&gt;&#123;</div><div class="line">  R apply(T t);</div><div class="line">&#125;</div><div class="line">public static &lt;T,R&gt; List&lt;R&gt; map(List&lt;T&gt; list,Function&lt;T,R&gt; f)&#123;</div><div class="line">  List&lt;R&gt; result = new ArrayList&lt;&gt;();</div><div class="line">  <span class="keyword">for</span>(T s: list)&#123;</div><div class="line">    result.add(f.apply(s));</div><div class="line">  &#125;</div><div class="line">  <span class="built_in">return</span> result;</div><div class="line">&#125;</div><div class="line">List&lt;Integer&gt; l = map(</div><div class="line">Arrays.asList(<span class="string">"lambdas"</span>,<span class="string">"in"</span>,<span class="string">"action"</span>),</div><div class="line">(String s) -&gt; s.length()</div><div class="line">);</div></pre></td></tr></table></figure></t,></p>
+<p>Java类型要么是引用类型（比如Byte、Integer、Object、List），要么是原始类型（比如int、double、byte、char）。但是泛型（比如Consumer<t> 中的T）只能绑定到引用类型。这是由泛型内部的实现方式造成的.因此，在Java里有一个将原始类型转换为对应的引用类型的机制。这个机制叫作装箱（boxing）。相反的是拆箱操作。</t></p>
+<h2 id="类型检查、类型推断以及限制"><a href="#类型检查、类型推断以及限制" class="headerlink" title="类型检查、类型推断以及限制"></a>类型检查、类型推断以及限制</h2><h3 id="类型检查"><a href="#类型检查" class="headerlink" title="类型检查"></a>类型检查</h3><p>Lambda的类型是从使用Lambda的上下文推断。上下文中Lambda表达式的需要的类型称为目标类型。<br><img src="/2017/12/02/java8/Lambda类型检查.png" alt=""><br>首先，你要找出filter方法的声明。<br>第二，要求它是Predicate<apple>（目标类型）对象的第二个正式参数。<br>第三，Predicate<apple>是一个函数式接口，定义了一个叫作test的抽象方法<br>第四，test 方法描述了一个函数描述符，它可以接受一个 Apple ，并返回一个 boolean 。<br>最后，filter 的任何实际参数都必须匹配这个要求</apple></apple></p>
+<h3 id="同样的Lambda，不同的接口"><a href="#同样的Lambda，不同的接口" class="headerlink" title="同样的Lambda，不同的接口"></a>同样的Lambda，不同的接口</h3><p>有了目标类型的概念，同一个Lambda表达式就可以与不同的函数式接口联系起来，只要它们的抽象方法签名能够兼容。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Callable&lt;Integer&gt; c = () -&gt; 42;</div><div class="line">PrivilegedAction&lt;Integer&gt; p = () -&gt; 42;</div></pre></td></tr></table></figure></p>
+<p>类型检查<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">为什么下面的代码不能编译</div><div class="line">Object o = () -&gt; &#123;System.out.println(<span class="string">"Tricky example"</span>); &#125;;</div><div class="line">答案：Lambda表达式的上下文是 Object （目标类型） 。但 Object 不是一个函数式接口。</div><div class="line">为了解决这个问题，你可以把目标类型改成 Runnable ，它的函数描述符是 () -&gt; void ：</div><div class="line">Runnable r = () -&gt; &#123;System.out.println(<span class="string">"Tricky example"</span>); &#125;;</div></pre></td></tr></table></figure></p>
+<h3 id="类型推断"><a href="#类型推断" class="headerlink" title="类型推断"></a>类型推断</h3><p>Java编译器会从上下文（目标类型）推断出用什么函数式接口来配合Lambda表达式，这意味着它也可以推断出适合Lambda的签名，因为函数描述符可以通过目标类型来得到。显示类型可读性更高<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Comparator&lt;Apple&gt; c =</div><div class="line">(Apple a1, Apple a2) -&gt; a1.getWeight().compareTo(a2.getWeight());</div><div class="line">Comparator&lt;Apple&gt; c =</div><div class="line">(a1, a2) -&gt; a1.getWeight().compareTo(a2.getWeight())</div></pre></td></tr></table></figure></p>
+<h3 id="使用局部变量"><a href="#使用局部变量" class="headerlink" title="使用局部变量"></a>使用局部变量</h3><p>Lambda表达式也允许使用自由变量（不是参数，而是在外层作用域中定义的变量），就像匿名类一样。 它们被称作捕获Lambda。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">int portNumber = 1337;</div><div class="line">Runnable r = () -&gt; System.out.println(portNumber);</div></pre></td></tr></table></figure></p>
+<p>Lambda可以没有限制地捕获（也就是在其主体中引用）实例变量和静态变量。但局部变量必须显式声明为 final ，或事实上是final 。换句话说，Lambda表达式只能捕获指派给它们的局部变量一次。（注：捕获实例变量可以被看作捕获最终局部变量 this） 例如，下面的代码无法编译，因为 portNumber变量被赋值两次<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">int portNumber = 1337;</div><div class="line">Runnable r = () -&gt; System.out.println(portNumber);</div><div class="line">portNumber = 31337</div></pre></td></tr></table></figure></p>
+<p>为什么局部变量有这些限制。<br>第一，实例变量和局部变量背后的实现有一个关键不同。实例变量都存储在堆中，而局部变量则保存在栈上。如果Lambda可以直接访问局部变量，而且Lambda是在一个线程中使用的，则使用Lambda的线程，可能会在分配该变量的线程将这个变量收回之后，去访问该变量。因此，Java在访问自由局部变量时，实际上是在访问它的副本，而不是访问原始变量。如果局部变量仅仅赋值一次那就没有什么区别了——因此就有了这个限制。<br>第二，这一限制不鼓励你使用改变外部变量的典型命令式编程模式.<br>闭包<br>你可能已经听说过闭包（closure，不要和Clojure编程语言混淆）这个词，你可能会想Lambda是否满足闭包的定义。用科学的说法来说，闭包就是一个函数的实例，且它可以无限制地访问那个函数的非本地变量。例如，闭包可以作为参数传递给另一个函数。它也可以访问和修改其作用域之外的变量。现在，Java 8的Lambda和匿名类可以做类似于闭包的事情：它们可以作为参数传递给方法，并且可以访问其作用域之外的变量。但有一个限制：它们不能修改定义Lambda的方法的局部变量的内容。 这些变量必须是隐式最终的。 可以认为Lambda是对值封闭，而不是对变量封闭。如前所述，这种限制存在的原因在于局部变量保存在栈上，并且隐式表示它们仅限于其所在线程。如果允许捕获可改变的局部变量，就会引发造成线程不安全的新的可能性，而这是我们不想看到的（实例变量可以，因为它们保存在堆中，而堆是在线程之间共享的） 。</p>
+<h2 id="方法引用"><a href="#方法引用" class="headerlink" title="方法引用"></a>方法引用</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">inventory.sort(comparing(Apple::getWeight));</div></pre></td></tr></table></figure>
+<h3 id="管中窥豹"><a href="#管中窥豹" class="headerlink" title="管中窥豹"></a>管中窥豹</h3><p>如果一个Lambda代表的只是直接调用这个方法，那最好还是用名称来调用它，而不是去描述如何调用它。事实上，方法引用就是让你根据已有的方法实现来创建Lambda表达式。但是，显式地指明方法的名称，你的代码的可读性会更好。<br>当你需要使用方法引用时，目标引用放在分隔符 :: 前，方法的名称放在后面。例如，Apple::getWeight 就是引用了 Apple 类中定义的方法 getWeight，，不需要括号，因为你没有实际调用这个方法。<br>构建方法引用的方式：</p>
+<ol>
+<li>指向静态方法的引用(Integer.parseInt方法，写做Integer::parseInt)</li>
+<li>指向任意实例化类型方法的方法引用，(String的length写做String::length)</li>
+<li>指向现有对象的实例方法的方法引用（假设你有一个局部变量expensiveTransaction用于存放 Transaction 类型的对象，它支持实例方法getValue ，那么你就可以写 expensive-Transaction::getValue ）</li>
+</ol>
+<p>二种和第三种方法引用可能乍看起来有点儿晕。类似于 String::length 的第二种方法引用的思想就是你在引用一个对象的方法，而这个对象本身是Lambda的一个参数。例如，Lambda表达式 (String s) -&gt; s.toUppeCase() 可以写作 String::toUpperCase。但第三种方法引用指的是，你在Lambda中调用一个已经存在的外部对象中的方法。例如，Lambda表达式()-&gt; expensiveTransaction.getValue() 可以写作expensiveTransaction::getValue。<br><img src="/2017/12/02/java8/lambda方法引用.png" alt=""></p>
+<h3 id="构造函数引用"><a href="#构造函数引用" class="headerlink" title="构造函数引用"></a>构造函数引用</h3><p>你可以利用它的名称和关键字new来创建它的一个引用：ClassName::new。它的功能与指向静态方法的引用类似。假设有一个构造函数没有参数，它适合Supplier的签名() -&gt; Apple。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">//无参数的构造函数</div><div class="line">Supplier&lt;Apple&gt; c1=Apple::new;</div><div class="line">Apple a=c1.get();</div><div class="line">或者</div><div class="line">Supplier&lt;Apple&gt; c1=()-&gt;new Apple();</div><div class="line">//带参数的构造函数</div><div class="line">Function&lt;Integer,Apple&gt; <span class="keyword">function</span>=Apple::new;</div><div class="line">等价于</div><div class="line">Function&lt;Integer,Apple&gt; <span class="keyword">function</span>=(weight)-&gt;new Apple(weight);</div><div class="line">Apple a=function.apply(110);</div><div class="line">//两个参数的构造函数</div><div class="line">BiFunction&lt;String,Integer,Apple&gt; biFunction=Apple::new;</div><div class="line">BiFunction&lt;String,Integer,Apple&gt; biFunction=(color,weight)-&gt;new Apple(color,weight);</div><div class="line">Apple a=biFunction.apply(<span class="string">"red"</span>,100);</div></pre></td></tr></table></figure></p>
+<h2 id="Lambda和方法引用实战"><a href="#Lambda和方法引用实战" class="headerlink" title="Lambda和方法引用实战"></a>Lambda和方法引用实战</h2><h2 id="复合Lambda表达式的有用方法"><a href="#复合Lambda表达式的有用方法" class="headerlink" title="复合Lambda表达式的有用方法"></a>复合Lambda表达式的有用方法</h2><p>许多函数式接口，比如用<br>于传递Lambda表达式的 Comparator 、Function 和 Predicate 都提供了允许你进行复合的方法。可以让两个谓词之间做一个 or 操作，组合成一个更大的谓词。而且，你还可以让一个函数的结果成为另一个函数的输入。窍门在于，我们即将介绍的方法都是默认方法。</p>
+<h3 id="比较器复合"><a href="#比较器复合" class="headerlink" title="比较器复合"></a>比较器复合</h3><h4 id="逆序"><a href="#逆序" class="headerlink" title="逆序"></a>逆序</h4><p>按照重量递减排序<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">inventory.sort(comparing(Apple::getWeight).reversed());</div></pre></td></tr></table></figure></p>
+<h4 id="比较器链"><a href="#比较器链" class="headerlink" title="比较器链"></a>比较器链</h4><p>按照重量递减排序,相同体重的苹果在根据国家排序<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">inventory.sort(comparing(Apple::getWeight).reversed().thenComparing(Apple::getCountry));</div></pre></td></tr></table></figure></p>
+<h3 id="谓词复合"><a href="#谓词复合" class="headerlink" title="谓词复合"></a>谓词复合</h3><p>谓词接口包括三个接口:negate、and和or，可以让你重用已有的predicate来创建更复杂的谓词。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">//苹果不是红的</div><div class="line">Predicate&lt;Apple&gt; notRedApple=redApple.negate();</div><div class="line">//苹果又红又重</div><div class="line">Predicate&lt;Apple&gt; redAndHeavyApples=redApple.and(a-&gt;a.ggetWeight()&gt;150);</div><div class="line">//又红又重的苹果或者绿苹果,a.and(b).or(c),代表(a&amp;b)||c,从左到右确定优先级</div><div class="line">Predicate&lt;Apple&gt; redAndHeadvyOrGreen=redApple.and(a-&gt;a.getWeight()&gt;150).or(a-&gt;a.getColor().equals(<span class="string">"green"</span>));</div></pre></td></tr></table></figure></p>
+<h3 id="函数复合"><a href="#函数复合" class="headerlink" title="函数复合"></a>函数复合</h3><p>可以把Function接口所代表的Lambda表达式复合，Function提供了andThen和compose两个默认方法，它们都返回一个Function的实例。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">default &lt;V&gt; Function&lt;V, R&gt; compose(Function&lt;? super V, ? extends T&gt; before) &#123;</div><div class="line">       Objects.requireNonNull(before);</div><div class="line">       <span class="built_in">return</span> (V v) -&gt; apply(before.apply(v));</div><div class="line">   &#125;</div><div class="line">default &lt;V&gt; Function&lt;T, V&gt; andThen(Function&lt;? super R, ? extends V&gt; after) &#123;</div><div class="line">     Objects.requireNonNull(after);</div><div class="line">     <span class="built_in">return</span> (T t) -&gt; after.apply(apply(t));</div><div class="line"> &#125;</div><div class="line">Function&lt;Integer, Integer&gt; f= x -&gt; x + 1;</div><div class="line">Function&lt;Integer, Integer&gt; g= x -&gt; x * 2;</div><div class="line">对于g(f(x))</div><div class="line">Function&lt;Integer,Integer&gt; h=f.andThen(g);</div><div class="line">Function&lt;Integer,Integer&gt; h=g.compose(f);</div><div class="line">int result=h.apply(1);</div></pre></td></tr></table></figure></p>
+<p>用String表示一封信的文本转换<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">public class Letter &#123;</div><div class="line">	public static String addHeader(String text) &#123;</div><div class="line">		<span class="built_in">return</span> <span class="string">"From Raoul, Mario and Alan: "</span> + text;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	public static String addFooter(String text) &#123;</div><div class="line">		<span class="built_in">return</span> text + <span class="string">" Kind regards"</span>;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	public static String checkSpelling(String text) &#123;</div><div class="line">		<span class="built_in">return</span> text.replaceAll(<span class="string">"labda"</span>, <span class="string">"lambda"</span>);</div><div class="line">	&#125;</div><div class="line">  Function&lt;String, String&gt; addHeader =Letter::addHeader;</div><div class="line">  Function&lt;String, String&gt; transformationPipeline=addHeader.andThen(Letter::checkSpelling).andThen(Letter::addFooter);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h1 id="函数式数据处理"><a href="#函数式数据处理" class="headerlink" title="函数式数据处理"></a>函数式数据处理</h1><h2 id="引入流"><a href="#引入流" class="headerlink" title="引入流"></a>引入流</h2><p>流允许你使用声明性方式处理数据集合，就现在来说，你可以把他们看成遍历数据集的高级迭代器，此外，流可以透明并行处理。下面两段代码都是用来返回低热量的菜肴名称的，并按照卡路里排序。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">//java7</div><div class="line">List&lt;Dish&gt; lowCaloricDishes = new ArrayList&lt;&gt;();</div><div class="line"><span class="keyword">for</span>(Dish d: menu)&#123;</div><div class="line">  <span class="keyword">if</span>(d.getCalories() &lt; 400)&#123;</div><div class="line">   lowCaloricDishes.add(d);</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line">Collections.sort(lowCaloricDishes, new Comparator&lt;Dish&gt;() &#123;</div><div class="line">  public int compare(Dish d1, Dish d2)&#123;</div><div class="line">     <span class="built_in">return</span> Integer.compare(d1.getCalories(), d2.getCalories());</div><div class="line">  &#125;</div><div class="line">&#125;);</div><div class="line">List&lt;String&gt; lowCaloricDishesName = new ArrayList&lt;&gt;();</div><div class="line"><span class="keyword">for</span>(Dish d: lowCaloricDishes)&#123;</div><div class="line"> lowCaloricDishesName.add(d.getName());</div><div class="line">&#125;</div><div class="line">//java8</div><div class="line">menu.parallelStream()</div><div class="line">				.filter((Dish d) -&gt; d.getCalories() &lt; 400)</div><div class="line">				.sorted((Dish d1, Dish d2) -&gt; d1.getCalories()</div><div class="line">				- d2.getCalories()).map((Dish d)-&gt;d.name).collect(toList());</div></pre></td></tr></table></figure></p>
+<h2 id="流简介"><a href="#流简介" class="headerlink" title="流简介"></a>流简介</h2><p>从支持数据处理操作的源生成的元素序列。集合强调的是数据，流强调的是计算</p>
+<ul>
+<li>元素序列–流提供了一个接口，可以访问特定元素类型的一组有序值。</li>
+<li>源–流会使用提供数据的源，如集合、数组或输入输出资源。从有序集合生成流时会保留原有的顺序。由列表生成的流，其元素顺序与列表一致。</li>
+<li>数据处理操作–流的数据处理功能类似于数据库的操作，如filter、map、reduce、find、match、sort。流操作可以顺序执行，也可以并行执行。<br>流操作的特点</li>
+<li>流水线–很多流操作本身会返回一个流，这样多个操作就可以链接起来，形成一个大的流水线。</li>
+<li>内部迭代–使用迭代器显式迭代的集合不同，流的迭代操作是在背后进行的。</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">menu.parallelStream()</div><div class="line">				.filter((d) -&gt; d.getCalories() &lt; 500).limit(1)</div><div class="line">				.map((d) -&gt; d.getName()).collect(Collectors.toList());</div></pre></td></tr></table></figure>
+<p><img src="/2017/12/02/java8/menu.png" alt=""></p>
+<h2 id="流与集合"><a href="#流与集合" class="headerlink" title="流与集合"></a>流与集合</h2><p>java现有的集合概念和新的流概念都提供了接口，来代表元素型有序值的有序接口。所谓有序，就是我们一般按照顺序取用值，而不是随机取用。<br>集合和流的之间的差异在于什么时候进行计算。集合是内存的数据结构，它包含数据结构目前所有值–集合中每个元素都得算出来才能添加到集合里面。（你可以往集合里加东西或者删东西，但是不管什么时候，集合中的每个元素都是放在内存里的，元素都得先算出来才能成为集合的一部分。）流在概念上是固定的数据结构，你不能添加或者删除元素，其元素是按需计算的。类比质数流，尽管质数有无穷多个，但是仅仅从流提取需要的值，这样实现会很简单。这是一种生产者消费者关系，换另外的角度来讲，流就像是个延迟创建的集合：只有在消费者要求的时候才会计算其值。而集合是急切创建的，以质数为例，要想创建一个包含所有质数的集合，那么集合永远创建不完，消费者永远获取不到这个集合。</p>
+<h3 id="只能遍历一次"><a href="#只能遍历一次" class="headerlink" title="只能遍历一次"></a>只能遍历一次</h3><p>和迭代器类似，流只能遍历一次，遍历完后，这个流就已经被消费掉了，你可以从原始数据源那里在获得一个新的流重新遍历一遍。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">List&lt;String&gt; title = Arrays.asList(<span class="string">"Java8"</span>, <span class="string">"In"</span>, <span class="string">"Action"</span>);</div><div class="line">Stream&lt;String&gt; s = title.stream();</div><div class="line">s.forEach(System.out::println);</div><div class="line">//java.lang.IllegalStateException:流已被操作</div><div class="line">或关闭</div><div class="line">s.forEach(System.out::println);</div></pre></td></tr></table></figure></p>
+<h3 id="外部迭代与内部迭代"><a href="#外部迭代与内部迭代" class="headerlink" title="外部迭代与内部迭代"></a>外部迭代与内部迭代</h3><h4 id="用for-Each循环外部迭代"><a href="#用for-Each循环外部迭代" class="headerlink" title="用for-Each循环外部迭代"></a>用for-Each循环外部迭代</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">List&lt;String&gt; names = new ArrayList&lt;&gt;();</div><div class="line"><span class="keyword">for</span>(Dish d: menu)&#123;</div><div class="line">  names.add(d.getName());</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="用背后迭代器"><a href="#用背后迭代器" class="headerlink" title="用背后迭代器"></a>用背后迭代器</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">List&lt;String&gt; names = new ArrayList&lt;&gt;();</div><div class="line">Iterator&lt;String&gt; iterator = menu.iterator();</div><div class="line"><span class="keyword">while</span>(iterator.hasNext()) &#123;</div><div class="line">   Dish d = iterator.next();</div><div class="line">   names.add(d.getName());</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="流：内部迭代"><a href="#流：内部迭代" class="headerlink" title="流：内部迭代"></a>流：内部迭代</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">List&lt;String&gt; names=menu.stream().map(d-&gt;d.getName()).collect(Collectors.toList());</div></pre></td></tr></table></figure>
+<p><img src="/2017/12/02/java8/迭代.png" alt=""></p>
+<h2 id="流操作"><a href="#流操作" class="headerlink" title="流操作"></a>流操作</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">List&lt;String&gt; name=menu.stream().filter(d-&gt;d.getCalories()&lt;300).map(d-&gt;g.getName())<span class="built_in">limit</span>(3).collect(Collectors.toList());</div></pre></td></tr></table></figure>
+<p>filter、map、limit可以连成一条流水线，collect触发流水线执行并关闭。可以连起来的流操作称为中间操作，关闭流的操作称为终端操作。</p>
+<h3 id="中间操作"><a href="#中间操作" class="headerlink" title="中间操作"></a>中间操作</h3><p>诸如filter、sorted等中间操作会返回另外一个流，这让多个操作可以连接起来形成一个查询。除非流水线触发一个终端操作，否则中间操作不会执行任何处理。</p>
+<h3 id="终端操作"><a href="#终端操作" class="headerlink" title="终端操作"></a>终端操作</h3><p>终端操作会从流的流水线生成结果，其结果是任何不是流的值，比如List、Integer甚至是void。</p>
+<h3 id="使用流"><a href="#使用流" class="headerlink" title="使用流"></a>使用流</h3><p>一个数据源来执行一个查询、一个中间操作链形成一条流的流水线、一个终端形成流水线，并能生成结果。<br>中间操作：<br>filter|Stream<t>|Predicate<t>|T-&gt;boolean<br>map|Stream<t>|Function<t,r>|T-&gt;R<br>limit|Stream<t><br>sorted|Stream<t>|Comparator<t>|(T,T)-&gt;int<br>distinct|Stream<t><br>终端操作<br>forEach 消费流中的每个元素并对其使用应用Lambda。这一操作返回void。<br>count 消费流中的元素个数，返回long<br>collect 把流规约成一个集合，比如list、map甚至是Integer。</t></t></t></t></t,r></t></t></t></p>
+<h1 id="使用流-1"><a href="#使用流-1" class="headerlink" title="使用流"></a>使用流</h1><h2 id="筛选和切片"><a href="#筛选和切片" class="headerlink" title="筛选和切片"></a>筛选和切片</h2><p>用谓词筛选，筛选出各不相同的元素，忽略流中的头几个元素，或将流截短至指定长度</p>
+<h3 id="用谓词筛选"><a href="#用谓词筛选" class="headerlink" title="用谓词筛选"></a>用谓词筛选</h3><p>streams支持filter方法<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">menu.stream().filter(Dish::isVegetarian).collect(toList());</div></pre></td></tr></table></figure></p>
+<h3 id="筛选各异的元素"><a href="#筛选各异的元素" class="headerlink" title="筛选各异的元素"></a>筛选各异的元素</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">numbers.stream().filter(i-&gt;i%2==0).distinct().forEach(System.out::println);</div></pre></td></tr></table></figure>
+<h3 id="截断流"><a href="#截断流" class="headerlink" title="截断流"></a>截断流</h3><p>limit(n)，会返回不超过n的流。</p>
+<h3 id="跳过流"><a href="#跳过流" class="headerlink" title="跳过流"></a>跳过流</h3><p>skip(n),返回一个扔掉前n个元素的流。</p>
+<h2 id="映射"><a href="#映射" class="headerlink" title="映射"></a>映射</h2><p>一个非常常见的数据处理套路就是从某些对象中选择信息。</p>
+<h3 id="对流中每个元素应用函数"><a href="#对流中每个元素应用函数" class="headerlink" title="对流中每个元素应用函数"></a>对流中每个元素应用函数</h3><p>流支持 map 方法，它会接受一个函数作为参数。这个函数会被应用到每个元素上，并将其映射成一个新的元素<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">List&lt;Integer&gt; wordLengths = words.stream().map(String::length).collect(toList());</div></pre></td></tr></table></figure></p>
+<h3 id="流的扁平化"><a href="#流的扁平化" class="headerlink" title="流的扁平化"></a>流的扁平化</h3><p>flatmap方法让你把一个流中的每个值都换成另一个流，然后把所有的流连接起来成为一个流<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">List&lt;String&gt; uniqueCharacters =words.stream().map(w -&gt;w.split(<span class="string">""</span>)).</div><div class="line">flatMap(Arrays::stream).distinct().collect(Collectors.toList());</div></pre></td></tr></table></figure></p>
+<p><img src="/2017/12/02/java8/flatmap.png" alt=""><br>给定两个数字列表，如何返回所有的数对<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">List&lt;Integer&gt; numbers1 = Arrays.asList(1, 2, 3);</div><div class="line">List&lt;Integer&gt; numbers2 = Arrays.asList(3, 4);</div><div class="line">List&lt;int[]&gt; pairs=numbers1.stream().flatMap(i-&gt;number2.stream().map(j-&gt;new int[]&#123;i,j&#125;)).collect(asList);</div></pre></td></tr></table></figure></p>
+<h2 id="查找和匹配"><a href="#查找和匹配" class="headerlink" title="查找和匹配"></a>查找和匹配</h2><h3 id="检查谓词至少符合一个元素"><a href="#检查谓词至少符合一个元素" class="headerlink" title="检查谓词至少符合一个元素"></a>检查谓词至少符合一个元素</h3><p>anyMatch可以回答流中是否有一个元素匹配给定谓词。nyMatch 方法返回一个boolean ，因此是一个终端操作。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">menu.stream().anyMatch(Dish::isVegetarian)&#123;</div><div class="line">  System.out.println(<span class="string">"The menu is (somewhat) vegetarian friendly!!"</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="检查谓词是否都符合所有元素"><a href="#检查谓词是否都符合所有元素" class="headerlink" title="检查谓词是否都符合所有元素"></a>检查谓词是否都符合所有元素</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">boolean isHealthy = menu.stream().allMatch(d-&gt;d.getCalories() &lt; 1000);</div></pre></td></tr></table></figure>
+<h3 id="noneMatch"><a href="#noneMatch" class="headerlink" title="noneMatch"></a>noneMatch</h3><p>确保流中没有任何元素与给定的谓词匹配.anyMatch 、 allMatch 和 noneMatch 这三个操作都用到了我们所谓的短路， 这就是大家熟悉的Java中 &amp;&amp; 和 || 运算符短路在流中的版本。</p>
+<h3 id="查找元素"><a href="#查找元素" class="headerlink" title="查找元素"></a>查找元素</h3><p>isPresent() 将在 Optional 包含值的时候返回 true , 否则返回 false 。<br>ifPresent(Consumer<t> block) 会在值存在的时候执行给定的代码块。Consumer 函数式接口；它让你传递一个接收 T 类型参数，并返回 void 的Lambda<br>表达式。<br>T get() 会在值存在时返回值，否则抛出一个 NoSuchElement 异常。<br>T orElse(T other) 会在值存在时返回值，否则返回一个默认值。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">menu.stream().filter(Dish::isVegetarian).findAny().ifPresent(d-&gt;System.out.println(d.getName());</div></pre></td></tr></table></figure></t></p>
+<h3 id="查找第一个元素"><a href="#查找第一个元素" class="headerlink" title="查找第一个元素"></a>查找第一个元素</h3><p>findFirst.如果你不关心返回的元素是哪个，请使用 findAny ，因为它在使用并行流<br>时限制较少。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Optional&lt;Integer&gt; firstSquareDivisibleByThree =someNumbers.stream()</div><div class="line">.map(x -&gt; x * x)</div><div class="line">.filter(x -&gt; x % 3 == 0)</div><div class="line">.findFirst();</div></pre></td></tr></table></figure></p>
+<h2 id="归约"><a href="#归约" class="headerlink" title="归约"></a>归约</h2><p>你将看到如何把一个流中的元素组合起来，使用reduce操作来表达更复杂的查询</p>
+<h3 id="元素求和"><a href="#元素求和" class="headerlink" title="元素求和"></a>元素求和</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">int sum = numbers.stream().reduce(0, (a, b) -&gt; a + b);</div><div class="line">//reduce 还有一个重载的变体，它不接受初始值，但是会返回一个 Optional 对象：</div><div class="line">Optional&lt;Integer&gt; sum = numbers.stream().reduce((a, b) -&gt; (a + b));</div></pre></td></tr></table></figure>
+<p>Integer 类现在有了一个静态的sum方法来对两个数求和，这恰好是我们想要的，用不着反复用Lambda写同一段代码了。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">int sum = numbers.stream().reduce(0, Integer::sum);</div></pre></td></tr></table></figure></p>
+<h3 id="最大值和最小值"><a href="#最大值和最小值" class="headerlink" title="最大值和最小值"></a>最大值和最小值</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Optional&lt;Integer&gt; max=numbers.stream().reduce(Integer::max);</div><div class="line">Optional&lt;Integer&gt; min=numbers.stream().reduce(Integer::min);</div></pre></td></tr></table></figure>
+<p>诸如map或filter等操作会从输入流中获取每一个元素，并在输出流中得到0或1个结果。这些操作一般都是无状态的：它们没有内部状态（假设用户提供的Lambda或方法引用没有内部可变状态）。但诸如reduce、sum、max等操作需要内部状态来累积结果。<br><img src="/2017/12/02/java8/stream.png" alt=""></p>
+<h2 id="数据值"><a href="#数据值" class="headerlink" title="数据值"></a>数据值</h2><h3 id="原始类型流特化"><a href="#原始类型流特化" class="headerlink" title="原始类型流特化"></a>原始类型流特化</h3><p>Java 8引入了三个原始类型特化流接口来解决这个问题：IntStream、DoubleStream 和LongStream ，分别将流中的元素特化为int、long和double ，从而避免了暗含的装箱成本。</p>
+<h4 id="映射到数值"><a href="#映射到数值" class="headerlink" title="映射到数值"></a>映射到数值</h4><p>将流转换为特化版本的常用方法是 mapToInt 、mapToDouble和mapToLong.如果流是空的，sum默认返回0。IntStream还支持其他的方便方法，如max、min 、 average<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">int calories = menu.stream().mapToInt(Dish::getCalories).sum();</div></pre></td></tr></table></figure></p>
+<h4 id="转换回对象流"><a href="#转换回对象流" class="headerlink" title="转换回对象流"></a>转换回对象流</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">OptionalInt maxCalories = menu.stream().mapToInt(Dish::getCalories)</div><div class="line">.max();</div></pre></td></tr></table></figure>
+<h4 id="默认值OptionalInt"><a href="#默认值OptionalInt" class="headerlink" title="默认值OptionalInt"></a>默认值OptionalInt</h4><p>Optional 可以用Integer 、 String 等参考类型来参数化。对于三种原始流特化，也分别有一个 Optional 原始类型特化版本： OptionalInt 、 OptionalDouble 和 OptionalLong 。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">OptionalInt max=menu.stream().mapToInt(Dish::getCalories).max();</div><div class="line">int m=max.orElse(1);</div></pre></td></tr></table></figure></p>
+<h3 id="数值范围"><a href="#数值范围" class="headerlink" title="数值范围"></a>数值范围</h3><p>Java 8引入了两个可以用于 IntStream 和 LongStream 的静态方法，帮助生成这种范围：range 和 rangeClosed 。 range 是不包含结束值的。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">IntStream evenNumbers = IntStream.rangeClosed(1, 100)</div><div class="line">.filter(n -&gt; n % 2 == 0);</div><div class="line">System.out.println(evenNumbers.count());</div></pre></td></tr></table></figure></p>
+<h2 id="构建流"><a href="#构建流" class="headerlink" title="构建流"></a>构建流</h2><h3 id="由值创建流"><a href="#由值创建流" class="headerlink" title="由值创建流"></a>由值创建流</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Stream&lt;String&gt; stream = Stream.of(<span class="string">"Java 8 "</span>, <span class="string">"Lambdas "</span>, <span class="string">"In "</span>);</div></pre></td></tr></table></figure>
+<h3 id="由数组创建流"><a href="#由数组创建流" class="headerlink" title="由数组创建流"></a>由数组创建流</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">int[] numbers=&#123;1,2,,3&#125;;</div><div class="line">int sum=Arrays.stream(numbers).sum();</div></pre></td></tr></table></figure>
+<h3 id="由文件生成流"><a href="#由文件生成流" class="headerlink" title="由文件生成流"></a>由文件生成流</h3><p>java.nio.file.Files 中的很多静态方法都会返回一个流。例如，一个很有用的方法是Files.lines ，它会返回一个由指定文件中的各行构成的字符串流。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">long uniqueWords=0;</div><div class="line">try&#123;</div><div class="line">  Stream&lt;String&gt; line=Files.lines(Paths.get(<span class="string">"data.txt"</span>),Charset.defaultCharset());</div><div class="line">  uniqueWords=line.flatMap(i-&gt;Arrays.stream(i.split(<span class="string">" "</span>))).distinct().count();</div><div class="line">&#125;catch(Exception e)&#123;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="创建无限流"><a href="#创建无限流" class="headerlink" title="创建无限流"></a>创建无限流</h3><h4 id="迭代"><a href="#迭代" class="headerlink" title="迭代"></a>迭代</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Stream.iterator(0,n-&gt;n+2).limit.forEach(System.out::println);</div></pre></td></tr></table></figure>
+<h4 id="生成"><a href="#生成" class="headerlink" title="生成"></a>生成</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Stream.generate(Math::random).limit(5).forEach(System.out::println);</div></pre></td></tr></table></figure>
+<h1 id="用流收集数据"><a href="#用流收集数据" class="headerlink" title="用流收集数据"></a>用流收集数据</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Map&lt;Currency,List&lt;Transaction&gt;&gt; transactionsByCurrencies=transactions.stream().collect(groupingBy(Transaction::getCurrency));</div></pre></td></tr></table></figure>
+<h2 id="收集器简介"><a href="#收集器简介" class="headerlink" title="收集器简介"></a>收集器简介</h2><p>多级分组里函数式版本只要再加上一个收集器就可以轻松地增强功能了。</p>
+<h3 id="收集器用做高级归约"><a href="#收集器用做高级归约" class="headerlink" title="收集器用做高级归约"></a>收集器用做高级归约</h3><p>Collector会对元素应用一个转换函数（很多时候是不体现任何效果的恒等转换例如toList），并将结果累积在一个数据结构中，从而产生这一过程的最终输出。Collectors实用类提供了很多静态工厂方法，可以方便地创建常见收集器的实例，只要拿来用就可以了。最直接和最常用的收集器是 toList静态方法，它会把流中所有的元素收集到一个 List 中。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">List&lt;Transaction&gt; transactions=transactionStream.collect(Collectors.toList());</div></pre></td></tr></table></figure></p>
+<h3 id="预定义收集器"><a href="#预定义收集器" class="headerlink" title="预定义收集器"></a>预定义收集器</h3><p>Collectors提供的工厂方法groupingBy创建的收集器，主要提供三大功能：把流元素归约和汇总为一个值、元素分组、元素分区</p>
+<h2 id="归约和汇总"><a href="#归约和汇总" class="headerlink" title="归约和汇总"></a>归约和汇总</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">long total=menu.stream().collect(counting());</div></pre></td></tr></table></figure>
+<h3 id="寻找流中最小值和最大值"><a href="#寻找流中最小值和最大值" class="headerlink" title="寻找流中最小值和最大值"></a>寻找流中最小值和最大值</h3><p>Collectors.maxBy 和Collectors.minBy ，来计算流中的最大或最小值。这两个收集器接收一个Comparator 参数来比较流中的元素<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">Comparator&lt;Dish&gt; dishCaloriesComparator =</div><div class="line">Comparator.comparingInt(Dish::getCalories);</div><div class="line">Optional&lt;Dish&gt; mostCalorieDish = menu.stream().collect(maxBy(dishCaloriesComparator));</div></pre></td></tr></table></figure></p>
+<h3 id="汇总"><a href="#汇总" class="headerlink" title="汇总"></a>汇总</h3><p>Collectors类专门为汇总提供了一个工厂方法：Collectors.summingInt。它可接受一个把对象映射为求和所需int的函数，并返回一个收集器；该收集器在传递给普通的collect方法后即执行我们需要的汇总操作。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">int totalCalories = menu.stream().collect(summingInt(Dish::getCalories));</div><div class="line">double average=menu.stream().collect(averagingInt(Dish::getCalories));</div><div class="line">IntSummaryStatistics menuStatistics =</div><div class="line">menu.stream().collect(summarizingInt(Dish::getCalories));</div><div class="line">IntSummaryStatistics&#123;count=9, sum=4300, min=120,average=477.777778, max=800&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="连接字符串"><a href="#连接字符串" class="headerlink" title="连接字符串"></a>连接字符串</h3><p>joining 工厂方法返回的收集器会把对流中每一个对象应用 toString 方法得到的所有字符串连接成一个字符串<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">String shortMenu = menu.stream().collect(joining(<span class="string">", "</span>));</div></pre></td></tr></table></figure></p>
+<h3 id="广义的归约汇总"><a href="#广义的归约汇总" class="headerlink" title="广义的归约汇总"></a>广义的归约汇总</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">//第一个参数是归约操作的起始值,第二个是转换函数，第三个是BinaryOperator，累积函数</div><div class="line">int totalCalories = menu.stream().collect(reducing(0, Dish::getCalories, (i, j) -&gt; i + j));</div></pre></td></tr></table></figure>
+<p>reduce 方法旨在把两个值结合起来生成一个新值，它是一个不可变的归约。与此相反， collect 方法的设计就是要改变容器，从而累积要输出的结果。使用 reduce 方法还会造成一个实际问题：这个归约过程不能并行工作，因为由多个线程并发修改同一个数据结构可能会破坏 List 本身。果你想要线程安全，就需要每次分配一个新的 List ，而对象分配又会影响性能。</p>
+<h2 id="分组"><a href="#分组" class="headerlink" title="分组"></a>分组</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">Map&lt;Dish.Type,List&lt;Dish&gt;&gt; map=menu.stream().collect(groupingBy(Dish::getType));</div><div class="line">public enum CaloricLevel &#123;</div><div class="line">   DIET, NORMAL, FAT</div><div class="line">&#125;</div><div class="line">Map&lt;CaloricLevel, List&lt;Dish&gt;&gt; caloricLevel = menu.stream().collect(</div><div class="line">groupingBy(</div><div class="line">dish-&gt;&#123;</div><div class="line">      <span class="keyword">if</span>(dish.getCalories() &lt;= 400)</div><div class="line">        <span class="built_in">return</span> CaloricLevel.DIET;</div><div class="line">      <span class="keyword">else</span> <span class="keyword">if</span>(dish.getCalories() &lt;= 700)</div><div class="line">        <span class="built_in">return</span> CaloricLevel.NORMAL;</div><div class="line">      <span class="keyword">else</span></div><div class="line">        <span class="built_in">return</span> CaloricLevel.FAT;</div><div class="line">&#125;));</div><div class="line">Map&lt;Dish.Type, Long&gt; typesCount = menu.stream().collect(groupingBy(</div><div class="line">Dish::getCalories,counting()</div><div class="line">));</div></pre></td></tr></table></figure>
+<h3 id="多级分组"><a href="#多级分组" class="headerlink" title="多级分组"></a>多级分组</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">Map&lt;Dish.Type, Map&lt;CaloricLevel, List&lt;Dish&gt;&gt;&gt; dishesByTypeCaloricLevel =</div><div class="line">menu.stream().collect(groupingBy(Dish::getType,groupingBy(dish -&gt; &#123;</div><div class="line">  <span class="keyword">if</span>(dish.getCalories()&lt;=400)</div><div class="line">    <span class="built_in">return</span> CaloricLevel.DIET;</div><div class="line">  <span class="keyword">else</span> <span class="keyword">if</span>(dish.getCalories()&lt;=700)</div><div class="line">    <span class="built_in">return</span> CaloricLevel.NORMAL;</div><div class="line">  <span class="keyword">else</span></div><div class="line">    <span class="built_in">return</span> CaloricLevel.FAT;</div><div class="line">&#125; )</div><div class="line">)</div><div class="line">);</div></pre></td></tr></table></figure>
+<h2 id="分区"><a href="#分区" class="headerlink" title="分区"></a>分区</h2><p>由一个谓词作为一个返回函数，分区函数返回一个布尔值，意味着分组Map的键值是boolean，最多可以分成两组-true是一组，false是一组。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Map&lt;Boolean, List&lt;Dish&gt;&gt; partitionedMenu =</div><div class="line">menu.stream().collect(partitioningBy(Dish::isVegetarian));</div></pre></td></tr></table></figure></p>
+<p><img src="/2017/12/02/java8/分区.png" alt=""></p>
+<h2 id="收集器接口"><a href="#收集器接口" class="headerlink" title="收集器接口"></a>收集器接口</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">public interface Collector&lt;T, A, R&gt; &#123;</div><div class="line">   Supplier&lt;A&gt; supplier();</div><div class="line">   BiConsumer&lt;A, T&gt; accumulator();</div><div class="line">   Function&lt;A, R&gt; finisher();</div><div class="line">   BinaryOperator&lt;A&gt; combiner();</div><div class="line">   Set&lt;Characteristics&gt; characteristics();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>T 是流中要收集的项目的泛型。<br>A 是累加器的类型，累加器是在收集过程中用于累积部分结果的对象。<br>R 是收集操作得到的对象（通常但并不一定是集合）的类型</p>
+<h3 id="理解collector接口声明的方法"><a href="#理解collector接口声明的方法" class="headerlink" title="理解collector接口声明的方法"></a>理解collector接口声明的方法</h3><h4 id="建立新的结果容器-supplier方法"><a href="#建立新的结果容器-supplier方法" class="headerlink" title="建立新的结果容器:supplier方法"></a>建立新的结果容器:supplier方法</h4><p>supplier 方法必须返回一个结果为空的 Supplier ，也就是一个无参数函数，在调用时它会创建一个空的累加器实例，供数据收集过程使用。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">public Supplier&lt;List&lt;T&gt;&gt; <span class="function"><span class="title">supplier</span></span>()&#123;</div><div class="line">  <span class="built_in">return</span> ()-&gt;new ArrayList&lt;T&gt;();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="把元素添加到结果容器-accumulator"><a href="#把元素添加到结果容器-accumulator" class="headerlink" title="把元素添加到结果容器:accumulator"></a>把元素添加到结果容器:accumulator</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">public BiConsumer&lt;List&lt;T&gt; ,T&gt;()&#123;</div><div class="line">  <span class="built_in">return</span> (list,item)-&gt;list.add(item);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="把结果应用最终转换：finisher"><a href="#把结果应用最终转换：finisher" class="headerlink" title="把结果应用最终转换：finisher"></a>把结果应用最终转换：finisher</h4><p>在遍历完流后， finisher 方法必须返回在累积过程的最后要调用的一个函数，以便将累加器对象转换为整个集合操作的最终结果<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">public Function&lt;List&lt;T&gt;, List&lt;T&gt;&gt; <span class="function"><span class="title">finisher</span></span>() &#123;</div><div class="line">     <span class="built_in">return</span> Function.identity();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><img src="/2017/12/02/java8/顺序归约.png" alt=""></p>
+<h4 id="合并两个结果容器"><a href="#合并两个结果容器" class="headerlink" title="合并两个结果容器"></a>合并两个结果容器</h4><p>四个方法中的最后一个—— combiner 方法会返回一个供归约操作使用的函数，它定义了对流的各个子部分进行并行处理时，各个子部分归约所得的累加器要如何合并。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">public BinaryOperator&lt;List&lt;T&gt;&gt; <span class="function"><span class="title">combiner</span></span>() &#123;</div><div class="line">   <span class="built_in">return</span> (list1, list2) -&gt; &#123;list1.addAll(list2);<span class="built_in">return</span> list1; &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><img src="/2017/12/02/java8/combine规约.png" alt=""></p>
+<h4 id="characteristics方法"><a href="#characteristics方法" class="headerlink" title="characteristics方法"></a>characteristics方法</h4><p>characteristics 会返回一个不可变的 Characteristics 集合， 它定义<br>了收集器的行为:<br>UNORDERED ——归约结果不受流中项目的遍历和累积顺序的影响。<br>CONCURRENT —— accumulator 函数可以从多个线程同时调用，且该收集器可以并行归<br>约流。如果收集器没有标为 UNORDERED ，那它仅在用于无序数据源时才可以并行归约<br>IDENTITY_FINISH ——这表明完成器方法返回的函数是一个恒等函数，可以跳过。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">import java.util.*;</div><div class="line">import java.util.function.*;</div><div class="line">import java.util.stream.Collector;</div><div class="line">import static java.util.stream.Collector.Characteristics.*;</div><div class="line">public class ToListCollector&lt;T&gt; implements Collector&lt;T, List&lt;T&gt;, List&lt;T&gt;&gt; &#123;</div><div class="line">@Override</div><div class="line">public Supplier&lt;List&lt;T&gt;&gt; <span class="function"><span class="title">supplier</span></span>() &#123;</div><div class="line"><span class="built_in">return</span> ArrayList::new;</div><div class="line">&#125;</div><div class="line">@Override</div><div class="line">public BiConsumer&lt;List&lt;T&gt;, T&gt; <span class="function"><span class="title">accumulator</span></span>() &#123;</div><div class="line"><span class="built_in">return</span> List::add;</div><div class="line">&#125;</div><div class="line">@Override</div><div class="line">public Function&lt;List&lt;T&gt;, List&lt;T&gt;&gt; <span class="function"><span class="title">finisher</span></span>() &#123;</div><div class="line"><span class="built_in">return</span> Function.indentity();</div><div class="line">&#125;</div><div class="line">@Override</div><div class="line">public BinaryOperator&lt;List&lt;T&gt;&gt; <span class="function"><span class="title">combiner</span></span>() &#123;</div><div class="line"><span class="built_in">return</span> (list1, list2) -&gt; &#123;</div><div class="line">list1.addAll(list2);</div><div class="line"><span class="built_in">return</span> list1;</div><div class="line">&#125;;</div><div class="line">&#125;</div><div class="line">@Override</div><div class="line">public Set&lt;Characteristics&gt; <span class="function"><span class="title">characteristics</span></span>() &#123;</div><div class="line"><span class="built_in">return</span> Collections.unmodifiableSet(EnumSet.of(</div><div class="line">IDENTITY_FINISH, CONCURRENT));</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">List&lt;Dish&gt; dishes = menuStream.collect(</div><div class="line">new ToListCollector&lt;Dish&gt;()</div><div class="line">);</div></pre></td></tr></table></figure></p>
+<h1 id="并行数据处理与性能"><a href="#并行数据处理与性能" class="headerlink" title="并行数据处理与性能"></a>并行数据处理与性能</h1><h2 id="并行流"><a href="#并行流" class="headerlink" title="并行流"></a>并行流</h2><p>行流就是一个把内容分成多个数据块，并用不同的线程分别处理每个数据块的流。这样一来，你就可以自动把给定操作的工作负荷分配给多核处理器的所有内核，让它们都忙起来。</p>
+<h2 id="并行流-1"><a href="#并行流-1" class="headerlink" title="并行流"></a>并行流</h2><p>可以通过对收集源调用parallelStream把集合转换成并行流。并行流就是把一个内容分成多个数据块，并用不同的线程分别处理每个数据块的流。</p>
+<h3 id="将顺序流转化成并行流"><a href="#将顺序流转化成并行流" class="headerlink" title="将顺序流转化成并行流"></a>将顺序流转化成并行流</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">public static long sequentialSum(long n) &#123;</div><div class="line">		<span class="built_in">return</span> Stream.iterate(1L, i -&gt; i + 1)</div><div class="line">		.limit(n)</div><div class="line">		.reduce(0L, Long::sum);</div><div class="line">&#125;</div><div class="line">public static long parallelSum(long n) &#123;</div><div class="line">  	<span class="built_in">return</span> Stream.iterate(1L, i -&gt; i + 1)</div><div class="line">  	.limit(n)</div><div class="line">  	.parallel()</div><div class="line">  	.reduce(0L, Long::sum);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>并行流内部使用了默认的 ForkJoinPool，它默认的线程数量 就是 你 的 处 理器 数 量 ， 这个 值 是 由 Runtime.getRuntime().available-<br>Processors() 得到的。但是你可以通过系统属性 java.util.concurrent.ForkJoinPool.common.<br>parallelism来改变线程池大小，如下所示：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">System.setProperty(<span class="string">"java.util.concurrent.ForkJoinPool.common.parallelism"</span>,<span class="string">"12"</span>);</div></pre></td></tr></table></figure></p>
+<h3 id="测量流性能"><a href="#测量流性能" class="headerlink" title="测量流性能"></a>测量流性能</h3><p>真实的情况反而并发流反而更慢了，造成的原因有两点</p>
+<ol>
+<li>iterate生成的是装箱的对象，必须拆箱成数字才能求和.</li>
+<li>我们很难把 iterate 分成多个独立块来并行执行;因为每次应用这个函数都要依赖前一次应用的结果.</li>
+</ol>
+<p>更有效的针对方案：<br>LongStream.rangeClosed 直接产生原始类型的 long 数字，没有装箱拆箱的开销。<br>LongStream.rangeClosed 会生成数字范围,很容易拆分为独立的小块<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">public static long rangedSum(long n)&#123;</div><div class="line">		<span class="built_in">return</span> LongStream.rangeClosed(0, n).reduce(0L,Long::sum );</div><div class="line">	&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="正确使用并行流"><a href="#正确使用并行流" class="headerlink" title="正确使用并行流"></a>正确使用并行流</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">public static long sideEffectSum(long n) &#123;</div><div class="line">Accumulator accumulator = new Accumulator();</div><div class="line">LongStream.rangeClosed(1, n).forEach(accumulator::add);</div><div class="line"><span class="built_in">return</span> accumulator.total;</div><div class="line">&#125;</div><div class="line">public class Accumulator &#123;</div><div class="line">public long total = 0;</div><div class="line">public void add(long value) &#123; total += value; &#125;</div><div class="line">&#125;</div><div class="line">public static long sideEffectParallelSum(long n) &#123;</div><div class="line">Accumulator accumulator = new Accumulator();</div><div class="line">LongStream.rangeClosed(1,n).parallel().forEach(accumulator::add);</div><div class="line"><span class="built_in">return</span> accumulator.total;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>因为它在本质上就是顺序的。每次访问 total 都会出现数据竞争。如果你尝试用同步来修复，那就完全失去并行的意义了.这回方法的性能无关紧要了，唯一要紧的是每次执行都会返回不同的结果，都离正确值<br>50000005000000 差很远。这是由于多个线程在同时访问累加器，执行 total += value ，而这一句虽然看似简单，却不是一个原子操作。问题的根源在于，forEach 中调用的方法有副作用，它会改变多个线程共享的对象的可变状态。</p>
+<h3 id="高效使用并行流"><a href="#高效使用并行流" class="headerlink" title="高效使用并行流"></a>高效使用并行流</h3><ul>
+<li>如果有疑问，测量。</li>
+<li>留意装箱。自动装箱和拆箱操作会大大降低性能。java8的原始类型流（IntStream、DoubleStream、LongStream）来避免这些操作。</li>
+<li>有些操作本身在并行流上的性能比顺序流的性能要差。特别是findFirst和limit这些依赖于元素顺序。</li>
+<li>还要考虑流操作流水线的总计算成本。N是要处理的元素总数，Q是一个元素通过流水线的大致成本，N*Q是对这个成本的粗略估计，Q值比较高时代表使用并行流性能好的可能性比较大。</li>
+<li>对于较小的数据量，选择并行流不是个好的选择</li>
+<li>要考虑流的数据结构是否容易分解ArrayList的拆分效率比LinkedList拆分效率高，后者需要遍历。</li>
+<li>流自身的特点，以及流水线中的中间操作修改流的方式，都可能会改变分解过程的性能</li>
+<li>还要考虑终端操作中合并步骤的代价是大是小</li>
+</ul>
+<p><img src="/2017/12/02/java8/流拆分性能.png" alt=""></p>
+<h2 id="分支-合并框架"><a href="#分支-合并框架" class="headerlink" title="分支/合并框架"></a>分支/合并框架</h2><h3 id="使用RecursiveTask"><a href="#使用RecursiveTask" class="headerlink" title="使用RecursiveTask"></a>使用RecursiveTask</h3><p><img src="/2017/12/02/java8/使用RecursiveTask.png" alt=""></p>
+<h3 id="工作窃取"><a href="#工作窃取" class="headerlink" title="工作窃取"></a>工作窃取</h3><p>分支/合并框架工程用一种称为工作窃取（work stealing）的技术来解决这个问题。在实际应用中，这意味着这些任务差不多被平均分配到ForkJoinPool 中的所有线程上。每个线程都为分配给它的任务保存一个双向链式队列，每完成一个任务，就会从队列头上取出下一个任务开始执行。基于前面所述的原因，某个线程可能早早完成了分配给它的所有任务，也就是它的队列已经空了，而其他的线程还很忙。这时，这个线程并没有闲下来，而是随机选了一个别的线程，从队列的尾巴上“偷走”一个任务。这个过程一直继续下去，直到所有的任务都执行完毕，所有的队列都清空。<br><img src="/2017/12/02/java8/工作窃取.png" alt=""></p>
+<h2 id="Spliterator"><a href="#Spliterator" class="headerlink" title="Spliterator"></a>Spliterator</h2><p>Spliterator是Java8中加入的另一个新接口；这个名字代表“可分迭代器”（splitable iterator）。和 Iterator 一样，Spliterator 也用于遍历数据源中的元素，但它是为了并行执行而设计的。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">public interface Spliterator&lt;T&gt; &#123;</div><div class="line"> boolean tryAdvance(Consumer&lt;? super T&gt; action);</div><div class="line"> Spliterator&lt;T&gt; trySplit();</div><div class="line"> long estimateSize();</div><div class="line"> int characteristics();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>T 是 Spliterator 遍历的元素的类型。tryAdvance方法的行为类似于普通的Iterator，因为它会按顺序一个一个使用Spliterator中的元素，并且如果还有其他元素要遍历就返回true。但trySplit是专为 Spliterator接口设计的，因为它可以把一些元素划出去分给第二个Spliterator（由该方法返回），让它们两个并行处理。Spliterator还可通过estimateSize方法估计还剩下多少元素要遍历，因为即使不那么确切，能快速算出来是一个值,也有助于让拆分均匀一点.<br><img src="/2017/12/02/java8/递归拆分.png" alt=""><br><img src="/2017/12/02/java8/spliterator.png" alt=""></p>
+<h1 id="默认方法-1"><a href="#默认方法-1" class="headerlink" title="默认方法"></a>默认方法</h1><p>Java 8中的接口现在支持在声明方法的同时提供实现，这听起来让人惊讶！通过两种方式可以完成这种操作。其一，Java 8允许在接口内声明静态方法。其二，Java 8引入了一个新功能，叫默认方法，通过默认方法你可以指定接口方法的默认实现。换句话说，接口能提供方法的具体实现。因此，实现接口的类如果不显式地提供该方法的具体实现，就会自动继承默认的实现。</p>
+<h2 id="不断演进Api"><a href="#不断演进Api" class="headerlink" title="不断演进Api"></a>不断演进Api</h2><p>你的库中包含了一个 Resizable接口，它定义了一个简单的可缩放形状必须支持的很多方法， 比如： setHeight 、 setWidth 、getHeight 、 getWidth 以及 setAbsoluteSize 。 此外， 你还提供了几个额外的实现 （out-of-box implementation） ，如正方形、长方形。由于你的库非常流行，你的一些用户使用 Resizable 接口创建了他们自己感兴趣的实现，比如椭圆。<br>发布API几个月之后，你突然意识到 Resizable 接口遗漏了一些功能。比如，如果接口提供一个 setRelativeSize 方法，可以接受参数实现对形状的大小进行调整，那么接口的易用性会更好。你要考虑已经使用了你接口的用户，他们已经按照自身的需求实现了 Resizable 接口。</p>
+<h3 id="初始版本的-API"><a href="#初始版本的-API" class="headerlink" title="初始版本的 API"></a>初始版本的 API</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">public interface Resizable extends Drawable&#123;</div><div class="line"> int getWidth();</div><div class="line"> int getHeight();</div><div class="line"> void <span class="built_in">set</span>Width(int width);</div><div class="line"> void <span class="built_in">set</span>Height(int height);</div><div class="line"> void <span class="built_in">set</span>AbsoluteSize(int width, int height);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="第二版"><a href="#第二版" class="headerlink" title="第二版"></a>第二版</h3><p>void setRelativeSize(int wFactor, int hFactor);<br>二进制级的兼容性表示现有的二进制执行文件能无缝持续链接（包括验证、准备和解析）和运行。比如，为接口添加一个方法就是二进制级的兼容，这种方式下，如果新添加的方法不被调用，接口已经实现的方法可以继续运行，不会出现错误。简单地说， 源代码级的兼容性表示引入变化之后， 现有的程序依然能成功编译通过。 比如，向接口添加新的方法就不是源码级的兼容， 因为遗留代码并没有实现新引入的方法， 所以它们无法顺利通过编译。最后，函数行为的兼容性表示变更发生之后，程序接受同样的输入能得到同样的结果。比如，为接口添加新的方法就是函数行为兼容的，因为新添加的方法在程序中并未被调用</p>
+<h2 id="概述默认方法"><a href="#概述默认方法" class="headerlink" title="概述默认方法"></a>概述默认方法</h2><p>缺失的方法实现会作为接口的一部分由实现类继承（所以命名为默认实现） ，而无需由实现类提供。默认方法由 default 修饰符修饰，并像类中声明的其他方法一样包含方法体。</p>
+<h2 id="默认方法的使用模式"><a href="#默认方法的使用模式" class="headerlink" title="默认方法的使用模式"></a>默认方法的使用模式</h2><h3 id="可选方法"><a href="#可选方法" class="headerlink" title="可选方法"></a>可选方法</h3><p>Java 8之前，由于用户通常不会使用该方法， remove 方法常被忽略。因此，实现 Interator 接口的类通常会为 remove 方法放置一个空的实现，这些都是些毫无用处的模板代码。 Iterator 接口就为remove方法提供了一个默认实现</p>
+<h3 id="行为的多继承"><a href="#行为的多继承" class="headerlink" title="行为的多继承"></a>行为的多继承</h3><h2 id="解决冲突的规则"><a href="#解决冲突的规则" class="headerlink" title="解决冲突的规则"></a>解决冲突的规则</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">public interface A &#123;</div><div class="line">default void <span class="function"><span class="title">hello</span></span>() &#123;</div><div class="line">  System.out.println(<span class="string">"Hello from A"</span>);</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">public interface B extends A &#123;</div><div class="line">default void <span class="function"><span class="title">hello</span></span>() &#123;</div><div class="line">System.out.println(<span class="string">"Hello from B"</span>);</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">public class C implements B, A &#123;</div><div class="line">public static void main(String... args) &#123;</div><div class="line">new C().hello();</div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="解决问题的三条规则"><a href="#解决问题的三条规则" class="headerlink" title="解决问题的三条规则"></a>解决问题的三条规则</h3><p>(1) 类中的方法优先级最高。类或父类中声明的方法的优先级高于任何声明为默认方法的优先级。<br>(2) 如果无法依据第一条进行判断，那么子接口的优先级更高：函数签名相同时，优先选择拥有最具体实现的默认方法的接口，即如果 B 继承了 A ，那么 B 就比 A 更加具体。<br>(3) 最后，如果还是无法判断，继承了多个接口的类必须通过显式覆盖和调用期望的方法<br>Java 8中引入了一种新的语法 X.super.m(…) ，其中 X 是你希望调用的 m<br>方法所在的父接口。如果你希望 C 使用来自于 B 的默认方法，它的调用方式看起来就如下所示<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">public class C implements B, A &#123;</div><div class="line">void <span class="function"><span class="title">hello</span></span>()&#123;</div><div class="line">B.super.hello();</div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/01/高性能网络通讯/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1989,162 +2293,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/07/hbase架构/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="李睿">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/07/hbase架构/" itemprop="url">hbase架构</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-07T22:19:10+08:00">
-                2017-11-07
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/hbase/" itemprop="url" rel="index">
-                    <span itemprop="name">hbase</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="数据查找和存储"><a href="#数据查找和存储" class="headerlink" title="数据查找和存储"></a>数据查找和存储</h2><h3 id="B-树"><a href="#B-树" class="headerlink" title="B+树"></a>B+树</h3><p>B+树的性质使得能够对主键进行高效的插入、查找以及删除，B+树远好于二叉树的数据划分，大大减少查询特定主键所需要的IO。此外，B+树能够提供高效的范围扫描，由于叶节点相互连接且主键有序，扫描时避免了耗时的遍历树的操作。在很多关系型数据库中，都把该数据结构用做索引。<br>当添加新的索引时，可能会使得页表满了拆分成两个页表，若页表不在一块，在进行范围查询时，需要读取不在一块的页表甚至很远的页表，因此我们需要优化该表，使用optimize table，将B+顺序写，使得范围查找时加快。</p>
-<h3 id="LSM树-Log-Structured-Merge"><a href="#LSM树-Log-Structured-Merge" class="headerlink" title="LSM树(Log Structured Merge)"></a>LSM树(Log Structured Merge)</h3><p>输入数据首先存储在日志文件中，这些文件的完全有序，当有日志文件被修改时，对应的更新会保存在内存中，来加速查询。在经历数次数据进行修改后，内存逐渐被占满后，LSM树会把有序的键数据对写入磁盘，同时创建一个新的数据存储文件，并且内存中的数据可以丢弃。存储文件组织与B树相似，不过其为磁盘顺序读取做了优化，所有节点都是满的并按页存储，修改数据文件通过滚动合并完成。如果数据量过于庞大，磁盘中的树相应地也会很大，导致的后果是合并的速度会变慢。一个解决方法是建立各个层次的树，低层次的树都比上一层次的树数据集大。假设内存中的树为c0, 磁盘中的树按照层次一次为c1, c2, c3, … ck-1, ck。合并的顺序是(c0, c1), (c1, c2)…(ck-1, ck)。<br>查询时先查找内存中的存储，然后在查找磁盘文件。删除是一种特殊的更改，当删除标记被存储后，查找时会跳过被删除的键。当页被重写时，有删除标记的键会被丢掉。后台运维可以设定一个TTL，在TTL后，检查时间戳，然后重写丢弃过期的记录。<br><strong>B+树与LSM树对比</strong><br>在没有太多修改（插入或者删除）时，B+树表现得很好，因为这些修改要求执行高性能的优化操作以保证查询能在有限的时间内完成。在任意位置添加的数据规模越大，速度越快，这些页成为碎片的速度越快，最后用户写入的速度比优化重写速度更快，导致碎片化。因而只能多次随机io，导致建立索引速度变慢。<br>LSM树使用日志文件内存存储将随机写变为顺序写，因此也能保证稳定的插入速率，由于读写独立，所以不会存在冲突。由于存储数据布局更优，查询一个键需要的磁盘寻道次数在一个可预测的范围，并且读取与改建连续任意数量的记录都不会引发额外的磁盘寻道。一般来说，有几个存储文件，最多几次寻道。</p>
-<h2 id="存储"><a href="#存储" class="headerlink" title="存储"></a>存储</h2><p>Hbase主要处理两种文件：1.预写文件(write ahead file,WAL);2.实际数据文件，由HRegionServer管理。基本流程是：客户端首先联系Zookeeper子集群（quorum）查找行健，通过Zookeeper获取含有-ROOT-的region服务器名来完成。通过含有-ROOT-的region服务器可以查询到含有.meta表中对应的region服务器名。这两处内容会被缓存。最终通过.meta服务器获取客户端查询的行键所在region服务器名。一旦知道数据所在的位置，Hbase会缓存信息，后面客户端就不需要查询.meta.</p>
-<h3 id="写路径"><a href="#写路径" class="headerlink" title="写路径"></a>写路径</h3><p>当用户向HregionServer发起HTable.put(Put)请求时，其会交给对应的region来处理。第一步是要决定数据是否需要写到HLog类实现的预写日志中，一旦数据被写入WAL中，数据就会放到Memstore中，同时还会检查memstore是否已经满了，如果满了，就会将请求刷新到磁盘里。刷新请求由另外一个RegionServer的线程处理，它会把数据写成HDFS中的一个新HFile，同时保存最后写的序号。</p>
-<h3 id="文件"><a href="#文件" class="headerlink" title="文件"></a>文件</h3><ul>
-<li>根级文件<br>一个region服务器所有region共享一个对应的子目录，在Hbase根目录下命名为logs的目录</li>
-<li>表级文件<br>每张表都有自己的目录，其位于文件系统中的hbase根目录下，每张表包括一个名为.tableinfo的顶层文件</li>
-<li>region级文件<br>每张表的目录里面，每个列族都有单独一个目录。</li>
-<li>region拆分<br>region存储文件增长超过配置的大小就会一分为二</li>
-<li>region合并<br>合并会把磁盘文件合并成数量更少的体积更大的文件<h3 id="HFile格式"><a href="#HFile格式" class="headerlink" title="HFile格式"></a>HFile格式</h3>存储Hbase的数据，分为Trailer、MetaIndex、DataIndex、FileInfo、Data，Data一般存放Magic和keyvalue，keyvalue可以采用压缩算法压缩数据。<h3 id="keyvalue格式"><a href="#keyvalue格式" class="headerlink" title="keyvalue格式"></a>keyvalue格式</h3>keyvalue的格式：KeyLength、ValueLength、(RowLength、Row、ColumnFamilyLength、ColumnFamily、ColumnQualifier、TimeStamp、KeyType)、value,括号部分是key，可以转化为java实例，就可以通过get方法获取属性。<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">System.out.println(<span class="string">"family:"</span> + Bytes.toString(kv.getFamily()));</div><div class="line">System.out.println(<span class="string">"qualifier:"</span> + Bytes.toString(kv.getQualifier()));</div><div class="line">System.out.println(<span class="string">"value:"</span> + Bytes.toString(kv.getValue()));</div><div class="line">System.out.println(<span class="string">"Timestamp:"</span> + kv.getTimestamp());</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<h2 id="WAL"><a href="#WAL" class="headerlink" title="WAL"></a>WAL</h2><p>region服务器会将数据保存在内存中，直到积攒足够多的数据刷新到磁盘，但是存储在磁盘中的数据是不稳定的，例如断电时候就会数据丢失，比较常见的解决方案是预写日志(WAL):每次更新都会写入日志，只有当写入成功才会通知客户端操作成功。</p>
-<h3 id="HLog"><a href="#HLog" class="headerlink" title="HLog"></a>HLog</h3><p>实现WAL类叫做HLog，当region收到更新操作，就直接把数据保存到一个共享的WAL实例中。</p>
-<h3 id="HLog-key"><a href="#HLog-key" class="headerlink" title="HLog key"></a>HLog key</h3><p>存储keyvalue的归属，即region和表名，信息存储在HLogKey中。还存储了序列号，每一条的记录都是递增的，还记录了写入到日志的时间戳。</p>
-<h3 id="WalEdit"><a href="#WalEdit" class="headerlink" title="WalEdit"></a>WalEdit</h3><p>每一个修改都会被封装为WalEdit实例。</p>
-<h3 id="LogSyncer"><a href="#LogSyncer" class="headerlink" title="LogSyncer"></a>LogSyncer</h3><p>延迟日志刷写标记，如果设置为false，每一次编辑发送到服务器，都会调用写日志的sync。</p>
-<h3 id="LogRoller"><a href="#LogRoller" class="headerlink" title="LogRoller"></a>LogRoller</h3><p>在特定时间内滚动日志</p>
-<h2 id="读路径"><a href="#读路径" class="headerlink" title="读路径"></a>读路径</h2><p>Hbase的每个列族使用多个存储文件进行数据存储。后台合并将小文件写入到大文件减少文件的数目。墓碑标记是可以标记一个单元格，多个单元格，一整行。</p>
-<h2 id="region查找"><a href="#region查找" class="headerlink" title="region查找"></a>region查找</h2><p>为了让客户端查找到包含特定主键的region，Hbase提供两张目录表，一张-ROOT-和.META.。-ROOT-用来查询所有.META.表中region的位置。Hbase的设计时只有一个root region，从而保证类似于B+树结构的三层查找：第一层是Zookeeper中包含root region位置信息的节点。第二层是从-ROOT-中查找对应meta region位置。第三层是从.META.表中查找用户表中对应region的位置。</p>
-<h2 id="region的生命周期"><a href="#region的生命周期" class="headerlink" title="region的生命周期"></a>region的生命周期</h2><p>offline、pending open、opening、open、pending close、closing、closed、splitting</p>
-<h2 id="Zookeeper"><a href="#Zookeeper" class="headerlink" title="Zookeeper"></a>Zookeeper</h2><p>主要功能有跟踪region服务器、保存root region地址。</p>
-<h2 id="复制"><a href="#复制" class="headerlink" title="复制"></a>复制</h2><p>Hbase最基本的架构师主推送，一个主集群可以将数据复制到任意数目的从集群。所有的WALEdits都会被复制以保证原子性。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2194,7 +2342,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">43</span>
+                <span class="site-state-item-count">44</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2205,7 +2353,7 @@
             
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
-                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-count">12</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -2216,7 +2364,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-count">17</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -2265,7 +2413,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2017</span>
+  <span itemprop="copyrightYear">2018</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
