@@ -74,7 +74,7 @@
 <link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="java并发," />
 
 
 
@@ -92,13 +92,17 @@
 
 
 
+<meta name="description" content="java并发容器和框架ConcurrentHashMap实现原理与使用为什么要使用ConcurrentHashMapConcurrentHashMap初始化方法是通过initialCapacity、loadFactor和concurrencyLevel等几个参数来初始化segment数组、段偏移量segmentShift、段掩码segmentMask和每个segment里的HashEntry数组来">
+<meta name="keywords" content="java并发">
 <meta property="og:type" content="article">
 <meta property="og:title" content="java并发编程6~8">
 <meta property="og:url" content="http://yoursite.com/2018/01/05/java并发编程6-8/index.html">
 <meta property="og:site_name" content="博客">
-<meta property="og:updated_time" content="2018-01-05T13:51:00.888Z">
+<meta property="og:description" content="java并发容器和框架ConcurrentHashMap实现原理与使用为什么要使用ConcurrentHashMapConcurrentHashMap初始化方法是通过initialCapacity、loadFactor和concurrencyLevel等几个参数来初始化segment数组、段偏移量segmentShift、段掩码segmentMask和每个segment里的HashEntry数组来">
+<meta property="og:updated_time" content="2018-01-05T14:02:34.483Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="java并发编程6~8">
+<meta name="twitter:description" content="java并发容器和框架ConcurrentHashMap实现原理与使用为什么要使用ConcurrentHashMapConcurrentHashMap初始化方法是通过initialCapacity、loadFactor和concurrencyLevel等几个参数来初始化segment数组、段偏移量segmentShift、段掩码segmentMask和每个segment里的HashEntry数组来">
 
 
 
@@ -312,6 +316,28 @@
           </span>
 
           
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java并发编程艺术读书笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">java并发编程艺术读书笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
 
           
             
@@ -336,7 +362,8 @@
       
 
       
-        
+        <h1 id="java并发容器和框架"><a href="#java并发容器和框架" class="headerlink" title="java并发容器和框架"></a>java并发容器和框架</h1><h2 id="ConcurrentHashMap实现原理与使用"><a href="#ConcurrentHashMap实现原理与使用" class="headerlink" title="ConcurrentHashMap实现原理与使用"></a>ConcurrentHashMap实现原理与使用</h2><h3 id="为什么要使用ConcurrentHashMap"><a href="#为什么要使用ConcurrentHashMap" class="headerlink" title="为什么要使用ConcurrentHashMap"></a>为什么要使用ConcurrentHashMap</h3><p>ConcurrentHashMap初始化方法是通过initialCapacity、loadFactor和concurrencyLevel等几个参数来初始化segment数组、段偏移量segmentShift、段掩码segmentMask和每个segment里的HashEntry数组来实现的。</p>
+
       
     </div>
 
@@ -362,6 +389,12 @@
     </div>
 
     <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/java并发/" rel="tag"># java并发</a>
+          
+        </div>
       
 
       
@@ -427,8 +460,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg"
@@ -497,6 +539,22 @@
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#java并发容器和框架"><span class="nav-number">1.</span> <span class="nav-text">java并发容器和框架</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ConcurrentHashMap实现原理与使用"><span class="nav-number">1.1.</span> <span class="nav-text">ConcurrentHashMap实现原理与使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么要使用ConcurrentHashMap"><span class="nav-number">1.1.1.</span> <span class="nav-text">为什么要使用ConcurrentHashMap</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       

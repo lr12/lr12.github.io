@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2018-01-05T13:51:00.888Z</updated>
+  <updated>2018-01-05T14:02:34.483Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,12 +20,21 @@
     <link href="http://yoursite.com/2018/01/05/java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B6-8/"/>
     <id>http://yoursite.com/2018/01/05/java并发编程6-8/</id>
     <published>2018-01-05T13:51:00.000Z</published>
-    <updated>2018-01-05T13:51:00.888Z</updated>
+    <updated>2018-01-05T14:02:34.483Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="java并发容器和框架"><a href="#java并发容器和框架" class="headerlink" title="java并发容器和框架"></a>java并发容器和框架</h1><h2 id="ConcurrentHashMap实现原理与使用"><a href="#ConcurrentHashMap实现原理与使用" class="headerlink" title="ConcurrentHashMap实现原理与使用"></a>ConcurrentHashMap实现原理与使用</h2><h3 id="为什么要使用ConcurrentHashMap"><a href="#为什么要使用ConcurrentHashMap" class="headerlink" title="为什么要使用ConcurrentHashMap"></a>为什么要使用ConcurrentHashMap</h3><p>ConcurrentHashMap初始化方法是通过initialCapacity、loadFactor和concurrencyLevel等几个参数来初始化segment数组、段偏移量segmentShift、段掩码segmentMask和每个segment里的HashEntry数组来实现的。</p>
+]]></content>
     
     <summary type="html">
     
+      &lt;h1 id=&quot;java并发容器和框架&quot;&gt;&lt;a href=&quot;#java并发容器和框架&quot; class=&quot;headerlink&quot; title=&quot;java并发容器和框架&quot;&gt;&lt;/a&gt;java并发容器和框架&lt;/h1&gt;&lt;h2 id=&quot;ConcurrentHashMap实现原理与使用&quot;&gt;&lt;a 
+    
     </summary>
     
+      <category term="java并发编程艺术读书笔记" scheme="http://yoursite.com/categories/java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E8%89%BA%E6%9C%AF%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="java并发" scheme="http://yoursite.com/tags/java%E5%B9%B6%E5%8F%91/"/>
     
   </entry>
   
