@@ -273,6 +273,209 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/10/线程池和Executor/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="李睿">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/10/线程池和Executor/" itemprop="url">线程池和Executor</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-10T09:53:55+08:00">
+                2018-01-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java并发编程艺术读书笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">java并发编程艺术读书笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="java中的线程池"><a href="#java中的线程池" class="headerlink" title="java中的线程池"></a>java中的线程池</h1><p>线程池是运用场景最多的并发框架，几乎所有需要异步或者并发执行任务的程序都可以使用线程池。线程池的好处如下:</p>
+<ul>
+<li>降低资源损耗；通过重复利用已创建的线程降低线程创建和销毁造成的消耗。</li>
+<li>提高响应速度；当任务到达时，任务可以不需要等到线程创建就能立即执行。</li>
+<li>提高线程的可管理性；线程是稀缺资源，如果无限制地创建，不仅会消耗系统资源，还会降低系统的稳定性，使用线程统一分配、调优和监控。</li>
+</ul>
+<h2 id="线程池的实现原理"><a href="#线程池的实现原理" class="headerlink" title="线程池的实现原理"></a>线程池的实现原理</h2><p>1）线程池判断核心线程池是否都在执行任务。如果不是，则创建一个新的工作线程来执行任务。如果核心线程池里的线程都在执行任务，则进入下个流程。<br>2）线程池判断工作队列是否已满。如果工作队列没有满，则新提交的任务存储在这个工作队列里。如果工作队列满了，则进入下个流程。<br>3）线程池判断线程池的线程是否都处于工作状态，如果没有，则创建一个新的工作线程来执行任务。如果已经满了，则交给饱和策略来处理这个任务。<br><img src="/2018/01/10/线程池和Executor/线程池流程.png" alt=""></p>
+<p><img src="/2018/01/10/线程池和Executor/线程池执行.png" alt=""><br>ThreadPoolExecutor执行execute分下面四种情况：</p>
+<ol>
+<li>如果当前运行的线程少于corePoolSize，则新建新的线程来执行任务，执行这一步需要全局锁。</li>
+<li>如果运行的线程等于或多于corePoolSize，则将任务加入BlockingQueue</li>
+<li>如果无法将任务加入BlockingQueue，则创建新的线程来处理任务。执行这一步骤需要获取全局锁</li>
+<li>如果创建新的线程将使当前运行的线程超出maximumPoolSize，任务将被拒绝，并调用RejectedExecutionHandler.rejectedExecution()方法。</li>
+</ol>
+<p>采用上述步骤的总体思路是，是为了在执行execute方法时，尽量避免获取全局锁。在ThreadPoolExecutor完成预热之后（当前的运行线程数大于等于corePoolSize），几乎所有的execute方法都是执行步骤2，而步骤2不需要获取全局锁。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">public void execute(Runnable <span class="built_in">command</span>) &#123;</div><div class="line">    <span class="keyword">if</span>(<span class="built_in">command</span> == null)</div><div class="line">        throw new NullPointerException();</div><div class="line">    // 如果线程数小于基本线程数，则创建线程并执行当前任务</div><div class="line">    <span class="keyword">if</span>(poolSize &gt;= corePoolSize || !addIfUnderCorePoolSize(<span class="built_in">command</span>)) &#123;</div><div class="line">        // 如线程数大于等于核心线程数或线程创建失败，则将当前任务放到工作队列中。</div><div class="line">        <span class="keyword">if</span>(runState == RUNNING &amp;&amp; workQueue.offer(<span class="built_in">command</span>)) &#123;</div><div class="line">            <span class="keyword">if</span>(runState != RUNNING || poolSize == 0)</div><div class="line">                ensureQueuedTaskHandled(<span class="built_in">command</span>);</div><div class="line">        &#125;</div><div class="line">        // 如果线程池不处于运行中或任务无法放入队列，并且当前线程数量小于最大允许的线程数量，则创建一个线程执行任务。</div><div class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(!addIfUnderMaximumPoolSize(<span class="built_in">command</span>))</div><div class="line">            // 抛出RejectedExecutionException异常</div><div class="line">            reject(<span class="built_in">command</span>); // is shutdown or saturated</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>工作线程：线程池创建线程时，会将线程封装成工作线程worker，woker在执行完任务后，还会循环获取工作队列里的任务来执行。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">public void <span class="function"><span class="title">run</span></span>() &#123;</div><div class="line">            try &#123;</div><div class="line">                Runnable task = firstTask;</div><div class="line">                firstTask = null;</div><div class="line">                <span class="keyword">while</span>(task != null || (task =getTask()) != null) &#123;</div><div class="line">                    runTask(task);</div><div class="line">                    task = null;</div><div class="line">                &#125;</div><div class="line">            &#125; finally &#123;</div><div class="line">                workerDone(this);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p><img src="/2018/01/10/线程池和Executor/执行任务.png" alt=""><br>线程池执行任务分两种情况：1.在execute方法中创建一个线程时，会让这个线程执行当前任务。2.这个线程执行完任务后，会反复从BlockingQueue获取任务来执行。</p>
+<h2 id="线程池的使用"><a href="#线程池的使用" class="headerlink" title="线程池的使用"></a>线程池的使用</h2><h3 id="线程池的创建"><a href="#线程池的创建" class="headerlink" title="线程池的创建"></a>线程池的创建</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">public ThreadPoolExecutor(int corePoolSize,</div><div class="line">                              int maximumPoolSize,</div><div class="line">                              long keepAliveTime,</div><div class="line">                              TimeUnit unit,</div><div class="line">                              BlockingQueue&lt;Runnable&gt; workQueue,</div><div class="line">                              ThreadFactory threadFactory,</div><div class="line">                              RejectedExecutionHandler handler)</div></pre></td></tr></table></figure>
+<ol>
+<li>corePoolSize(线程池的基本大小)：当提交一个任务到线程池时，线程池会创建一个线程来执行任务，及时其他空闲的基本线程能够执行新任务也会创建线程，等到需要执行的任务数大于线程池基本大小时就不再创建。如果调用prestartAllCoreThreads方法，线程池会提前创建并启动所有线程。</li>
+<li>runnableTaskQueue（任务队列）:用于保存等待执行任务的阻塞队列。可选择以下几个阻塞队列：<br>ArrayBlockingQueue:是一个基于数组结构的有界阻塞队列，此队列按FIFO原则对元素进行排序<br>LinkedBlockingQueue：一个基于链表结构的阻塞队列，此队列按FIFO排序元素，吞吐量通常高于ArrayBlockingQueue。静态工厂方法Executors.newFixedThreadPool使用了这个队列。<br>SynchronousQueue：一个不存储元素的阻塞队列。每个插入操作必须等到另外一个线程调用移除操作，否则操作一直处于阻塞状态，吞吐量高于LinkedBlockingQueue，Executors.newCachedThreadPool使用了这个队列<br>PriorityBlockingQueue：一个具有优先队列的无限阻塞队列</li>
+<li>maximumPoolSize（线程池最大数量）：线程允许创建的最大线程数，如果队列满了并且已创建的线程数小于最大线程数，则线程池会再创建新的线程执行任务。如果使用无界的任务队列这个参数就没意义。</li>
+<li><p>ThreadFactory：用来创建线程的工厂，可以通过线程工厂给每个创建的线程设置更有意义的名字。使用开源框架guava提供的ThreadFactoryBuilder可以快速地给线程池里的线程设置有意义的名字。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">new ThreadFactoryBuilder().setNameFormat(<span class="string">"XX-task-%d"</span>).build();</div></pre></td></tr></table></figure>
+</li>
+<li><p>RejectedExecutionHandler(饱和策略):当队列和线程池满时，说明线程池处于饱和状态，那么必须采用一种策略处理提交的新任务。这个策略默认是AbortPolicy，表示无法处理任务时抛异常。<br>AbortPolicy：直接抛出异常<br>CallerRunsPolicy：只用调用者所在线程来运行任务<br>DiscardOldestPolicy：丢弃队列里最后一个任务，来执行当前任务<br>DiscardPolicy：不处理，丢弃掉</p>
+</li>
+<li>keepAliveTime（线程活动保持时间）：线程池的工作线程空闲后，保持存活的时间。所以，如果任务很多，并且每个任务执行时间都比较短，，可以调大时间，提高cpu的利用率。</li>
+<li>TimeUnit（线程活动保持时间的单位）：可选的时间有Days、HOUSRS、MINUTES、SECONDS、MILLISECONDS、MICROSECONDS、NANOSECONDS</li>
+</ol>
+<h3 id="向线程池提交任务"><a href="#向线程池提交任务" class="headerlink" title="向线程池提交任务"></a>向线程池提交任务</h3><p>可以使用两个方法向线程池提交任务，分别为execute和submit方法。execute方法用于提交不需要返回值的任务，所以无法判断任务是否被线程池执行成功。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">threadPool.execute(new <span class="function"><span class="title">Runnable</span></span>()&#123;</div><div class="line">  public void <span class="function"><span class="title">run</span></span>()&#123;</div><div class="line"></div><div class="line">  &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
+<p>submit方法用于提交需要返回值的任务，线程池会返回一个Future对象，通过这个future对象可以判断任务是否执行成功，并且可以通过future的get方法来获取返回值，get方法会阻塞当前线程直到任务完成。而使用get(long timeout,TimeUnit unit)则会阻塞当前线程一段时间后立即返回，这时候有可能任务还未执行完。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">Future&lt;Object&gt; future=executor.submit(harReturnValuetask);</div><div class="line">try&#123;</div><div class="line">  Object s=future.get();</div><div class="line">&#125;catch(Exception e)&#123;</div><div class="line"></div><div class="line">&#125;finally&#123;</div><div class="line">  executor.shutdown();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="关闭线程池"><a href="#关闭线程池" class="headerlink" title="关闭线程池"></a>关闭线程池</h3><p>可以通过调用线程池的shutdown或shutdownNow方法来关闭线程池。他的原理是遍历线程池中的工作线程，然后逐个调用线程的interupt方法来中断线程，所以无法中断的任务可能永远无法终止。但是他们存在一定的区别，shutdownNow是先把线程池的状态设置为STOP，然后尝试停止所有正在执行或暂停任务的线程，并返回等待执行任务的列表。而shoutdown只是将线程池的状态设置为shutdown状态，然后中断所有没有正在执行任务的线程。<br>只要调用这两个关闭方法中的其中一个，isshutdown方法就会返回true，当所有任务都已关闭后，才表示线程池关闭成功，这时调用isTerminaed方法会返回true。至于应该调用哪一种方法来关闭线程池，应该由提交到线程池的任务特性决定，通常调用shutdown方法来关闭线程池，如果任务不一定要执行完，则可以调用shutdownNow方法。</p>
+<h3 id="合理配置线程池"><a href="#合理配置线程池" class="headerlink" title="合理配置线程池"></a>合理配置线程池</h3><p>想合理地配置线程池，就必须首先分析任务特性，可以从以下几个角度来分析。<br>任务的性质：CPU密集任务、IO密集任务、混合型任务<br>任务的优先级：高、中、低<br>任务执行的时间：长、中、短<br>任务的依赖性：是否依赖其他系统资源，如数据库连接<br>性质不同的任务可以用不同规模的线程池分开处理，CPU密集型任务应该配置尽可能小的线程，如配置Ncpu+1个线程的线程池。由于IO密集型任务线程并不是一直在执行任务，则应配置尽可能多的线程，如2*Ncpu。对于混合型任务，如果可以拆分，将其拆分成CPU密集型任务和IO密集型任务，只要这两个任务执行时间相差不是很大，那么拆分后的吞吐量将高于串行的执行的吞吐量。如果这两个任务执行时间相差太大，则没必要进行分解。可以通过Runtime.getRunTime().availableProcessors()方法获取当前设备的cpu数量。<br>优先级不同可以使用PriorityBlockingQueue来处理，它可以让优先级高的任务先执行。<br>执行时间不同交给不同规模的线程池来处理或者可以使用优先级队列，让执行时间段的任务先执行。<br>依赖数据库连接池任务，因为线程提交SQl后需要等待数据库返回结果，等待的时间越长，cpu的空余时间越长，那么线程数应该设置越大，才能更好地利用cpu。建议使用有界队列，有界队列能增加系统的稳定性和预警能力，可以根据需要设大一点儿，比如几千。有一次，我们系统里后台任务线程池的队列和线程池全满了，不断抛出抛弃任务的异常，通过排查发现是数据库出现了问题，导致执行SQL变得非常缓慢，因为后台任务线程池里的任务全是需要向数据库查询和插入数据的，所以导致线程池里的工作线程全部阻塞，任务积压在线程池里。如果当时我们设置成无界队列，那么线程池的队列就会越来越多，有可能会撑满内存，导致整个系统不可用，而不只是后台任务出现问题。当然，我们的系统所有的任务是用单独的服务器部署的，我们使用不同规模的线程池完成不同类型的任务，但是出现这样问题时也会影响到其他任务。</p>
+<h3 id="线程池的监控"><a href="#线程池的监控" class="headerlink" title="线程池的监控"></a>线程池的监控</h3><p>如果在系统中大量使用线程池，则有必要对线程池进行监控，方便出现问题时定位。监控线程池可使用如下属性<br>taskCount：线程需要执行的任务数量<br>completedTaskCount：线程池在运行过程时已完成的任务数量，小于或等于taskCount。<br>largestPoolSize：线程池曾经创建过的最大线程数量<br>getPoolSize：线程池的线程数量<br>getActiveCount：获取活动线程数<br>通过扩展线程池进行监控，可以通过继承线程池来自定义线程池，重写线程池的beforeExecute、afterExecute和terminated方法，也可以在任务执行前、执行后和线程池关闭前执行一些代码进行监控。例如，监控任务的平均执行时间、最大执行时间和最小执行时间。这几个方法在线程池里是空方法。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">protected void beforeExecute(Thread t, Runnable r)&#123; &#125;</div></pre></td></tr></table></figure></p>
+<h1 id="Executor框架"><a href="#Executor框架" class="headerlink" title="Executor框架"></a>Executor框架</h1><h2 id="Executor框架简介"><a href="#Executor框架简介" class="headerlink" title="Executor框架简介"></a>Executor框架简介</h2><h3 id="Executor框架的两级调度模型"><a href="#Executor框架的两级调度模型" class="headerlink" title="Executor框架的两级调度模型"></a>Executor框架的两级调度模型</h3><p>java线程被一对一映射为本地操作系统线程。java线程启动时会创建一个本地操作系统线程；当该线程终止时，这个操作系统线程会被回收。操作系统会调度所有线程并将它们分配给可用的cpu。<br>在上层，java多线程程序通常把应用分解为若干个任务，然后使用用户级调度器(Executor框架)将这些任务映射为固定数量的线程；在底层，操作系统内核将这些线程映射到硬件处理器上。简单的说，应用程序通过Executor框架控制上层的调度，下层的调度通过操作系统内核控制，下层的调度不受应用程序的控制。<br><img src="/2018/01/10/线程池和Executor/二级调度.png" alt=""></p>
+<h3 id="Executor框架的结构与成员"><a href="#Executor框架的结构与成员" class="headerlink" title="Executor框架的结构与成员"></a>Executor框架的结构与成员</h3><h4 id="Executor框架的架构"><a href="#Executor框架的架构" class="headerlink" title="Executor框架的架构"></a>Executor框架的架构</h4><p>Executor框架主要由3大部分组成。</p>
+<ul>
+<li>任务，包括被执行任务需要实现的接口Runnable或Callable接口。</li>
+<li>任务的执行。包括任务执行机制的核心接口Executor，以及继承Executor的ExecutorService接口。Executor框架有两个关键类实现了ExecutorService接口，包括ThreadPoolExecutor和ScheduledThreadPoolExecutor。</li>
+<li>异步计算的结果。包括接口Future和实现Future接口的FutureTask类。</li>
+</ul>
+<p>Executor是一个接口，它是Executor框架的基础，它将任务的提交和任务的执行分离开来。<br>ThreadPoolExecutor是线程池的核心实现类，用来执行被提交的任务。<br>ScheduledThreadPoolExecutor是一个实现类，可以在给定的延迟后运行命令，或者定期执行命令。比Timer更灵活，功能更强大。<br>Future接口和实现Future接口的实现类FutureTask，代表异步计算的结果。<br>Runnable和Callable的实现类，都可以被ThreadPoolExecutor和ScheduledThreadPoolExecutor执行<br><img src="/2018/01/10/线程池和Executor/class.png" alt=""><br><img src="/2018/01/10/线程池和Executor/#x.png" alt=""><br>主线程首先要创建实现Runnable或者Callable接口的任务对象，工具类Executors可以把一个Runnable对象封装成Callable对象(Executors.callable(Runnble task)或Executors.callable(Runnable task,Object result))。<br>然后可以把Runnable对象直接交给ExecutorService执行(ExecutorService.execute(Runable command)),或者可以把Ruunable对象或Callable对象提交给ExecutorService执行(ExecutorService.submit(Runnable task)或ExecutorService.submit(Callable task))。<br>如果执行ExecutorService.submit(…)，ExecutorService将返回一个Future对象，（目前jdk返回的是FutureTask对象），由于FutureTask实现了Runnable，程序员也可以创建FutureTask，然后直接交给ExecutorService运行。<br>最后，主线程可以调用FutureTask.get()方法等待任务执行完成，主线程也可以执行FutureTask.cancel(boolean mayInterruptIfRunning)取消任务的运行。</p>
+<h4 id="Executor框架的成员"><a href="#Executor框架的成员" class="headerlink" title="Executor框架的成员"></a>Executor框架的成员</h4><p>主要成员有：ThreadPoolExecutor、ScheduledThreadPoolExecutor、Future接口、Runnable接口、Callable接口和Executors。</p>
+<h5 id="ThreadPoolExecutor"><a href="#ThreadPoolExecutor" class="headerlink" title="ThreadPoolExecutor"></a>ThreadPoolExecutor</h5><p>ThreadPoolExecutor通常使用工厂类Executors来创建。Executors可以创建三种类型的ThreadPoolExecutor：SingleThreadExecutor、FixedThreadPool、CachedThreadPool。</p>
+<h6 id="FixedThreadPool"><a href="#FixedThreadPool" class="headerlink" title="FixedThreadPool"></a>FixedThreadPool</h6><p>创建固定线程数的FixedThreadPool。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">public static ExecutorService newFixedThreadPool(int nThreads)</div><div class="line">public static ExecutorService newFixedThreadPool(int nThreads, ThreadFactory threadFactory)</div></pre></td></tr></table></figure></p>
+<h6 id="SingleThreadExecutor"><a href="#SingleThreadExecutor" class="headerlink" title="SingleThreadExecutor"></a>SingleThreadExecutor</h6><p>创建单个线程的SingleThreadExecutor的API<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">public static ExecutorService newSingleThreadExecutor()</div><div class="line">public static ExecutorService newSingleThreadExecutor(ThreadFactory threadFactory)</div></pre></td></tr></table></figure></p>
+<h6 id="CachedThreadPool"><a href="#CachedThreadPool" class="headerlink" title="CachedThreadPool"></a>CachedThreadPool</h6><p>创建一个会根据需要创建新线程的CachedThreadPool<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">public static ExecutorService newCachedThreadPool()</div><div class="line">public static ExecutorService newCachedThreadPool(ThreadFactory threadFactory)</div></pre></td></tr></table></figure></p>
+<p>CachedThreadPool是大小无界的线程池，适用于执行很多的短期异步任务的小程序，或者是负载较轻的服务器。</p>
+<h5 id="ScheduledThreadPoolExecutor"><a href="#ScheduledThreadPoolExecutor" class="headerlink" title="ScheduledThreadPoolExecutor"></a>ScheduledThreadPoolExecutor</h5><p>通常使用Executors创建，可以创建两种类型的ScheduledThreadPoolExecutor<br>ScheduledThreadPoolExecutor.包含若干线程的ScheduledThreadPoolExecutor<br>SingleThreadScheduledExecutor.包含一个线程的ScheduledThreadPoolExecutor<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">public static ScheduledExecutorService newSingleThreadScheduledExecutor()</div><div class="line">public static ScheduledExecutorService newSingleThreadScheduledExecutor(ThreadFactory threadFactory)</div></pre></td></tr></table></figure></p>
+<h5 id="Future接口"><a href="#Future接口" class="headerlink" title="Future接口"></a>Future接口</h5><p>Future接口和实现Future接口的FutureTask类用来表示异步计算的结果，当我们把Callable接口或Runnable接口的实现类提交(submit)给ThreadPoolExecutor或ScheduledThreadPoolExecutor时，ThreadPoolExecutor或ScheduledThreadPoolExecutor会返回一个FutureTask对象。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;T&gt; Future&lt;T&gt; submit(Callable&lt;T&gt; task)</div><div class="line">&lt;T&gt; Future&lt;T&gt; submit(Runnable task, T result)</div><div class="line">Future&lt;&gt; submit(Runnable task)</div></pre></td></tr></table></figure></p>
+<p>目前最新的JDK 8为止，Java通过上述API返回的是一个FutureTask对象。但从API可以看到，Java仅仅保证返回的是一个实现了Future接口的对象。在将来的JDK实现中，返回的可能不一定是FutureTask。</p>
+<h5 id="Runnable和Callable接口"><a href="#Runnable和Callable接口" class="headerlink" title="Runnable和Callable接口"></a>Runnable和Callable接口</h5><p>Runnable和Callable接口的实现类，都可以被ThreadPoolExecutor或ScheduledThreadPoolExecutor执行。区别是Runnable不会返回结果，而Callable可以返回结果。除了可以创建实现Callable接口的对象外，还可以使用工厂类Executors把一个Runnable接口包装成Callable接口<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">public static Callable&lt;Object&gt; callable(Runnable task) // 假设返回对象Callable1</div><div class="line">public static &lt;T&gt; Callable&lt;T&gt; callable(Runnable task, T result) // 假设返回对象Callable2</div></pre></td></tr></table></figure></p>
+<p>当我们把一个Callable对象（比如上面的Callable1或Callable2）提交给ThreadPoolExecutor或ScheduledThreadPoolExecutor执行时，submit（…）会向我们返回一个FutureTask对象。我们可以执行FutureTask.get()方法来等待任务执行完成。当任务成功完成后FutureTask.get()将返回该任务的结果。例如，如果提交的是对象Callable1，FutureTask.get()方法将返回null；如果提交的是对象Callable2，FutureTask.get()方法将返回result对象。</p>
+<h2 id="ThreadPoolExecutor详解"><a href="#ThreadPoolExecutor详解" class="headerlink" title="ThreadPoolExecutor详解"></a>ThreadPoolExecutor详解</h2><h3 id="FixedThreadPool详解"><a href="#FixedThreadPool详解" class="headerlink" title="FixedThreadPool详解"></a>FixedThreadPool详解</h3><p>可重用固定线程数的线程池。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">public static ExecutorService newFixedThreadPool(int nThreads) &#123;</div><div class="line"><span class="built_in">return</span> new ThreadPoolExecutor(nThreads, nThreads,0L, TimeUnit.MILLISECONDS,new LinkedBlockingQueue&lt;Runnable&gt;()</div><div class="line">);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>FixedThreadPool的corePoolSize和maximumPoolSize都被设置为创建FixedThreadPool时指定的参数nThreads。<br>当线程池的线程数大于corePoolSize时，keepAliveTime为多余的空闲线程等待新任务的最长时间，超过这个时间后多于的线程将被终止。这里设置为0，意味着多余的线程会被立即终止。<br><img src="/2018/01/10/线程池和Executor/execute.png" alt=""><br>说明：<br>1）如果当前运行的线程数少于corePoolSize，则创建新线程来执行任务。<br>2）在线程池预热后，将任务加入LinkedBlockingQueue<br>3）线程执行完1任务后，会在循环中反复从LinkedBlockingQueue获取任务执行<br>FixedThreadPool使用无界队列LinkedBlockingQueue作为线程池的工作队列(队列的容量为Integer.MAX_VALUE)，使用无界队列作为工作队列将会对线程池带来如下影响<br>1）当线程池中的线程数达到corePoolSize，新任务将在无界队列中等待，因此线程池的线程数不会超过corePoolSize，<br>2）由于1，使用无界队列时maximumPoolSize将是无效参数。<br>3）由于1和2，keepAlive将是无效参数<br>4）由于使用无界队列，运行中的FixedThreadPool（未执行方法shutdown或shutdownNow）不会拒绝任务（不会调用RejectedExecutionHandler.rejectedExecution方法）。</p>
+<h3 id="SingleThreadExecutor-1"><a href="#SingleThreadExecutor-1" class="headerlink" title="SingleThreadExecutor"></a>SingleThreadExecutor</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">public static ExecutorService <span class="function"><span class="title">newSingleThreadExecutor</span></span>() &#123;</div><div class="line"><span class="built_in">return</span> new FinalizableDelegatedExecutorService(new ThreadPoolExecutor(1, 1,0L, TimeUnit.MILLISECONDS,new LinkedBlockingQueue&lt;Runnable&gt;()</div><div class="line">));&#125;</div></pre></td></tr></table></figure>
+<p>SingleThreadExecutor的corePoolSize和maximumPoolSize都设为1，其他参数与fixedThreadPool一样。SingleThreadExecutor使用无界队列LinkedBlickedQueue。<br><img src="/2018/01/10/线程池和Executor/single.png" alt=""></p>
+<h3 id="CachedThreadPool-1"><a href="#CachedThreadPool-1" class="headerlink" title="CachedThreadPool"></a>CachedThreadPool</h3><p>CachedThreadPool是一个会根据需要创建新线程的线程池<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">public static ExecutorService <span class="function"><span class="title">newCachedThreadPool</span></span>() &#123;</div><div class="line"><span class="built_in">return</span> new ThreadPoolExecutor(0, Integer.MAX_VALUE,60L, TimeUnit.SECONDS,new SynchronousQueue&lt;Runnable&gt;()</div><div class="line">);&#125;</div></pre></td></tr></table></figure></p>
+<p>CachedThreadPool的corePoolSize被设置为0，即corePool为空，maximumPoolSize被设置为Integer.MAX_VALUE，即maximumPool是无界，这里把keepalive的时间设置为60L，意味着CachedThreadPool的空余线程等待新任务的最长时间为60s，空余线程超过60s会被终止。<br>CachedThreadPool采用没有容量的SynchronousQueue作为线程池的工作队列，但CachedThreadPool的maximumPoolSize是无界的，这意味者如果主线程提交的速度高于maximumPool中线程处理任务的速度，CachedThreadPool会不断创建新线程，极端情况下，CachedThreadPool会因为创建过多线程而耗尽cpu和内存资源。<br><img src="/2018/01/10/线程池和Executor/cached_execute.png" alt=""><br>1）首先执行SynchronousQueue.offer(Runnable task)。如果当前maximumPool中有空余的时间正在执行SynchronousQueue.poll（keepAliveTime，TimeUnit.NANOSECONDS），那么主线程执行的offer操作与poll操作配对成功，主线程把任务交给空余的线程执行，execute方法执行完成；否则执行步骤2<br>2）当初始maximumPool为空时，将没有线程执行SynchronousQueue.poll（keepAliveTime，TimeUnit.NANOSECONDS），这种情况下步骤1）将会失败，将会创建一个新线程来执行任务。<br>3）在步骤2新建的线程将任务执行完后，会执行SynchronousQueue.poll（keepAliveTime，TimeUnit.NANOSECONDS）。这个poll操作会让空余线程最多在SynchronousQueue中等待60秒，如果60秒内主线程提交了一个任务，这个空余线程将执行主线程提交的任务，否则这个空余线程将会终止。<br>SynchronousQueue是一个没有容量的阻塞队列。每个插入操作必须等待另一个线程的对应移除操作，反之亦然。CachedThreadPool使用SynchronousQueue，把主线程提交的任务传递给空闲线程执行。</p>
+<h2 id="ScheduledThreadPoolExecutor详解"><a href="#ScheduledThreadPoolExecutor详解" class="headerlink" title="ScheduledThreadPoolExecutor详解"></a>ScheduledThreadPoolExecutor详解</h2><p>ScheduledThreadPoolExecutor继承来自ThreadPoolExecutor，它主要用来给定的延迟之后运行任务，或者定期执行任务。ScheduledThreadPoolExecutor与Timer类似，但功能更强大且更灵活。Timer对应的是单个后台线程，而ScheduledThreadPoolExecutor可以在构造函数中指定多个对应的后台线程数。</p>
+<h3 id="ScheduledThreadPoolExecutor的运行机制"><a href="#ScheduledThreadPoolExecutor的运行机制" class="headerlink" title="ScheduledThreadPoolExecutor的运行机制"></a>ScheduledThreadPoolExecutor的运行机制</h3><p>DelayQueue是一个无界队列，所以ThreadPoolExecutor的maximumPoolSize在ScheduledThreadPoolExecutor中没有什么意义。<br><img src="/2018/01/10/线程池和Executor/scheduled任务传递.png" alt=""><br>ScheduledThreadPoolExecutor的执行分为两个部分：<br>1）当调用scheduleAtFixRate方法或者scheduleWithFixedDelay时，会向DelayQueue添加一个实现RunnableScheduledFuture接口的ScheduledFutureTask<br>2）线程池中的线程从DelayQueue获取ScheduleFutureTask，然后执行任务。<br><img src="/2018/01/10/线程池和Executor/schedule.png" alt=""><br>ScheduleThreadPoolExecutor为了实现周期性执行任务，对ThreadPoolExecutor做了修改：使用DelayQueue作为任务队列；获取任务的方式不同；执行周期任务后，增加了额外处理。</p>
+<h3 id="ScheduledThreadPoolExecutor的实现"><a href="#ScheduledThreadPoolExecutor的实现" class="headerlink" title="ScheduledThreadPoolExecutor的实现"></a>ScheduledThreadPoolExecutor的实现</h3><p>ScheduleThreadPoolExecutor会把待调度的任务（ScheduledFutureTask）放到一个DelayQueue里。<br>ScheduledFutureTask有三个参数：<br>long型成员变量time，标识这个任务被执行的时间；<br>long型成员变量sequenceNumber，表示这个任务被添加到ScheduledThreadPoolExecutor的序号；<br>long型成员变量period，表示任务执行的周期；<br>DelayQueue封装了一个PriorityQueue，它会对ScheduledFutureTask按照time的大小进行排序，如果time一样，就比较SequenceNumber。<br><img src="/2018/01/10/线程池和Executor/schedule任务执行.png" alt=""><br>1）线程1从DelayQueue中获取已到期的ScheduledFutureTask(delayQueue.take())，到期任务指的是time小于等于当前时间。<br>2）线程1执行这个ScheduledFutureTask<br>3）线程1修改time为下次将要被执行时间<br>4）修改time后将ScheduledFutureTask放回到DelayQueue中<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">public E take() throws InterruptedException &#123;</div><div class="line">    final ReentrantLock lock = this.lock;</div><div class="line">    lock.lockInterruptibly(); //1</div><div class="line">    try &#123;</div><div class="line">        <span class="keyword">for</span>(;;) &#123;</div><div class="line">            E first = q.peek();</div><div class="line">            <span class="keyword">if</span>(first == null) &#123;</div><div class="line">                available.await();//2.1</div><div class="line">            &#125; <span class="keyword">else</span>&#123;</div><div class="line">                long delay =  first.getDelay(TimeUnit.NANOSECONDS);</div><div class="line">                <span class="keyword">if</span>(delay &gt; 0) &#123;</div><div class="line">                    long tl = available.awaitNanos(delay);//2.2</div><div class="line">                &#125; <span class="keyword">else</span>&#123;</div><div class="line">                    E x = q.poll();  //2.3.1</div><div class="line">                    assert x != null;</div><div class="line">                    <span class="keyword">if</span>(q.size() != 0)</div><div class="line">                        available.signalAll(); //2.3.2 wake up other takers</div><div class="line">                    <span class="built_in">return</span> x;</div><div class="line"></div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125; finally &#123;</div><div class="line">        lock.unlock();//3</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><img src="/2018/01/10/线程池和Executor/scheduled_condition.png" alt=""><br>1)获取Lock<br>2）获取周期任务；<br>如果PriorityQueue为空，当前线程到Condition等待，否则执行下面2.2<br>如果如果Priority的头元素的时间比当前时间大，到condition等待time时间，否则执行2.3<br>3）释放锁<br>ScheduledThreadPoolExecutor在一个循环中执行步骤2，直到线程从PriorityQueue获取到一个元素之后（执行2.3.1之后），才会退出无限循环（结束步骤2）。<br>最后，让我们看看ScheduledThreadPoolExecutor中的线程执行任务的步骤4，把ScheduledFutureTask放入DelayQueue中的过程。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">public boolean offer(E e) &#123;</div><div class="line">    final ReentrantLock lock = this.lock;</div><div class="line">    lock.lock();//1</div><div class="line">    try &#123;</div><div class="line">        E first = q.peek();</div><div class="line">        q.offer(e);//2.1</div><div class="line">        <span class="keyword">if</span>(first == null || e.compareTo(first) &lt; 0)</div><div class="line">            available.signalAll();//2.2</div><div class="line">        <span class="built_in">return</span> <span class="literal">true</span>;</div><div class="line">    &#125; finally &#123;</div><div class="line">        lock.unlock();//3</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><img src="/2018/01/10/线程池和Executor/schedule-delay.png" alt=""><br>1)获取锁<br>2）添加任务；向PriorityQueue添加任务，如果添加的是头元素，则唤醒其他线程<br>3）释放锁</p>
+<h2 id="FutureTask详解"><a href="#FutureTask详解" class="headerlink" title="FutureTask详解"></a>FutureTask详解</h2><p>Future接口和实现类FutureTask，代表异步计算的结果</p>
+<h3 id="FutureTask简介"><a href="#FutureTask简介" class="headerlink" title="FutureTask简介"></a>FutureTask简介</h3><p>FutureTask除了实现Future接口还实现了Runnable接口。FutureTask可以交给Executor执行，也可以由调用线程直接执行（FutureTask.run()）。根据FutureTask.run()方法被执行时机，FutureTask可以处于下面三种状态。<br>1）未启动。FutureTask.run还没有被执行之前，FutureTask处于未启动状态，当创建一个FutureTask，在没有执行run方法之前，处于未启动状态。<br>2）已启动。run方法被执行过程，处于已启动状态<br>3）已完成。执行完正常结束，或被取消(FutureTask.cancel())，或执行run方法过程中抛出异常而异常结束。<br><img src="/2018/01/10/线程池和Executor/FutureTask状态.png" alt=""><br>但FutureTask处于未启动或已启动状态时，执行FutureTask.get()会导致线程阻塞，当FutureTask处于已完成状态，执行FutureTask.get()方法将导致调用线程立即返回结果或者抛出异常。<br>当FutureTask处于未启动状态时，FutureTask.cancel()将导致任务永远不会被执行；当FutureTask处于已启动状态时，执行FutureTask.cancel(true)方法将以中断执行此任务线程的方式来试图停止任务；当FutureTask处于已启动状态时，执行FutureTask.cancel(false)方法将不会对正在执行此任务的线程产生影响(让正在执行的任务运行完成)；当FutureTask处于已完成状态时，执行FutureTask.cancel()方法将返回false。<br><img src="/2018/01/10/线程池和Executor/cancel.png" alt=""></p>
+<h3 id="FutureTask的使用"><a href="#FutureTask的使用" class="headerlink" title="FutureTask的使用"></a>FutureTask的使用</h3><p>可以把FutureTask交给Executor执行；也可以通过ExecutorService.submit（…）方法返回一个FutureTask，然后执行FutureTask.get()方法或FutureTask.cancel（…）方法。除此以外，还可以单独使用FutureTask。<br>当一个线程需要等待另一个线程把某个任务执行完后它才能继续执行，此时可以使用FutureTask。假设有多个线程执行若干任务，每个任务最多只能被执行一次。当多个线程试图同时执行同一个任务时，只允许一个线程执行任务，其他线程需要等待这个任务执行完后才能继续执行。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">private final  ConcurrentMap&lt;Object, Future&lt;String&gt;&gt; taskCache = new ConcurrentHashMap&lt;Object, Future&lt;String&gt;&gt;();</div><div class="line">	private static String executionTask(final String taskName)</div><div class="line">			throws ExecutionException, InterruptedException &#123;</div><div class="line">		<span class="keyword">while</span>(<span class="literal">true</span>) &#123;</div><div class="line">			Future&lt;String&gt; future = taskCache.get(taskName);// 1.1,2.1</div><div class="line">			<span class="keyword">if</span>(future == null) &#123;</div><div class="line">				Callable&lt;String&gt; task = new Callable&lt;String&gt;() &#123;</div><div class="line">					public String call() throws InterruptedException &#123;</div><div class="line">						<span class="built_in">return</span> taskName;</div><div class="line">					&#125;</div><div class="line">				&#125;; // 1.2创建任务</div><div class="line">				FutureTask&lt;String&gt; futureTask = new FutureTask&lt;String&gt;(task);</div><div class="line">				future = taskCache.putIfAbsent(taskName, futureTask);// 1.3</div><div class="line">				<span class="keyword">if</span>(future == null) &#123;</div><div class="line">					future = futureTask;</div><div class="line">					futureTask.run();// 1.4执行任务</div><div class="line">				&#125;</div><div class="line">			&#125;</div><div class="line">			try &#123;</div><div class="line">				<span class="built_in">return</span> future.get();// 1.5,2.2线程在此等待任务执行完成</div><div class="line">			&#125; catch (CancellationException e) &#123;</div><div class="line">				taskCache.remove(taskName, future);</div><div class="line">			&#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p><img src="/2018/01/10/线程池和Executor/future.png" alt=""><br>当两个线程试图同时执行同一个任务时，如果Thread 1执行1.3后Thread 2执行2.1，那么接下来Thread 2将在2.2等待，直到Thread 1执行完1.4后Thread 2才能从2.2（FutureTask.get()）返回</p>
+<h3 id="FutureTask的实现"><a href="#FutureTask的实现" class="headerlink" title="FutureTask的实现"></a>FutureTask的实现</h3><p>FutureTask的实现是基于AQS，concurrent包中很多阻塞类(ReentrantLock)都是基于阻塞类实现的.AQS是一个同步框架，它提供通用机制来原子性管理同步状态、阻塞和唤醒线程。基于AQS实现的同步器包括：ReentrantLock、Semaphore、ReentrantReadWriteLock、CountDownLatch、FutureTask<br>每一个基于AQS实现的同步器都会包含两种类型的操作，如下。<br>至少一个acquire操作。这个操作阻塞调用线程，除非直到AQS的状态允许这个线程继续执行。FutureTask的acquire操作为get/get（long timeout，TimeUnit unit）方法调用。<br>至少一个release操作。这个操作改变AQS的状态，改变后的状态可允许一个或多个阻塞线程被解除阻塞。FutureTask的release操作包括run方法和cancel（…）方法。<br>基于“复合优先于继承”的原则，FutureTask声明了一个内部私有的继承于AQS的子类Sync，对FutureTask所有公有方法的调用都会委托给这个内部子类。<br>AQS被作为“模板方法模式”的基础类提供给FutureTask的内部子类Sync，这个内部子类只需要实现状态检查和状态更新的方法即可，这些方法将控制FutureTask的获取和释放操作。具体来说，Sync实现了AQS的tryAcquireShared（int）方法和tryReleaseShared（int）方法，Sync通过这两个方法来检查和更新同步状态。<br><img src="/2018/01/10/线程池和Executor/FutureTask设计.png" alt=""><br>Sync是一个内部私有类，它继承自AQS，创建FutureTask时会创建Sync，FutureTask的所有共有方法都委托给Sync。<br>FutureTask.get()会调用AQS.acquireSharedInterruptibly（int arg）方法，这个方法执行过程如下<br>1）首先会回调在子类Sync的tryAcquireShared方法来判断是否可以成功，acquire成功的条件为：state为执行成功状态或已取消状态，且runner不为null。<br>2）如果成功则在get方法中立即返回，失败了就在等待队列中去等待其他线程执行release操作。<br>3）当其他线程执行release操作（比如FutureTask.run()或FutureTask.cancel()）唤醒当前线程。当前线程再次执行tryAcquireShared将返回正值1，当前线程将离开等待队列并且唤醒他的后继线程。<br>4）最后返回计算结果或返回抛出异常。<br>FutureTask.run()执行过程如下：<br>FutureTask.run()的执行过程如下。<br>1）执行在构造函数中指定的任务（Callable.call()）。<br>2）以原子方式来更新同步状态（调用AQS.compareAndSetState（int expect，int update），设置state为执行完成状态RAN）。如果这个原子操作成功，就设置代表计算结果的变量result的值为Callable.call()的返回值，然后调用AQS.releaseShared（int arg）。<br>3）AQS.releaseShared（int arg）首先会回调在子类Sync中实的tryReleaseShared（arg）来执行release操作（设置运行任务的线程runner为null，然会返回true）；AQS.releaseShared（int arg），然后唤醒线程等待队列中的第一个线程。<br>4）调用FutureTask.done()。<br>当执行FutureTask.get()方法时，如果FutureTask不是处于执行完成状态RAN或已取消状态CANCELLED，当前执行线程将到AQS的线程等待队列中等待（见下图的线程A、B、C和D）。当某个线程执行FutureTask.run()方法或FutureTask.cancel（…）方法时，会唤醒线程等待队列的第一个线程<br><img src="/2018/01/10/线程池和Executor/级联唤醒.png" alt=""><br>假设开始时FutureTask处于未启动状态或已启动状态，等待队列中已经有3个线程（A、B和C）在等待。此时，线程D执行get()方法将导致线程D也到等待队列中去等待。当线程E执行run()方法时，会唤醒队列中的第一个线程A。线程A被唤醒后，首先把自己从<br>队列中删除，然后唤醒它的后继线程B，最后线程A从get()方法返回。线程B、C和D重复A线程的处理流程。最终，在队列中等待的所有线程都被级联唤醒并从get()方法返回。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/05/java并发编程6-8/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2023,430 +2226,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/15/Apache-ActiveMQ-笔记/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="李睿">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/15/Apache-ActiveMQ-笔记/" itemprop="url">Apache ActiveMQ 笔记一</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-15T09:52:52+08:00">
-                2017-12-15
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/消息中间件/" itemprop="url" rel="index">
-                    <span itemprop="name">消息中间件</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="消息中间件"><a href="#消息中间件" class="headerlink" title="消息中间件"></a>消息中间件</h1><p>面向消息的中间件：Message-oriented Middleware, MOM<br>基本功能：将信息以消息的形式，从一个应用程序传送到另一个或多个应用程序。<br>主要特点：</p>
-<ul>
-<li>消息异步接受，类似手机短信的行为，消息发送者不需要等待消息接受者的响应，减少软件多系统集成的耦合度。</li>
-<li>消息可靠接收，确保消息在中间件可靠保存，只有接收方收到后才删除消息，多个消息也可以组成原子事务。</li>
-</ul>
-<h2 id="JMS"><a href="#JMS" class="headerlink" title="JMS"></a>JMS</h2><p>java message service</p>
-<h3 id="JMS规范"><a href="#JMS规范" class="headerlink" title="JMS规范"></a>JMS规范</h3><p>java消息服务定义了java中访问消息中间件的接口。JMS只是接口，并没有实现，实现JMS的接口的消息中间件称为JMS Provider，例如ActiveMQ。</p>
-<h3 id="术语"><a href="#术语" class="headerlink" title="术语"></a>术语</h3><p>JMS Provider：实现JMS接口的消息中间件<br>PTP：point to point，即点对点模型<br>pub/sub：publish/subscribe，即发布/订阅消息模型<br>Queue：队列目标<br>Topic：主题目标<br>ConnectionFactory：连接工厂，JMS用它来创建连接<br>Connection：JMS客户端到JMS provider的连接<br>Destination：消息的目的地<br>Session：会话，一个发送或接收消息的线程<br>MessageProducer：由session对象创建用来发送消息的对象<br>MessageConsumer：由session对象创建用来接收消息的对象<br>Acknowledge：签收<br>Transaction：事务</p>
-<h3 id="JMS编程模型"><a href="#JMS编程模型" class="headerlink" title="JMS编程模型"></a>JMS编程模型</h3><p>在 JMS 编程模型中，JMS 客户端（组件或应用程序）通过 JMS 消息服务交换消息。消息生产者将消息发送至消息服务，消息消费者则从消息服务接收这些消息。这些消息传送操作是使用一组实现 JMS 应用编程接口 (API) 的对象 （由 JMS Provide 提供）来执行的。<br>在 JMS 编程模型中，JMS 客户端使用 ConnectionFactory 对象创建一个连接，向消息服务发送消息以及从消息服务接收消息均是通过此连接来进行。Connection是客户端与消息服务的活动连接。创建连接时，将分配通信资源以及验证客户端。这是一个相当重要的对象，大多数客户端均使用一个连接来进行所有的消息传送。连接用于创建会话。Session 是一个用于生成和使用消息的单线程上下文。它用于创建发送的生产者和接收消息的消费者，并为所发送的消息定义发送顺序。会话通过大量确认选项或通过事务来支持可靠传送。客户端使用 MessageProducer 向指定的物理目标 （在 API 中表示为目标身份对象）发送消息。<br>生产者可指定一个默认传送模式（持久性消息与非持久性消息）、优先级和有效期值，以控制生产者向物理目标发送的所有消息。同样，客户端使用 MessageConsumer 对象从指定的物理目标（在 API 中表示为目标对象）接收消息。消费者可使用消息选择器，借助它，消息服务可以只向消费者发送与选择标准匹配的那些消息。消费者可以支持同步或异步消息接收。异步使用可通过向消费者注册 MessageListener 来实现。当会话线程调用 MessageListener 对象的 onMessage 方法时，客户端将使用消息。</p>
-<h3 id="JMS编程域"><a href="#JMS编程域" class="headerlink" title="JMS编程域"></a>JMS编程域</h3><p>JMS接收两种截然不同的消息传送模型PTP和Pub/Sub</p>
-<ul>
-<li>PTP<br>消息从一个生产者传送给一个消费者。在此传送模型中，目标是一个队列。消息首先传送到队列目标，然后根据队列传送策略，从该队列将消息传送到这队列进行注册的某一个消费者，一次只传送一条消息。可以向队列目标发送消息的生产者的数量没有限制，但每条消息只能发送至、并由一个消费者成功使用。如果没有已经向队列目标注册的消费者，队列将保留它收到的消息，并在某个消费者向该队列进行注册时将消息传送给该消费者。</li>
-<li>Pub/Sub<br>消息从一个生产者传送至任意数量的消费者。在此传送模型中，目标是一个主题。消息首先被传送至主题目标，然后传送至所有已订阅此主题的活动消费者。可以向主题目标发送消息的生产者的数量没有限制，并且每个消息可以发送至任意数量的订阅消费者。主题目标也支持持久订阅的概念。持久订阅表示消费者已向主题目标进行注册，但在消息传送时此消费者可以处于非活动状态。当此消费者再次处于活动状态时，它将接收此信息。如果没有已经向主题目标注册的消费者，主题不保留其接收到的消息，除非有非活动消费者注册了持久订阅</li>
-</ul>
-<h2 id="JMS消息结构"><a href="#JMS消息结构" class="headerlink" title="JMS消息结构"></a>JMS消息结构</h2><p>JMS消息由消息头、属性和消息体组成</p>
-<h3 id="消息头"><a href="#消息头" class="headerlink" title="消息头"></a>消息头</h3><p>消息头包含消息的识别信息和路由信息，消息头包含一些标准的属性如JMSDestination、JMSMessageID<br>JMSDestination<br><img src="/2017/12/15/Apache-ActiveMQ-笔记/jms消息结构.png" alt=""><br>JMSDestination(自动)：消息发送的目的地主要指Queue和Topic<br>JMSDeliveryMode（自动）：传送模式有两种模式：持久模式和非持久模式，一条持久性消息应该被传递一次仅仅一次，这就意味着如果JMS提供者出现故障，该消息不会丢失，它会在服务器恢复之后再次传递。<br>JMSExpiration（自动）：消息过期时间，等于Destination 的send 方法的timeToLive值加上发送时刻的GMT 时间值。如果timeToLive值等于零则JMSExpiration 被设为零，表示该消息永不过期。如果发送后，在消息过期时间之后消息还没有被发送到目的地，则该消息被清除<br>JMSPriority(自动):消息优先级， 从 0-9 十个级别，0-4 是普通消息，5-9 是加急消息。JMS 不要求JMS Provider严格按照这十个优先级发送消息，但必须保证加急消息要先于普通消息到达。默认是4级。<br>JMSMessageID（自动）：唯一识别每个消息的标识，由JMS Provider 产生。<br>JMSTimestamp（自动）：一个JMS Provider在调用send()方法时自动设置的。它是消息被发送和消费者实际接收的时间差。自动分配。<br>JMSCorrelationID（开发者设置）：用来连接到另外一个消息，典型的应用是在回复消息中连接到原消息。在大多数情况下，JMSCorrelationID用于将一条消息标记为对 JMSMessageID标示的上一条消息的应答，不过，JMSCorrelationID可以是任何值，不仅仅是JMSMessageID。<br>JMSReplyTo（开发者设置）：提供本消息回复消息的目的地址。<br>JMSType（开发者设置）：消息类型的识别符。由开发者设置<br>JMSRedelivered(自动)：如果一个客户端收到一个设置了JMSRedelivered属性的消息，则表示可能客户端曾经在早些时候收到过该消息，但并没有签收 (acknowledged)。如果该消息被重新传送，JMSRedelivered=true反之，JMSRedelivered =false。</p>
-<h3 id="消息体"><a href="#消息体" class="headerlink" title="消息体"></a>消息体</h3><p>TextMessage:java.lang.String 对象，如xml 文件内容<br>MapMessage:名/值对的集合，名是String 对象，值类型可以是Java 任何基本类型。<br>ByteMessage:字节流<br>StreamMessage：java输入输出流<br>ObjectMessage：java中可序列化对象</p>
-<h3 id="消息属性"><a href="#消息属性" class="headerlink" title="消息属性"></a>消息属性</h3><h4 id="应用程序特定的属性"><a href="#应用程序特定的属性" class="headerlink" title="应用程序特定的属性"></a>应用程序特定的属性</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">TextMessage message=session.createTextMessage();</div><div class="line">message.setStringProperty(<span class="string">"username"</span>,username);</div></pre></td></tr></table></figure>
-<h4 id="JMS定义的属性"><a href="#JMS定义的属性" class="headerlink" title="JMS定义的属性"></a>JMS定义的属性</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">message.setStringProperty(<span class="string">"JMSXGroupID"</span>,<span class="string">"GroupA"</span>);</div><div class="line">message.setIntProperty(<span class="string">"JMSXGroupSeq"</span>, -1);</div></pre></td></tr></table></figure>
-<table>
-<thead>
-<tr>
-<th>名字</th>
-<th>类型</th>
-<th>设置者</th>
-<th>用法</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>JMSXUserID</td>
-<td>String</td>
-<td>发送时提供商设置</td>
-<td>发送时的用户标识</td>
-</tr>
-<tr>
-<td>JMSXAppID</td>
-<td>String</td>
-<td>发送时提供商设置</td>
-<td>发送消息的应用标识</td>
-</tr>
-<tr>
-<td>JMSXDeliveryCount</td>
-<td>int</td>
-<td>发送时提供商设置</td>
-<td>转发消息重试次数，第一次是1，第二次是2</td>
-</tr>
-<tr>
-<td>JMSXGroupID</td>
-<td>String</td>
-<td>客户端</td>
-<td>消息所在消息组的标识</td>
-</tr>
-<tr>
-<td>JMSXGroupSeq</td>
-<td>int</td>
-<td>客户端</td>
-<td>组内消息的序号第一个消息是1，第二个是2</td>
-</tr>
-<tr>
-<td>JMSXProducerTXID</td>
-<td>String</td>
-<td>发送时提供商设置</td>
-<td>产生消息时的事务的事务标识</td>
-</tr>
-<tr>
-<td>JMSXConsumerTXID</td>
-<td>String</td>
-<td>接收时提供商设置</td>
-<td>接收消息的事务的事务标识</td>
-</tr>
-<tr>
-<td>JMSXRcvTimestamp</td>
-<td>long</td>
-<td>接收时提供商设置</td>
-<td>JMS转发到消费者的消息</td>
-</tr>
-<tr>
-<td>JMSXState</td>
-<td>int</td>
-<td>提供商</td>
-<td>假定存在一个消息仓库，它存储了每个消息的拷贝，且这些消息从原始消息被发送开始，每个的拷贝的状态有1(等待),2（准备），3（到期）或者4（保留）。由于状态与生产者和消费者无关，所以它不是由它们来提供。它只和在仓库中查找消息相关，因此JMS没有提供这种API。</td>
-</tr>
-</tbody>
-</table>
-<h3 id="消息的确认"><a href="#消息的确认" class="headerlink" title="消息的确认"></a>消息的确认</h3><p>如果会话是事务性的，那么消息确认自动由commit 处理，且恢复自动由rollback 处理。如果会话不是事务性的，有三个确认选择，且手工处理恢复。</p>
-<ul>
-<li><p>DUPS_OK_ACKNOWLEDGE:这个选项告诉会话懒惰确认消息的传递。如果JMS失败，这很可能造成传递重复消息，因此这个选项只用于可以忍受重复消息的消费者。它的好处是减少了会话为防止重复所要做的工作</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">session = conn.createTopicSession(<span class="literal">false</span>, Session.DUPS_OK_ACKNOWLEDGE);</div></pre></td></tr></table></figure>
-</li>
-<li><p>AUTO_ACKNOWLEDGE:使用这个选项，当消息被成功地从调用接收返回或处理消息的MessageListener 成功返回时，会话自动确认客户端的消息接收</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">session = conn.createTopicSession(<span class="literal">false</span>, Session.AUTO_ACKNOWLEDGE);</div></pre></td></tr></table></figure>
-</li>
-<li><p>CLIENT_ ACKNOWLEDGE:使用这个选项，客户端通过调用消息的acknowledge方法来确认消息。确认一个被消费的消息会自动确认被该会话转发的所有消息。当使用 CLIENT_ACKNOWLEDGE 模式时，客户端可以在处理它们时产生大量未确认消息。JMS 提供商应当为管理员提供限制客户端超量运行的途径，以便客户端不会造成资源耗尽并保证当它们使用的资源被临时阻塞时造成失败。 会话的recover 方法用于停止一个会话然后使用第一个未确认消息来重新启动它。事实上，会话的被转发消息序列被重新设置到最后一个确认消息之后。现在转发的消息序列可以与起初转发的消息序列不同， 因为消息到期和收到更高优先级的消息。会话必须设置消息的redelivered 标记，表示它是由于恢复而被重新转发。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">conn.createTopicSession(<span class="literal">false</span>, Session.CLIENT_ACKNOWLEDGE);</div><div class="line">message.acknowledge();</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<h2 id="PTP模型"><a href="#PTP模型" class="headerlink" title="PTP模型"></a>PTP模型</h2><p>PTP(Point-to-Point)模型是基于队列的，生产者发消息到队列，消费者从队列接收消息，队列的存在使得消息的异步传输成为可能。</p>
-<table>
-<thead>
-<tr>
-<th>名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>ConnectionFactory</td>
-<td>客户端用ConnectionFactory创建Connection对象</td>
-</tr>
-<tr>
-<td>Connection</td>
-<td>一个到JMS provider的连接</td>
-</tr>
-<tr>
-<td>Session</td>
-<td>客户端用session创建Message、Producer、Consumer。如果在session关闭有一些消息已经收到但还未被签收，当消费者下次再连接到相同队列时，会被再次接收。</td>
-</tr>
-<tr>
-<td>Destination(Queue或TemporaryQueue)</td>
-<td>此处的目标为队列，队列由队列名识别。临时队列只能由创建它的Connection 所创建的消费者消费，但是任何生产者都可向临时队列发送消息。</td>
-</tr>
-<tr>
-<td>MessageProducer</td>
-<td>客户端用MessageProducer发送消息到队列中</td>
-</tr>
-<tr>
-<td>MessageConsumer</td>
-<td>客户端用MessageConsumer 接收队列中的消息，如果用户在receive方法中设定了消息选择条件，那么不符合条件的消息会留在队列中，不会被接收到。</td>
-</tr>
-<tr>
-<td>可靠性</td>
-<td>队列可以长久地保存消息直到消费者收到消息。消费者不需要因为担心消息会丢失而时刻和队列保持激活的连接状态，充分体现了异步传输模式的优势。</td>
-</tr>
-</tbody>
-</table>
-<h2 id="PUB-SUB模型"><a href="#PUB-SUB模型" class="headerlink" title="PUB/SUB模型"></a>PUB/SUB模型</h2><p>JMS Pub/Sub 模型定义了如何向一个内容节点发布和订阅消息，这些节点被称作主题。主题可以被认为是消息的传输中介，发布者(publisher)发布消息到主题，订阅者(subscribe) 从主题订阅消息。主题使得消息订阅者和消息发布者保持互相独立，不需要接触即可保证消息的传送。</p>
-<table>
-<thead>
-<tr>
-<th>名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>订阅(subscription)</td>
-<td>消息订阅分为非持久订阅和持久订阅，非持久订阅只有当客户端处于激活状态，也就是和JMSProvider 保持连接状态才能收到发送到某个主题的消息，而当客户端处于离线状态，这个时间段发到主题的消息将会丢失，永远不会收到。持久订阅时，客户端向JMS 注册一个识别自己身份的ID，当这个客户端处于离线时，JMS Provider 会为这个ID 保存所有发送到主题的消息，当客户再次连接到JMS Provider 时， 会根据自己的ID 得到所有当自己处于离线时发送到主题的消息</td>
-</tr>
-<tr>
-<td>ConnectionFactory</td>
-<td>客户端用 ConnectionFactory 创建Connection对象</td>
-</tr>
-<tr>
-<td>Connection</td>
-<td>一个到JMS provider的连接</td>
-</tr>
-<tr>
-<td>Session</td>
-<td>客户端用Session 创建MessageProducer 和MessageConsumer 对象。它还提供持久订阅主题，或使用unsubscribe 方法取消消息的持久订阅。</td>
-</tr>
-<tr>
-<td>Destination(Topic和TemporaryTopic)</td>
-<td>客户端用 Session 创建Destination 对象。此处的目标为主题，主题由主题名识别。临时主题只能由创建它的Connection 所创建的消费者消费。临时主题不能提供持久订阅功能。JMS 没有给出主题的组织和层次结构的定义，由JMS Provider 自己定义。</td>
-</tr>
-<tr>
-<td>MessageProducer</td>
-<td>客户端用MessageProducer发送消息到主题中</td>
-</tr>
-<tr>
-<td>MessageConsumer</td>
-<td>客户端用MessageConsumer 接收主题中的消息， 如果用户在receive方法中设定了消息选择条件，那么不符合条件的消息会留在队列中，不会被接收到。</td>
-</tr>
-<tr>
-<td>恢复和重新派送</td>
-<td>非持久订阅状态下，不能恢复或重新派送一个未签收的消息。只有持久订阅才能恢复或重新派送一个未签收的消息。</td>
-</tr>
-<tr>
-<td>可靠性</td>
-<td>当所有的消息必须被接收，则用持久订阅模式。当丢失消息能够被容忍，则用非持久订阅模式。</td>
-</tr>
-</tbody>
-</table>
-<h2 id="并发"><a href="#并发" class="headerlink" title="并发"></a>并发</h2><p>支持并发的对象：Destination、ConnectionFactory、Connection<br>不支持并发的对象：Session、MessageProducer、MessageConsumer</p>
-<h1 id="如何配置ActiveMQ"><a href="#如何配置ActiveMQ" class="headerlink" title="如何配置ActiveMQ"></a>如何配置ActiveMQ</h1><blockquote>
-<blockquote>
-<blockquote>
-<p>Master-Slave集群：<br>由至少3个节点组成，一个Master节点，其他为Slave节点。只有Master节点对外提供服务，Slave节点处于等待状态。当主节点宕机后，从节点会推举出一个节点出来成为新的Master节点，继续提供服务。<br>优点是可以解决多服务热备的高可用问题，缺点是无法解决负载均衡和分布式的问题。<br>Broker Cluster集群：<br>Broker-Cluster部署方式中，各个broker通过网络互相连接，并共享queue.当broker-A上面指定的queue-A中接收到一个message处于pending状态，而此时没有consumer连接broker-A时。如果cluster中的broker-B上面有一个consumer在消费queue-A的消息，那么broker-B会先通过内部网络获取到broker-A上面的message，并通知自己的consumer来消费。<br>优点是可以解决负载均衡和分布式的问题。但不支持高可用。</p>
-</blockquote>
-</blockquote>
-</blockquote>
-<h2 id="如何配置传输连接"><a href="#如何配置传输连接" class="headerlink" title="如何配置传输连接"></a>如何配置传输连接</h2><h3 id="格式配置如下"><a href="#格式配置如下" class="headerlink" title="格式配置如下"></a>格式配置如下</h3><p><img src="/2017/12/15/Apache-ActiveMQ-笔记/配置.png" alt=""></p>
-<h3 id="TCP"><a href="#TCP" class="headerlink" title="TCP"></a>TCP</h3><p>activeMQ 的 Broker 和 Client 之间需要一个高稳定性的通信，不难发现，TCP是一个理想的实现。所以我们并不惊讶在 ActiveMQ 频繁的使用 TCP 协议。<br>在做数据交互之前，我们需要知道必须序列化数据，消息是如何通过一个叫wire protocol 的来序列化成字节流。默认情况下，ActiveMQ 把 wire protocol 叫做OpenWire。它的目的是促使网络上的效率和数据快速交互等。默认的 Broker 配置，TCP 的 Client 监听端口是 61616。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">tcp://host:port?key=value</div></pre></td></tr></table></figure></p>
-<h3 id="NIO"><a href="#NIO" class="headerlink" title="NIO"></a>NIO</h3><p>NIO 协议和 TCP 协议类似，nio 更侧重于底层的访问操作。它不同与传统的I/O 流操作。允许开发人员对同一资源可有更多的 client 调用和服务端有更多的负载。<br>以下场景使用NIO：</p>
-<ul>
-<li>你可能有大量的 Client 去链接到 Broker 上；<br>般情况下，大量的 Client 去链接 Broker 是被操作系统的线程数所限制的。因此，NIO 的实现比 TCP 需要更少的线程去运行，所以，建议你使用 NIO 协议。</li>
-<li>你可能对于 Broker 有一个很迟钝的网络传输。<br>NIO 比 TCP 提供更好的性能。</li>
-</ul>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">nio://host:port?key=value</div><div class="line">&lt;transportConnectors&gt;</div><div class="line">&lt;transportConnector name=<span class="string">"tcp"</span> uri=<span class="string">"tcp://localhost:61616?trade=true"</span>/&gt;</div><div class="line">&lt;transportConnector name=<span class="string">"nio"</span> uri=<span class="string">"nio://localhost:61616?trade=true"</span>/&gt;</div><div class="line">&lt;/transportConnectors&gt;</div></pre></td></tr></table></figure>
-<p>运行原理如下：Producer 通过 NIO 协议发送数据到 broker，Consumer 通过 TCP 协议接收数据<br><img src="/2017/12/15/Apache-ActiveMQ-笔记/broker.png" alt=""></p>
-<h2 id="UDP"><a href="#UDP" class="headerlink" title="UDP"></a>UDP</h2><p>TCP是被用在稳定可靠的场景中使用的，然而，UDP 通常用在快速数据传递和不怕数据丢失的场景中使用的。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">udp://hostname:port?key=value</div></pre></td></tr></table></figure></p>
-<p>TCP 是一个原始的流协议，意味者数据包的传递是有保证的。UDP 则没有保证。<br>TCP 同样也是一个可靠性高的传递协议。意味者数据包不会丢失，反之，UDP 则不能保证</p>
-<h3 id="Secure-Sockets-Layer-Protocol-SSL"><a href="#Secure-Sockets-Layer-Protocol-SSL" class="headerlink" title="Secure Sockets Layer Protocol(SSL)"></a>Secure Sockets Layer Protocol(SSL)</h3><p>基于 TCP 之上的安全协议</p>
-<h3 id="HTTP-HTTPS"><a href="#HTTP-HTTPS" class="headerlink" title="HTTP/HTTPS"></a>HTTP/HTTPS</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">http://hostname:port?key=value</div></pre></td></tr></table></figure>
-<h3 id="vm-protocol"><a href="#vm-protocol" class="headerlink" title="vm protocol"></a>vm protocol</h3><p>VM transport 允许在 VM 内部通信，从而避免了网络传输的开销。这时候采用的连接不是socket连接，而是直接地方法调用。第一个创建 VM 连接的客户会启动一个 embed VM broker，接下来所有使用相同的broker name的VM连接都会使用这个 broker。当这个 broker上所有的连接都关闭的时候，这个broker也会自动关闭</p>
-<h2 id="如何配置网络"><a href="#如何配置网络" class="headerlink" title="如何配置网络"></a>如何配置网络</h2><p>一个ActiveMQ Broker对于你的所有的应用来说是非常实用的。但是，某些场景需要一些高级的特性。例如：高稳定性和大传输量。典型的就是用在网络中。Broker集群在多个ActiveMQ的实例中大大优化了消息的传递。这章主要是解释网络链接在 ActiveMQ 的应用，Broker 到 Broker 的通信。网络链接是以通道的形式将一个Broker 和其他的 Broker 链接起来通信。 网络链接默认是单向的， 然而， 一个 Broker在一端发送消息， 在另一 Broker 在另一端接收消息。 这就是所谓的 “桥接” 。 然而，你可能想创建一个双向的通道对于两个 Broker。他将不仅发送消息而且也能从相同的通道来接收消息。ActiveMQ 支持这种双向链接，通常作为 duplex connector来映射。如下图<br><img src="/2017/12/15/Apache-ActiveMQ-笔记/brokers.png" alt=""></p>
-<h3 id="如何配置Dynamic-Networks"><a href="#如何配置Dynamic-Networks" class="headerlink" title="如何配置Dynamic Networks"></a>如何配置Dynamic Networks</h3><h4 id="multicast协议"><a href="#multicast协议" class="headerlink" title="multicast协议"></a>multicast协议</h4><p>ActiveMQ 使用 Multicast 协议将一个 Service 和其他的 Broker 的 Service 连接起来。IP multicast是一个被用于网络中传输数据到其它一组接收者的技术。Ip multic 传统的概念称为组地址。组地址是 ip 地址在 224.0.0.0 到 239.255.255.255 之间的 ip 地址<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">multicast://address:port?transportOptions</div><div class="line">multicast://default</div><div class="line">multicast://224.1.2.3:6255</div><div class="line">multicast://224.1.2.3:6255?group=mygroupname</div><div class="line">&lt;broker xmlns=<span class="string">"http://activemq.apache.org/schema/core"</span> brokerName=<span class="string">"localhost"</span> dataDirectory=<span class="string">"<span class="variable">$&#123;activemq.data&#125;</span>"</span>&gt;</div><div class="line">&lt;networkConnectors&gt;</div><div class="line">  &lt;networkConnector name=<span class="string">"default-nc"</span> uri=<span class="string">"multicast://default"</span> /&gt;</div><div class="line">  &lt;/networkConnectors&gt;</div><div class="line">  &lt;transportConnectors&gt;</div><div class="line">            &lt;!-- DOS protection, <span class="built_in">limit</span> concurrent connections to 1000 and frame size to 100MB --&gt;</div><div class="line">            &lt;transportConnector name=<span class="string">"openwire"</span> uri=<span class="string">"tcp://0.0.0.0:61616?maximumConnections=1000&amp;amp;wireFormat.maxFrameSize=104857600"</span> discoveryUri=<span class="string">"multicast://default"</span>/&gt;</div><div class="line">        &lt;/transportConnectors&gt;</div><div class="line">&lt;/broker&gt;</div></pre></td></tr></table></figure></p>
-<p>“default”=是 activemq 默认的 ip，默认动态的寻找地址<br>“discoveryUri”=是指在 transport 中用 multicast 的 default 的地址传递。<br>“uri”=指动态寻找可利用的地址<br><em>防止自动寻找地址</em><br>1.名称为 openwire 的 transport，移除discoveryUri=”multicast://default”即可。传输链接用默认的名称 openwire 来配置 broker 的 tcp 多点链接，这将允许其它 broker 能够自动发现和链接到可用的 broker 中<br>2.名称为“default-nc”的 networkConnector，注释掉或者删除即可<br>3.使 brokerName 的名字唯一。默认是 localhost。是为了唯一识别 Broker的实例</p>
-<h4 id="discovery协议"><a href="#discovery协议" class="headerlink" title="discovery协议"></a>discovery协议</h4><p>Discovery 是在 multicast 协议的功能上定义的。功能类似与 failover 功能。它将动态的发现 multicast 协议的 broker 的链接并且随机的链接其中一个 broker。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">discovery:(discoveryAgentURI)?transportOptions</div><div class="line">discovery:discoveryAgentURI</div></pre></td></tr></table></figure></p>
-<h4 id="peer协议"><a href="#peer协议" class="headerlink" title="peer协议"></a>peer协议</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">peer://peergroup/brokerName?key=value</div></pre></td></tr></table></figure>
-<h4 id="fanout协议"><a href="#fanout协议" class="headerlink" title="fanout协议"></a>fanout协议</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">fanout://(fanoutUri)?key=value</div></pre></td></tr></table></figure>
-<h3 id="如何配置Static-Networks"><a href="#如何配置Static-Networks" class="headerlink" title="如何配置Static Networks"></a>如何配置Static Networks</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">static://(uri1,uri2)</div></pre></td></tr></table></figure>
-<p><img src="/2017/12/15/Apache-ActiveMQ-笔记/static.png" alt=""><br>关于以上视图，两个 Brokers 是网络链接的。Brokers 通过一个 static 的协议来创建一个链接。一个 Consumer 链接到 brokerB 的一个地址上 ，当 Producer 在brokerA 上以相同的地址发送消息时， 此时它将被转移到 brokerB 上。 这种情况下，BrokerA 转发消息到 BrokerB 上。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&lt;broker xmlns=<span class="string">"http://activemq.apache.org/schema/core"</span> brokerName=<span class="string">"brokerA"</span> dataDirectory=<span class="string">"<span class="variable">$&#123;activemq.data&#125;</span>"</span>&gt;</div><div class="line">&lt;networkConnectors&gt;</div><div class="line">  &lt;networkConnector uri=<span class="string">"static:(tcp://localhost:61617)"</span>  /&gt;</div><div class="line">  &lt;/networkConnectors&gt;</div><div class="line">  &lt;transportConnectors&gt;</div><div class="line">            &lt;transportConnector name=<span class="string">"openwire"</span> uri=<span class="string">"localhost:61616"</span>/&gt;</div><div class="line">        &lt;/transportConnectors&gt;</div><div class="line">&lt;/broker&gt;</div></pre></td></tr></table></figure></p>
-<p>以上配置broker监听端口在 61617上，它定义了一个 networks 链接到 BrokerB上。以上例子，消息在 BrokerA 上被发送，消息被转发到 BrokerB 上，此时通过Consumer 来消费该消息。</p>
-<h4 id="failover-protocol"><a href="#failover-protocol" class="headerlink" title="failover protocol"></a>failover protocol</h4><p>Failover 协议实现了自动重新链接的逻辑。这里有两种方式提供了稳定的brokers 列表对于 Client 链接。 第一种方式：提供一个 static 的可用的 Brokers 列表。第二种方式：提供一个 dynamic 发现的可用 Brokers.<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">failover:(tcp://localhost:61616)</div></pre></td></tr></table></figure></p>
-<p>对于 broker 失败 client 不需要重新去启动，而是自动的去连接其它可用的broker</p>
-<h1 id="消息存储的持久化"><a href="#消息存储的持久化" class="headerlink" title="消息存储的持久化"></a>消息存储的持久化</h1><p>消息的持久化不仅支持persistence和non-persistence，还支持recovery。</p>
-<h2 id="PTP"><a href="#PTP" class="headerlink" title="PTP"></a>PTP</h2><p><img src="/2017/12/15/Apache-ActiveMQ-笔记/PTP.png" alt=""></p>
-<h2 id="pub-sub"><a href="#pub-sub" class="headerlink" title="pub/sub"></a>pub/sub</h2><p><img src="/2017/12/15/Apache-ActiveMQ-笔记/pub-sub.png" alt=""></p>
-<h2 id="有效存储"><a href="#有效存储" class="headerlink" title="有效存储"></a>有效存储</h2><ul>
-<li>AMQ 消息存储-默认的消息存储</li>
-<li>KahaDB 消息存储-提供了容量的提升和恢复能力（5.3 以上采用）</li>
-<li>JDBC 消息存储-消息基于 JDBC 存储的。</li>
-<li>Memory 消息存储-基于内存的消息存储。</li>
-</ul>
-<h3 id="AMQ-Message-Store"><a href="#AMQ-Message-Store" class="headerlink" title="AMQ Message Store"></a>AMQ Message Store</h3><p>AMQ Message Store 是 ActiveMQ 5.0 缺省的持久化存储。它是一个基于文件、事务存储设计为快速消息存储的一个结构。AMQ 消息存储的初衷是尽可能简单的应用。它用了一个基于文件存储的消息数据库并且不依赖与第三方数据库。ActiveMQ 不会下载数据和不会运行很长时间。反之，AMQ 存储结构是以流的形式来进行消息交互的。如果 AMQ 消息存储没有配置，那么它会使用默认的配置参数。选择性的使用消息存储或者改变 AMQ 消息存储的默认行为。当然了，一个<persistenceadapter>元素必须被配置。<br>Message commands 被保存到 transactional journal（由 rolling data logs 组成）。Messages 被保存到 data logs 中，同时被 reference store 进行索引以提高存取速度。Date logs 由一些单独的 data log 文件组成， 缺省的文件大小是 32M， 如果某个消息的大小超过了 data log 文件的大小， 那么可以修改配置以增加data log 文件的大小。如果某个 data log 文件中所有的消息都被成功消费了，那么这个data log 文件将会被标记，以便在下一轮的清理中被删除或者归档。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&lt;broker brokerName=<span class="string">"broker"</span> persistent=<span class="string">"true"</span> useShutdownHook =<span class="string">"false"</span>&gt;</div><div class="line"> &lt;persistenceAdapter&gt;</div><div class="line"> &lt;amqPersistenceAdapter directory=<span class="string">"<span class="variable">$&#123;activemq.base&#125;</span>/data"</span> maxFileLength=<span class="string">"32mb"</span> /&gt;</div><div class="line"> &lt;/persistenceAdapter&gt;</div><div class="line">&lt;/boker&gt;</div></pre></td></tr></table></figure></persistenceadapter></p>
-<p><img src="/2017/12/15/Apache-ActiveMQ-笔记/amq.png" alt=""></p>
-<ol>
-<li>Journal=包括一些基于消息和命令存储的回滚日志文件。 当数据文件到达最大值时，新的数据文件将会被创建。数据文件中的消息都会被映射， 如果一些消息如果不长时间使用的话， 他将会被移除或者被存档。Journal 仅仅是把当前的最新消息链接到该数据文件上即可， 所以存储相当的快.</li>
-<li>Cache:能够快速的是存储在journal目录中的数据恢复到内存中。 Cache还更新当前消息 id 和定位消息在journal中存储的最新映射。映射存储被更新后，消息才被安全的从缓存中移除。在缓存更新到映射存储这个范围段内我们需要配置属性checkpoinInterval。如果ActiveMQ消息 broker 在内存达到上限时 checkpoint将会起作用。</li>
-<li>Refernce：在journal中通过消息的id来映射消息。 它能够准确的从FIFO中映射其队列的数据结构和通过指针指向持久化订阅的主题消息。索引指数指的是 hash 索引。它也可以用一个内存 HashMap 类型的。</li>
-</ol>
-<p>使用场景：<br>AMQ 是 ActiveMQ 的默认消息存储，它提供了在执行中的负载平衡，事实上这种存储是已经在嵌入 broker 和配置 xml 的 broker 中是最理想的存储方式对于用户。<br>它对于独立的和嵌入式的 ActiveMQ 来说是由可靠的持久性依赖于持久的事务处理和高效的索引来存储使其最优化程度高。AMQ 存储的这用易操作性意味这它将被大部分应用所使用， 从高输出应用到存储大数据量的消息。</p>
-<h3 id="KahaDB-Message-Store"><a href="#KahaDB-Message-Store" class="headerlink" title="KahaDB Message Store"></a>KahaDB Message Store</h3><p>KahaDB 是一种新的消息消息存储，而且解决了 AMQ 的一些不足，提高了性能。 AMQ 消息存储用两个分离的文件对于每一个索引和如果 broker 没有彻底关闭则恢复很麻烦， 所有的索引文件需要重新构建， broker 需要遍历所有的消息日志文件。<br>为了克服以上限制， KahaDB 消息存储对于它的索引用一个事务日志和仅仅用一个索引文件来存储它所有的地址。不同于 AMQ。而且在生成环境测试链接数到10000，而且每一个链接对应一个队列。<br>Kaha Persistence 是一个专门针对消息持久化的解决方案。它对典型的消息使用模式进行了优化。在 Kaha 中，数据被追加到 data logs 中。当不再需要 log 文件中的数据的时候，log 文件会被丢弃。以下是其配置的一个例子<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&lt;broker brokerName=<span class="string">"broker"</span> persistent=<span class="string">"true"</span> useShutdownHook=<span class="string">"false"</span>&gt;</div><div class="line"> &lt;persistenceAdapter&gt;</div><div class="line"> &lt;kahaPersistenceAdapter directory=<span class="string">"activemq-data"</span> maxDataFileLength=<span class="string">"33554432"</span></div><div class="line"> &lt;/persistenceAdapter&gt;</div><div class="line">   &lt;/broker&gt;</div></pre></td></tr></table></figure></p>
-<p><img src="/2017/12/15/Apache-ActiveMQ-笔记/kaha.png" alt=""><br>所有的索引文件更新的记录存在 Redo Log 中，这样就不用更新没有变化的索引数据了，仅仅更新变化的数据。额外的，KahaDB 消息存储用了一个 B-Tree 布局恰恰和 AMQ 消息存储相反，KahaBD 消息存储保持所有的索引在一个持久的 hash 表中，然而 hash 索引在时刻的变化，KahaBD 在这方面已经有了很好的性能特征<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&lt;broker brokerName=<span class="string">"broker"</span> persistent=<span class="string">"true"</span> useShutdownHook=<span class="string">"false"</span>&gt;</div><div class="line">&lt;persistenceAdapter&gt;</div><div class="line">&lt;kahaDB directory=<span class="string">"activemq-data"</span> journalMaxFileLength=<span class="string">"32mb"</span>/&gt;</div><div class="line">&lt;/persistenceAdapter&gt;</div><div class="line">&lt;transportConnectors&gt;</div><div class="line">&lt;transportConnector uri=<span class="string">"tcp://localhost:61616"</span>/&gt;</div><div class="line">&lt;/transportConnectors&gt;</div><div class="line">&lt;/broker&gt;</div></pre></td></tr></table></figure></p>
-<h3 id="JDBC-Message-Store"><a href="#JDBC-Message-Store" class="headerlink" title="JDBC Message Store"></a>JDBC Message Store</h3><p>当我们使用 JDBC 消息存储默认的驱动使用 Apache Derby 数据库。同时也支持其它关系数据库：MySQL、Oracle、SQLServer、Sybase、Informix、MaxDB.<br>JDBC 消息存储提供了三张表， 其中两种表是用于存储消息和第三张表是用于类似与排他锁似的，这样确保 ActiveMQ 仅仅由一个用户进入数据库.<br><img src="/2017/12/15/Apache-ActiveMQ-笔记/msgs.png" alt=""><br><img src="/2017/12/15/Apache-ActiveMQ-笔记/ack1.png" alt=""><br><img src="/2017/12/15/Apache-ActiveMQ-笔记/ack2.png" alt=""><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">&lt;persistence&gt;</div><div class="line">&lt;jdbcPersistence dataSourceRef=<span class="string">"mysql-ds"</span>/&gt;</div><div class="line">&lt;/persistence&gt;</div><div class="line">&lt;bean id=<span class="string">"mysql-ds"</span> class=<span class="string">"org.apache.commons.dbcp.BasicDataSource"</span> destroy-method=<span class="string">"close"</span>&gt;</div><div class="line">&lt;property name=<span class="string">"driverClassName"</span>value=<span class="string">"com.mysql.jdbc.Driver"</span>/&gt;</div><div class="line">&lt;property name=<span class="string">"url"</span> value=<span class="string">"jdbc:mysql://localhost/activemq?relaxAutoCommit=true"</span>/&gt;</div><div class="line">&lt;propertyname=<span class="string">"username"</span> value=<span class="string">"activemq"</span>/&gt;</div><div class="line">&lt;property name=<span class="string">"password"</span>value=<span class="string">"activemq"</span>/&gt;</div><div class="line">&lt;propertyname=<span class="string">"poolPreparedStatements"</span> value=<span class="string">"true"</span>/&gt;</div><div class="line">&lt;/bean&gt;</div></pre></td></tr></table></figure></p>
-<h3 id="jdbc-with-journal"><a href="#jdbc-with-journal" class="headerlink" title="jdbc with journal"></a>jdbc with journal</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&lt;beans&gt;</div><div class="line">&lt;broker brokerName=<span class="string">"test-broker"</span> xmlns=<span class="string">"http://activemq.apache.org/schema/core"</span>&gt;</div><div class="line">&lt;persistenceFactory&gt; &lt;journalPersistenceAdapterFactory journalLogFiles=<span class="string">"4"</span> journalLogFileSize=<span class="string">"32768"</span> useJournal=<span class="string">"true"</span> useQuickJournal=<span class="string">"true"</span> dataSource=<span class="string">"#derby-ds"</span> dataDirectory=<span class="string">"activemq-data"</span> /&gt;</div><div class="line">&lt;/persistenceFactory&gt;</div><div class="line">&lt;/broker&gt;</div><div class="line">&lt;/beans&gt;</div></pre></td></tr></table></figure>
-<p>JDBC Store和JDBC Message Store with ActiveMQ Journal的区别<br>1:Jdbc with journal的性能优于jdbc<br>2:Jdbc用于master/slave模式的数据库分享<br>3:Jdbc with journal不能用于master/slave模式<br>4:一般情况下,推荐使用jdbc with journal</p>
-<h3 id="memory-message-Store"><a href="#memory-message-Store" class="headerlink" title="memory message Store"></a>memory message Store</h3><p>内存消息存储主要是存储所有的持久化的消息在内存中。这里没有动态的缓存存在，所以你必须注意设置你的 broker 在 JVM 和内存限制。<br>消息存储基于 Memory，所有的消息都存储在内存里。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&lt;beans&gt;</div><div class="line">&lt;broker brokerName=<span class="string">"test-broker"</span> persistent=<span class="string">"false"</span> xmlns=<span class="string">"http://activemq.apache.org/schema/core"</span>&gt;</div><div class="line">&lt;transportConnectors&gt;</div><div class="line">&lt;transportConnector uri=<span class="string">"tcp://localhost:61635"</span>/&gt;</div><div class="line">&lt;/transportConnectors&gt; &lt;/broker&gt;</div><div class="line">&lt;/beans&gt;</div></pre></td></tr></table></figure></p>
-<h3 id="KahaDB、-AMQ-区别"><a href="#KahaDB、-AMQ-区别" class="headerlink" title="KahaDB、  AMQ 区别"></a>KahaDB、  AMQ 区别</h3><ol>
-<li>KahaDB 克服了 AMQ 的一些不足。</li>
-<li>kahaDB 性能上优于 AMQ。</li>
-<li>KahaDB 用于大量的 broker【500 个以上】 。</li>
-<li>AMQ 用于独立和嵌入式的 broker 比较好。</li>
-<li>AMQ 在执行的性能和索引方面都比较不错。</li>
-<li>kahaDB 和 AMQ 两者是独立的，谁也不包括谁。<h3 id="使用内存消息存储"><a href="#使用内存消息存储" class="headerlink" title="使用内存消息存储"></a>使用内存消息存储</h3>如果你的 broker 仅仅对于一组消息的消费是很快的，那么可以使用内存消息存储，但是他通常用于内部简单的消息测试，而不花费很多时间。或者能够在测试消息后清除消息<h1 id="如何用ActiveMQ构建应用"><a href="#如何用ActiveMQ构建应用" class="headerlink" title="如何用ActiveMQ构建应用"></a>如何用ActiveMQ构建应用</h1><h2 id="用ActiveMQ构建java应用"><a href="#用ActiveMQ构建java应用" class="headerlink" title="用ActiveMQ构建java应用"></a>用ActiveMQ构建java应用</h2><h3 id="嵌入式broker启动"><a href="#嵌入式broker启动" class="headerlink" title="嵌入式broker启动"></a>嵌入式broker启动</h3><h4 id="broker-service启动broker"><a href="#broker-service启动broker" class="headerlink" title="broker service启动broker"></a>broker service启动broker</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">BrokerService broker = new BrokerService();</div><div class="line">broker.setUseJmx(<span class="literal">true</span>);</div><div class="line">broker.addConnector(<span class="string">"tcp://localhost:61616"</span>);</div><div class="line">broker.start();</div></pre></td></tr></table></figure>
-</li>
-</ol>
-<h4 id="broker-factory启动"><a href="#broker-factory启动" class="headerlink" title="broker factory启动"></a>broker factory启动</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">String Uri = <span class="string">"properties:resources/broker.properties"</span>;</div><div class="line">//默认不自动启动。</div><div class="line">// BrokerService broker1 = BrokerFactory.createBroker(Uri);</div><div class="line">BrokerService broker1 = BrokerFactory.createBroker(new URI(Uri));</div><div class="line">//<span class="string">"true"</span>表示自动启动。反之，不启动。</div><div class="line">// BrokerService broker2 = BrokerFactory.createBroker(Uri,<span class="literal">true</span>);</div><div class="line">broker1.addConnector(<span class="string">"tcp://localhost:61616"</span>);</div><div class="line">broker1.start();</div></pre></td></tr></table></figure>
-<h4 id="利用spring集成broker"><a href="#利用spring集成broker" class="headerlink" title="利用spring集成broker"></a>利用spring集成broker</h4><p><img src="/2017/12/15/Apache-ActiveMQ-笔记/spring-broker.png" alt=""></p>
-<h4 id="activeMQ嵌入到其他应用服务器中"><a href="#activeMQ嵌入到其他应用服务器中" class="headerlink" title="activeMQ嵌入到其他应用服务器中"></a>activeMQ嵌入到其他应用服务器中</h4><h1 id="ActiveMq的安全"><a href="#ActiveMq的安全" class="headerlink" title="ActiveMq的安全"></a>ActiveMq的安全</h1><h2 id="Simple-Authentication-Plugin"><a href="#Simple-Authentication-Plugin" class="headerlink" title="Simple Authentication Plugin"></a>Simple Authentication Plugin</h2><p>适用于简单的认证需求，或者用于建立测试环境。它允许在 XML 配置文件中指定用户、用户组和密码等信息<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div></pre></td><td class="code"><pre><div class="line">&lt;broker useJmx=<span class="string">"true"</span> persistent=<span class="string">"false"</span></div><div class="line">xmlns=<span class="string">"http://activemq.apache.org/schema/core"</span></div><div class="line">populateJMSXUserID=<span class="string">"true"</span>&gt;</div><div class="line">&lt;transportConnectors&gt;</div><div class="line">&lt;transportConnector uri=<span class="string">"tcp://localhost:61616"</span>/&gt;</div><div class="line">&lt;/transportConnectors&gt;</div><div class="line">&lt;destinations&gt;</div><div class="line">&lt;queue physicalName=<span class="string">"TEST.Q"</span> /&gt;</div><div class="line">&lt;/destinations&gt;</div><div class="line">&lt;plugins&gt;</div><div class="line">&lt;simpleAuthenticationPlugin&gt;</div><div class="line">&lt;users&gt;</div><div class="line">&lt;authenticationUser username=<span class="string">"system"</span> password=<span class="string">"manager"</span></div><div class="line">groups=<span class="string">"users,admins"</span>/&gt;</div><div class="line">&lt;authenticationUser username=<span class="string">"user"</span> password=<span class="string">"password"</span></div><div class="line">groups=<span class="string">"users"</span>/&gt;</div><div class="line">&lt;authenticationUser username=<span class="string">"guest"</span> password=<span class="string">"password"</span></div><div class="line">groups=<span class="string">"guests"</span>/&gt;</div><div class="line">&lt;/users&gt;</div><div class="line">&lt;/simpleAuthenticationPlugin&gt;</div><div class="line">&lt;authorizationPlugin&gt;</div><div class="line">&lt;map&gt;</div><div class="line">&lt;authorizationMap&gt;</div><div class="line">&lt;authorizationEntries&gt;</div><div class="line">&lt;authorizationEntry queue=<span class="string">"&gt;"</span> <span class="built_in">read</span>=<span class="string">"admins"</span> write=<span class="string">"admins"</span></div><div class="line">admin=<span class="string">"admins"</span> /&gt;</div><div class="line">&lt;authorizationEntry queue=<span class="string">"USERS.&gt;"</span> <span class="built_in">read</span>=<span class="string">"users"</span></div><div class="line">write=<span class="string">"users"</span> admin=<span class="string">"users"</span> /&gt;</div><div class="line">&lt;authorizationEntry queue=<span class="string">"GUEST.&gt;"</span> <span class="built_in">read</span>=<span class="string">"guests"</span></div><div class="line">write=<span class="string">"guests,users"</span> admin=<span class="string">"guests,users"</span> /&gt;</div><div class="line">&lt;authorizationEntry queue=<span class="string">"TEST.Q"</span> <span class="built_in">read</span>=<span class="string">"guests"</span></div><div class="line">write=<span class="string">"guests"</span> /&gt;</div><div class="line">&lt;authorizationEntry topic=<span class="string">"&gt;"</span> <span class="built_in">read</span>=<span class="string">"admins"</span> write=<span class="string">"admins"</span></div><div class="line">admin=<span class="string">"admins"</span> /&gt;</div><div class="line">&lt;authorizationEntry topic=<span class="string">"USERS.&gt;"</span> <span class="built_in">read</span>=<span class="string">"users"</span></div><div class="line">write=<span class="string">"users"</span> admin=<span class="string">"users"</span> /&gt;</div><div class="line">&lt;authorizationEntry topic=<span class="string">"GUEST.&gt;"</span> <span class="built_in">read</span>=<span class="string">"guests"</span></div><div class="line">write=<span class="string">"guests,users"</span> admin=<span class="string">"guests,users"</span> /&gt;</div><div class="line">&lt;authorizationEntry topic=<span class="string">"ActiveMQ.Advisory.&gt;"</span></div><div class="line"><span class="built_in">read</span>=<span class="string">"guests,users"</span> write=<span class="string">"guests,users"</span> admin=<span class="string">"guests,users"</span>/&gt;</div><div class="line">&lt;/authorizationEntries&gt;</div><div class="line">&lt;/authorizationMap&gt;</div><div class="line">&lt;/map&gt;</div><div class="line">&lt;/authorizationPlugin&gt;</div><div class="line">&lt;/plugins&gt;</div><div class="line">&lt;/broker&gt;</div></pre></td></tr></table></figure></p>
-<h2 id="JAAS授权插件"><a href="#JAAS授权插件" class="headerlink" title="JAAS授权插件"></a>JAAS授权插件</h2><p>JAAS Authentication Plugin依赖标准的 JAAS 机制来实现认证。通常情况下，你需要通过设置java.security.auth.login.config 系统属性来配置 loginmodules的配置文件。如果没有指定这个系统属性，那么JAAS Authentication Plugin 会缺省使用 login.config 作为文件名</p>
-<h3 id="在activeMQ-xml中配置"><a href="#在activeMQ-xml中配置" class="headerlink" title="在activeMQ.xml中配置"></a>在activeMQ.xml中配置</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;plugins&gt;</div><div class="line">    &lt;jaasAuthenticationPlugin configuration=<span class="string">"activemq-domain"</span> /&gt;</div><div class="line">&lt;/plugins&gt;</div></pre></td></tr></table></figure>
-<h3 id="创建login-config"><a href="#创建login-config" class="headerlink" title="创建login.config"></a>创建login.config</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">activemq-domain &#123;</div><div class="line">  org.apache.activemq.jaas.PropertiesLoginModule required</div><div class="line">    debug=<span class="literal">true</span></div><div class="line">    org.apache.activemq.jaas.properties.user=<span class="string">"users.properties"</span></div><div class="line">    org.apache.activemq.jaas.properties.group=<span class="string">"groups.properties"</span>;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
-<h3 id="创建users-properties和groups-properties文件，包含用户和用户组信息"><a href="#创建users-properties和groups-properties文件，包含用户和用户组信息" class="headerlink" title="创建users.properties和groups.properties文件，包含用户和用户组信息"></a>创建users.properties和groups.properties文件，包含用户和用户组信息</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">users.properties：</div><div class="line">system=password</div><div class="line">user=password</div><div class="line">guest=password</div><div class="line">groups.properties：</div><div class="line">admins=system</div><div class="line">users=system,user</div><div class="line">guests=guest</div></pre></td></tr></table></figure>
-<h3 id="Authorization-plugin-in的使用"><a href="#Authorization-plugin-in的使用" class="headerlink" title="Authorization plugin-in的使用"></a>Authorization plugin-in的使用</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">在activemq.xml中如下配置：</div><div class="line">&lt;plugins&gt;</div><div class="line">  &lt;authorizationPlugin&gt;</div><div class="line">    &lt;map&gt;</div><div class="line">      &lt;authorizationMap&gt;</div><div class="line">        &lt;authorizationEntries&gt;</div><div class="line">          &lt;authorizationEntry queue=<span class="string">"&gt;"</span> <span class="built_in">read</span>=<span class="string">"admins"</span> write=<span class="string">"admins"</span> admin=<span class="string">"admins"</span> /&gt;</div><div class="line">          &lt;authorizationEntry queue=<span class="string">"USERS.&gt;"</span> <span class="built_in">read</span>=<span class="string">"users"</span> write=<span class="string">"users"</span> admin=<span class="string">"users"</span> /&gt;</div><div class="line">          &lt;authorizationEntry queue=<span class="string">"GUEST.&gt;"</span> <span class="built_in">read</span>=<span class="string">"guests"</span> write=<span class="string">"guests,users"</span> admin=<span class="string">"guests,users"</span> /&gt;</div><div class="line">          &lt;authorizationEntry queue=<span class="string">"TEST.Q"</span> <span class="built_in">read</span>=<span class="string">"guests"</span> write=<span class="string">"guests"</span> /&gt;</div><div class="line">          &lt;authorizationEntry topic=<span class="string">"&gt;"</span> <span class="built_in">read</span>=<span class="string">"admins"</span> write=<span class="string">"admins"</span> admin=<span class="string">"admins"</span> /&gt;</div><div class="line">          &lt;authorizationEntry topic=<span class="string">"USERS.&gt;"</span> <span class="built_in">read</span>=<span class="string">"users"</span> write=<span class="string">"users"</span> admin=<span class="string">"users"</span> /&gt;</div><div class="line">          &lt;authorizationEntry topic=<span class="string">"GUEST.&gt;"</span> <span class="built_in">read</span>=<span class="string">"guests"</span> write=<span class="string">"guests,users"</span> admin=<span class="string">"guests,users"</span> /&gt;</div><div class="line">          &lt;authorizationEntry topic=<span class="string">"ActiveMQ.Advisory."</span>&gt; <span class="built_in">read</span>=<span class="string">"guests,users"</span> write=<span class="string">"guests,users"</span> admin=<span class="string">"guests,users"</span>/&gt;</div><div class="line">        &lt;/authorizationEntries&gt;</div><div class="line">      &lt;/authorizationMap&gt;</div><div class="line">    &lt;/map&gt;</div><div class="line">  &lt;/authorizationPlugin&gt;</div><div class="line">&lt;/plugins&gt;</div></pre></td></tr></table></figure>
-<h1 id="ActiveMQ特点"><a href="#ActiveMQ特点" class="headerlink" title="ActiveMQ特点"></a>ActiveMQ特点</h1><h2 id="使用activeMQ进行集群"><a href="#使用activeMQ进行集群" class="headerlink" title="使用activeMQ进行集群"></a>使用activeMQ进行集群</h2><h3 id="Queue-consumer-clusters"><a href="#Queue-consumer-clusters" class="headerlink" title="Queue consumer clusters"></a>Queue consumer clusters</h3><p>我们支持 Consumer对消息高可靠性的负载平衡消费，如果一个 Consumer 死掉，该消息会转发到其它的Consumer消费的Queue上。如果一个 Consumer 获得消息比其它Consumer快，那么他将获得更多的消息。如果一个 Conseumer消费缓慢，则其它 Consumer会替换它。</p>
-<h3 id="Broker-clusters"><a href="#Broker-clusters" class="headerlink" title="Broker clusters"></a>Broker clusters</h3><p>大部情况下是使用一系列的 Broker 和 Client 链接到一起。如果一个 Broker死掉了，Client 可以自动链接到其它Broker上。实现以上行为我门需要用failover：//协议作为 Client，如果启动了多个Broker，Client 可以使用static discover 或者Dynamic discovery 容易的从一个 broker 到另一个 broker 直接链接。这样的当一个broker上没有 Consumer 的话， 那么它的消息不会被消费的， 然而该 broker会通过存储和转发的策略来把该消息发到其它 broker 上。这里的 brokers 没有网络链接各个 brokers。</p>
-<h3 id="discovery-of-brokers"><a href="#discovery-of-brokers" class="headerlink" title="discovery of brokers"></a>discovery of brokers</h3><p>ActiveMQ 支持使用 static discovery 或者 dynamic discovery 来动态发现brokers，以至于 Client 能够链接到其它发现的 broker，从而形成网络。</p>
-<h3 id="networks-of-brokers"><a href="#networks-of-brokers" class="headerlink" title="networks of brokers"></a>networks of brokers</h3><p>如果你正在使用client/server或者hub/spoke类型的拓扑结构并且你有很多的client很多的broker。这就有可能其中一个broker只有生产者没有消费者，这样的话消息会在这个broker上堆积，并且得不到处理。为了避免这种情况，ActiveMQ提供了网络连接模式（Network of brokers），该模式可以提供存储和转发消息的功能，具体就是broker之间可以互相传送消息，这样也允许我们在网络连接模式中提供重分发TOPIC和QUEUES的功能（参见：<a href="http://activemq.apache.org/how-do-distributed-queues-work.html）。" target="_blank" rel="external">http://activemq.apache.org/how-do-distributed-queues-work.html）。</a><br>这允许一个client去连接任意一个broker， 并且当有错误发生的时候可以failover到其他的broker，它提供了从client的角度来观察一个broker集群<br>网络连接模式允许我们放大client群到一个很大的数量级，因为我们可以运行我们需要的任意多个broker.<br>你可以把该模式想象成一个client集群去连接一个broker集群同时拥有failover和discovery功能去做成的一个简单的易用的消息结构。<br>（注：此处的网络连接模式，仅仅只是为了避免集群中的broker只有producer而没有consumer的情况，它会在不同的broker中间传送消息，以便让所有的消息都能有消费者来处理，但是<br>该模式下不会有消费的备份，在任何时刻，对客户端来说同一个消息都只存在一份，若需要消息备份机制则需要Master Slave的支持，这我们下面会说到）<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">&lt;networkConnectors&gt;  </div><div class="line">    &lt;networkConnector uri=<span class="string">"static:(nio://192.168.9.102:61616)"</span>/&gt;  </div><div class="line">&lt;/networkConnectors&gt;   </div><div class="line">&lt;transportConnectors&gt;  </div><div class="line">    &lt;transportConnector uri=<span class="string">"nio://0.0.0.0:61616?maximumConnections=1000&amp;wireFormat.maxFrameSize=104857600"</span>/&gt;  </div><div class="line">&lt;/transportConnectors&gt;  </div><div class="line">&lt;!-- dynamic discovery config--&gt;  </div><div class="line">&lt;networkConnectors&gt;  </div><div class="line">    &lt;networkConnector uri=<span class="string">"multicast://default"</span>/&gt;  </div><div class="line">&lt;/networkConnectors&gt;   </div><div class="line">&lt;transportConnectors&gt;  </div><div class="line">    &lt;transportConnector uri=<span class="string">"nio://0.0.0.0:61616?maximumConnections=1000&amp;wireFormat.maxFrameSize=104857600"</span>  discoveryUri=<span class="string">"multicast://default"</span>/&gt;  </div><div class="line">&lt;/transportConnectors&gt;</div></pre></td></tr></table></figure></p>
-<h3 id="Master-Slave"><a href="#Master-Slave" class="headerlink" title="Master Slave"></a>Master Slave</h3><p>运行独立应用部署的 Brokers 由一个问题，它在任何时候其 broker 在物理上都是独有的。 如果一个 broker 断掉， 那么你必须等待重新复制消息才能启动 broker。必须是 persistent=true 的情况下成立。例如：这里指的是 Shared Nonthing Master/Slave模式，就是说如果 master断掉了，消息的备份会存储在slave中。重新拷贝 slave目录下的数据到 master 的目录下即可，重启 master 了。还有一种就是启动 slave 来替换 master。</p>
-<h3 id="Replicated-Message-Stores"><a href="#Replicated-Message-Stores" class="headerlink" title="Replicated Message Stores"></a>Replicated Message Stores</h3><p>Master/Slave 模式的另一种方式就是基于Shared File和 DataBase 的共享模式。当master断掉以后，消息应经存储到硬盘上了，此时 slave 获得锁替换了 Master</p>
-<h2 id="Master-Slave集群"><a href="#Master-Slave集群" class="headerlink" title="Master/Slave集群"></a>Master/Slave集群</h2><h3 id="纯Master-Slave"><a href="#纯Master-Slave" class="headerlink" title="纯Master/Slave"></a>纯Master/Slave</h3><ul>
-<li>Slave broker 消费 master broker 上所有的消息状态，例如消息、确认和事务状态等。只要 slave broker 连接到了 master broker，它不会（也不被允许）启动任何 network connectors 或者 transport connectors，所以唯一的目的就是复制 master broker 的状态。</li>
-<li>Master broker 只有在消息成功被复制到 slave broker 之后才会响应客户。例如，客户的 commit 请求只有在 master broker 和 slave broker 都处理完毕 commit 请求之后才会结束。</li>
-<li>当 master broker 失效的时候，slave broker 有两种选择，一种是 slave broker 启动所有的 network connectors 和 transport connectors，这允许客户端切换到 slave broker；另外一种是 slave broker 停止。这种情况下，slave broker 只是复制了 master broker 的状态。</li>
-<li>客户应该使用 failover transport 并且应该首先尝试连接 master broker。<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">failover://(tcp://masterhost:61616,tcp://slavehost:61615)?random</div><div class="line">ize=<span class="literal">false</span></div></pre></td></tr></table></figure>
-</li>
-</ul>
-<p>设置randomize为false就可以让客户总是首先尝试连接master broker（slave broker 并不会接受任何连接，直到它成为了 master broker）。<br>限制：</p>
-<ul>
-<li>只能有一个 slave broker 连接到 master broker。</li>
-<li>在因 master broker 失效而导致 slave broker 成为 master 之后，之前的master broker 只有在当前的 master broker（原 slave broker）停止后才能重新生效。</li>
-<li>Master broker 失效后而切换到 slave broker 后，最安全的恢复 master broker 的方式是人工处理。首先要停止 slave broker（这意味着所有的客户也要停止） 。 然后把 slave broker 的数据目录中所有的数据拷贝到 master broker 的数据目录中。然后重启 master broker 和 slave broker。</li>
-</ul>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">//Master broker 不需要特殊的配置。Slave broker 需要进行以下配置</div><div class="line">&lt;broker masterConnectorURI=<span class="string">"tcp://masterhost:62001"</span> shutdownOn MasterFailure=<span class="string">"false"</span>&gt;</div><div class="line"> &lt;transportConnectors&gt;</div><div class="line"> &lt;transportConnector uri=<span class="string">"tcp://slavehost:61616"</span> /&gt;</div><div class="line"> &lt;/transportConnectors&gt;</div><div class="line">&lt;/broker&gt;</div></pre></td></tr></table></figure>
-<h3 id="JDBC-DataBase-master-slave集群"><a href="#JDBC-DataBase-master-slave集群" class="headerlink" title="JDBC DataBase master/slave集群"></a>JDBC DataBase master/slave集群</h3><p>如果你用单纯的 JDBC 而没有用高性能的持久此时你将依赖于你的数据库作为单独的持久存储引擎。如果你没有高性能的要求，类似这种数据库作为存储引擎可以应用很多场景。<br>启动利用数据库作为数据源，采用Master/Slave模式，其中在启动的时候Master首先获得独有锁，其它 Slaves Broker 则等待获取独有锁。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">failover:(tcp: //broker1:61616,tcp://broker2:61616,tcp://broker3:61616)</div></pre></td></tr></table></figure></p>
-<p>如果 Master 失败，则它释放独有锁，其他 Slaver 则获取独有锁.其它 Slaver 立即获得独有锁后此时它将变成 Master，并且启动所有的传输链接。同时，Client 将停止链接之前的 Master 和将会轮询链接到其他可以利用的 Broker 即新 Master。</p>
-<h3 id="share-file-master-slave集群"><a href="#share-file-master-slave集群" class="headerlink" title="share file master/slave集群"></a>share file master/slave集群</h3><p>希望基于相同的存储目录下运行多个 Broker，首先，该 Broker Master 会首先获得排它锁。如果该 Master Broker 死掉了会释放掉排它锁，则其它的 Slave Broker会替换它。Slave 是一个轮询的从 Master 那里获得排它锁。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&lt;broker useJmx=<span class="string">"false"</span> xmlns=<span class="string">"http://activemq.org/config/1.0"</span>&gt;</div><div class="line">&lt;persistenceAdapter&gt;</div><div class="line">&lt;journaledJDBC dataDirectory=<span class="string">"/sharedFileSystem/broker"</span>/&gt;</div><div class="line">&lt;/persistenceAdapter&gt;</div></pre></td></tr></table></figure></p>
-<p>如果你使用 SAN 或者共享文件系统，那么你可以使用 Shared File System Master Slave。基本上，你可以运行多个 broker，这些 broker 共享数据目录。当第一个 broker 得到文件上的排他锁之后，其它的 broker 便会在循环中等待获得这把锁。客户端使用 failover transport 来连接到可用的 broker。当 master broker 失效的时候会释放这把锁，这时候其中一个 slave broker 会得到这把锁从而成为master broker。</p>
-<h2 id="network-of-brokers-存储和转发集群"><a href="#network-of-brokers-存储和转发集群" class="headerlink" title="network of brokers (存储和转发集群)"></a>network of brokers (存储和转发集群)</h2><h3 id="单向传递"><a href="#单向传递" class="headerlink" title="单向传递"></a>单向传递</h3><p>ActiveMQ默认的两个broker链接是单方向的，brokerA可以消费brokerB的消息<br><img src="/2017/12/15/Apache-ActiveMQ-笔记/单向broker.png" alt=""></p>
-<h3 id="双向传递"><a href="#双向传递" class="headerlink" title="双向传递"></a>双向传递</h3><p><img src="/2017/12/15/Apache-ActiveMQ-笔记/双向broker.png" alt=""><br><img src="/2017/12/15/Apache-ActiveMQ-笔记/扩展broker.png" alt=""><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&lt;networkConnectors&gt;</div><div class="line">&lt;networkConnector uri=<span class="string">"static://(tcp://backoffice:61617)"</span> name=<span class="string">"brdge"</span> duplex=<span class="string">"true"</span> ConduitSubscriptions=<span class="string">"true"</span>&gt;</div><div class="line">&lt;/networkConnector&gt;</div><div class="line">&lt;/networkConnectors&gt;</div></pre></td></tr></table></figure></p>
-<p>Duplex=”true”表示双发可以通信.<br>ConduitSubscriptions=“false”表示每个 Consumer 上都会收到所有的发送的消息。<br>Name=“bridge”默认的。</p>
-<h3 id="Broker连接集群"><a href="#Broker连接集群" class="headerlink" title="Broker连接集群"></a>Broker连接集群</h3><p>一个常见的场景是有多个 JMS broker，有一个客户连接到其中一个 broker。如果这个 broker 失效，那么客户会自动重新连接到其它的 broker。在 ActiveMQ中使用 failover:// 协议来实现这个功能。ActiveMQ3.x 版本的 reliable://协议已经变更为 failover://。如果某个网络上有多个 brokers 而且客户使用静态发现（使用 Static Transport 或 Failover Transport）或动态发现（使用 Discovery Transport），那么客户可以容易地在某个broker失效的情况下切换到其它的 brokers。然而，stand alone brokers并不了解其它brokers上的consumer，也就是说如果某个broker 上没有 consumers，那么这个 broker 上的消息可能会因得不到处理而积压起来。目前的解决方案是使用 Network of brokers，以便在 broker 之间存储转发消息。ActiveMQ 在未来会有更好的特性，用来在客户端处理这个问题。从 ActiveMQ1.1 版本起，ActiveMQ 支持 networks of brokers。它支持分布式的 queues 和 topics。一个 broker 会相同对待所有的订阅（subscription）：不管他们是来自本地的客户连接，还是来自远程 broker，它都会递送有关的消息拷贝到每个订阅。远程 broker 得到这个消息拷贝后，会依次把它递送到其内部的本地连接上。 有两种方式配置 Network of brokers， 一种是使用 static transport，<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&lt;broker brokerName=<span class="string">"receiver"</span> persistent=<span class="string">"false"</span> useJmx=<span class="string">"false"</span>&gt;</div><div class="line">&lt;transportConnectors&gt;</div><div class="line">&lt;transportConnector uri=<span class="string">"tcp://localhost:62002"</span> /&gt;</div><div class="line">&lt; /transportConnectors&gt;</div><div class="line">&lt;networkConnectors&gt;</div><div class="line">&lt;networkConnector uri=<span class="string">"static:( tcp://localhost:61616, tcp://remotehost:61616)"</span> /&gt;</div><div class="line">&lt;/networkConnectors&gt;</div><div class="line">&lt;/broker&gt;</div></pre></td></tr></table></figure></p>
-<p>或者使用dynamic transport<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&lt;broker name=<span class="string">"sender"</span> persistent=<span class="string">"false"</span> useJmx=<span class="string">"false"</span>&gt; &gt;</div><div class="line"> &lt;transportConnectors&gt;</div><div class="line"> &lt;transportConnector uri=<span class="string">"tcp://localhost:0"</span> discoveryUri=<span class="string">"multicast://default"</span> /&gt;</div><div class="line"> &lt;/transportConnectors&gt;</div><div class="line"> &lt;networkConnectors&gt;</div><div class="line"> &lt;networkConnector uri=<span class="string">"multicast://default"</span> /&gt;</div><div class="line"> &lt;/networkConnectors&gt;</div><div class="line">  &lt;/broker&gt;</div></pre></td></tr></table></figure></p>
-<h2 id="Queue-consumer集群"><a href="#Queue-consumer集群" class="headerlink" title="Queue consumer集群"></a>Queue consumer集群</h2><p>ActiveMQ支持订阅同一个queue的consumers上的集群。如果一个consumer失效，那么所有未被确认的消息都会被发送到这个 queue 上其它的 consumers。如果某个 consumer 的处理速度比其它 consumers 更快，那么这个 consumer 就会消费更多的消息</p>
-<h2 id="网络配置"><a href="#网络配置" class="headerlink" title="网络配置"></a>网络配置</h2><h3 id="dynamicOnly"><a href="#dynamicOnly" class="headerlink" title="dynamicOnly"></a>dynamicOnly</h3><p>默认是 false，如果是 true，消息将被动态的转接的在其他 broker 的 consumer上</p>
-<h3 id="prefetchSize"><a href="#prefetchSize" class="headerlink" title="prefetchSize"></a>prefetchSize</h3><p>ActiveMQ使用了　消息”预取限制“(prefetch limit)：表示在某个时间段内，可能向消费者传输的最大消息量，如果达到该上限，那么停止发送，直到ActiveMQ收到消费者的acknowledgements(确认，表示已经处理了该消息。prefetch limit可以针对每个不同的consumer来设置。<br>为了获取更高的性能，prefetch limit当然是越大越好，只要consumer有足够大的消息缓冲区(messagevolume)。如果消息的总量非常少，而且每个消息的处理时间非常的长，那么，可以将prefetch设置为1，这样，每次向consumer发送一个消息，等其确认已经处理完毕后，再发送第二个。<br>特别地，如果prefetch设置为0，表示consumer每次　主动向activeMQ要求传输最大的数据量，而不是被动地接收消息</p>
-<h3 id="conduitSubscriptons"><a href="#conduitSubscriptons" class="headerlink" title="conduitSubscriptons"></a>conduitSubscriptons</h3><p>关于 conduitSubscriptions 属性，这里稍稍说明一下。设想有两个 brokers，分别是brokerA和brokerB， 它们之间用forwarding bridge连接。 有一个consumer连接到brokerA并订阅 queue： Q.TEST。 有两个 consumers 连接到 brokerB， 也是订阅 queue： Q.TEST。这三个 consumers 有相同的优先级。然后启动一个 producer，它发送了 30 条消息到brokerA。如果 conduitSubscriptions=true，那么 brokerA 上的 consumer 会得到 15 条消息， 另外15条消息会发送给brokerB。 此时负载并不均衡， 因为此时brokerA将brokerB上的两个 consumers 视为一个；如果 conduitSubscriptions=false，那么每个 consumer上都会收到 10 条消息。</p>
-<h3 id="decreaseNetwordConsumerPriority"><a href="#decreaseNetwordConsumerPriority" class="headerlink" title="decreaseNetwordConsumerPriority"></a>decreaseNetwordConsumerPriority</h3><p>默认是 false。设定消费者优先权</p>
-<h3 id="networkTTL"><a href="#networkTTL" class="headerlink" title="networkTTL"></a>networkTTL</h3><p>默认是 1</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2496,7 +2275,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">45</span>
+                <span class="site-state-item-count">46</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

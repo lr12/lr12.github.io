@@ -273,6 +273,159 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/14/elasticsearch入门/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="李睿">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/11/14/elasticsearch入门/" itemprop="url">elasticsearch入门</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-14T14:16:48+08:00">
+                2017-11-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/elasticSearch/" itemprop="url" rel="index">
+                    <span itemprop="name">elasticSearch</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>elasticSearch是基于Lucene的开源搜索引擎。lucene是现在最先进、性能最好、功能最全的搜索引擎库。但是lucene是一个库，你必须使用java语言集成到你的应用。Lucene通过restful api隐藏Lucene的复杂性。es的特性如下：</p>
+<ul>
+<li>分布式的实时存储</li>
+<li>分布式的实时搜索引擎</li>
+<li>可以扩展到上百台服务器，处理PB级结构化或非结构化数据</li>
+</ul>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><h2 id="java-API"><a href="#java-API" class="headerlink" title="java API"></a>java API</h2><h3 id="节点客户端"><a href="#节点客户端" class="headerlink" title="节点客户端"></a>节点客户端</h3><p>节点客户端是以无数据节点加入集群，它自己不存储数据，它知道数据在集群里的具体位置，并且能够直接转发请求到对应节点上</p>
+<h3 id="传输客户端"><a href="#传输客户端" class="headerlink" title="传输客户端"></a>传输客户端</h3><p>能够发送请求到远程集群，它自己不加入集群，只是简单转发请求到集群的节点</p>
+<h3 id="基于http协议，以json为数据交互格式的Restful-ApI"><a href="#基于http协议，以json为数据交互格式的Restful-ApI" class="headerlink" title="基于http协议，以json为数据交互格式的Restful ApI"></a>基于http协议，以json为数据交互格式的Restful ApI</h3><h2 id="面向文档"><a href="#面向文档" class="headerlink" title="面向文档"></a>面向文档</h2><p>es是面向文档的，他可以存储整个对象或者文档。并且文档可以被索引、搜索、排序、过滤。json是文档序列化的格式。</p>
+<h2 id="索引"><a href="#索引" class="headerlink" title="索引"></a>索引</h2><p>es的索引一个文档指的是将一个文档存储到索引里，以便检索和查询，类似数据库的insert。但是如果文档已存在，会覆盖文档。</p>
+<h2 id="搜索"><a href="#搜索" class="headerlink" title="搜索"></a>搜索</h2><h3 id="检索文档"><a href="#检索文档" class="headerlink" title="检索文档"></a>检索文档</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Get sjjhpt/fwjlb/1 //索引 类型 文档id</div></pre></td></tr></table></figure>
+<h3 id="简单检索"><a href="#简单检索" class="headerlink" title="简单检索"></a>简单检索</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Get sjjhpt/fwjlb/_search //默认返回前十个数据</div></pre></td></tr></table></figure>
+<h3 id="查询字符串查询"><a href="#查询字符串查询" class="headerlink" title="查询字符串查询"></a>查询字符串查询</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Get sjjhpt/fwjlb/_search?q=userid:hxdt</div></pre></td></tr></table></figure>
+<h3 id="使用DSL语句查询"><a href="#使用DSL语句查询" class="headerlink" title="使用DSL语句查询"></a>使用DSL语句查询</h3><p>以json请求体出现<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">POST sjjhpt/fwjlb/_search</div><div class="line">&#123;</div><div class="line">  <span class="string">"query"</span>:&#123;</div><div class="line">    <span class="string">"match"</span>:&#123;</div><div class="line">       <span class="string">"userid"</span>:<span class="string">"hxdt"</span></div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="更复杂的搜索"><a href="#更复杂的搜索" class="headerlink" title="更复杂的搜索"></a>更复杂的搜索</h3><p>filter重点在区间查询<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">POST sjjhpt/fwjlb/_search</div><div class="line">&#123;</div><div class="line">  <span class="string">"query"</span>:&#123;</div><div class="line">    <span class="string">"bool"</span>:&#123;</div><div class="line"></div><div class="line">    <span class="string">"filter"</span>:[</div><div class="line">      &#123;</div><div class="line">        <span class="string">"range"</span>:&#123;</div><div class="line">           <span class="string">"dyrq"</span>:&#123;</div><div class="line">           	  <span class="string">"gt"</span>:<span class="string">"2017-05-06"</span></div><div class="line">           &#125;</div><div class="line">        &#125;</div><div class="line">      &#125;</div><div class="line">    ]</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="全文搜索"><a href="#全文搜索" class="headerlink" title="全文搜索"></a>全文搜索</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">POST /elkdb/elktable/_search //elkname包含aa或包含bb</div><div class="line">&#123;</div><div class="line">  <span class="string">"query"</span>:&#123;</div><div class="line">    <span class="string">"match"</span>:&#123;</div><div class="line">       <span class="string">"elkname"</span>:<span class="string">"aa bb"</span></div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="短语搜索"><a href="#短语搜索" class="headerlink" title="短语搜索"></a>短语搜索</h3><p>搜索确切的匹配若干个单词或者短语<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">POST /elkdb/elktable/_search //询同时包含<span class="string">"aa"</span>和<span class="string">"bb"</span>,并且是相邻的</div><div class="line">&#123;</div><div class="line">  <span class="string">"query"</span>:&#123;</div><div class="line">    <span class="string">"match_phrase"</span>:&#123;</div><div class="line">       <span class="string">"elkname"</span>:<span class="string">"aa bb"</span></div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="高亮搜索"><a href="#高亮搜索" class="headerlink" title="高亮搜索"></a>高亮搜索</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">POST /elkdb/elktable/_search</div><div class="line">&#123;</div><div class="line">  <span class="string">"query"</span>:&#123;</div><div class="line">    <span class="string">"match"</span>:&#123;</div><div class="line">       <span class="string">"elkname"</span>:<span class="string">"aa"</span></div><div class="line">    &#125;</div><div class="line">  &#125;,</div><div class="line">  <span class="string">"highlight"</span>:&#123;</div><div class="line">  	<span class="string">"pre_tags"</span>: [</div><div class="line">          <span class="string">"&lt;em class=\"c_color\"&gt;"</span></div><div class="line">      ],</div><div class="line">      <span class="string">"post_tags"</span>: [</div><div class="line">        <span class="string">"&lt;/em&gt;"</span></div><div class="line">      ],</div><div class="line">  	<span class="string">"fields"</span>:&#123;</div><div class="line">  		<span class="string">"elkname"</span>:&#123;</div><div class="line"></div><div class="line">  		&#125;</div><div class="line">  	&#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="聚合"><a href="#聚合" class="headerlink" title="聚合"></a>聚合</h2><p>类比数据库的group by<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">sjjhpt/fwjlb/_search POST</div><div class="line">&#123;</div><div class="line">	<span class="string">"aggs"</span>:&#123;</div><div class="line">		<span class="string">"group_by_jkbsf"</span>:&#123;</div><div class="line">			<span class="string">"terms"</span>:&#123;</div><div class="line">				<span class="string">"field"</span>:<span class="string">"jkbsf"</span></div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>聚合允许分级汇总<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">sjjhpt/fwjlb/_search POST //查询相同接口标识符的平均id</div><div class="line">&#123;</div><div class="line">	<span class="string">"aggs"</span>:&#123;</div><div class="line">		<span class="string">"group_by_jkbsf"</span>:&#123;</div><div class="line">			<span class="string">"terms"</span>:&#123;</div><div class="line">				<span class="string">"field"</span>:<span class="string">"jkbsf"</span></div><div class="line">			&#125;,</div><div class="line">			<span class="string">"aggs"</span>:&#123;</div><div class="line">				<span class="string">"avg_id"</span>:&#123;</div><div class="line">					<span class="string">"avg"</span>:&#123;</div><div class="line">						<span class="string">"field"</span>:<span class="string">"id"</span></div><div class="line">					&#125;</div><div class="line">				&#125;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/13/logstash配置/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1628,166 +1781,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/25/消息中间件/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="李睿">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/10/25/消息中间件/" itemprop="url">消息中间件（第六章）</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-25T15:23:21+08:00">
-                2017-10-25
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/大型网站中间件/" itemprop="url" rel="index">
-                    <span itemprop="name">大型网站中间件</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="消息中间件的价值"><a href="#消息中间件的价值" class="headerlink" title="消息中间件的价值"></a>消息中间件的价值</h2><h3 id="消息中间件的定义"><a href="#消息中间件的定义" class="headerlink" title="消息中间件的定义"></a>消息中间件的定义</h3><p>Message oriented middleWare,面向消息的系统（消息中间件）是在分布式系统中完成消息的发送和接收的基础软件</p>
-<h3 id="通过示例看消息中间件对应用的解耦"><a href="#通过示例看消息中间件对应用的解耦" class="headerlink" title="通过示例看消息中间件对应用的解耦"></a>通过示例看消息中间件对应用的解耦</h3><h4 id="通过服务调用让其他系统感知事件发生的方式"><a href="#通过服务调用让其他系统感知事件发生的方式" class="headerlink" title="通过服务调用让其他系统感知事件发生的方式"></a>通过服务调用让其他系统感知事件发生的方式</h4><p>假设我们的登录系统，需要支持的一个功能是发短信给用户，如果在增加后续跟其他系统打交道的工作，会让登录系统变得十分复杂。<br>如登陆系统负责向消息中间件发送消息，而其他的系统则向消息中间件来订阅这个消息，然后完成自己的工作。</p>
-<h4 id="通过消息中间件解耦服务调用"><a href="#通过消息中间件解耦服务调用" class="headerlink" title="通过消息中间件解耦服务调用"></a>通过消息中间件解耦服务调用</h4><p>从登陆系统的角度来看，这些系统都不是登录系统必须依赖的，登录系统只需要校验用户名和密码，而类似发短信系统不是登录系统必须依赖的系统。所以，我们需要解耦，服务调用会被固定格式的消息所取代。<br>通过消息中间件解耦，登录系统不需要知道有多少个系统需要知道登录成功这件事，也不用关心怎么传递给他们，只需要把登录成功这件事转化成一个消息发送到消息中间件就好。并且各个系统不受影响。</p>
-<h2 id="互联网时代的消息中间件"><a href="#互联网时代的消息中间件" class="headerlink" title="互联网时代的消息中间件"></a>互联网时代的消息中间件</h2><p>JMS:Java Message Service-&gt;规范-&gt;Hornetq,ActiveMQ等产品是这个规范的实现</p>
-<h3 id="如何解决消息发送的一致性"><a href="#如何解决消息发送的一致性" class="headerlink" title="如何解决消息发送的一致性"></a>如何解决消息发送的一致性</h3><h4 id="消息发送一致性的定义"><a href="#消息发送一致性的定义" class="headerlink" title="消息发送一致性的定义"></a>消息发送一致性的定义</h4><p>消息发送一致性指产生消息的业务动作与消息发送的一致。即如果业务操作成功了，那么由这个操作产生的消息一定要发送出去，否则就丢失消息了；而另一方面，如果这个业务行为没有发生或者失败，那么就不应该把消息发出去.</p>
-<h4 id="jms"><a href="#jms" class="headerlink" title="jms"></a>jms</h4><p>JMS几个比较重要的元素：<br>Destination：消息所走的通道的目标定义，也就是消息从发送方发出后要走的通道，而不是最终接收方。<br>ConnectionFactory：用于创建连接的对象<br>Connection：连接接口，用于创建session<br>Session：会话接口，消息的发送者，消息的接收者以及消息都是由会话创建。<br>MessageConsumer：消息的消费者，用于订阅并处理消息的对象。<br>MessageProvider：消息的生产者，用于发送消息的对象<br>XXXMessage：指各种类型的对象，包括Bytemessage、MapMessage、ObjectMessage、StreamMesssage和TextMessage；<br>在jms的api接口中，有很多XA开头的类，他们是支持XA协议的接口。XA系列的接口集中在ConnectionFactory、Connection和Session上。但也会造成问题：<br>1.引入分布式事务，这会带来开销和复杂性；<br>2.对于业务操作有限制，要求业务操作的资源必须支持XA协议，才能够与发送消息一起做分布式事务，这会造成限制（凡是参与全局事务的所有资源均应该使用其XA版。特别地，对于JDBC资源，必须使用JDBC XADataSource）。</p>
-<h4 id="其他办法"><a href="#其他办法" class="headerlink" title="其他办法"></a>其他办法</h4><p>简单的方案不能保证一致性，但是出现问题的概率也不大；即便做到业务操作都支持XA，如果引入二阶段提交的分布式事务，则有点重。<br>简化流程：<br>1) 业务处理应用首先把消息发给消息中间件，标记消息的状态为待处理.<br>   (2) 消息中间件收到消息后，把消息存储在消息存储中，并不投递该消息.<br>   (3)消息中间件返回消息处理的结果，仅是入库的结果，结果是成功或者失败.<br>   (4)业务方收到消息中间件返回的结果并进行处理:<br>a) 如果收到的结果是失败，那么就放弃业务处理，结束<br>b) 如果收到的结果是成功，则进行业务自身的操作<br>   (5)业务操作完成，把业务操作的结果发送给消息中间件<br>   (6)消息中间件收到业务操作结果，根据结果进行处理<br>a) 如果业务失败，则删除消息存储中的消息，结束<br>b)如果业务成功，则更新消息存储中的消息状态为可发送，并且进行调度，进行消息的投递。<br>最终一致性方案的补偿流程:<br>(1)消息中间件询问状态为待处理的消息对应业务操作结果<br>(2)应用即消息发布者对业务操作检查操作结果<br>(3)发送业务处理结果给消息中间件<br>(4)消息中间件更新消息状态，业务成功，消息状态为待发送；业务失败则消息删除</p>
-<h3 id="如何解决消息中间件与使用者的强依赖关系"><a href="#如何解决消息中间件与使用者的强依赖关系" class="headerlink" title="如何解决消息中间件与使用者的强依赖关系"></a>如何解决消息中间件与使用者的强依赖关系</h3><p>如果消息系统出现问题，就会导致业务操作无法继续操作。解决的思路如下：<br>1.提供消息中间件系统的可靠性，但是没办法办证百分百可靠；<br>2.对于消息中间件系统中影响业务的部分，其可靠性与业务系统一样；<br>3.提供弱依赖的功能；<br>对于思路一：我们无法保证百分百可靠；<br>对于思路二：把消息中间件所需要的消息表与业务数据表放到同一个业务数据库，业务操作和写入消息作为一个本地事务完成，然后再通知消息中间件有消息可以发送，解决一致性，也可以消息中间件定时去轮询业务数据库找到需要发送的消息，取出内容后进行发送。这个会有三个影响：<br>1.需要业务自己的数据库去承载消息数据；<br>2.需要消息中间件访问业务数据库；<br>3.需要业务操作的对象是数据库，或者说是支持事务的存储，必须这个存储能够支持消息中间件的需求。<br>所以我们有个折中的操作：消息中间件不再直接与业务数据库打交道，将业务操作、写入消息，轮询消息等全部放到业务应用。<br>加一个本地磁盘作为一个消息存储，如果消息中间件崩溃，我们可以把本地磁盘作为存储消息的地方。这有两种用法：1.作为一致性发送消息的解决方案的容灾手段，，平时不工作，出问题才切换。2.直接使用该方式；<br>最后我们看下业务操作与消息一致性带来的两个限制：<br>1.需要确定要发送的消息内容；2.需要实现对业务的检查</p>
-<h3 id="消息模型对消息的接收的影响"><a href="#消息模型对消息的接收的影响" class="headerlink" title="消息模型对消息的接收的影响"></a>消息模型对消息的接收的影响</h3><p>在JMS中，有Queue（点对点）和Topic（发布/订阅）两种模型</p>
-<h4 id="JMS-Queue模型"><a href="#JMS-Queue模型" class="headerlink" title="JMS Queue模型"></a>JMS Queue模型</h4><p>应用1和应用2发送消息到JMS服务器，这些消息根据到达的顺序形成一个队列，应用3和应用4进行消息的消费;如果Queue里面的消息被一个应用处理了，那么连接到JMS Queue上的另一个应用是收不到这个消息的。即连接到这个JMS Queue上的应用共同消费了所有的消息。消息从发送端发送出来时不能确定最终会被哪个应用消费，但是可以明确的是只有一个应用会去消费这条消息，Peer To Peer方式(PTP)</p>
-<h4 id="JMS-Topic模型"><a href="#JMS-Topic模型" class="headerlink" title="JMS Topic模型"></a>JMS Topic模型</h4><p>和Queue模型的最大区别在于消息接收的部分，在该模型中，接收消息的应用3和应用4是可以独立收到所有到达Topic的消息的，Pub/Sub方式</p>
-<h4 id="JMS中客户端连接的处理和带来的限制"><a href="#JMS中客户端连接的处理和带来的限制" class="headerlink" title="JMS中客户端连接的处理和带来的限制"></a>JMS中客户端连接的处理和带来的限制</h4><p>在使用JMS时，每个Connection都有一个ClientId，用于标记的唯一性。如果两个应用共建立三个连接，每个连接都会收到所有发送到topic的消息。</p>
-<h4 id="我们需要什么样的消息模型"><a href="#我们需要什么样的消息模型" class="headerlink" title="我们需要什么样的消息模型"></a>我们需要什么样的消息模型</h4><p>我们要满足的需求为：<br>消息发送方和接收方都是集群；<br>同一个消息的接收方可能有多个集群进行消息的处理；<br>不同集群对于同一条消息的消息不能互相干扰；<br>现在我们需要每个集群使用topic模式，然后集群的内部使用queue模式；我们可以引入clusterId，用这个id标识不同的集群；集群内各个应用连接使用这个clusterid。当服务器端进行调度时，在不同的集群之间独立投递，而拥有相同的clusterId的共同消费这个消息。<br>还有一种思路是将JMS的topic和queue级联使用，首先最顶层是JMS topic，中间有一层消息中转层，再通过JMS queue，最下层是集群内消费使用。<br>缺点是级联方式过于繁重，处理复杂，好处是使用jms实现。</p>
-<h3 id="消息订阅者订阅消息的方式"><a href="#消息订阅者订阅消息的方式" class="headerlink" title="消息订阅者订阅消息的方式"></a>消息订阅者订阅消息的方式</h3><p>分为持久订阅和非持久订阅<br>非持久化订阅指的是消息接收者和消息中间件之间的消息订阅关系的存续，与消息接收者自身运行的状态有直接的关系。<br>持久化订阅指的是消息订阅关系一旦建立，除非应用显式地取消订阅关系，否则订阅关系将一直存在，如果消息接收者应用停止，那么消息会保留，等待下次应用启用后投递给消息接收者。</p>
-<h3 id="保证消息可靠性的做法"><a href="#保证消息可靠性的做法" class="headerlink" title="保证消息可靠性的做法"></a>保证消息可靠性的做法</h3><p>持久订阅能够保证消息的可靠性，消息从发送端到接收端，中间需要经历三个阶段可靠：<br>1.消息发送者把消息发送给消息中间件；<br>2.消息中间件把消息存入消息存储；<br>3.消息中间件把消息投递给消息接收端；</p>
-<h4 id="消息发送端的可靠"><a href="#消息发送端的可靠" class="headerlink" title="消息发送端的可靠"></a>消息发送端的可靠</h4><p>发送者需要把消息的发送结果准确的传给应用，应用才能进行相关的业务操作。消息从发送者发送到消息中间件，只有消息中间件及时明确地返回成功，才能确认消息可靠地到达消息中间件。返回错误、异常或者超时，都可以认为这个动作失败。</p>
-<h4 id="消息存储的可靠性"><a href="#消息存储的可靠性" class="headerlink" title="消息存储的可靠性"></a>消息存储的可靠性</h4><p>1.实现基于文件的消息存储<br>主要把消息直接存储在本地磁盘，不需要对额外独立存储。ActiveMQ（kaha db），KahaDB是基于文件的本地数据库储存形式<br>2.使用数据库作为消息存储<br>3.基于双机内存的消息存储<br>磁盘IO的关系，性能会受到影响，内存的速度远超磁盘，但断电会失去数据，正常情况下，消息持久存储不工作，一旦一个机器故障，会停止另一台的写，并把数据写入数据持久存储。</p>
-<h4 id="消息系统的扩容"><a href="#消息系统的扩容" class="headerlink" title="消息系统的扩容"></a>消息系统的扩容</h4><p>1.消息中间件自身如何扩容<br>消息中间件本身没有持久态，扩容比较容易，只需要让消息发送者和消息订阅者能够感知到有新的消息中间件机器加入了集群。同一个存储区分存储的消息来自哪个消息中间件应用：增加一个server字段。<br>2.消息存储的扩容处理<br>优势：1.不用保证消息的顺序；2.提供从服务端对消息投递的方式，不支持主动获取消息。<br>首先，消息发送到消息中间件，消息中间件将消息入库，所以消息中间件一定知道消息存在哪。<br>其次，由于内存中进行调度的消息数量有限，因此我们会调度存在数据库的消息，这个调度必然会跨所有库和所有表，需要投递的消息会把相关索引消息加载到内存中，内存调度消息也自然有了存储节点的消息。</p>
-<h4 id="消息投递的可靠性保证"><a href="#消息投递的可靠性保证" class="headerlink" title="消息投递的可靠性保证"></a>消息投递的可靠性保证</h4><p>1.消息投递简介<br>消息中间件需要显示地收到接收者确认消息处理完毕，才能删除消息。<br>2.投递处理的优化<br>投递处理第一个可优化的是在进行投递时一定要采用多线程方式处理，每个线程处理一条消息时，会得到需要接收该消息的订阅者集群Id列表，然后从每个订阅者集群Id里选择一个连接来处理，消息投递后会更新消息状态，然后统一更新消息表中的消息状态。如果订阅者集群有一个很慢的订阅者，负责投递的所有线程会慢慢堵死，都需要等待这个慢的订阅者返回。<br>我们还可以采用，采用异步的方式，把消息返回处理的工作放到另外的线程池中操作，保证投递的环节不会被堵死，返回的结果可以放在内存中，等待其他线程进行处理。<br>其次我们还要优化，即一个应用有多个订阅者订阅同样的消息，如果不加以优化，会发送多次同样的消息，我们的优化是：单机共享连接；消息只发送一次，然后传到单机多订阅者生成多个处理实例。</p>
-<h3 id="订阅者视角的消息重复的产生和应对"><a href="#订阅者视角的消息重复的产生和应对" class="headerlink" title="订阅者视角的消息重复的产生和应对"></a>订阅者视角的消息重复的产生和应对</h3><h4 id="消息重复产生的原因"><a href="#消息重复产生的原因" class="headerlink" title="消息重复产生的原因"></a>消息重复产生的原因</h4><p>第一类原因是消息发送方重复发送消息<br>1.消息发送端发送消息给消息中间件，消息中间件收到消息并成功存储，这是消息中间件出现了问题，导致应用端没有收到消息发送成功的返回，因而进行了重复的发送。<br>2.消息中间件由于负载比较高变得比较慢，成功把消息存储到消息存储后，返回成功结果超时。<br>3.消息中间件收到消息存储后，但由于网络原因，导致应用端收不到消息，进行重试。<br>解决的办法有通过消息id来标识<br>第二类原因是消息中间件对外投递时发生了重复<br>1.消息中间件投递由于网络原因，消息中间件没能收到反馈消息；<br>2.消息接收者处理时间比较长，超时<br>3.消息中间件出现问题，没收到结果消息<br>4.消息存储出现故障，没能更新状态<br>可以采用分布式事务来解决，但是不过这种方式比较复杂，成本也比较高；另一种方式是要求消息消费者来处理这种重复的方式，也就是要求这是幂等操作。</p>
-<h4 id="JMS消息确认与消息重复的关系"><a href="#JMS消息确认与消息重复的关系" class="headerlink" title="JMS消息确认与消息重复的关系"></a>JMS消息确认与消息重复的关系</h4><p>AUTO_ACKNOWLEDGE<br>自动确认，当JMS消息接收者接收到消息，JMS的客户端会自动进行确认。但是确认时消息还没来得及处理或者还未处理完成，所以这种确认方式也是不可靠<br>CLIENT-ACKNOWLEDGE<br>客户自己确认的方式，也就是客户端如果要确认消息处理成功，告诉服务器端确认消息，需要主动调用Message接口的acknowledge方法进行消息接收成功的调用；<br>DUPS_OK_ACKNOWLEDGE<br>这种方式是消息接收方的消息处理函数执行结束后确认，一方面保证消息一定是处理结束后才确认，另一方面也不需要客户端调用acknowledge接口<br>消息接收者接收的消息会出现下面两张情况：<br>1.at lease once<br>采用CLIENT-ACKNOWLEDGE或者DUPS_OK_ACKNOWLEDGE并且在消息处理前没有确认的话，就可能产生这种现象。<br>2.at most once<br>采用AUTO_ACKNOWLEDGE或者CLIENT-ACKNOWLEDGE并且在接收消息后立刻确认的情况</p>
-<h3 id="消息投递的其他属性支持"><a href="#消息投递的其他属性支持" class="headerlink" title="消息投递的其他属性支持"></a>消息投递的其他属性支持</h3><p>1.消息优先级<br>一般情况下消息先到先投递，消息的优先级属性可以根据优先级确定投递顺序。<br>2.订阅者消息处理顺序和分级订阅<br>消息的多个订阅者之间是独立的，它们对消息的处理并不会相互造成影响。但对于一些场景，对于同样的消息，可能会希望有些订阅者处理结束后再让其他订阅者处理。另一种方案是分级订阅。<br>把优先接收者和一般接收者分开，优先接收者处理成功后主动把消息投递到另外的消息中间件，然后一般接收者接收新产生的消息。<br>3，自定义属性<br>消息自身的创建时间、类型、投递次数等属性属于基础属性，在消息体外，自定义属性会很方便，这种自定义属性类似http的header<br>4.局部顺序<br>局部顺序是指在众多消息中，和某件事情有关的多条消息之间有顺序，而多件事情之间的消息没有顺序。比如我们可以不必保持多个人之间的交易顺序，但是对同一个交易产生的变化需要保持其顺序。<br>比如线上的交易的消息状态依次生死：创建、付款、发货、确认（Kafka发送1条消息的时候，可以指定(topic, partition, key) 3个参数。partiton和key是可选的。如果你指定了partition，那就是所有消息发往同1个partition，就是有序的。并且在消费端，Kafka保证，1个partition只能被1个consumer消费。）</p>
-<h3 id="保证顺序的消息队列的设计"><a href="#保证顺序的消息队列的设计" class="headerlink" title="保证顺序的消息队列的设计"></a>保证顺序的消息队列的设计</h3><p>同一消息订阅者处理不同消息，成功与否跟消息的内容有关（比如手机充值，我们可以看到充值成功与否跟手机号码合法化有关），现在讨论依赖消息订阅者的状态有关（数据复制，只要源数据库可用，则复制一定成功）。<br>在这样场景下，一个吞吐量达且支持顺序的消息中间件是很有价值的，数据变更平台就是这样的一个场景。在这里，由原来的push模式变为pull模式，为了让消息接收者更好的控制消息的接收和处理，消息中间件逻辑也得到了简化。具体实现是消息存储写到文件中，采用顺序写入，消息必须按顺序消费，所以一个消息接收者在每一个他所接收的消息队列上有一个当前消费的位置，之前的位置代表已经消费的消息，不同消费者维护分别维护自己的指针，可以通过指针的回溯来进行消息的补发。接收端拥有比较大的自主权。</p>
-<h4 id="单机多序列问题和优化"><a href="#单机多序列问题和优化" class="headerlink" title="单机多序列问题和优化"></a>单机多序列问题和优化</h4><p>单机多队列的隔离完成了对消息的有序支持。如果单的队列数量数量多，性能会下降很大，原因是队列数量大时，写就接近随机写。改进措施有按顺序写入，然后根据队列做个索引。<br>带来的好处是：<br>1.队列轻量化，单个队列数据量少<br>2.对磁盘访问串行化，避免竞争<br>缺点是：<br>1.写虽然是顺序写，但是读是随机读<br>2.读先读逻辑队列在读物理队列，增加开销<br>3.需要保证物理队列与逻辑队列的完全一致。编程复杂</p>
-<h4 id="解决本地消息存储的可靠性"><a href="#解决本地消息存储的可靠性" class="headerlink" title="解决本地消息存储的可靠性"></a>解决本地消息存储的可靠性</h4><p>采用消息同步复制的方式解决可靠性的问题<br>把单个消息中间件变为主（master）备（slave）两个节点，slave订阅master所有消息，用来消息备份。不过需要注意这是一个异步操作，slave订阅收到的消息会比master略少一点，存在着丢失信息的可能，类似mysql的replication<br>同样是把单个节点扩展到Master/Slave节点，但是采用的是同步复制，而不是订阅。对于消息更为严格的场景，第二种更为安全可靠</p>
-<h4 id="如何支持队列的扩容"><a href="#如何支持队列的扩容" class="headerlink" title="如何支持队列的扩容"></a>如何支持队列的扩容</h4><p>基本的策略是消息发送者能够知道应该把消息写入迁移到新的队列中，并且也让消息订阅者知道，当前队列消费完消息后要去新的队列去消费消息<br>有几个关键点：<br>1.原队列在开始扩容会有个标记，即便有新的消息进来，也不再接收<br>2.通知消息发送端发送新的队列位置<br>3.对于消息接收端，对原来队列的定位会收到新旧两个位置，当旧数据的数据接收完毕后，则只会关心新队列的位置</p>
-<h3 id="push和pull方式对比"><a href="#push和pull方式对比" class="headerlink" title="push和pull方式对比"></a>push和pull方式对比</h3><p>1.从数据传输状态；push保存在服务器端，pull保存在消费端<br>2.从传输失败，重试；push要维护每次传输状态，pull不需要<br>3.数据传输的实时性；push非常实时，pull默认的短轮询方式的实时依赖性依赖于pull间隔时间，间隔越大，实时性越低，长轮询的方式实时性与pull一致。<br>4.从流控机制；push方式服务器需要根据订阅者的消费能力做流控，pull方式消费端可以根据自身消费能力决定是否去pull消息</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1837,7 +1830,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">45</span>
+                <span class="site-state-item-count">46</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
