@@ -1,0 +1,785 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="微服务,springboot," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="博客" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="框架简介springboot的宗旨并非是重写spring或是替代spring，而是希望通过设计大量的自动化配置等方式来简化spring原有样版化的配置，使得开发者可以快速构建应用。除了解决配置问题外，springboot还可以通过一系列starter poms的定义，让我们整合各项功能时，不需要在maven的pom.xml维护那些错综复杂的依赖关系，而是通过类似模块化的starter模块定义来引用">
+<meta name="keywords" content="微服务,springboot">
+<meta property="og:type" content="article">
+<meta property="og:title" content="springboot">
+<meta property="og:url" content="http://yoursite.com/2018/01/16/springboot/index.html">
+<meta property="og:site_name" content="博客">
+<meta property="og:description" content="框架简介springboot的宗旨并非是重写spring或是替代spring，而是希望通过设计大量的自动化配置等方式来简化spring原有样版化的配置，使得开发者可以快速构建应用。除了解决配置问题外，springboot还可以通过一系列starter poms的定义，让我们整合各项功能时，不需要在maven的pom.xml维护那些错综复杂的依赖关系，而是通过类似模块化的starter模块定义来引用">
+<meta property="og:image" content="http://yoursite.com/2018/01/16/springboot/加载顺序.png">
+<meta property="og:updated_time" content="2018-01-16T16:06:03.958Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="springboot">
+<meta name="twitter:description" content="框架简介springboot的宗旨并非是重写spring或是替代spring，而是希望通过设计大量的自动化配置等方式来简化spring原有样版化的配置，使得开发者可以快速构建应用。除了解决配置问题外，springboot还可以通过一系列starter poms的定义，让我们整合各项功能时，不需要在maven的pom.xml维护那些错综复杂的依赖关系，而是通过类似模块化的starter模块定义来引用">
+<meta name="twitter:image" content="http://yoursite.com/2018/01/16/springboot/加载顺序.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/01/16/springboot/"/>
+
+
+
+
+
+  <title>springboot | 博客</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/16/springboot/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="李睿">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">springboot</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-16T15:25:25+08:00">
+                2018-01-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/springboot/" itemprop="url" rel="index">
+                    <span itemprop="name">springboot</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="框架简介"><a href="#框架简介" class="headerlink" title="框架简介"></a>框架简介</h1><p>springboot的宗旨并非是重写spring或是替代spring，而是希望通过设计大量的自动化配置等方式来简化spring原有样版化的配置，使得开发者可以快速构建应用。<br>除了解决配置问题外，springboot还可以通过一系列starter poms的定义，让我们整合各项功能时，不需要在maven的pom.xml维护那些错综复杂的依赖关系，而是通过类似模块化的starter模块定义来引用，使得依赖管理变得更为简单。<br>springboot除了可以很好的融入docker之外，其自身支持嵌入式的tomcat、jetty等容器。通过springboot构建的应用不需要安装tomcat，只需将springboot应用打成jar包，通过java-jar命令直接运行并启动一个标准化的web应用，这使得应用变得很轻量。<br>整个springboot生态系统都用到了groovy，完全可以通过gradle和groovy来开发springboot应用。</p>
+<h1 id="项目解析"><a href="#项目解析" class="headerlink" title="项目解析"></a>项目解析</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version=<span class="string">"1.0"</span> encoding=<span class="string">"UTF-8"</span>?&gt;</div><div class="line">&lt;project xmlns=<span class="string">"http://maven.apache.org/POM/4.0.0"</span> xmlns:xsi=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></div><div class="line">	xsi:schemaLocation=<span class="string">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"</span>&gt;</div><div class="line">	&lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;</div><div class="line"></div><div class="line">	&lt;groupId&gt;com.software&lt;/groupId&gt;</div><div class="line">	&lt;artifactId&gt;demo&lt;/artifactId&gt;</div><div class="line">	&lt;version&gt;0.0.1-SNAPSHOT&lt;/version&gt;</div><div class="line">	&lt;packaging&gt;jar&lt;/packaging&gt;</div><div class="line"></div><div class="line">	&lt;name&gt;demo&lt;/name&gt;</div><div class="line">	&lt;description&gt;Demo project <span class="keyword">for</span> Spring Boot&lt;/description&gt;</div><div class="line"></div><div class="line">	&lt;parent&gt;</div><div class="line">		&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">		&lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;</div><div class="line">		&lt;version&gt;1.5.9.RELEASE&lt;/version&gt;</div><div class="line">		&lt;relativePath/&gt; &lt;!-- lookup parent from repository --&gt;</div><div class="line">	&lt;/parent&gt;</div><div class="line"></div><div class="line">	&lt;properties&gt;</div><div class="line">		&lt;project.build.sourceEncoding&gt;UTF-8&lt;/project.build.sourceEncoding&gt;</div><div class="line">		&lt;project.reporting.outputEncoding&gt;UTF-8&lt;/project.reporting.outputEncoding&gt;</div><div class="line">		&lt;java.version&gt;1.7&lt;/java.version&gt;</div><div class="line">	&lt;/properties&gt;</div><div class="line"></div><div class="line">	&lt;dependencies&gt;</div><div class="line">		&lt;dependency&gt;</div><div class="line">			&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">			&lt;artifactId&gt;spring-boot-starter-data-jpa&lt;/artifactId&gt;</div><div class="line">		&lt;/dependency&gt;</div><div class="line">		&lt;dependency&gt;</div><div class="line">			&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">			&lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;</div><div class="line">		&lt;/dependency&gt;</div><div class="line"></div><div class="line">		&lt;dependency&gt;</div><div class="line">			&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">			&lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;</div><div class="line">			&lt;scope&gt;<span class="built_in">test</span>&lt;/scope&gt;</div><div class="line">		&lt;/dependency&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">    			&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">    			&lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;</div><div class="line">    		&lt;/dependency&gt;</div><div class="line">	&lt;/dependencies&gt;</div><div class="line"></div><div class="line">	&lt;build&gt;</div><div class="line">		&lt;plugins&gt;</div><div class="line">			&lt;plugin&gt;</div><div class="line">				&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">				&lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;</div><div class="line">			&lt;/plugin&gt;</div><div class="line">		&lt;/plugins&gt;</div><div class="line">	&lt;/build&gt;</div><div class="line"></div><div class="line"></div><div class="line">&lt;/project&gt;</div></pre></td></tr></table></figure>
+<p>打包的为jar包，parent配置指定spring-boot-starter-parent为1.5.9，该父项定义了springboot版本的基础依赖和一些默认配置内容，比如application.properties的位置等</p>
+<ul>
+<li>spring-boot-starter-web:全栈web开发模块，包含嵌入式tomcat、spring MVC</li>
+<li>spring-boot-starter-test:通用测试模块，包含Junit、Hamcrest、Mockito</li>
+<li>spring-boot-starterjdbc或者spring-boot-starter-data-jpa：访问数据库的能力</li>
+</ul>
+<p>在使用springboot构建应用时，各项功能模块的整合不再像传统spring应用开发一样，需要在pom文件里做大量依赖配置，而是通过starter POMs定义的依赖包，使得功能模块整合变得非常轻巧。</p>
+<h1 id="实现Restful接口"><a href="#实现Restful接口" class="headerlink" title="实现Restful接口"></a>实现Restful接口</h1><p>在springboot中创建一个restful api的实现代码同spring mvc应用一样，只是不用做很多配置。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">@RestController</div><div class="line">public class HelloController &#123;</div><div class="line"></div><div class="line">	@RequestMapping(<span class="string">"/hello"</span>)</div><div class="line">	public String <span class="function"><span class="title">sayHello</span></span>()&#123;</div><div class="line">		<span class="built_in">return</span> <span class="string">"say hello"</span>;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h1 id="配置文件"><a href="#配置文件" class="headerlink" title="配置文件"></a>配置文件</h1><p>springboot默认的配置文件位置是src/main/resources/application.properties,根据我们引入的不同starter模块，可以在这里定义容器端口号，数据库连接信息，日志级别等各种配置信息。比如添加server.port=8888，指定端口号是8888.springboot除了用传统的properties文件外，还支持现在广泛使用的yaml。<br>yaml配置格式不像properties配置那样以单纯的键值对形式来表示，而是以类似缩进形式表现。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">environments:</div><div class="line">   dev:</div><div class="line">      url: http://dev.bar.com</div><div class="line">      name: Developer Setup</div><div class="line">   prod:</div><div class="line">      url: http://foo.bar.com</div><div class="line">      name: My cool app</div><div class="line">等价于properties</div><div class="line">environments.dev.url=http://dev.bar.com</div><div class="line">environments.dev.name=Developer Setup</div><div class="line">environments.prod.url=http://foo.bar.com</div><div class="line">environments.prod.name=My cool app</div></pre></td></tr></table></figure></p>
+<h1 id="自定义参数"><a href="#自定义参数" class="headerlink" title="自定义参数"></a>自定义参数</h1><p>除了可以预定义各个starter模块预定义的配置属性，也可以在配置文件中定义一些我们需要定义的属性。比如在application.properties添加<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">book.name=java并发</div><div class="line">book.author=lr</div><div class="line">//通过@value加载自定义参数</div><div class="line">@Component</div><div class="line">public class Book&#123;</div><div class="line">  @Value(<span class="string">"<span class="variable">$&#123;book.name&#125;</span>"</span>)</div><div class="line">  private String name;</div><div class="line">  @Value(<span class="string">"<span class="variable">$&#123;book.author&#125;</span>"</span>)</div><div class="line">  private String author;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h1 id="使用随机数"><a href="#使用随机数" class="headerlink" title="使用随机数"></a>使用随机数</h1><p>我们希望有些参数被加载时不是一个固定的值，比如密钥，服务端口。可以使用${random}产生随机的int、long或者String字符串<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">//随机字符串</div><div class="line">blog.value=<span class="variable">$&#123;random.value1&#125;</span></div><div class="line">//随机int</div><div class="line">blog.number=<span class="variable">$&#123;random.int&#125;</span></div><div class="line">//随机long</div><div class="line">blog.bignumber=<span class="variable">$&#123;random.long&#125;</span></div><div class="line">//10以内的随机数</div><div class="line">blog.test1=<span class="variable">$&#123;random.int(10)&#125;</span></div><div class="line">//10~20的随机数</div><div class="line">blog.test2=<span class="variable">$&#123;random.int[10,20]&#125;</span></div></pre></td></tr></table></figure></p>
+<h1 id="命令行参数"><a href="#命令行参数" class="headerlink" title="命令行参数"></a>命令行参数</h1><p>可以在命令行指定应用的参数，比如设置应用端口java -jar xxx.jar –server.port=8888</p>
+<h1 id="多环境配置"><a href="#多环境配置" class="headerlink" title="多环境配置"></a>多环境配置</h1><p>通常同一套程序会被应用和安装在不同环境中，比如开发、测试、生产，其中每个环境的数据库地址、服务端口等配置都不同，如果在不同环境打包时都要频繁修改配置文件，那必然十分繁琐。<br>在springboot中，多环境配置的文件名需要满足application-{profile}.properties的格式，其中profile是你的环境标识，例如<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">application-dev.properties 开发环境</div><div class="line">application-test.properties 测试环境</div><div class="line">application-prod.properties 生产环境</div><div class="line">在application设置spring-profiles-active=dev，默认选择开发</div><div class="line">执行时 java -jar xx.jar --spring-profiles-active=<span class="built_in">test</span> 修改</div></pre></td></tr></table></figure></p>
+<h1 id="加载顺序"><a href="#加载顺序" class="headerlink" title="加载顺序"></a>加载顺序</h1><p><img src="/2018/01/16/springboot/加载顺序.png" alt=""></p>
+<h1 id="监控管理"><a href="#监控管理" class="headerlink" title="监控管理"></a>监控管理</h1><p>spring-boot-starter-actuator模块能够为springboot提供监控，spring cloud在实现各个微服务组件时，进一步为该模块做了不少扩展，比如为原生端增加了不少指标和度量信息。</p>
+<h1 id="初识actuator"><a href="#初识actuator" class="headerlink" title="初识actuator"></a>初识actuator</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">  &lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;</div><div class="line">&lt;/dependency&gt;</div><div class="line">/health</div><div class="line">&#123;<span class="string">"status"</span>:<span class="string">"UP"</span>&#125;</div></pre></td></tr></table></figure>
+<h1 id="原生端"><a href="#原生端" class="headerlink" title="原生端"></a>原生端</h1><ul>
+<li>应用配置类：获取应用程序的应用配置、环境变量、自动化配置报告</li>
+<li>度量指标类：获取运行过程监控的度量指标，比如内存信息、线程池信息、http请求统计。</li>
+<li>操作控制类：提供对应用关闭等操作类功能</li>
+</ul>
+<h2 id="应用配置类"><a href="#应用配置类" class="headerlink" title="应用配置类"></a>应用配置类</h2><ul>
+<li>/autoconfig 获取应用自动化配置报告</li>
+<li>/beans 获取应用上下文创建的所有bean</li>
+<li>/configprops 获取配置的属性信息</li>
+<li>/env 环境属性报告，包括环境变量、jvm命令行、应用配置</li>
+<li>/mappings 所有spring mvc控制器映射关系</li>
+<li>/info 自定义信息</li>
+</ul>
+<h2 id="指标度量类"><a href="#指标度量类" class="headerlink" title="指标度量类"></a>指标度量类</h2><ul>
+<li>metrics 内存信息、线程、垃圾回收</li>
+<li>health 各类健康指标</li>
+<li>dump 暴露运行中的线程信息</li>
+<li>trace 返回基本http跟踪信息</li>
+</ul>
+<h2 id="操作控制类"><a href="#操作控制类" class="headerlink" title="操作控制类"></a>操作控制类</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">/shutdown</div><div class="line">endpoints.shutdown.enabled=<span class="literal">true</span> //修改配置文件</div></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/微服务/" rel="tag"># 微服务</a>
+          
+            <a href="/tags/springboot/" rel="tag"># springboot</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/01/10/线程池和Executor/" rel="next" title="线程池和Executor">
+                <i class="fa fa-chevron-left"></i> 线程池和Executor
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/01/17/服务治理Eureka/" rel="prev" title="服务治理Eureka">
+                服务治理Eureka <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg"
+               alt="李睿" />
+          <p class="site-author-name" itemprop="name">李睿</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">48</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">20</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#框架简介"><span class="nav-number">1.</span> <span class="nav-text">框架简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#项目解析"><span class="nav-number">2.</span> <span class="nav-text">项目解析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实现Restful接口"><span class="nav-number">3.</span> <span class="nav-text">实现Restful接口</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#配置文件"><span class="nav-number">4.</span> <span class="nav-text">配置文件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#自定义参数"><span class="nav-number">5.</span> <span class="nav-text">自定义参数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用随机数"><span class="nav-number">6.</span> <span class="nav-text">使用随机数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#命令行参数"><span class="nav-number">7.</span> <span class="nav-text">命令行参数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#多环境配置"><span class="nav-number">8.</span> <span class="nav-text">多环境配置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#加载顺序"><span class="nav-number">9.</span> <span class="nav-text">加载顺序</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#监控管理"><span class="nav-number">10.</span> <span class="nav-text">监控管理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#初识actuator"><span class="nav-number">11.</span> <span class="nav-text">初识actuator</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#原生端"><span class="nav-number">12.</span> <span class="nav-text">原生端</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#应用配置类"><span class="nav-number">12.1.</span> <span class="nav-text">应用配置类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#指标度量类"><span class="nav-number">12.2.</span> <span class="nav-text">指标度量类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#操作控制类"><span class="nav-number">12.3.</span> <span class="nav-text">操作控制类</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">李睿</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

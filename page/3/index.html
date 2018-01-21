@@ -273,6 +273,306 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/15/elasticSearch数据/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="李睿">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/11/15/elasticSearch数据/" itemprop="url">elasticSearch数据</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-15T13:41:31+08:00">
+                2017-11-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/elasticSearch/" itemprop="url" rel="index">
+                    <span itemprop="name">elasticSearch</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="文档"><a href="#文档" class="headerlink" title="文档"></a>文档</h2><p>文档元数据如下<br>_index 文档存储的地方；_type文档代表的对象的类；_id 文档的唯一标识*</p>
+<h3 id="index"><a href="#index" class="headerlink" title="_index"></a>_index</h3><p>索引(index)类似于关系型数据库里的”数据库”——它是我们存储和索引关联数据的地方。索引名必须是全部小写，不能以下划线开头，不能包含逗号.</p>
+<h3 id="type"><a href="#type" class="headerlink" title="_type"></a>_type</h3><p>在Elasticsearch中，我们使用相同类型(type)的文档表示相同的”事物”，类似关系型数据库中的表，因为他们的数据结构也是相同的。每个类型(type)都有自己的映射(mapping)或者结构定义，就像传统数据库表中的列一样。所有类型下的文档被存储在同一个索引下，但是类型的映射(mapping)会告诉Elasticsearch不同的文档如何被索引._type 的名字可以是大写或小写，不能包含下划线或逗号。</p>
+<h3 id="id"><a href="#id" class="headerlink" title="_id"></a>_id</h3><p>唯一标识一个文档，如果不指定，es自动生成</p>
+<h2 id="索引文档"><a href="#索引文档" class="headerlink" title="索引文档"></a>索引文档</h2><p>自动生成的id一般是22个字节长的uuid<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">PUT _index/_type/_id</div><div class="line">&#123;</div><div class="line"><span class="string">"field"</span>:<span class="string">"value"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="检索文档"><a href="#检索文档" class="headerlink" title="检索文档"></a>检索文档</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GET _index/_type/_id 或者 GET _index/_type/_id?pretty 美化字符串</div></pre></td></tr></table></figure>
+<p>pretty:在任意的查询字符串中增加 pretty  参数，类似于上面的例子。会让Elasticsearch美化输出(pretty-print)JSON响应以便更加容易阅读。_source  字段不会被美化，它的样子与我们输入的一致。</p>
+<h3 id="检索文档的一部分"><a href="#检索文档的一部分" class="headerlink" title="检索文档的一部分"></a>检索文档的一部分</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GET /_index/_type/_id?_source=field,filed</div></pre></td></tr></table></figure>
+<h3 id="只获取元数据"><a href="#只获取元数据" class="headerlink" title="只获取元数据"></a>只获取元数据</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GET /_index/_type/_id/_source</div></pre></td></tr></table></figure>
+<h3 id="检查文档是否存在"><a href="#检查文档是否存在" class="headerlink" title="检查文档是否存在"></a>检查文档是否存在</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl -i -XHEAD http://localhost:9200/website/blog/123</div></pre></td></tr></table></figure>
+<h2 id="更新文档"><a href="#更新文档" class="headerlink" title="更新文档"></a>更新文档</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">PUT _index/_type/_id //更新后version要改变</div><div class="line">&#123;</div><div class="line"><span class="string">"field"</span>:<span class="string">"value"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ol>
+<li>从旧文档中检索JSON</li>
+<li>修改它</li>
+<li>删除旧文档</li>
+<li>索引新文档<h2 id="删除文档"><a href="#删除文档" class="headerlink" title="删除文档"></a>删除文档</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">DELETE /_index/_type/_id</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="版本控制"><a href="#版本控制" class="headerlink" title="版本控制"></a>版本控制</h2><p>数据库在并发冲突时提供了悲观锁和乐观锁的机制，es提供的机制是乐观并发控制。每个文档都有个版本号，当修改时version加一，如果指定的version不是现在的就会失败<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">//插入一行记录</div><div class="line">PUT /website/blog/1/_create</div><div class="line">&#123;</div><div class="line"><span class="string">"title"</span>: <span class="string">"My first blog entry"</span>,</div><div class="line"><span class="string">"text"</span>: <span class="string">"Just trying this out..."</span></div><div class="line">&#125;</div><div class="line">//获取当前数据,可以知道当前版本是1</div><div class="line">GET /website/blog/1</div><div class="line">&#123;</div><div class="line"><span class="string">"_index"</span> : <span class="string">"website"</span>,</div><div class="line"><span class="string">"_type"</span> : <span class="string">"blog"</span>,</div><div class="line"><span class="string">"_id"</span> : <span class="string">"1"</span>,</div><div class="line"><span class="string">"_version"</span> : 1,</div><div class="line"><span class="string">"found"</span> : <span class="literal">true</span>,</div><div class="line"><span class="string">"_source"</span> : &#123;</div><div class="line"><span class="string">"title"</span>: <span class="string">"My first blog entry"</span>,</div><div class="line"><span class="string">"text"</span>: <span class="string">"Just trying this out..."</span></div><div class="line">&#125;</div><div class="line">//根据当前版本对数据进行修改</div><div class="line">PUT /website/blog/1?version=1</div><div class="line">&#123;</div><div class="line"><span class="string">"title"</span>: <span class="string">"My first blog entry"</span>,</div><div class="line"><span class="string">"text"</span>: <span class="string">"Starting to get the hang of this..."</span></div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">//如果当前版本不是1则会失败</div></pre></td></tr></table></figure></p>
+<h3 id="使用外部版本控制系统"><a href="#使用外部版本控制系统" class="headerlink" title="使用外部版本控制系统"></a>使用外部版本控制系统</h3><p>一种常见的结构是使用一些其他的数据库做为主数据库，然后使用Elasticsearch搜索数据，这意味着所有主数据库发生变化，就要将其拷贝到Elasticsearch中。如果有多个进程负责这些数据的同步，就会遇到上面提到的并发问题。如果主数据库有版本字段——或一些类似于 timestamp  等可以用于版本控制的字段——是你就可以在Elasticsearch的查询字符串后面添加 version_type=external  来使用这些版本号。版本号必须是整数，大于零小于 9.2e+18  ——Java中的正的 long  。<br>外部版本号与之前说的内部版本号在处理的时候有些不同。它不再检查 _version  是否与请求中指定的一致，而是检查是否小于指定的版本。如果请求成功，外部版本号就会被存储到 _version  中。外部版本号不仅在索引和删除请求中指定，也可以在创建(create)新文档中指定。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">PUT /website/blog/2?version=5&amp;version_type=external</div><div class="line">&#123;</div><div class="line"><span class="string">"title"</span>: <span class="string">"My first external blog entry"</span>,</div><div class="line"><span class="string">"text"</span>: <span class="string">"Starting to get the hang of this..."</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="更新文档-1"><a href="#更新文档-1" class="headerlink" title="更新文档"></a>更新文档</h2><p>update  请求表单接受一个局部文档参数 doc  ，它会合并到现有文档中——对象合并在一起，存在的标量字段被覆盖，新字段被添加。注：更新文档如果不存在，则会报错<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">POST /website/blog/1/_update</div><div class="line">&#123;</div><div class="line"><span class="string">"doc"</span> : &#123;</div><div class="line"><span class="string">"tags"</span> : [ <span class="string">"testing"</span> ],</div><div class="line"><span class="string">"views"</span>: 0</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">POST /website/blog/1/_update</div><div class="line">&#123;</div><div class="line"><span class="string">"script"</span> : <span class="string">"ctx._source.views+=1"</span></div><div class="line">&#125;</div><div class="line">//更新不存在的文档，如果有加一，没有初始化为1</div><div class="line">POST /website/pageviews/1/_update</div><div class="line">&#123;</div><div class="line"><span class="string">"script"</span> : <span class="string">"ctx._source.views+=1"</span>,</div><div class="line"><span class="string">"upsert"</span>: &#123;</div><div class="line"><span class="string">"views"</span>: 1</div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="更新和冲突"><a href="#更新和冲突" class="headerlink" title="更新和冲突"></a>更新和冲突</h3><p>这些可以通过 retry_on_conflict  参数设置重试次数来自动完成，这样 update  操作将会在发生错误前重试——这个值默认为0。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">POST /website/pageviews/1/_update?retry_on_conflict=5</div><div class="line">&#123;</div><div class="line"><span class="string">"script"</span> : <span class="string">"ctx._source.views+=1"</span>,</div><div class="line"><span class="string">"upsert"</span>: &#123;</div><div class="line"><span class="string">"views"</span>: 0</div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="mget"><a href="#mget" class="headerlink" title="mget"></a>mget</h2><p>检索多个文档<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">GET /_mget</div><div class="line">&#123;</div><div class="line"><span class="string">"docs"</span> : [</div><div class="line">&#123;</div><div class="line"><span class="string">"_index"</span> : <span class="string">"website"</span>,</div><div class="line"><span class="string">"_type"</span> : <span class="string">"blog"</span>,</div><div class="line"><span class="string">"_id"</span> : 2</div><div class="line">&#125;,</div><div class="line">&#123;</div><div class="line"><span class="string">"_index"</span> : <span class="string">"website"</span>,</div><div class="line"><span class="string">"_type"</span> : <span class="string">"pageviews"</span>,</div><div class="line"><span class="string">"_id"</span> : 1,</div><div class="line"><span class="string">"_source"</span>: <span class="string">"views"</span></div><div class="line">&#125;</div><div class="line">]</div><div class="line">&#125;</div><div class="line">//如果你想检索的文档在同一个 _index  中（甚至在同一个 _type  中），你就可以在URL中定义一个默认的 /_index  或者 /_index/_type  </div><div class="line">GET /website/blog/_mget</div><div class="line">&#123;</div><div class="line"><span class="string">"docs"</span> : [</div><div class="line">&#123; <span class="string">"_id"</span> : 2 &#125;,</div><div class="line">&#123; <span class="string">"_type"</span> : <span class="string">"pageviews"</span>, <span class="string">"_id"</span> : 1 &#125;</div><div class="line">]</div><div class="line">&#125;</div><div class="line">//如果所有文档具有相同 _index  和 _type  ，你可以通过简单的 ids  数组来代替完整的 docs 数组</div><div class="line">GET /website/blog/_mget</div><div class="line">&#123;</div><div class="line"><span class="string">"ids"</span> : [ <span class="string">"2"</span>, <span class="string">"1"</span> ]</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="批量"><a href="#批量" class="headerlink" title="批量"></a>批量</h2><p>bulk  API允许我们使用单一请求来实现多个文档的 create  、 index  、 update  或 delete  。这对索引类似于日志活动这样的数据流非常有用，它们可以以成百上千的数据为一个批次按序进行索引。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&#123; action: &#123; metadata &#125;&#125;\n</div><div class="line">&#123; request body &#125;\n</div><div class="line">&#123; action: &#123; metadata &#125;&#125;\n</div><div class="line">&#123; request body &#125;\n</div></pre></td></tr></table></figure></p>
+<p>注意：1.每行必须以 “\n”  符号结尾，包括最后一行。这些都是作为每行有效的分离而做的标记；2.每一行的数据不能包含未被转义的换行符，它们会干扰分析——这意味着JSON不能被美化打印<br>action: create（创建、若存在则报错）、index（创建或替换）、update（更新）、delete（删除文档）<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">POST /_bulk</div><div class="line">&#123; <span class="string">"delete"</span>: &#123; <span class="string">"_index"</span>: <span class="string">"website"</span>, <span class="string">"_type"</span>: <span class="string">"blog"</span>, <span class="string">"_id"</span>: <span class="string">"123"</span> &#125;&#125; &lt;1&gt;</div><div class="line">&#123; <span class="string">"create"</span>: &#123; <span class="string">"_index"</span>: <span class="string">"website"</span>, <span class="string">"_type"</span>: <span class="string">"blog"</span>, <span class="string">"_id"</span>: <span class="string">"123"</span> &#125;&#125;</div><div class="line">&#123; <span class="string">"title"</span>: <span class="string">"My first blog post"</span> &#125;</div><div class="line">&#123; <span class="string">"index"</span>: &#123; <span class="string">"_index"</span>: <span class="string">"website"</span>, <span class="string">"_type"</span>: <span class="string">"blog"</span> &#125;&#125;</div><div class="line">&#123; <span class="string">"title"</span>: <span class="string">"My second blog post"</span> &#125;</div><div class="line">&#123; <span class="string">"update"</span>: &#123; <span class="string">"_index"</span>: <span class="string">"website"</span>, <span class="string">"_type"</span>: <span class="string">"blog"</span>, <span class="string">"_id"</span>: <span class="string">"123"</span>, <span class="string">"_retry_on_conflict"</span> : 3&#125; &#125;</div><div class="line">&#123; <span class="string">"doc"</span> : &#123;<span class="string">"title"</span> : <span class="string">"My updated blog post"</span>&#125; &#125;</div></pre></td></tr></table></figure></p>
+<p>当然，你可以指定index和type，当下面指定时会覆盖掉<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">POST /website/_bulk</div><div class="line">&#123; <span class="string">"index"</span>: &#123; <span class="string">"_type"</span>: <span class="string">"log"</span> &#125;&#125;</div><div class="line">&#123; <span class="string">"event"</span>: <span class="string">"User logged in"</span> &#125;</div><div class="line"></div><div class="line">POST /website/<span class="built_in">log</span>/_bulk</div><div class="line">&#123; <span class="string">"index"</span>: &#123;&#125;&#125;</div><div class="line">&#123; <span class="string">"event"</span>: <span class="string">"User logged in"</span> &#125;</div><div class="line">&#123; <span class="string">"index"</span>: &#123; <span class="string">"_type"</span>: <span class="string">"blog"</span> &#125;&#125;</div><div class="line">&#123; <span class="string">"title"</span>: <span class="string">"Overriding the default type"</span> &#125;</div></pre></td></tr></table></figure></p>
+<p>批量最好的批次在5Mb~15Mb</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/14/分布式集群/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="李睿">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/11/14/分布式集群/" itemprop="url">分布式集群</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-14T21:22:00+08:00">
+                2017-11-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/elasticSearch/" itemprop="url" rel="index">
+                    <span itemprop="name">elasticSearch</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>一个节点就是一个elasticsearch实例，一个集群由一个或者多个节点组成，具有相同的cluster.name，它们协同工作，分享数据和负载。<br>集群中的一个节点选举称为master，将临时管理集群级别的一些变更，<strong>例如新建、删除索引、增加或移除节点。主节点不参与文档级别的变更或搜索，意味着在流量增长时，master不会成为瓶颈。</strong></p>
+<h2 id="集群健康"><a href="#集群健康" class="headerlink" title="集群健康"></a>集群健康</h2><p>集群健康分为三种：red、yellow、green,green代表所有的主分片和复制分片都可用，yellow代表所有主要分片可用，但是不是所有复制分片可用，red代表不是所有主分片可用<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GET _cluster/health</div></pre></td></tr></table></figure></p>
+<h2 id="添加索引"><a href="#添加索引" class="headerlink" title="添加索引"></a>添加索引</h2><p>索引是用来指向一个或者多个分片的逻辑命名空间，一个分片是一个最小级别工作单元。分片可以是主分片或者复制分片，索引的每一个文档属于一个主分片，主分片的数量决定了索引最终存储的数量。复制分片是主分片的一个副本，可以防止硬件故障导致的数据丢失，同时提供读请求。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">PUT /sjjhpt</div><div class="line">//创建三个主分片，一个副本</div><div class="line">&#123;</div><div class="line">  <span class="string">"settings"</span>:&#123;</div><div class="line">     <span class="string">"number_of_shards"</span>:3,</div><div class="line">     <span class="string">"number_of_replicas"</span>: 1.</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="增加故障转移"><a href="#增加故障转移" class="headerlink" title="增加故障转移"></a>增加故障转移</h2><p>在单一节点运行会有单点故障的风险，要防止单点故障，要启动另外一个节点。文档首先会在主分片中存储，然后并发复制到其他复制分片，确保主分片和复制分片都会被检索。</p>
+<h2 id="横向扩展"><a href="#横向扩展" class="headerlink" title="横向扩展"></a>横向扩展</h2><p>可以增加节点数，最多节点数为(主分片个数)* (副本数量+1)</p>
+<h2 id="更多扩展"><a href="#更多扩展" class="headerlink" title="更多扩展"></a>更多扩展</h2><p>当然，只是有更多的复制分片在同样数量的节点上并不能提高我们的性能，因为每个分片都要访问更小比重的节点资源（译者注：大部分请求都聚集到了分片少的节点，导致一个节点吞吐量太大，反而降低性能）。你需要增加硬件来提高吞吐量。<br>不过这些额外的复制节点意味着我们有更多的冗余：通过以上对接点的设置，我们更够承受两个节点故障而不丢失数据.</p>
+<h2 id="应对故障"><a href="#应对故障" class="headerlink" title="应对故障"></a>应对故障</h2><p>当主节点故障后，会重新选举主节点，如果主分片不能正常工作，重新选举的主节点会提升副本分片为主分片</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/14/elasticsearch入门/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1477,310 +1777,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/29/构建大型网站的其他要素/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="李睿">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/10/29/构建大型网站的其他要素/" itemprop="url">构建大型网站的其他要素（第八章）</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-29T13:25:33+08:00">
-                2017-10-29
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/大型网站中间件/" itemprop="url" rel="index">
-                    <span itemprop="name">大型网站中间件</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="加速静态内容访问的速度的CDN"><a href="#加速静态内容访问的速度的CDN" class="headerlink" title="加速静态内容访问的速度的CDN"></a>加速静态内容访问的速度的CDN</h2><p>CDN，Content Delivery Network，内容分发网络。CDN的作用是把用户需要的内容分发到离用户近的地方，这样可以从用户能就近获取所需的内容。整个CDN系统分为CDN源站和CDN节点。CDN源站提供CDN节点使用的数据源头，CDN节点部署在离最终用户比较近的地方，加速用户对站点的访问。CDN就是网络缓存技术，一般存放静态文件（js，css，图片，视频，页面框架）。<br>浏览器访问网站的顺序：<br>1.用户提交要访问的域名地址；<br>2.浏览器对域名进行解析，获取ip地址；<br>3.浏览器向所得到的ip发送请求；<br>4.浏览器根据返回的内容显示数据<br>有了CDN后的顺序：<br>1.用户提交要访问的域名地址；<br>2.浏览器对域名进行解析，由于CDN对域名解析过程做了调整，所以得到该域名对应的CNAME记录。<br>3.对CNAME进行解析得到实际的ip地址。在这次解析中会使用全局负载均衡CDN解析，需要我们根据地理位置以及所在的ISP确定结果，然后获取到具体的IP地址。<br>4.得到实际的ip地址后，我们会向服务器发送请求。<br>5.CDN会根据请求的内容是否在本地缓存进行不同的处理。<br>如果存在，直接返回结果；不存在，则请求CDN源站，获取内容，返回结果。<br>CDN关键的技术：<br>1.全局调度<br>全局调度是完成用户就近访问的第一步，我们需要根据用户地域、接入运营商、以及CDN机房的负载情况去调度。<br>2.缓存技术<br>如果请求不存在CDN节点，则请求CDN源站，获取内容，返回结果。如果命中率不高，加速有限。要提升命中率，首先缓存的容量要足够大，可以使用内存+SSD+硬盘混合存储。还有新增变更数据预加载也能提升命中<br>3.内容分发<br>内容分发主要包括在CDN上不用回源的数据的管理和分发，主要包括静态页面。<br>4.带宽优化<br>只返回必要数据和使用更好的压缩算法</p>
-<h2 id="大型网站的存储支持"><a href="#大型网站的存储支持" class="headerlink" title="大型网站的存储支持"></a>大型网站的存储支持</h2><h3 id="分布式文件系统"><a href="#分布式文件系统" class="headerlink" title="分布式文件系统"></a>分布式文件系统</h3><p>对一些图片、大文本的存储使用数据库就不合适了。GFS主要由三部分构成：GFS Client、GFS Master、GFS chunkserver</p>
-<h4 id="Client"><a href="#Client" class="headerlink" title="Client"></a>Client</h4><p>应用使用GFS的入口，Client负责从GFS Master上获取要操作的文件在chunkserver中的具体地址，然后直接和chunkserver通信，获取数据或者进行数据写入和更新。</p>
-<h4 id="Master"><a href="#Master" class="headerlink" title="Master"></a>Master</h4><p>可以说是整个文件系统的大脑，这里维护了所有的文件系统的元数据，包括名字空间、访问控制信息、文件与chunk的映射信息、chunk的当前位置。Master也控制整个系统范围内的活动，例如，无效的chunk的回收以及chunksever之前的chunk迁移等。Master与chunkServer之间通过周期性的心跳进行通信，检测对方是否在线。</p>
-<h4 id="ChunkServer"><a href="#ChunkServer" class="headerlink" title="ChunkServer"></a>ChunkServer</h4><p>这是文件系统存储的地方。在每个chunkserver上会用chunk的方式管理数据。每个chunk是固定大小的文件，超过chunk的文件会被分为多个chunk进行存储，小于chunk的文件则会将多个文件存储在一个chunk中。<br>GFS主要解决单机的存储问题和安全问题，HDFS是java的类GFS的实现。</p>
-<h3 id="NOSQL"><a href="#NOSQL" class="headerlink" title="NOSQL"></a>NOSQL</h3><p>not only sql。基本上处于分布式文件系统和SQL关系型数据库之间的系统都被归为NoSql范畴。<br>在NoSql Data Modeling Techniques文章中，一个NoSql和Sql的基础都来自key value，另外一个NoSql继续发展，就会变成Sql数据库。</p>
-<h4 id="key-value"><a href="#key-value" class="headerlink" title="key-value"></a>key-value</h4><p>最基础的技术支撑，后续的产品都基于key-value存储发展起来。但是有个问题，没有办法进行高效的范围查询。</p>
-<h4 id="ordered-key-value"><a href="#ordered-key-value" class="headerlink" title="ordered key-value"></a>ordered key-value</h4><p>key是有序的，可以解决key的范围查询的效率，但是在这个模型中，value本身的内容和结构是由应用来负责解析和存储的。</p>
-<h4 id="Big-Table"><a href="#Big-Table" class="headerlink" title="Big Table"></a>Big Table</h4><p>是google发表的名为BigTable：A Distributed Storage System for Structured Data论文中提到的一个产品，是一个结构化数据的分布式存储系统。BigTable对value进行了schema的支持，value是由多个Column family组成，Column family的内部是Column，ColumnFamily不能动态扩展，但是Column能够动态扩展。（hbase可以是里面的一个实现）</p>
-<h4 id="Document-full-text-Search"><a href="#Document-full-text-Search" class="headerlink" title="Document full-text Search"></a>Document full-text Search</h4><p>Document数据库有两个很大的进步，一个是可以在内部任意定义schema，而不再仅仅是map的嵌套；另一个是全文检索的支持。</p>
-<h4 id="Graph"><a href="#Graph" class="headerlink" title="Graph"></a>Graph</h4><p>图数据库可以看成从有序的key-value数据库发展而来的一个分支，主要是支持图结构的数据模型。<br>这里面讲的Full-Text Search和Graph在一些地方可能不能归为NoSql。<br>Hbase是借鉴Google BigTable的一个java版本的实现，存储到hbase的数据是通过HRegionServer来管理，每个HRegionServer管理了多个HRegion，每个Region管理了具体数据。HMaster管理所有的HRegionServer节点，是一个中心控制结构。还有比较经典的Amazon的Dynamo，它是采用了一致性哈希来进行管理。</p>
-<h3 id="缓存系统"><a href="#缓存系统" class="headerlink" title="缓存系统"></a>缓存系统</h3><p>缓存是非持久化，用来加速应用对数据的读取。Redis和Memcache是两个广泛的缓存系统，Redis已经有了对于集群的支持，memcache本身还是一个单机的应用。如果想把多个节点构成一个集群，常见的有一致性哈希。有两个使用缓存的场景<br>首先是使用缓存降低底层读的压力，需要注意缓存和数据一致性的问题。在这种方式中，应用不直接操作缓存，存储由缓存控制。但是这种场景下，因为保证写入缓存后要能写入存储，所以缓存本身的逻辑比较复杂，需要很多操作日志和故障恢复。<br>另一种使用缓存的方式是，应用直接与缓存和存储系统打交道，一般的做法是在写操作时更新缓存，然后失效缓存；而在读数据时先读缓存，如果缓存没有命中，再去读数据，写入缓存。<br>这里重点考虑缓存与存储数据一致性问题，这里指最终一致性。重点考虑缓存没有命中和数据更改的情况，以及更新存储中的数据后没来得及将缓存失效<br>还有就是全数据缓存，当存储的数据变化就直接同步到缓存，这样应用取数据都从缓存中取。用于数据变更通知平台<br>大型网站使用缓存的场景还有对于web应用页面渲染的缓存。以一个页面展示为例，我们队页面进行了分块，其中有静态内容，也有动态内容，如果整个页面采用服务器渲染的方式，我们希望相对静止的内容可以进行缓存而不用每次都要重新渲染。具体的技术有ESI（edge side includes），是通过在返回的页面加上标签，然后标签的内容去用缓存填充的一个过程。处理ESI标签可以放在java应用容器中去处理，也可以放在java应用容器前置的服务器去处理。<br>两种方式对比如下：<br>1.渲染页面和ESI处理在一个进程里，处理效率会提升，当页面内容是内部对象时就可以处理ESI标签，而如果放在前置服务器，需要对内容进行一次扫描，定位到ESI标签后再处理。<br>2.ESI放在Web前置服务器去处理，对于后端来说可以不用去考虑ESI标签问题，例如当后端处理请求为java应用、php 应用时，可以统一把ESI处理放在前置服务器上，这样后端就只用处理请求，不必对每个应用做都去处理ESI工作。</p>
-<h2 id="搜索系统"><a href="#搜索系统" class="headerlink" title="搜索系统"></a>搜索系统</h2><p>当网站的数据量和访问量很小时候，一些数据的查询可以用数据库的like操作来实现，当然这种操作比较效率很低也不够智能。当数据量和访问量很大时候，就需要在站内使用搜索技术来解决这问题。</p>
-<h3 id="爬虫问题"><a href="#爬虫问题" class="headerlink" title="爬虫问题"></a>爬虫问题</h3><p>对于全网搜索来说，我们需要爬虫去获取被检索的网站内容。这里我们要讲更新索引的方式<br>1.定时从数据源中拉取，我们称之为增量dump。这要求数据库有个记录变更时间的字段，否则无法获取一段时间变更的数据，而这个字段需要有索引，否则效率变得很低。增量dump开始前，需要全量dump构造初始化的数据。增量的时间间隔一般在分钟级，这会引起明显延迟。<br>2.通过数据变更的通知，及时通过搜索引擎构建索引及时性会很好不过带来的系统压力会很大。因而这种方式主要用在实时性很高的场景。</p>
-<h3 id="倒排索引"><a href="#倒排索引" class="headerlink" title="倒排索引"></a>倒排索引</h3><p>倒排索引是很重要的一项搜索引擎技术。正向索引可以理解为文章和关键词的映射。相对于正向索引，倒排索引是把值的内容拆分成了索引的key，而原来用做索引的key则变成了值，也就是关键词和文档之间的映射。搜索引擎比数据库高效的原因就在于倒排索引。如何确定倒排索引的关键词，关键在于分词。</p>
-<h3 id="查询预处理"><a href="#查询预处理" class="headerlink" title="查询预处理"></a>查询预处理</h3><p>查询表预处理主要负责对用户搜索内容进行分词及分词后的分析，包括同义词的替换和及词后的分析，包括一些同义词的替换和纠错等。这一部分是在使用搜索引擎前对搜索内容的梳理，这部分的工作也最终影响到搜索结果的质量。<br>备注：1、在建立索引时，拆词建索引时就把同义词考虑进去，将同义词的词条加入到索引中，然后检索时，直接根据输入拆词来检索2、在建立索引时，不对同义词进行任何处理，在检索时，先拆词，针对拆分出来的词元（呵呵，自创的称呼）也即关键字，进行同义词匹配，把匹配好的同义词拼成一个新的关键字，搜索索引时根据此关键字来进行检索。个人觉得，方案二更优于方案一，理由如下：在建立索引时，就处理同义词，一方面会增加索引库的容量，导致索引效率的降低；其次，如果后期对同义词进行了扩展，比如原来，一个单词有2个同义词，后面增加到3个，就需要对索引进行重建了，！<br>似,is,are =&gt; 是（一般适用于纠错，格式一表示如果文本中出现了is,are,那么直接替换成是。expand参数对此没有影响。）好人,好心人,热心人（格式二表示如果文本中出现了好人或者好心人或者热心人，当expand=true时，把待替换的文本用好人好心人 热心人替换；当expand=false时，把待替换文本用第一个单词即好人替换。）</p>
-<h3 id="相关度计算"><a href="#相关度计算" class="headerlink" title="相关度计算"></a>相关度计算</h3><p>查询在搜索引擎上被执行，对于返回的结果，需要计算和搜索内容的相关度展示给用户，相关度计算是指不指定按照某个字段排序的基础上对结果的排序，排序的原则是被搜索到的内容和搜索内容之间的相关度。<br>相关度的计算方式很多，例如有空间向量模型、概率模型<br><a href="http://blog.csdn.net/hguisu/article/details/7981145" target="_blank" rel="external">http://blog.csdn.net/hguisu/article/details/7981145</a></p>
-<h2 id="数据计算支撑"><a href="#数据计算支撑" class="headerlink" title="数据计算支撑"></a>数据计算支撑</h2><h3 id="离线计算"><a href="#离线计算" class="headerlink" title="离线计算"></a>离线计算</h3><p>离线计算是业务产生数据离开生产环境后进行的计算。就是业务数据从在线存储中移动到离线存储中，然后进行数据处理的过程。<br>在离线计算领域里，MapReduce模型十分著名和常用，MapReduce是google在2004发表的论文：MapReduce：simplified Data Processing On Large Clusters.<br>（<a href="http://www.cnblogs.com/fuzhe1989/p/3413457.html）。" target="_blank" rel="external">http://www.cnblogs.com/fuzhe1989/p/3413457.html）。</a><br>主要分为两个阶段，Map阶段和Reduce阶段。在map阶段，我们根据设定的规则，把整体数据集映射给不同的worker来处理，并且生成各自的处理结果。而在reduce阶段，是对前面处理过的数据进行聚合，形成不同的结果，一个任务的处理可能是不止一次MapReduce过程。<br>Hadoop是MapReduce的一个开源实现，Hadoop使用HDFS进行数据存储，Spark提供了基于内存的集群计算的支持，Spark本身是为了集群计算中特定类型工作而设计的。例如机器学习，基于内存的方式使得spark的速度非常快</p>
-<h3 id="在线计算"><a href="#在线计算" class="headerlink" title="在线计算"></a>在线计算</h3><p>Storm是在线计算的一个框架<br>Nimbus：负责资源分配和任务调度。<br>Supervisor：负责接受nimbus分配的任务，启动和停止属于自己管理的worker进程。<br>Worker：运行具体处理组件逻辑的进程。<br>Task：worker中每一个spout/bolt的线程称为一个task. 在storm0.8之后，task不再与物理线程对应，同一个spout/bolt的task可能会共享一个物理线程，该线程称为executor。</p>
-<h2 id="发布系统"><a href="#发布系统" class="headerlink" title="发布系统"></a>发布系统</h2><p>当完成应用的开发和测试后，需要使应用上线来为最终用户提供服务。<br>1.分发应用<br>我们需要提供自动高效且容易操作的机制把经过测试的程序包分发到线上的应用，我们一般会采用web的操作方式，通过专用通道把应用程序包从线下环境传送到线上的发布服务器。发布控制台-&gt;多机房-&gt;发布服务器<br>2.启动校验<br>应用重启启动后，需要进行校验从而完成这台应用服务器上的应用发布，对应用的校验通常是应用自身提供一个检测脚本或者页面，发布系统执行这个脚本或者访问页面后来判断返回的结果。<br>停止应用时,需要优雅的关闭，需要在关闭应用前把这个应用从负载均衡或者软负载中心上移除<br>3.灰度发布<br>会对新应用进行分批发布，逐步扩大新应用在整个集群中的比例直至最后全部完成。这里讲的灰度发布主要是针对新应用在用户体验方面完全感知不到的更新.<br>4.产品改版Beta<br>提供新旧应用的共存</p>
-<h2 id="应用监控系统"><a href="#应用监控系统" class="headerlink" title="应用监控系统"></a>应用监控系统</h2><p>1.数据监视维度<br>系统数据和应用自身的数据.系统数据指的就是当前应用运行的系统环境的信息，如CPU使用率、内存使用情况、交换分区使用情况、当前系统负载、IO情况等;而应用自身的数据，则是不同应用有不同的数据，一般会是调用次数、成功率、响应时间、异常数量等维度的数据<br>2.数据记录方式<br>系统自身的数据已经被记录到了本地磁盘，应用的数据一般也是存放在应用自身的目录中，便于采集。也有直接把应用日志通过网络发送到采集服务器的情况，可以减轻本地写日志的压力<br>对于应用数据的记录，会考虑用定时统计的方式记录一些量很大的信息.如对于一个提供服务的应用，在没有特别需求时，并不直接记录每次调用的信息，而是会记录一段时间如5s或者一个间隔时间内的总调用次数、总响应时间这样写信息，而对于异常信息则每次都会予以记录;采用统计的方式是为了减小记录的大小以及对本地磁盘的写入压力。<br>3.数据采集方式<br>采集方式有应用服务器主动对同给监控中心以及等待监控中心来拉取两种方式。前者控制权在应用服务器上,可能出现的问题是应用服务器推送的压力超过采集的中心服务器的能力，会造成重试等额外开销并且需要应用服务器上的推送程序控制重试逻辑和当前传送位置等信息。后者把复杂性都放在中心采集服务器上处理，使得应用服务器中支持数据采集的部分变的简单<br>4.展示与警告<br>提供图表的形式可以提供Web页面的展示-&gt;通过手机应用来接收报警-&gt;短信方式好<br>5.控制<br>控制<br>应用启动后在运行期对于应用的行为改变-&gt;对于应用的运维，最低的要求是出现问题时可以通过重启应用解决，但是我们还是需要更加精细化的控制应用-降低和一些切换。降级是我们遇到大量请求且不能扩容的情况时所进行的功能限制的行为-&gt;而切换更多的是当依赖的下层系统出现故障并且需要手工进行切换时的一个管理，这些控制一般都是通过开关，参数设置来完成</p>
-<h2 id="依赖管理系统"><a href="#依赖管理系统" class="headerlink" title="依赖管理系统"></a>依赖管理系统</h2><p>随着网站功能增多，应用的个数迅速增加，应用之间的关系也会越来越复杂，理清这些依赖关系并能够管理这些依赖会非常重要<br>-&gt;一个应用在完成某个功能时到底需要依赖哪些外部系统、这些依赖中哪些是必要依赖，强依赖(登陆验证用户名和密码)，哪些是有了更好没有也可以的依赖，弱依赖（如记录登陆时间和ip等）-&gt;<br>-&gt;动态检测（在系统运行阶段，通过功能的调用来发现应用的依赖关系）和静态检测（分析代码来确定所调用的具体外部应用）-&gt;动态检测的主要检查方式是模拟被调用系统不可用和响应慢的两种情况-&gt;<br>-&gt;Google#Dapper,A Large-Scale Distributed Systems Tracing Infrastructure-&gt;traceId,index-&gt;形成一个调用时序图</p>
-<h2 id="多机房问题分析"><a href="#多机房问题分析" class="headerlink" title="多机房问题分析"></a>多机房问题分析</h2><p>同城机房和异地机房<br>同城多个机房中，对于重要的应用系统，会在不止一个机房中部署；而对于数据库系统，则会把主备放在不同机房。尽量避免不必要的跨机房的内部系统调用，为了数据安全，把产生的业务数据都同步到异地的机房。把一些对数据延迟不敏感的系统部署到异地,如只读系统….</p>
-<h2 id="系统容量规划"><a href="#系统容量规划" class="headerlink" title="系统容量规划"></a>系统容量规划</h2><p>我们应该知道的信息就是整个系统的容量以及运行时所处的水位。我们把某个应用系统集群能够提供的并发能力和当前的压力比作一个水桶的容量和水位。那么准确知道各个系统的容量和当前高峰时的水位是一件很重要的事情。因为我们还是希望优先通过扩大容量来支持更多的请求而不是首选降级的方案。<br>考虑过去的增长情况并结合人为的判断<br>1.弄清楚当前系统高峰期的水位<br>2.弄清楚当前各个系统的容量<br>3.通过测试，压力测试，设置警戒值，高峰水位搞过警戒值就增加容量，保持高峰的水位是低于警戒值的</p>
-<h2 id="内部私有云"><a href="#内部私有云" class="headerlink" title="内部私有云"></a>内部私有云</h2>
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/27/软负载中心与集中配置管理/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="李睿">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/10/27/软负载中心与集中配置管理/" itemprop="url">软负载中心与集中配置管理（第七章）</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-27T15:39:30+08:00">
-                2017-10-27
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/大型网站中间件/" itemprop="url" rel="index">
-                    <span itemprop="name">大型网站中间件</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="初始软负载中心"><a href="#初始软负载中心" class="headerlink" title="初始软负载中心"></a>初始软负载中心</h2><p>在服务框架，服务查找中心就是软负载中心；而在消息中间件中消息发送者以及消息消费者对于消息中间件的感知也是通过软负载中心。<br>软负载中心有两个最基本的职能：<br>1.聚合地址信息；无论是服务框架中需要用到的服务提供者地址还是消息中间件系统中的消息中间件地址，都需要由软负载中心去聚合地址列表，形成一个可供服务调用者及消息发送者、接收者接收的列表。<br>2.生命周期感知；软件负载中心能够对服务上下线自动感知，并且根据这个变化去更新服务地址数据，形成新的地址列表后，把数据传给需要数据的调用者或者消息的发送者和接收者。</p>
-<h2 id="软负载中心的结构"><a href="#软负载中心的结构" class="headerlink" title="软负载中心的结构"></a>软负载中心的结构</h2><p>软负载中心包括：一个是软负载中心的服务端，另一个是软负载中心的客户端；服务端主要负责感知提供服务的机器是否在线，聚合提供者的机器信息，并且负责把数据传给使用数据的应用。客户端承载了两个角色，作为服务提供者，客户端主要是把服务提供者提供服务的具体信息主动传给服务端，并且随着提供服务的变化去更新数据；而作为服务使用者，客户端主要向服务端告知自己所需要的数据，并负责去更新数据，还要进行本地缓存，使得每次去请求服务来获取列表都是一个本地操作。<br>软件负载中心内部有三部分重要数据<br>1.聚合数据<br>聚合后的地址列表。对于提供的服务信息，我们使用唯一的dataId来标识，同时dataId支持分组（group），通过dataId和group可以定位到唯一的数据内容，这个内容是通过聚合完成的完整数据，而这个信息在内部就是一个key-value结构。<br>2.订阅关系<br>在软负载中心中，需要数据的应用把自己需要的数据告诉软负载中心，这就是订阅关系，订阅的粒度也是通过dataId和group来确定数据，那么会有dataId和group到数据订阅者的分组ID的一个映射关系，当聚合的数据发生变化，通过订阅关系的数据找到需要通知的数据订阅者，然后去进行数据更新操作。<br>3.连接关系<br>连接到软负载中心的节点和软负载中心已经建立的连接管理。使用软负载中心的应用，无论是发布数据还是订阅数据，都会有一个独立的分组，而连接数据就是用groupId作为key，然后对应管理这个物理连接，采用的是长连接方式。当订阅的数据发生变化，通过订阅关系找到需要通知的groupId，在连接数据这里就能够找到对应的连接，完成对应用的更新。</p>
-<h2 id="内容聚合功能的设计"><a href="#内容聚合功能的设计" class="headerlink" title="内容聚合功能的设计"></a>内容聚合功能的设计</h2><p>保证数据的正确性<br>内容聚合主要需要保证的是并发场景下的数据聚合的正确性。另外需要考虑发布数据的机器短时间内上下线的问题，指发布数据刚连接上来，然后就断线了就是断线后又很快上线发布数据。内容聚合主要保证在这些异常又较为复杂的场景中保证数据的正确性<br>高效聚合数据<br>因为软负载中心是系统的中枢，虽然软负载中心不再服务调用或者消息投递的路径上，但是服务提供者以及消息中间件的服务地址列表都是由软负载中心进行管理的，高效聚合数据在软负载中心自身重启或者服务提供者大面积重启带来很大的便利。<br>在这里，我们讨论下实现（前提是java实现），我们可以用map来存储，用dataId和group作为key，value就是聚合后的数据。有几个关键点需要注意<br>1.并发下的数据正确性的保证<br>先看看场景，并发操作会是数据插入、更新、删除三个一起在一起的操作，其中删除、更新主要因同一个数据的不同数据发布者变化产生，而数据插入是由于多个新的dataId有进入到Map结构的需求。（如软件负载中心重启和大量的数据发布者重启时）<br>我们可以用ConcurrentHashMap线程安全管理所有dataId的数据，也可以用linkedlist来操作，但是要在增删或者读加锁，否则线程不安全。<br>2.数据更新、删除的顺序保证<br>所发布数据变化主要有新增、更新和删除，而处理顺序一定要跟真实世界的顺序一致，比较容易出现的问题是在网络断开后删除数据与数据新增和删除的问题。我们采用NIO的方式通信，通过selector感知连接的事件，包括数据可读、数据可写、建立连接、连接断开的事件，然后把这些交给IO线程池中的线程去处理，那么更新、新增数据和连接断开要去删除数据有可能在两个线程中去处理。如果是发布数据很快就断开，那么就有可能会出现先删除再新增。一个解决方案是新增数据时查看下是否连接还存在。<br>3.大量数据的同时插入、更新时的性能保证<br>ConcurrentHashmap在写时候采用分段锁，在读的时候不加锁，但在大量数据也遇到性能问题，改进的方案是：增加任务队列，对应的处理线程，以及对应的数据存储。这样针对同样的数据处理任务都放在同一个线程里，我们可以直接使用线程不安全容器；多线程的请求变成一个顺序的队列操作，交给任务队列处理，任务队列是需要线程安全，但是因为这里的操作主要是任务加入队列和任务从队列取出，都是简单的操作，锁冲突的情况相对之前加锁进行数据处理好多了。数据更新的线程如果需要等待更新结果，那就只要进行等待就可以了；而读取数据则一定需要等待任务执行结束后才能拿到结果。</p>
-<h2 id="解决服务上下线的感知"><a href="#解决服务上下线的感知" class="headerlink" title="解决服务上下线的感知"></a>解决服务上下线的感知</h2><p>软负载的可用服务列表，当服务可用时，需要自动把服务加到服务地址列表，而服务不可用，需要自动从列表删除，这也就是上下线感知，这也是与使用硬件负载均衡需要配置服务列表的相比的一大优点<br>服务器的上下线的感知，具体有两种实现<br>1.通过客户端与服务器端的连接感知<br>无论是服务的发布者还是接收者都需要与软负载中心维持一个长连接。对于服务提供者来说，软负载中心可以通过这个长连接的心跳或者数据的发布来判断服务发布者是否在线。如果很久没有心跳或者数据的发布，则判定为不在线，那么就会取出这个发布者发布的数据。而对于新上线的发布者，通过连接建立和数据发布就实现了上线的通知。<br>这个方式有个结构的问题，即软负载中心属于旁路，也就是它不在调用链上，当软负载中心自身的负载很高时，是可能产生误判的。例如软负载中心负载压力很大，处理请求变慢，心跳数据来不及处理，会以为心跳超时而判定服务不在线，会导致原本可用的服务下线。<br>另外可能的问题是，如果服务发布者到软负载中心的网络链路有问题，而服务发布者到服务使用者本身没有问题，也会造成感知的问题，解决方案有在软负载中心的客户端增加逻辑，当收到软负载中心通知的应用下线数据时，需要服务调用者进行验证才能接收这个通知，但是这个方法带来的是对每个服务提供者的一次额外校验。<br>2.通过对于发布数据中提供的地址接口进行连接的检查<br>通过长连接的相关感知判断服务下线，不直接认定这个服务下线，而是交给另一个独立的监控应用去验证这个服务是否已经不在了，方式是通过地址、端口去进行连接验证，这种方法是有缺陷，所以还是需要服务调用者进行最终确认。</p>
-<h2 id="软负载中心的数据分发的特点和设计"><a href="#软负载中心的数据分发的特点和设计" class="headerlink" title="软负载中心的数据分发的特点和设计"></a>软负载中心的数据分发的特点和设计</h2><h3 id="数据分发和消息订阅的区别"><a href="#数据分发和消息订阅的区别" class="headerlink" title="数据分发和消息订阅的区别"></a>数据分发和消息订阅的区别</h3><p>第一个差别是：消息中间件需要保证消息不丢失、每条消息都能送到消息订阅者，而软负载中心只需要保证最新的数据送到消息订阅者，不需要保证每次的数据变化都能让最终订阅者感知<br>第二个差别是：关于订阅者的集群，也就是订阅者的分组。在消息中间件中，一个集群的不同机器是分享所有消息，因为只要同一集群的一台机器去处理就好。而软负载中心不同，软负载中心维持的是大家需要的服务数据，所以需要把这个数据分发给所有机器。</p>
-<h3 id="提升数据分发性能需要注意的问题"><a href="#提升数据分发性能需要注意的问题" class="headerlink" title="提升数据分发性能需要注意的问题"></a>提升数据分发性能需要注意的问题</h3><p>1.数据压缩<br>数据压缩可以降低数据量，提升网络吞吐量，使用cpu来换带宽。<br>2.全量与增量的选择<br>每次传输全量数据，逻辑简单，但是传输数据量大。使用增量，传输数据小，但实现复杂。建议刚开始数据量小时传输全量，数据量大传输增量</p>
-<h2 id="针对服务化的特性支持"><a href="#针对服务化的特性支持" class="headerlink" title="针对服务化的特性支持"></a>针对服务化的特性支持</h2><h3 id="软负载特性分组"><a href="#软负载特性分组" class="headerlink" title="软负载特性分组"></a>软负载特性分组</h3><p>通过dataId和group来唯一确定数据。分组是为了隔离<br>1.根据环境区分<br>比较多的用于线下环境。在线下开发测试的环境中，需要对不同环境项目隔离和区分<br>2.分优先级的隔离<br>更多用于线上，也就是可以把提供同样的服务通过组的概念分开，也就是重要的服务使用者会有专门的组提供服务<br>关于分组，可以采用ip地址自动归组的方式</p>
-<h3 id="提供自动感知以外的上下线开关"><a href="#提供自动感知以外的上下线开关" class="headerlink" title="提供自动感知以外的上下线开关"></a>提供自动感知以外的上下线开关</h3><p>1.优雅地停止应用<br>我们先从服务列表中去掉这个机器，然后等待这个机器的服务执行完成，然后再停止应用。通过指令直接从软负载中心使机器下线，是可以帮助做到这一点。<br>2.保持应用场景，用于排错<br>遇到服务的问题，可以把出问题的服务留下一台机器进行故障定位和场景分析，这时需要把这台机器从服务列表中拿下，以免有新的请求进来造成服务失败。</p>
-<h3 id="维护路由规则"><a href="#维护路由规则" class="headerlink" title="维护路由规则"></a>维护路由规则</h3><p>路由规则需要统一维护，软负载中心可以管理这些数据。</p>
-<h2 id="从单机到集群"><a href="#从单机到集群" class="headerlink" title="从单机到集群"></a>从单机到集群</h2><p>当系统规模不是很大时，可以使用单机加一个备用机器的方式充当软负载中心。<br>对于服务框架而言，用到的场景是服务调用，而服务本身多是无状态的，其中集群处理相对简单；对于消息中间件，如果本身存储系统不在本地，那也就是无状态的集群，如果存储在本地，还要考虑数据的迁移。而软负载中心要走向集群，需要考虑的问题有：<br>1.数据管理问题<br>软负载中心聚合了整个分布式集群中的服务地址信息，首先是信息存放的位置<br>2.连接管理问题</p>
-<h3 id="数据统一管理方案"><a href="#数据统一管理方案" class="headerlink" title="数据统一管理方案"></a>数据统一管理方案</h3><p>把数据聚合信息放在同一个地方，那么也就变成了无状态；整个结构分三层：聚合数据这一层就是在管理数据；软负载中心的机器则是无状态的；最下层是数据发布者或者订阅者。此时软负载中心的机器是对等的。我们还可以对这个方案进行改进，把软负载中心分为两类，一类是聚合数据的机器，另一类是数据推送机器；</p>
-<h3 id="数据对等管理方案"><a href="#数据对等管理方案" class="headerlink" title="数据对等管理方案"></a>数据对等管理方案</h3><p>把数据分散到各个软负载中心的节点上，并且把自己管理的数据分发到其他节点上，从而保证每个节点都有整个集群的数据，并且这些节点的角色是对等的，数据发布者和数据订阅者，只需要去连软负载中心集群的任何一台机器就好，在软负载中心各个节点间会进行数据同步。同步的时候，我们没有必要每次变化都同步，我们可以批量处理更加高效，只要合并这些变化同步一次就好。一种方案是每个负载均衡节点互相同步；另一种是把软负载中心分为两类，一类是聚合数据的机器，另一类是数据推送机器；需要同步的是数据推送数据和聚合数据机器。</p>
-<h2 id="集中配置管理中心"><a href="#集中配置管理中心" class="headerlink" title="集中配置管理中心"></a>集中配置管理中心</h2><p>软负载中心保存了管理服务地址列表、路由规则、消息的订阅关系，这些数据我们可以从是否持久和是否聚合两个维度分类。<br>持久性是数据本身跟发布者的生命周期无关，典型的是持久订阅关系、路由规则、数据访问层的分库分表规则和数据库配置。非持久指的是与发布者的生命周期有关，例如服务地址列表，此外服务地址列表和订阅关系是需要聚合的，而路由关系不需要聚合</p>
-<h3 id="客户端的实现和容灾策略"><a href="#客户端的实现和容灾策略" class="headerlink" title="客户端的实现和容灾策略"></a>客户端的实现和容灾策略</h3><p>客户端通过http协议与集中配置管理中心进行通信，采用长轮询的方式。建立连接并且发送请求，如果有数据，长轮询和普通轮询就会返回；如果没有数据，长轮询就会等待直到有数据或者超时。普通轮询就会直接返回。容灾的考虑，客户端有四个特性：1.数据缓存；2.数据快照；3.本地配置；4.文件格式。</p>
-<h3 id="服务端的实现和容灾策略"><a href="#服务端的实现和容灾策略" class="headerlink" title="服务端的实现和容灾策略"></a>服务端的实现和容灾策略</h3><h3 id="数据库策略"><a href="#数据库策略" class="headerlink" title="数据库策略"></a>数据库策略</h3>
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1830,7 +1826,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">46</span>
+                <span class="site-state-item-count">48</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1841,7 +1837,7 @@
             
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
-                <span class="site-state-item-count">12</span>
+                <span class="site-state-item-count">14</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -1852,7 +1848,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">17</span>
+                <span class="site-state-item-count">20</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

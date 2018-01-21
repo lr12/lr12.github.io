@@ -273,6 +273,320 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/19/activemq先进特性/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="李睿">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/19/activemq先进特性/" itemprop="url">activemq先进特性和优化性能</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-19T23:07:38+08:00">
+                2017-12-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/消息中间件/" itemprop="url" rel="index">
+                    <span itemprop="name">消息中间件</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="先进特性"><a href="#先进特性" class="headerlink" title="先进特性"></a>先进特性</h1><h2 id="Destination-Features"><a href="#Destination-Features" class="headerlink" title="Destination Features"></a>Destination Features</h2><h3 id="Composite-Destinations"><a href="#Composite-Destinations" class="headerlink" title="Composite Destinations"></a>Composite Destinations</h3><p>ActiveMQ 支持 composite destinations。它允许用一个虚拟的destination 代表多个 destinations。例如你可以通过 composite destinations 在一个操作中同时向 12 个 queue 发送消息。在 composite destinations 中，多个 destination之间采用”,”分割。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">Queue queue =  new ActiveMQQueue(<span class="string">"FOO.A,FOO.B,FOO.C"</span>)</div><div class="line">&lt;destinationInterceptors&gt;</div><div class="line"> &lt;virtualDestinat ionInterceptor&gt;</div><div class="line"> &lt;virtualDestinations&gt;</div><div class="line"> &lt;compositeQueue name=<span class="string">"MY.QUEUE"</span>&gt;</div><div class="line"> &lt;forwardTo&gt;</div><div class="line"> &lt;queue physicalName=<span class="string">"FOO"</span>  /&gt;</div><div class="line"> &lt;topic physicalName=<span class="string">"BAR"</span>  /&gt;</div><div class="line"> &lt;/forwardTo&gt;</div><div class="line"> &lt;/compositeQueue&gt;</div><div class="line"> &lt;/virtualDestinations&gt;</div><div class="line"> &lt;/virtualDestinationInterceptor&gt;</div><div class="line">&lt;/destinationInterceptors&gt;</div></pre></td></tr></table></figure></p>
+<h3 id="mirrored-Queues"><a href="#mirrored-Queues" class="headerlink" title="mirrored Queues"></a>mirrored Queues</h3><p>每个queue中的消息只能被一个 consumer 消费。然而，有时候你可能希望能够监视生产者和消费者之间的消息流。你可以通过使用 Virtual Destinations 来建立一个 virtual queue 来把消息转发到多个 queues 中。但是 为系统中每个queue 都进行如此的配置可能会很麻烦。<br>ActiveMQ支持 Mirrored Queues。Broker 会把发送到某个 queue 的所有消息转发到一个名称类似的 topic，因此监控程序可以订阅这个 mirrored queue topic。为了启用Mirrored Queues，首先要将 BrokerService 的useMirroredQueues属性设置成  true ，然后可以通过destinationInterceptors设置其它属性，如mirror topic的前缀，缺省是”VirtualTopic.Mirror.” 。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">&lt;broker xmlns=<span class="string">"http://activemq.org/config/1.0"</span> brokerName=<span class="string">"MirroredQueuesBroker1"</span> useMirroredQueues=<span class="string">"true"</span>&gt; &gt;</div><div class="line"> &lt;transportConnectors&gt;</div><div class="line"> &lt;transportConnector uri=<span class="string">"tcp://localhost:61616"</span> /&gt;</div><div class="line"> &lt;/transportConnectors&gt;</div><div class="line"> &lt;destinationInterceptors&gt;</div><div class="line"> &lt;mirroredQueue copyMessage = <span class="string">"true"</span> prefix=<span class="string">"Mirror.Topic"</span> /&gt;</div><div class="line"> &lt;/destinationInterceptors&gt;</div><div class="line">&lt;/broker&gt;</div><div class="line">BrokerService answer = new BrokerService();</div><div class="line">answer.setUseMirroredQueues(<span class="literal">true</span>);</div><div class="line">answer.setPersistent(isPersistent());</div><div class="line">answer.addConnector(<span class="built_in">bind</span>Address);</div><div class="line"><span class="built_in">return</span> answer;</div></pre></td></tr></table></figure></p>
+<h3 id="Wildcards-Desitination"><a href="#Wildcards-Desitination" class="headerlink" title="Wildcards Desitination"></a>Wildcards Desitination</h3><p>Wildcards 用来支持联合的名字分层体系（federated name hierarchies）。它不是 JMS 规范的一部分， 而是 ActiveMQ 的扩展。 ActiveMQ 支持以下三种 wildcards：<br>“.” 用于作为路径上名字间的分隔符。<br>“*“ 用于匹配路径上的任何名字。<br>“&gt;” 用于递归地匹配任何以这个名字开始的 destination。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">PRICE.STOCK.NASDAQ.IBM （IBM 在 NASDAQ 的股价）</div><div class="line">PRICE.STOCK.NYSE.SUNW （SUN 在纽约证券交易所的股价）</div><div class="line">PRICE.&gt; :Any price <span class="keyword">for</span> any product on any exchange</div><div class="line">PRICE.STOCK.NASDAQ.* :Any stock price on NASDAQ</div><div class="line">PRICE.STOCK.*.IBM :Any IBM stock price on any exchange</div></pre></td></tr></table></figure></p>
+<h3 id="virtual-Topic"><a href="#virtual-Topic" class="headerlink" title="virtual Topic"></a>virtual Topic</h3><p>虚拟主题，它创建一个逻辑地址并且使用户在客户端可以使用生产者和消费者消息在多个物理地址上关联起来，提高更解耦的消息配置。<br>最好的场景就是应用在发布/订阅上，允许生产者根本无需知道订阅该消息的消费者的数量。<br>ActiveMQ中，topic只有在持久订阅（durablesubscription）下是持久化的。存在持久订阅时，每个持久订阅者，都相当于一个持久化的queue的客户端，它会收取所有消息。这种情况下存在两个问题：<br>1.同一应用内consumer端负载均衡的问题：同一个应用上的一个持久订阅不能使用多个consumer来共同承担消息处理功能。因为每个都会获取所有消息。queue模式可以解决这个问题，broker端又不能将消息发送到多个应用端。所以，既要发布订阅，又要让消费者分组，这个功能jms规范本身是没有的。<br>2.同一应用内consumer端failover的问题：由于只能使用单个的持久订阅者，如果这个订阅者出错，则应用就无法处理消息了，系统的健壮性不高。<br>为了解决这两个问题，ActiveMQ中实现了虚拟Topic的功能。使用起来非常简单。对于消息发布者来说，就是一个正常的Topic，名称以VirtualTopic.开头。例如VirtualTopic.TEST。<br>对于消息接收端来说，是个队列，不同应用里使用不同的前缀作为队列的名称，即可表明自己的身份即可实现消费端应用分组。例如Consumer.A.VirtualTopic.TEST，说明它是名称为A的消费端，同理Consumer.B.VirtualTopic.TEST说明是一个名称为B的客户端。可以在同一个应用里使用多个consumer消费此queue，则可以实现上面两个功能。又因为不同应用使用的queue名称不同（前缀不同），所以不同的应用中都可以接收到全部的消息。每个客户端相当于一个持久订阅者，而且这个客户端可以使用多个消费者共同来承担消费任务。<br>使用同样queue名称的消费者会平分所有消息。<br><a href="http://blog.csdn.net/paul_wei2008/article/details/51252255" target="_blank" rel="external">http://blog.csdn.net/paul_wei2008/article/details/51252255</a></p>
+<h3 id="队列选项"><a href="#队列选项" class="headerlink" title="队列选项"></a>队列选项</h3><p>consumer.prefetchSize    不定    consumer持有的未确认最大消息数量<br>consumer.maximumPendingMessageLimit    0    控制非持久主题在慢消费（slow consumer）情况下丢弃消息的最大数量。<br>consumer.noLocal    false<br>consumer.dispatchAsync    true    是否异步分发，参见 dispatch messages asynchronously。<br>consumer.retroactive    false    是否为回溯消费者 Retroactive Consumer.<br>consumer.selector    null    JMS Selector.<br>consumer.exclusive    false    是否为独占消费者 Exclusive Consumer.<br>consumer.priority    0    配置消费者优先级 Consumer Priority.</p>
+<h2 id="Message-dispatching-Features"><a href="#Message-dispatching-Features" class="headerlink" title="Message dispatching Features"></a>Message dispatching Features</h2><h3 id="Message-cursor（消息游标）"><a href="#Message-cursor（消息游标）" class="headerlink" title="Message cursor（消息游标）"></a>Message cursor（消息游标）</h3><p>当 producer 发送的持久化消息到达 broker 之后， broker 首先会把它保存在持久存储中。接下来，如果发现当前有活跃的 consumer，而且这个 consumer 消费消息的速度能跟上 producer 生产消息的速度，那么 ActiveMQ 会直接把消息传递给broker 内部跟这个 consumer 关联的 dispatch queue；如果当前没有活跃的consumer 或者 consumer 消费消息的速度跟不上 producer 生产消息的速度，那么ActiveMQ 会使用 Pending Message Cursors 保存对消息的引用。在需要的时候，Pending Message Cursors 把消息引用传递给 broker 内部跟这个 consumer 关联的dispatch queue。<br>总共分为三种消息游标：<br>Store-based cursors<br>broker默认采用的游标。它将游标信息保存在存储中。针对速度不同的消费者，这种游标机制采取的方式不同。对于快速消费者，因为消费速度很快，存储中的消息数量会很少，所以不需要游标。这时，消息发送到broker时，先保存在持久存储中，然后直接发送给了消费者。而对于慢消费者，消息的持久存储中会保存大量的消息，所以需要使用游标来指定下一次批量读取消息的位置。<br>VM cursors<br>若消费者能跟上生产者生产的速度，这时持久存储中消息虽然不是很多，但是若能也能在内存中保存一些游标，对获取存储中的消息的性能会有很大的提升。<br>File-based cursors<br>对VM cursors 的一种改进。当内存中的游标达到一定限额后，就会将一些游标存储到临时文件中。<br>Activemq默认使用store-based游标。当然也可为不同的Destination修改游标策略。通过修改destinationPolicy节点来更改默认配置。.</p>
+<h3 id="严格调度策略"><a href="#严格调度策略" class="headerlink" title="严格调度策略"></a>严格调度策略</h3><p>有时候需要保证不同的 topic consumer 以相同的顺序接收消息。通常ActiveMQ 会保证 topic consumer 以相同的顺序接收来自同一个 producer 的消息。然而，由于多线程和异步处理，不同的 topic consumer 可能会以不同的顺序接收来自不同 producer 的消息。例如有两个 producer，分别是 P 和 Q。差不多是同一时间内，P 发送了 P1、P2 和 P3 三个消息；Q 发送了 Q1 和 Q2 两个消息。两个不同的 consumer 可能会以以下顺序接收到消息：<br>consumer1: P1 P2 Q1 P3 Q2<br>consumer2: P1 Q1 Q2 P2 P3<br>Strict order dispatch policy 会保证每个 topic consumer 会以相同的顺序接收消息， 代价是性能上的损失。 以下是采用了strict order dispatch policy后，两个不同的 consumer 可能以以下的顺序接收消息：<br>consumer1: P1 P2 Q1 P3 Q2<br>consumer2: P1 P2 Q1 P3 Q2<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">&lt;destinationPolicy&gt;</div><div class="line"> &lt;policyMap&gt;</div><div class="line"> &lt;policyEntries&gt;</div><div class="line"> &lt;policyEntry topic=<span class="string">"FOO"</span>&gt;</div><div class="line"> &lt;dispatchPolicy&gt;</div><div class="line"> &lt;strictOrderDispatchPolicy  /&gt;</div><div class="line"> &lt;/dispatchPolicy&gt;</div><div class="line"> &lt;/policyEntry&gt;</div><div class="line"> &lt;/policyEntries&gt;</div><div class="line"> &lt;/policyMap&gt;</div><div class="line"> &lt; /destinationPolicy&gt;</div></pre></td></tr></table></figure></p>
+<h3 id="轮询分发策略"><a href="#轮询分发策略" class="headerlink" title="轮询分发策略"></a>轮询分发策略</h3><p>ActiveMQ 的缺省参数是针对处理大量消息时的高性能和高吞吐量而设置的。所以缺省的 prefetch 参数比较大，而且缺省的 dispatch policies 会尝试尽可能快的填满 prefetch 缓冲。 然而在有些情况下，例如只有少量的消息而且单个消息的处理时间比较长，那么在缺省的 prefetch 和dispatch policies 下，这些少量的消息总是倾向于被分发到个别的 consumer 上。这样就会因为负载的不均衡分配而导致处理时间的增加。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;dispatchPolicy&gt;</div><div class="line">&lt;roundRobinDispatchPolicy  /&gt;</div><div class="line">&lt;/dispatchPolicy&gt;</div></pre></td></tr></table></figure></p>
+<h3 id="Configure-Startup-Destinations"><a href="#Configure-Startup-Destinations" class="headerlink" title="Configure Startup Destinations"></a>Configure Startup Destinations</h3><p>启动时 JMS 地址配置<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&lt;destinations&gt;</div><div class="line">&lt;queue physicalName=<span class="string">"FOO.BAR"</span> /&gt;</div><div class="line">&lt;topic physicalName=<span class="string">"SOME.TOPIC"</span> /&gt;</div><div class="line">&lt;/destinations&gt;</div></pre></td></tr></table></figure></p>
+<h3 id="Async-sends"><a href="#Async-sends" class="headerlink" title="Async sends"></a>Async sends</h3><p>Acivemq 支持异步和同步发送消息。在 ActiveMQ4.0 以上，所有的异步或同步对于 Consumer 来说是变得可配置了。默认是在 ConnectionFactory、Connection、Connection URI 等方面配置对于一个基于 Destination 的 Consumer 来说。<br>ActiveMQ 默认设置 dispatcheAsync=true 是最好的性能设置。如果你处理的是Slow Consumer 则使用 dispatcheAsync=true，反之，那你使用的是 Fast Consumer则使用 dispatcheAsync=false<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cf = new ActiveMQConnectionFactory( <span class="string">"tcp://locahost:61616?jms.useAsyncSend= true "</span> );</div></pre></td></tr></table></figure></p>
+<h3 id="Optimized-Acknowledgement"><a href="#Optimized-Acknowledgement" class="headerlink" title="Optimized Acknowledgement"></a>Optimized Acknowledgement</h3><p>ActiveMQ缺省支持批量确认消息。由于批量确认会提高性能，因此这是缺省的确认方式。如果希望在应用程序中禁止经过优化的确认方式，那么可以采用如下方法<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cf = new ActiveMQConnectionFactory(<span class="string">"tcp://locahost:61616?jms.optimizeAcknowledge=false"</span>);</div></pre></td></tr></table></figure></p>
+<h3 id="Producer-Flow-Control"><a href="#Producer-Flow-Control" class="headerlink" title="Producer Flow Control"></a>Producer Flow Control</h3><p>同步发送消息的producer会自动使用producer flow control ；对于异步发送消息的producer，要使用producer flow control，你先要为connection配置一个ProducerWindowSize参数.ProducerWindowSize 是 producer 在发送消息的过程中， 收到 broker 对于之前发送消息的确认之前， 能够发送消息的最大字节数</p>
+<h2 id="Message-Feature"><a href="#Message-Feature" class="headerlink" title="Message Feature"></a>Message Feature</h2><h3 id="Blob-Message"><a href="#Blob-Message" class="headerlink" title="Blob Message"></a>Blob Message</h3><p>配置其地址：包括其上传的 url 的地址<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">tcp://localhost:61616?jms.blobTransferPolicy.uploadUrl=http://foo.com</div><div class="line">方式一：</div><div class="line">BlobMessage message = session.createBlobMessage(new URL(<span class="string">"http://some.shared.site.com"</span>);</div><div class="line">producer.send(message);</div><div class="line">// lets use a <span class="built_in">local</span> file</div><div class="line">方式二：</div><div class="line">BlobMessage message = session.createBlobMessage(new File(<span class="string">"/foo/bar"</span>);</div><div class="line">producer.send(message);</div><div class="line">// lets use a stream</div><div class="line">InputStream <span class="keyword">in</span> = ...;</div><div class="line">BlobMessage message = session.createBlobMessage(<span class="keyword">in</span>);</div><div class="line">producer.send(message);</div><div class="line"></div><div class="line">BlobMessage blobMessage = (BlobMessage) message;</div><div class="line">InputStream <span class="keyword">in</span> = blobMessage.getInputStream();</div></pre></td></tr></table></figure></p>
+<h3 id="Advisory-Message"><a href="#Advisory-Message" class="headerlink" title="Advisory Message"></a>Advisory Message</h3><p>ActiveMQ 自身的系统消息地址.我们可以监听该地址来获取 activemq 的系统信息.</p>
+<h3 id="ActiveMQ-Stream"><a href="#ActiveMQ-Stream" class="headerlink" title="ActiveMQ Stream"></a>ActiveMQ Stream</h3><p><img src="/2017/12/19/activemq先进特性/stream1.png" alt=""><br><img src="/2017/12/19/activemq先进特性/stream2.png" alt=""></p>
+<h3 id="Transformer-message"><a href="#Transformer-message" class="headerlink" title="Transformer message"></a>Transformer message</h3><p>有时候需要在JMS provider内部进行message 的转换</p>
+<h2 id="Consumer-Features"><a href="#Consumer-Features" class="headerlink" title="Consumer Features"></a>Consumer Features</h2><h3 id="exclusive-consumer"><a href="#exclusive-consumer" class="headerlink" title="exclusive consumer"></a>exclusive consumer</h3><p>Queue 中的消息是按照顺序被分发到 consumers 的。然而，当你有多个consumers 同时从相同的 queue 中提取消息时，你将失去这个保证。因为这些消息是被多个线程并发的处理。有的时候，保证消息按照顺序处理是很重要的。例如，你可能不希望在插入订单操作结束之前执行更新这个订单的操作。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">queue = new ActiveMQQueue(<span class="string">"TEST.QUEUE?consumer.exclusive=true"</span>);</div><div class="line">consumer = session.createConsumer(queue);</div></pre></td></tr></table></figure></p>
+<p>如果存在 Exclusive Consumer 和普通的 Consumer，那么 Broker 会首先把消息发送给 Exclusive Consumer。除非该独有消费者死亡。</p>
+<h3 id="Message-Group"><a href="#Message-Group" class="headerlink" title="Message Group"></a>Message Group</h3><p>它是 Exclusive Consumer功能的增强。逻辑上，Message Groups 可以看成是一种并发的 Exclusive Consumer。跟所有的消息都由唯一的 consumer 处理不同，JMS 消息属性JMSXGroupID 被用来区分 message group。Message Groups 特性保证所有具有相同 JMSXGroupID 的消息会被分发到相同的 consumer（只要这个consumer保持active）。另外一方面，Message Groups 特性也是一种负载均衡的机制。在一个消息被分发到 consumer 之前，broker 首先检查消息 JMSXGroupID属性。如果存在，那么 broker 会检查是否有某个consumer 拥有这个 message group。如果没有，那么 broker 会选择一个consumer，并将它关联到这个message group。此后，这个 consumer 会接收这个 message group 的所有消息，直到：<br>1.Consumer 被关闭。<br>2.Message group被关闭。通过发送一个消息，并设置这个消息的JMSXGroupSeq为-1</p>
+<h4 id="创建一个message-groups"><a href="#创建一个message-groups" class="headerlink" title="创建一个message groups"></a>创建一个message groups</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">message.setStringProperty(<span class="string">"JMSXGroupID"</span>,<span class="string">"GroupA"</span>);</div></pre></td></tr></table></figure>
+<h4 id="关闭一个message-groups"><a href="#关闭一个message-groups" class="headerlink" title="关闭一个message groups"></a>关闭一个message groups</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">message.setStringProperty(<span class="string">"JMSXGroupID"</span>,<span class="string">"GroupA"</span>);</div><div class="line">message.setIntProperty(<span class="string">"JMSXGroupSeq"</span>, -1);</div></pre></td></tr></table></figure>
+<h3 id="JMS-Selectors"><a href="#JMS-Selectors" class="headerlink" title="JMS Selectors"></a>JMS Selectors</h3><p>JMS Selectors 用于在订阅中，基于消息属性和 Xpath 语法对进行消息的过滤</p>
+<h3 id="消息重发与死信管理"><a href="#消息重发与死信管理" class="headerlink" title="消息重发与死信管理"></a>消息重发与死信管理</h3><p>出现以下情况时，消息会被redelivered（重发）:</p>
+<ul>
+<li>使用一个事务session，并且调用了rollback方法.</li>
+<li>一个事务session，关闭之前调用了commit.</li>
+<li>在session中使用CLIENT_ACKNOWLEDGE签收模式，并且调用了Session.recover方法.<br>当消息试图被传递的次数是配置中 maximumRedeliveries 属性的值时，那么，broker 会任何该消息是一个死消息，并被把该消息发送到死队列中。默认，aciaveMQ 中死队列被声明为“ActivemMQ.DLQ” ，所有不能消费的消息被传递到该死队列中。<br>有时需要直接删除过期的消息而不需要发送到死队列中,xml可以使用属性processExpired=false来设置。<br>存放非持久消息到死队列中;默认情况下，Activemq 不会把非持久的死消息发送到死队列中。如果你想把非持久的消息发送到死队列中，需要设置属性processNonPersistent=“true”<h3 id="consumer-priority"><a href="#consumer-priority" class="headerlink" title="consumer priority"></a>consumer priority</h3>JMS JMSPriority 定义了十个消息优先级值， 0 是最低的优先级， 9 是最高的优先级。另外，客户端应当将0‐4 看作普通优先级，5‐9 看作加急优先级。<br>Consumer 的 Priority 的划分为 0~127 个级别，127 是最高的级别，0 是最低<br>的也是 ActiveMQ 默认的。<br>这种配置可以是 Broker 根据 Consumer 的优先级来发送消息先到较高的优先级的 Consumer 上，如果某个较高的 Consumer 的缓存预先被消息装载慢，则Broker 会把消息发送到仅次于它优先级的 Consumer 上.<h3 id="slow-consumer-handling"><a href="#slow-consumer-handling" class="headerlink" title="slow consumer handling"></a>slow consumer handling</h3>ActiveMQ通过prefetch机制来提高性能，这意味这客户端的内存里可能会缓存一定数量的消息。缓存消息的数量由prefetch limit来控制。当某个consumer的prefetch buffer已经达到上限，那么broker不会再向consumer分发消息，直到consumer向broker发送消息的确认。<h3 id="consumer-dispatcher-Async"><a href="#consumer-dispatcher-Async" class="headerlink" title="consumer dispatcher Async"></a>consumer dispatcher Async</h3>在 activemq4.0 以后， 你肯能选择 broker 执行同步或异步的方法消息给消费者。<br>默认是 true<h3 id="Retroactive-Consumer"><a href="#Retroactive-Consumer" class="headerlink" title="Retroactive Consumer"></a>Retroactive Consumer</h3>消费者回溯消息</li>
+</ul>
+<ol>
+<li>这种策略限制在基于一个静态的计数中对于主题 （Topic） 消息缓存的数量。</li>
+<li>这种策略限制在内存使用量中对于主题（Topic）消息缓存的数量</li>
+<li>仅仅保持发送到主题（Topic）的最后一个消息。</li>
+<li>不保存主题消息，不需要任何配置</li>
+<li>基于一个 JMS 属性选择器应用到所有的消息来设置其消息缓存的大小</li>
+<li>基于应用到每个消息的过期时间来限制其消息缓存数量。提示这种消息的生命周期时间来源于消息发送者设置其 timeToLive 参数。</li>
+</ol>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/19/为大量并发应用程序部署ActiveMQ/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="李睿">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/19/为大量并发应用程序部署ActiveMQ/" itemprop="url">为大量并发应用程序部署ActiveMQ</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-19T21:49:38+08:00">
+                2017-12-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/消息中间件/" itemprop="url" rel="index">
+                    <span itemprop="name">消息中间件</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="垂直扩展"><a href="#垂直扩展" class="headerlink" title="垂直扩展"></a>垂直扩展</h2><p>垂直扩展是一种用于增加单个ActiveMQ broker可以处理的连接数（因此增加负载）的技术。默认情况下，ActiveMQ broker设计为尽可能高效地移动消息，以确保低延迟和良好的性能。但是我们可以做一些配置调整，以确保ActiveMQ broker可以处理大量的并发连接和大量的队列。<br>默认情况下，ActiveMQ将使用阻塞I/O来处理传输连接。 这导致每个连接使用一个线程。 我们可以在ActiveMQ broker上使用非阻塞I/O（而客户端上仍然使用默认传输）来减少使用的线程数。broker的非阻塞I/O配置如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&lt;broker&gt;</div><div class="line">    &lt;transportConnectors&gt;</div><div class="line">        &lt;transportConnector name=<span class="string">"nio"</span> uri=<span class="string">"nio://localhost:61616"</span>/&gt;</div><div class="line">    &lt;/transportConnectors&gt;</div><div class="line">&lt;/broker&gt;</div></pre></td></tr></table></figure></p>
+<p>除了每个连接使用一个线程来阻塞I/O外，ActiveMQ broker可以使用线程为每个客户端连接分派消息。可以通过将名为org.apache.activemq.UseDedicatedTaskRunner的系统属性设置为false，让ActiveMQ使用线程池。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ACTIVEMQ_OPTS=<span class="string">"-Dorg.apache.activemq.UseDedicatedTaskRunner=false"</span></div></pre></td></tr></table></figure></p>
+<p>确保ActiveMQ broker具有足够的内存来处理大量并发连接有两步过程。<br>首先，需要确保启动ActiveMQ broker的JVM配置了足够的内存<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ACTIVEMQ_OPTS=<span class="string">"-Xmx1024M \-Dorg.apache.activemq.UseDedicatedTaskRunner=false"</span></div></pre></td></tr></table></figure></p>
+<p>确保专门为ActiveMQ broker在JVM配置适当的内存量。此调整通过&lt; system-Usage &gt;元素的limit属性进行。（最好从512MB开始，如果测试不够再往上加）<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">&lt;systemUsage&gt;</div><div class="line">    &lt;systemUsage&gt;</div><div class="line">        &lt;memoryUsage&gt;</div><div class="line">            &lt;memoryUsage <span class="built_in">limit</span>=<span class="string">"512 mb"</span>/&gt;</div><div class="line">        &lt;/memoryUsage&gt;</div><div class="line">        &lt;storeUsage&gt;</div><div class="line">            &lt;storeUsage <span class="built_in">limit</span>=<span class="string">"10 gb"</span> name=<span class="string">"foo"</span>/&gt;</div><div class="line">        &lt;/storeUsage&gt;</div><div class="line">        &lt;tempUsage&gt;</div><div class="line">            &lt;tempUsage <span class="built_in">limit</span>=<span class="string">"1 gb"</span>/&gt;</div><div class="line">        &lt;/tempUsage&gt;</div><div class="line">    &lt;/systemUsage&gt;</div><div class="line">&lt;/systemUsage&gt;</div></pre></td></tr></table></figure></p>
+<p>还应该降低每一个连接的CPU负载，如果使用的OpenWire连接方式，禁用紧密编码，否则会使得CPU过度紧张。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">String uri = <span class="string">"failover://(tcp://localhost:61616?"</span> + <span class="string">" wireFormat.tightEncodingEnabled=false)"</span>;</div><div class="line">ConnectionFactory cf = new ActiveMQConnectionFactory(uri);</div></pre></td></tr></table></figure></p>
+<p>前面研究的是broker怎么调整去处理数千个连接，下面开始研究的是怎么调整broker去处理数千个队列。<br>默认队列配置使用单独的线程来将消息从消息存储区分页到队列中，以便分发给感兴趣的消息消费者。 对于大量队列，建议通过为所有队列启用optimize-Dispatch属性来禁用此功能，<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&lt;destinationPolicy&gt;</div><div class="line">    &lt;policyMap&gt;</div><div class="line">        &lt;policyEntries&gt;</div><div class="line">            &lt;policyEntry queue=<span class="string">"&gt;"</span> optimizedDispatch=<span class="string">"true"</span>/&gt;</div><div class="line">        &lt;/policyEntries&gt;</div><div class="line">    &lt;/policyMap&gt;</div><div class="line">&lt;/destinationPolicy&gt;</div></pre></td></tr></table></figure></p>
+<p>为了确保不仅可以扩展到数千个连接，而且还可以扩展到数万个队列，使用JDBC消息存储库或更新和更快的KahaDB消息存储库。 KahaDB默认情况下在ActiveMQ中启用。</p>
+<p>到目前为止，我们已经考虑了扩展连接，减少线程使用，并选择正确的消息存储。 调整用于扩展的ActiveMQ的示例配置如以下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">&lt;broker xmlns=<span class="string">"http://activemq.apache.org/schema/core"</span> brokerName=<span class="string">"amq-broker"</span> dataDirectory=<span class="string">"<span class="variable">$&#123;activemq.base&#125;</span>/data"</span>&gt;</div><div class="line">    &lt;persistenceAdapter&gt;</div><div class="line">        &lt;kahaDB directory=<span class="string">"<span class="variable">$&#123;activemq.base&#125;</span>/data"</span> journalMaxFileLength=<span class="string">"32mb"</span>/&gt;</div><div class="line">    &lt;/persistenceAdapter&gt;</div><div class="line">    &lt;destinationPolicy&gt;</div><div class="line">        &lt;policyMap&gt;</div><div class="line">            &lt;policyEntries&gt;</div><div class="line">                &lt;policyEntry queue=<span class="string">"&amp;gt;"</span> optimizedDispatch=<span class="string">"true"</span>/&gt;</div><div class="line">            &lt;/policyEntries&gt;</div><div class="line">        &lt;/policyMap&gt;</div><div class="line">    &lt;/destinationPolicy&gt;</div><div class="line">    &lt;systemUsage&gt;</div><div class="line">        &lt;systemUsage&gt;</div><div class="line">            &lt;memoryUsage&gt;</div><div class="line">                &lt;memoryUsage <span class="built_in">limit</span>=<span class="string">"512 mb"</span>/&gt;</div><div class="line">            &lt;/memoryUsage&gt;</div><div class="line">            &lt;storeUsage&gt;</div><div class="line">                &lt;storeUsage <span class="built_in">limit</span>=<span class="string">"10 gb"</span> name=<span class="string">"foo"</span>/&gt;</div><div class="line">            &lt;/storeUsage&gt;</div><div class="line">            &lt;tempUsage&gt;</div><div class="line">                &lt;tempUsage <span class="built_in">limit</span>=<span class="string">"1 gb"</span>/&gt;</div><div class="line">            &lt;/tempUsage&gt;</div><div class="line">        &lt;/systemUsage&gt;</div><div class="line">    &lt;/systemUsage&gt;</div><div class="line">    &lt;transportConnectors&gt;</div><div class="line">        &lt;transportConnector name=<span class="string">"openwire"</span> uri=<span class="string">"nio://localhost:61616"</span>/&gt;</div><div class="line">    &lt;/transportConnectors&gt;</div><div class="line">&lt;/broker&gt;</div></pre></td></tr></table></figure></p>
+<h2 id="水平扩展"><a href="#水平扩展" class="headerlink" title="水平扩展"></a>水平扩展</h2><p>除了扩展单个broker之外，还可以使用networks来增加可用于应用程序的ActiveMQ broker的数量。 由于networks会自动将消息传递给具有感兴趣的消费者的连接broker，因此可以将客户端配置为连接到一个broker集群，随机选择一个来连接<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">failover://(tcp://broker1:61616,tcp://broker2:61616)?randomize=<span class="literal">true</span></div></pre></td></tr></table></figure></p>
+<p>为了确保队列或持久主题订阅者的消息不会在broker上孤立，需要将network配置为使用dynamicOnly和低网络prefetchSize<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&lt;networkConnector uri=<span class="string">"static://(tcp://remotehost:61617)"</span></div><div class="line">    name=<span class="string">"bridge"</span></div><div class="line">    dynamicOnly=<span class="string">"true"</span></div><div class="line">    prefetchSize=<span class="string">"1"</span>&gt;</div><div class="line">&lt;/networkConnector&gt;</div></pre></td></tr></table></figure></p>
+<p>使用network进行水平扩展会带来更多的延迟，因为潜在的消息必须在分发给消费者之前通过多个broker。</p>
+<h2 id="流量分区"><a href="#流量分区" class="headerlink" title="流量分区"></a>流量分区</h2><p>客户端流量分割是垂直和水平分割的混合。 通常不使用network，因为客户端应用程序决定什么流量应该到哪个broker上。 客户端应用程序必须维护多个JMS连接，并决定哪些JMS连接应用于哪些目标。<br>不直接使用network connection的优点是，减少在brokers之间转发消息的开销。 需要平衡这与导致典型应用程序的额外复杂性<br><img src="/2017/12/19/为大量并发应用程序部署ActiveMQ/流量分区.png" alt=""></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/15/Apache-ActiveMQ-笔记/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2423,306 +2737,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/15/elasticSearch数据/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="李睿">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/15/elasticSearch数据/" itemprop="url">elasticSearch数据</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-15T13:41:31+08:00">
-                2017-11-15
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/elasticSearch/" itemprop="url" rel="index">
-                    <span itemprop="name">elasticSearch</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="文档"><a href="#文档" class="headerlink" title="文档"></a>文档</h2><p>文档元数据如下<br>_index 文档存储的地方；_type文档代表的对象的类；_id 文档的唯一标识*</p>
-<h3 id="index"><a href="#index" class="headerlink" title="_index"></a>_index</h3><p>索引(index)类似于关系型数据库里的”数据库”——它是我们存储和索引关联数据的地方。索引名必须是全部小写，不能以下划线开头，不能包含逗号.</p>
-<h3 id="type"><a href="#type" class="headerlink" title="_type"></a>_type</h3><p>在Elasticsearch中，我们使用相同类型(type)的文档表示相同的”事物”，类似关系型数据库中的表，因为他们的数据结构也是相同的。每个类型(type)都有自己的映射(mapping)或者结构定义，就像传统数据库表中的列一样。所有类型下的文档被存储在同一个索引下，但是类型的映射(mapping)会告诉Elasticsearch不同的文档如何被索引._type 的名字可以是大写或小写，不能包含下划线或逗号。</p>
-<h3 id="id"><a href="#id" class="headerlink" title="_id"></a>_id</h3><p>唯一标识一个文档，如果不指定，es自动生成</p>
-<h2 id="索引文档"><a href="#索引文档" class="headerlink" title="索引文档"></a>索引文档</h2><p>自动生成的id一般是22个字节长的uuid<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">PUT _index/_type/_id</div><div class="line">&#123;</div><div class="line"><span class="string">"field"</span>:<span class="string">"value"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h2 id="检索文档"><a href="#检索文档" class="headerlink" title="检索文档"></a>检索文档</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GET _index/_type/_id 或者 GET _index/_type/_id?pretty 美化字符串</div></pre></td></tr></table></figure>
-<p>pretty:在任意的查询字符串中增加 pretty  参数，类似于上面的例子。会让Elasticsearch美化输出(pretty-print)JSON响应以便更加容易阅读。_source  字段不会被美化，它的样子与我们输入的一致。</p>
-<h3 id="检索文档的一部分"><a href="#检索文档的一部分" class="headerlink" title="检索文档的一部分"></a>检索文档的一部分</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GET /_index/_type/_id?_source=field,filed</div></pre></td></tr></table></figure>
-<h3 id="只获取元数据"><a href="#只获取元数据" class="headerlink" title="只获取元数据"></a>只获取元数据</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GET /_index/_type/_id/_source</div></pre></td></tr></table></figure>
-<h3 id="检查文档是否存在"><a href="#检查文档是否存在" class="headerlink" title="检查文档是否存在"></a>检查文档是否存在</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl -i -XHEAD http://localhost:9200/website/blog/123</div></pre></td></tr></table></figure>
-<h2 id="更新文档"><a href="#更新文档" class="headerlink" title="更新文档"></a>更新文档</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">PUT _index/_type/_id //更新后version要改变</div><div class="line">&#123;</div><div class="line"><span class="string">"field"</span>:<span class="string">"value"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ol>
-<li>从旧文档中检索JSON</li>
-<li>修改它</li>
-<li>删除旧文档</li>
-<li>索引新文档<h2 id="删除文档"><a href="#删除文档" class="headerlink" title="删除文档"></a>删除文档</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">DELETE /_index/_type/_id</div></pre></td></tr></table></figure>
-</li>
-</ol>
-<h2 id="版本控制"><a href="#版本控制" class="headerlink" title="版本控制"></a>版本控制</h2><p>数据库在并发冲突时提供了悲观锁和乐观锁的机制，es提供的机制是乐观并发控制。每个文档都有个版本号，当修改时version加一，如果指定的version不是现在的就会失败<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">//插入一行记录</div><div class="line">PUT /website/blog/1/_create</div><div class="line">&#123;</div><div class="line"><span class="string">"title"</span>: <span class="string">"My first blog entry"</span>,</div><div class="line"><span class="string">"text"</span>: <span class="string">"Just trying this out..."</span></div><div class="line">&#125;</div><div class="line">//获取当前数据,可以知道当前版本是1</div><div class="line">GET /website/blog/1</div><div class="line">&#123;</div><div class="line"><span class="string">"_index"</span> : <span class="string">"website"</span>,</div><div class="line"><span class="string">"_type"</span> : <span class="string">"blog"</span>,</div><div class="line"><span class="string">"_id"</span> : <span class="string">"1"</span>,</div><div class="line"><span class="string">"_version"</span> : 1,</div><div class="line"><span class="string">"found"</span> : <span class="literal">true</span>,</div><div class="line"><span class="string">"_source"</span> : &#123;</div><div class="line"><span class="string">"title"</span>: <span class="string">"My first blog entry"</span>,</div><div class="line"><span class="string">"text"</span>: <span class="string">"Just trying this out..."</span></div><div class="line">&#125;</div><div class="line">//根据当前版本对数据进行修改</div><div class="line">PUT /website/blog/1?version=1</div><div class="line">&#123;</div><div class="line"><span class="string">"title"</span>: <span class="string">"My first blog entry"</span>,</div><div class="line"><span class="string">"text"</span>: <span class="string">"Starting to get the hang of this..."</span></div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">//如果当前版本不是1则会失败</div></pre></td></tr></table></figure></p>
-<h3 id="使用外部版本控制系统"><a href="#使用外部版本控制系统" class="headerlink" title="使用外部版本控制系统"></a>使用外部版本控制系统</h3><p>一种常见的结构是使用一些其他的数据库做为主数据库，然后使用Elasticsearch搜索数据，这意味着所有主数据库发生变化，就要将其拷贝到Elasticsearch中。如果有多个进程负责这些数据的同步，就会遇到上面提到的并发问题。如果主数据库有版本字段——或一些类似于 timestamp  等可以用于版本控制的字段——是你就可以在Elasticsearch的查询字符串后面添加 version_type=external  来使用这些版本号。版本号必须是整数，大于零小于 9.2e+18  ——Java中的正的 long  。<br>外部版本号与之前说的内部版本号在处理的时候有些不同。它不再检查 _version  是否与请求中指定的一致，而是检查是否小于指定的版本。如果请求成功，外部版本号就会被存储到 _version  中。外部版本号不仅在索引和删除请求中指定，也可以在创建(create)新文档中指定。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">PUT /website/blog/2?version=5&amp;version_type=external</div><div class="line">&#123;</div><div class="line"><span class="string">"title"</span>: <span class="string">"My first external blog entry"</span>,</div><div class="line"><span class="string">"text"</span>: <span class="string">"Starting to get the hang of this..."</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h2 id="更新文档-1"><a href="#更新文档-1" class="headerlink" title="更新文档"></a>更新文档</h2><p>update  请求表单接受一个局部文档参数 doc  ，它会合并到现有文档中——对象合并在一起，存在的标量字段被覆盖，新字段被添加。注：更新文档如果不存在，则会报错<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">POST /website/blog/1/_update</div><div class="line">&#123;</div><div class="line"><span class="string">"doc"</span> : &#123;</div><div class="line"><span class="string">"tags"</span> : [ <span class="string">"testing"</span> ],</div><div class="line"><span class="string">"views"</span>: 0</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">POST /website/blog/1/_update</div><div class="line">&#123;</div><div class="line"><span class="string">"script"</span> : <span class="string">"ctx._source.views+=1"</span></div><div class="line">&#125;</div><div class="line">//更新不存在的文档，如果有加一，没有初始化为1</div><div class="line">POST /website/pageviews/1/_update</div><div class="line">&#123;</div><div class="line"><span class="string">"script"</span> : <span class="string">"ctx._source.views+=1"</span>,</div><div class="line"><span class="string">"upsert"</span>: &#123;</div><div class="line"><span class="string">"views"</span>: 1</div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h3 id="更新和冲突"><a href="#更新和冲突" class="headerlink" title="更新和冲突"></a>更新和冲突</h3><p>这些可以通过 retry_on_conflict  参数设置重试次数来自动完成，这样 update  操作将会在发生错误前重试——这个值默认为0。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">POST /website/pageviews/1/_update?retry_on_conflict=5</div><div class="line">&#123;</div><div class="line"><span class="string">"script"</span> : <span class="string">"ctx._source.views+=1"</span>,</div><div class="line"><span class="string">"upsert"</span>: &#123;</div><div class="line"><span class="string">"views"</span>: 0</div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h2 id="mget"><a href="#mget" class="headerlink" title="mget"></a>mget</h2><p>检索多个文档<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">GET /_mget</div><div class="line">&#123;</div><div class="line"><span class="string">"docs"</span> : [</div><div class="line">&#123;</div><div class="line"><span class="string">"_index"</span> : <span class="string">"website"</span>,</div><div class="line"><span class="string">"_type"</span> : <span class="string">"blog"</span>,</div><div class="line"><span class="string">"_id"</span> : 2</div><div class="line">&#125;,</div><div class="line">&#123;</div><div class="line"><span class="string">"_index"</span> : <span class="string">"website"</span>,</div><div class="line"><span class="string">"_type"</span> : <span class="string">"pageviews"</span>,</div><div class="line"><span class="string">"_id"</span> : 1,</div><div class="line"><span class="string">"_source"</span>: <span class="string">"views"</span></div><div class="line">&#125;</div><div class="line">]</div><div class="line">&#125;</div><div class="line">//如果你想检索的文档在同一个 _index  中（甚至在同一个 _type  中），你就可以在URL中定义一个默认的 /_index  或者 /_index/_type  </div><div class="line">GET /website/blog/_mget</div><div class="line">&#123;</div><div class="line"><span class="string">"docs"</span> : [</div><div class="line">&#123; <span class="string">"_id"</span> : 2 &#125;,</div><div class="line">&#123; <span class="string">"_type"</span> : <span class="string">"pageviews"</span>, <span class="string">"_id"</span> : 1 &#125;</div><div class="line">]</div><div class="line">&#125;</div><div class="line">//如果所有文档具有相同 _index  和 _type  ，你可以通过简单的 ids  数组来代替完整的 docs 数组</div><div class="line">GET /website/blog/_mget</div><div class="line">&#123;</div><div class="line"><span class="string">"ids"</span> : [ <span class="string">"2"</span>, <span class="string">"1"</span> ]</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h2 id="批量"><a href="#批量" class="headerlink" title="批量"></a>批量</h2><p>bulk  API允许我们使用单一请求来实现多个文档的 create  、 index  、 update  或 delete  。这对索引类似于日志活动这样的数据流非常有用，它们可以以成百上千的数据为一个批次按序进行索引。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&#123; action: &#123; metadata &#125;&#125;\n</div><div class="line">&#123; request body &#125;\n</div><div class="line">&#123; action: &#123; metadata &#125;&#125;\n</div><div class="line">&#123; request body &#125;\n</div></pre></td></tr></table></figure></p>
-<p>注意：1.每行必须以 “\n”  符号结尾，包括最后一行。这些都是作为每行有效的分离而做的标记；2.每一行的数据不能包含未被转义的换行符，它们会干扰分析——这意味着JSON不能被美化打印<br>action: create（创建、若存在则报错）、index（创建或替换）、update（更新）、delete（删除文档）<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">POST /_bulk</div><div class="line">&#123; <span class="string">"delete"</span>: &#123; <span class="string">"_index"</span>: <span class="string">"website"</span>, <span class="string">"_type"</span>: <span class="string">"blog"</span>, <span class="string">"_id"</span>: <span class="string">"123"</span> &#125;&#125; &lt;1&gt;</div><div class="line">&#123; <span class="string">"create"</span>: &#123; <span class="string">"_index"</span>: <span class="string">"website"</span>, <span class="string">"_type"</span>: <span class="string">"blog"</span>, <span class="string">"_id"</span>: <span class="string">"123"</span> &#125;&#125;</div><div class="line">&#123; <span class="string">"title"</span>: <span class="string">"My first blog post"</span> &#125;</div><div class="line">&#123; <span class="string">"index"</span>: &#123; <span class="string">"_index"</span>: <span class="string">"website"</span>, <span class="string">"_type"</span>: <span class="string">"blog"</span> &#125;&#125;</div><div class="line">&#123; <span class="string">"title"</span>: <span class="string">"My second blog post"</span> &#125;</div><div class="line">&#123; <span class="string">"update"</span>: &#123; <span class="string">"_index"</span>: <span class="string">"website"</span>, <span class="string">"_type"</span>: <span class="string">"blog"</span>, <span class="string">"_id"</span>: <span class="string">"123"</span>, <span class="string">"_retry_on_conflict"</span> : 3&#125; &#125;</div><div class="line">&#123; <span class="string">"doc"</span> : &#123;<span class="string">"title"</span> : <span class="string">"My updated blog post"</span>&#125; &#125;</div></pre></td></tr></table></figure></p>
-<p>当然，你可以指定index和type，当下面指定时会覆盖掉<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">POST /website/_bulk</div><div class="line">&#123; <span class="string">"index"</span>: &#123; <span class="string">"_type"</span>: <span class="string">"log"</span> &#125;&#125;</div><div class="line">&#123; <span class="string">"event"</span>: <span class="string">"User logged in"</span> &#125;</div><div class="line"></div><div class="line">POST /website/<span class="built_in">log</span>/_bulk</div><div class="line">&#123; <span class="string">"index"</span>: &#123;&#125;&#125;</div><div class="line">&#123; <span class="string">"event"</span>: <span class="string">"User logged in"</span> &#125;</div><div class="line">&#123; <span class="string">"index"</span>: &#123; <span class="string">"_type"</span>: <span class="string">"blog"</span> &#125;&#125;</div><div class="line">&#123; <span class="string">"title"</span>: <span class="string">"Overriding the default type"</span> &#125;</div></pre></td></tr></table></figure></p>
-<p>批量最好的批次在5Mb~15Mb</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/14/分布式集群/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="李睿">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/14/分布式集群/" itemprop="url">分布式集群</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-14T21:22:00+08:00">
-                2017-11-14
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/elasticSearch/" itemprop="url" rel="index">
-                    <span itemprop="name">elasticSearch</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>一个节点就是一个elasticsearch实例，一个集群由一个或者多个节点组成，具有相同的cluster.name，它们协同工作，分享数据和负载。<br>集群中的一个节点选举称为master，将临时管理集群级别的一些变更，<strong>例如新建、删除索引、增加或移除节点。主节点不参与文档级别的变更或搜索，意味着在流量增长时，master不会成为瓶颈。</strong></p>
-<h2 id="集群健康"><a href="#集群健康" class="headerlink" title="集群健康"></a>集群健康</h2><p>集群健康分为三种：red、yellow、green,green代表所有的主分片和复制分片都可用，yellow代表所有主要分片可用，但是不是所有复制分片可用，red代表不是所有主分片可用<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GET _cluster/health</div></pre></td></tr></table></figure></p>
-<h2 id="添加索引"><a href="#添加索引" class="headerlink" title="添加索引"></a>添加索引</h2><p>索引是用来指向一个或者多个分片的逻辑命名空间，一个分片是一个最小级别工作单元。分片可以是主分片或者复制分片，索引的每一个文档属于一个主分片，主分片的数量决定了索引最终存储的数量。复制分片是主分片的一个副本，可以防止硬件故障导致的数据丢失，同时提供读请求。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">PUT /sjjhpt</div><div class="line">//创建三个主分片，一个副本</div><div class="line">&#123;</div><div class="line">  <span class="string">"settings"</span>:&#123;</div><div class="line">     <span class="string">"number_of_shards"</span>:3,</div><div class="line">     <span class="string">"number_of_replicas"</span>: 1.</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h2 id="增加故障转移"><a href="#增加故障转移" class="headerlink" title="增加故障转移"></a>增加故障转移</h2><p>在单一节点运行会有单点故障的风险，要防止单点故障，要启动另外一个节点。文档首先会在主分片中存储，然后并发复制到其他复制分片，确保主分片和复制分片都会被检索。</p>
-<h2 id="横向扩展"><a href="#横向扩展" class="headerlink" title="横向扩展"></a>横向扩展</h2><p>可以增加节点数，最多节点数为(主分片个数)* (副本数量+1)</p>
-<h2 id="更多扩展"><a href="#更多扩展" class="headerlink" title="更多扩展"></a>更多扩展</h2><p>当然，只是有更多的复制分片在同样数量的节点上并不能提高我们的性能，因为每个分片都要访问更小比重的节点资源（译者注：大部分请求都聚集到了分片少的节点，导致一个节点吞吐量太大，反而降低性能）。你需要增加硬件来提高吞吐量。<br>不过这些额外的复制节点意味着我们有更多的冗余：通过以上对接点的设置，我们更够承受两个节点故障而不丢失数据.</p>
-<h2 id="应对故障"><a href="#应对故障" class="headerlink" title="应对故障"></a>应对故障</h2><p>当主节点故障后，会重新选举主节点，如果主分片不能正常工作，重新选举的主节点会提升副本分片为主分片</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2772,7 +2786,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">46</span>
+                <span class="site-state-item-count">48</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2783,7 +2797,7 @@
             
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
-                <span class="site-state-item-count">12</span>
+                <span class="site-state-item-count">14</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -2794,7 +2808,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">17</span>
+                <span class="site-state-item-count">20</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
