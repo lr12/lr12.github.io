@@ -1,0 +1,752 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="博客" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="Feign我们在使用Ribbon时，通常会利用它来对RestTemplate的请求拦截来实现对依赖服务的接口调用。RestTemplate已经实现了对http请求的封装处理，形成一套模板化的调用方法。在实际开发中，对服务依赖的调用可能不止一处，往往一个接口会被多处调用，我们需要封装一些客户端类来包装这些依赖服务的调用。在Feign实现下，我们只需要创建一个接口并用注解配置它，即可完成对服务提供方的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="feign和zuul">
+<meta property="og:url" content="http://yoursite.com/2018/01/22/feign和zuul/index.html">
+<meta property="og:site_name" content="博客">
+<meta property="og:description" content="Feign我们在使用Ribbon时，通常会利用它来对RestTemplate的请求拦截来实现对依赖服务的接口调用。RestTemplate已经实现了对http请求的封装处理，形成一套模板化的调用方法。在实际开发中，对服务依赖的调用可能不止一处，往往一个接口会被多处调用，我们需要封装一些客户端类来包装这些依赖服务的调用。在Feign实现下，我们只需要创建一个接口并用注解配置它，即可完成对服务提供方的">
+<meta property="og:updated_time" content="2018-01-23T09:20:48.426Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="feign和zuul">
+<meta name="twitter:description" content="Feign我们在使用Ribbon时，通常会利用它来对RestTemplate的请求拦截来实现对依赖服务的接口调用。RestTemplate已经实现了对http请求的封装处理，形成一套模板化的调用方法。在实际开发中，对服务依赖的调用可能不止一处，往往一个接口会被多处调用，我们需要封装一些客户端类来包装这些依赖服务的调用。在Feign实现下，我们只需要创建一个接口并用注解配置它，即可完成对服务提供方的">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/01/22/feign和zuul/"/>
+
+
+
+
+
+  <title>feign和zuul | 博客</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/22/feign和zuul/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="李睿">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">feign和zuul</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-22T22:06:30+08:00">
+                2018-01-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Feign"><a href="#Feign" class="headerlink" title="Feign"></a>Feign</h1><p>我们在使用Ribbon时，通常会利用它来对RestTemplate的请求拦截来实现对依赖服务的接口调用。RestTemplate已经实现了对http请求的封装处理，形成一套模板化的调用方法。在实际开发中，对服务依赖的调用可能不止一处，往往一个接口会被多处调用，我们需要封装一些客户端类来包装这些依赖服务的调用。在Feign实现下，我们只需要创建一个接口并用注解配置它，即可完成对服务提供方的接口绑定。</p>
+<h2 id="快速启动"><a href="#快速启动" class="headerlink" title="快速启动"></a>快速启动</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">      //pom文件</div><div class="line">      &lt;!--feign--&gt;</div><div class="line">      &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-cloud-starter-feign&lt;/artifactId&gt;</div><div class="line">      &lt;/dependency&gt;</div><div class="line">@EnableFeignClients</div><div class="line">@EnableDiscoveryClient</div><div class="line">@SpringBootApplication</div><div class="line">public class ConsumerApplication &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		SpringApplication.run(ConsumerApplication.class, args);</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line">@FeignClient(<span class="string">"hello-service"</span>)</div><div class="line">public interface HelloService&#123;</div><div class="line">  @RequestMapping(<span class="string">"/hello"</span>)</div><div class="line">  String hello();</div><div class="line">&#125;</div><div class="line">@RestController</div><div class="line">public class ConsumerController &#123;</div><div class="line"></div><div class="line">	@Autowired</div><div class="line">	HelloService helloService;</div><div class="line"></div><div class="line">	@RequestMapping(value=<span class="string">"/ribbon-consumer"</span>,method= RequestMethod.GET)</div><div class="line">	public String <span class="function"><span class="title">sayHello</span></span>()&#123;</div><div class="line">     <span class="built_in">return</span> helloService.hello();</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="继承"><a href="#继承" class="headerlink" title="继承"></a>继承</h2><p>[<a href="http://blog.didispace.com/spring-cloud-tips-feign-rpc/" target="_blank" rel="external">http://blog.didispace.com/spring-cloud-tips-feign-rpc/</a>]</p>
+<h2 id="Ribbon配置"><a href="#Ribbon配置" class="headerlink" title="Ribbon配置"></a>Ribbon配置</h2><h3 id="全局配置"><a href="#全局配置" class="headerlink" title="全局配置"></a>全局配置</h3><p>ribbon.key=value<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">ribbon.ConnectTimeout=500</div><div class="line">ribbon.readTimeout=5000</div></pre></td></tr></table></figure></p>
+<h3 id="指定服务配置"><a href="#指定服务配置" class="headerlink" title="指定服务配置"></a>指定服务配置</h3><p><client>.ribbon.key=value<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">hello-service.ribbon.ConnectTimeout=500</div><div class="line">hello-service.ribbon.readTimeout=5000</div></pre></td></tr></table></figure></client></p>
+<h2 id="Hystrix"><a href="#Hystrix" class="headerlink" title="Hystrix"></a>Hystrix</h2><h3 id="全局配置-1"><a href="#全局配置-1" class="headerlink" title="全局配置"></a>全局配置</h3><p>跟ribbon全局配置一样，使用hystrix.command.default.xxx</p>
+<h3 id="禁用"><a href="#禁用" class="headerlink" title="禁用"></a>禁用</h3><p>通过feign.hystrix.enabled=false关闭</p>
+<h2 id="服务降级配置"><a href="#服务降级配置" class="headerlink" title="服务降级配置"></a>服务降级配置</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">@FeignClient(<span class="string">"hello-service"</span>,fallback=HelloServiceFallback.class)</div><div class="line">public interface HelloService&#123;</div><div class="line">  @RequestMapping(<span class="string">"/hello"</span>)</div><div class="line">  String hello();</div><div class="line">&#125;</div><div class="line">@Component</div><div class="line">public HelloServiceFallback implements HelloService&#123;</div><div class="line">String <span class="function"><span class="title">hello</span></span>()&#123;</div><div class="line">retur <span class="string">"error"</span>;</div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h1 id="Zuul"><a href="#Zuul" class="headerlink" title="Zuul"></a>Zuul</h1><p>大多数情况下，为了保证对外服务的安全性，我们在服务端实现的微服务接口，往往都会有一定的权限验证机制，比如用户登录状态的校验。同时为了防止客户端在发起请求时防止篡改等安全方面的考虑，还会有一些签名验证的机制存在。由于微服务，我们将一个应用拆成多个应用，但这些应用都需要这些校验逻辑，随着微服务规模扩大，校验逻辑冗余越来越多，不便于扩展和优化。<br>API网关是一个更为智能的应用服务器，它的定义有点像设计模式的Facade模式，它的存在就像整个微服务架构系统的门面一样，所有外部客户端访问都需要经过它来进行调度和过滤。它除了要实现请求路由、负载均衡、验证校验等功能，还需要跟服务治理框架、熔断机制的结合。</p>
+<h2 id="快速入门"><a href="#快速入门" class="headerlink" title="快速入门"></a>快速入门</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">&lt;dependencies&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-cloud-starter-zuul&lt;/artifactId&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-cloud-starter-eureka&lt;/artifactId&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">&lt;/dependencies&gt;</div><div class="line"></div><div class="line">@EnableZuulProxy</div><div class="line">@SpringCloudApplication</div><div class="line">public class Application &#123;</div><div class="line">    public static void main(String[] args) &#123;</div><div class="line">        new SpringApplicationBuilder(Application.class).web(<span class="literal">true</span>).run(args);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">spring.application.name=api-gateway</div><div class="line">server.port=5555</div><div class="line"></div><div class="line">zuul.routes.a.path=/a/**</div><div class="line">zuul.routes.a.url=ribbon-consumer</div><div class="line"></div><div class="line">zuul.routes.b.path=/b/**</div><div class="line">zuul.routes.b.url=feign-consumer</div><div class="line"></div><div class="line">eureka.client.serviceUrl.defaultZone=http://localhost:1111/eureka/</div></pre></td></tr></table></figure>
+<h2 id="请求过滤"><a href="#请求过滤" class="headerlink" title="请求过滤"></a>请求过滤</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div></pre></td><td class="code"><pre><div class="line">@Component</div><div class="line">public class AccessFilter extends ZuulFilter &#123;</div><div class="line"></div><div class="line">    private static final Logger logger = LoggerFactory.getLogger(AccessFilter.class);</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public String <span class="function"><span class="title">filterType</span></span>() &#123;</div><div class="line">        <span class="built_in">return</span> <span class="string">"pre"</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public int <span class="function"><span class="title">filterOrder</span></span>() &#123;</div><div class="line">        <span class="built_in">return</span> 0;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public boolean <span class="function"><span class="title">shouldFilter</span></span>() &#123;</div><div class="line">        <span class="built_in">return</span> <span class="literal">true</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public Object <span class="function"><span class="title">run</span></span>() &#123;</div><div class="line">        logger.info(<span class="string">"AccessFilter run"</span>);</div><div class="line"></div><div class="line">        RequestContext requestContext = RequestContext.getCurrentContext();</div><div class="line">        HttpServletRequest httpServletRequest = requestContext.getRequest();</div><div class="line"></div><div class="line">        logger.info(httpServletRequest.getRequestURI());</div><div class="line"></div><div class="line">        Object accessToken = httpServletRequest.getParameter(<span class="string">"accessToken"</span>);</div><div class="line">        <span class="keyword">if</span>(accessToken == null) &#123;</div><div class="line">            requestContext.setSendZuulResponse(<span class="literal">false</span>);</div><div class="line">            requestContext.setResponseStatusCode(401);</div><div class="line">            <span class="built_in">return</span> null;</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        logger.info(<span class="string">"access token ok"</span>);</div><div class="line">        <span class="built_in">return</span> null;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">@EnableZuulProxy</div><div class="line">@SpringCloudApplication</div><div class="line">public class Application &#123;</div><div class="line">    public static void main(String[] args) &#123;</div><div class="line">        new SpringApplicationBuilder(Application.class).web(<span class="literal">true</span>).run(args);</div><div class="line">    &#125;</div><div class="line">    @Bean</div><div class="line">    public AccessFilter <span class="function"><span class="title">accessFilter</span></span>()&#123;</div><div class="line">       <span class="built_in">return</span> new AccessFilter();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>filterType：过滤器的类型，pre代表请求在被路由之前执行<br>filterOrder：过滤器的执行顺序，根据这个返回值来依次执行<br>shouldFilter：判断是否需要被过滤<br>run：过滤的具体逻辑，这里通过requestContext.setSendZuulResponse(false);来过滤请求，不对骑进行路由，通过requestContext.setResponseStatusCode(401);设置返回状态码，也可以通过requestContext.setResponseBody(body);来设置内容</p>
+<h2 id="路由详解"><a href="#路由详解" class="headerlink" title="路由详解"></a>路由详解</h2><h3 id="传统路由配置"><a href="#传统路由配置" class="headerlink" title="传统路由配置"></a>传统路由配置</h3><ul>
+<li>单实例配置<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">zuul.routes.user-service.path=/user-service/**</div><div class="line">zuul.routes.user-service.url=http://localhost:8080/</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>对符合/user-service/** 规则的请求路径，转发到<a href="http://localhost:8080/地址的路由规则上，比如，当有一个请求http://localhost:5555/user-service/hello,能够匹配，因而api网关会转发请求到http://localhost:8080/hello" target="_blank" rel="external">http://localhost:8080/地址的路由规则上，比如，当有一个请求http://localhost:5555/user-service/hello,能够匹配，因而api网关会转发请求到http://localhost:8080/hello</a></p>
+<ul>
+<li>多实例配置<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">zuul.routes.user-service.path=/user-service/**</div><div class="line">zuul.routes.user-service.serviceId=user-service</div><div class="line">ribbon.eureka.enabled=<span class="literal">false</span></div><div class="line">user-service.ribbon.listOfServers=http://localhost:8080,http://localhost:8081</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="服务路由配置"><a href="#服务路由配置" class="headerlink" title="服务路由配置"></a>服务路由配置</h3><p>在使用服务路由配置的时候，我们不需要向传统路由配置方式那样为serviceId指定具体的服务实例地址，只需要通过zuul.routes.<route>.path与zuul.routes.<route>.serviceId参数对进行配置就好。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">zuul.routes.user-service.path=/user-service/**</div><div class="line">zuul.routes.user-service.serviceId=user-service</div></pre></td></tr></table></figure></route></route></p>
+<h2 id="服务路由的默认规则"><a href="#服务路由的默认规则" class="headerlink" title="服务路由的默认规则"></a>服务路由的默认规则</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">zuul.routes.user-service.path=/user-service/**</div><div class="line">zuul.routes.user-service.serviceId=user-service</div></pre></td></tr></table></figure>
+<p>对于这样具备规则性的配置内容，我们总是希望可以自动完成，在zuul构建的网关引入Eureka后，它会为每个服务自动创建一个默认路由规则，这些默认路由会使用serviceId配置的服务名作为请求前缀。<br>由于默认情况下，所有Eureka上的服务都会被Zuul自动创建映射关系进行路由，这会使得我们不希望对外开放的服务也可能被外部访问。这个时候，我们需要使用zuul.ignored-services参数来设置一个匹配表达式来定义不自动创建路由的规则。如果服务名匹配，将不为创建路由规则。</p>
+<h2 id="路径匹配"><a href="#路径匹配" class="headerlink" title="路径匹配"></a>路径匹配</h2><p>?是匹配任意单个字符，<em> 匹配任意数量字符，*</em> 匹配任意数量字符，支持多级目录。</p>
+<h2 id="路由前缀"><a href="#路由前缀" class="headerlink" title="路由前缀"></a>路由前缀</h2><p>全局为路由规则增加前缀信息，提供zuul.prefix参数进行设置。</p>
+<h2 id="本地跳转"><a href="#本地跳转" class="headerlink" title="本地跳转"></a>本地跳转</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">zuul.routes.api-b.path=/api-b/**</div><div class="line">zuul.routes.api-b.url=forward:/<span class="built_in">local</span></div></pre></td></tr></table></figure>
+<h2 id="Cookie与头信息"><a href="#Cookie与头信息" class="headerlink" title="Cookie与头信息"></a>Cookie与头信息</h2><p>zuul在请求路由时，或过滤掉http请求头信息的一些敏感信息。默认的敏感头信息通过zuul.sensitiveHeaders参数定义，包括set-cookie、cookie、Authorization三个属性。</p>
+<ul>
+<li><p>通过全局设置</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">zuul.sensitiveHeaders=</div></pre></td></tr></table></figure>
+</li>
+<li><p>通过制定路由</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">zuul.routes.&lt;router&gt;.customSensitiveHeaders=<span class="literal">true</span></div><div class="line">或</div><div class="line">zuul.routes.&lt;router&gt;.sensitiveHeaders=</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>重定向问题，避免跳转暴露内部调用细节<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">zuul.addHostHeader=<span class="literal">true</span></div></pre></td></tr></table></figure></p>
+<h2 id="过滤器"><a href="#过滤器" class="headerlink" title="过滤器"></a>过滤器</h2><h3 id="过滤器详解"><a href="#过滤器详解" class="headerlink" title="过滤器详解"></a>过滤器详解</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">public String filterType();</div><div class="line">public int filterOrder();</div><div class="line">public boolean shouldFilter();</div><div class="line">public Object run();</div></pre></td></tr></table></figure>
+<p>filterType：返回一个字符串代表过滤器的类型，在zuul中定义了四种不同生命周期的过滤器类型，具体如下：<br>pre：路由之前<br>routing：路由之时<br>post： 路由之后<br>error：发送错误调用<br>filterOrder：过滤的顺序，数值越小优先级越高<br>shouldFilter：这里可以写逻辑判断，是否要过滤，true,永远过滤。<br>run：过滤器的具体逻辑。可用很复杂，包括查sql，nosql去判断该请求到底有没有权限访问。</p>
+<h3 id="请求生命周期"><a href="#请求生命周期" class="headerlink" title="请求生命周期"></a>请求生命周期</h3><p>第一阶段是pre，会被pre过滤器进行处理，该过滤器主要是在请求路由之前做一些前置工作，比如请求校验。<br>第二阶段是routing，路由请求转发阶段，请求会被routing过滤器处理，当服务实例请求结果都返回之后，routing阶段结束。<br>第三阶段是post，此时请求会被post类型的过滤器处理，我们可以对处理结果进行加工或者转换。<br>还有个特殊的阶段error阶段，前面三个阶段发生异常时才会触发。</p>
+<h2 id="核心过滤器"><a href="#核心过滤器" class="headerlink" title="核心过滤器"></a>核心过滤器</h2><h2 id="动态路由"><a href="#动态路由" class="headerlink" title="动态路由"></a>动态路由</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">// pom</div><div class="line">&lt;dependencies&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-cloud-starter-zuul&lt;/artifactId&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-cloud-starter-config&lt;/artifactId&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-cloud-starter-eureka&lt;/artifactId&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">&lt;/dependencies&gt;</div><div class="line"></div><div class="line">@EnableZuulProxy</div><div class="line">@SpringCloudApplication</div><div class="line">public class Application &#123;</div><div class="line">    public static void main(String[] args) &#123;</div><div class="line">        new SpringApplicationBuilder(Application.class).web(<span class="literal">true</span>).run(args);</div><div class="line">    &#125;</div><div class="line">    @RefreshScope</div><div class="line">    @ConfigurationProperties(<span class="string">"zuul"</span>)</div><div class="line">    public ZuulProperties <span class="function"><span class="title">zuulProperties</span></span>()&#123;</div><div class="line">      <span class="built_in">return</span> new ZuulProperties();</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">spring.application.name=api-gateway</div><div class="line">server.port=5555</div><div class="line">spring.cloud.config.uri=http://localhost:7001/</div><div class="line">eureka.client.serviceUrl.defaultZone=http://localhost:1111/eureka/</div></pre></td></tr></table></figure>
+<p>在git仓库上增加网关配置文件<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">zuul.routes.a.path=/a/**</div><div class="line">zuul.routes.a.url=ribbon-consumer</div><div class="line"></div><div class="line">zuul.routes.b.path=/b/**</div><div class="line">zuul.routes.b.url=feign-consumer</div></pre></td></tr></table></figure></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/01/22/服务容错保护-Hystrix/" rel="next" title="服务容错保护-Hystrix">
+                <i class="fa fa-chevron-left"></i> 服务容错保护-Hystrix
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg"
+               alt="李睿" />
+          <p class="site-author-name" itemprop="name">李睿</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">51</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">22</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Feign"><span class="nav-number">1.</span> <span class="nav-text">Feign</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#快速启动"><span class="nav-number">1.1.</span> <span class="nav-text">快速启动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#继承"><span class="nav-number">1.2.</span> <span class="nav-text">继承</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Ribbon配置"><span class="nav-number">1.3.</span> <span class="nav-text">Ribbon配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#全局配置"><span class="nav-number">1.3.1.</span> <span class="nav-text">全局配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#指定服务配置"><span class="nav-number">1.3.2.</span> <span class="nav-text">指定服务配置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hystrix"><span class="nav-number">1.4.</span> <span class="nav-text">Hystrix</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#全局配置-1"><span class="nav-number">1.4.1.</span> <span class="nav-text">全局配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#禁用"><span class="nav-number">1.4.2.</span> <span class="nav-text">禁用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服务降级配置"><span class="nav-number">1.5.</span> <span class="nav-text">服务降级配置</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Zuul"><span class="nav-number">2.</span> <span class="nav-text">Zuul</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#快速入门"><span class="nav-number">2.1.</span> <span class="nav-text">快速入门</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#请求过滤"><span class="nav-number">2.2.</span> <span class="nav-text">请求过滤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#路由详解"><span class="nav-number">2.3.</span> <span class="nav-text">路由详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#传统路由配置"><span class="nav-number">2.3.1.</span> <span class="nav-text">传统路由配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#服务路由配置"><span class="nav-number">2.3.2.</span> <span class="nav-text">服务路由配置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服务路由的默认规则"><span class="nav-number">2.4.</span> <span class="nav-text">服务路由的默认规则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#路径匹配"><span class="nav-number">2.5.</span> <span class="nav-text">路径匹配</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#路由前缀"><span class="nav-number">2.6.</span> <span class="nav-text">路由前缀</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#本地跳转"><span class="nav-number">2.7.</span> <span class="nav-text">本地跳转</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Cookie与头信息"><span class="nav-number">2.8.</span> <span class="nav-text">Cookie与头信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#过滤器"><span class="nav-number">2.9.</span> <span class="nav-text">过滤器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#过滤器详解"><span class="nav-number">2.9.1.</span> <span class="nav-text">过滤器详解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#请求生命周期"><span class="nav-number">2.9.2.</span> <span class="nav-text">请求生命周期</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#核心过滤器"><span class="nav-number">2.10.</span> <span class="nav-text">核心过滤器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#动态路由"><span class="nav-number">2.11.</span> <span class="nav-text">动态路由</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">李睿</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

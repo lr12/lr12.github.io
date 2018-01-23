@@ -273,6 +273,462 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/02/hbase-java-api/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="李睿">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/11/02/hbase-java-api/" itemprop="url">hbase java api</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-02T16:29:51+08:00">
+                2017-11-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/hbase/" itemprop="url" rel="index">
+                    <span itemprop="name">hbase</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="CRUD操作"><a href="#CRUD操作" class="headerlink" title="CRUD操作"></a>CRUD操作</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div><div class="line">157</div><div class="line">158</div><div class="line">159</div><div class="line">160</div><div class="line">161</div><div class="line">162</div><div class="line">163</div><div class="line">164</div><div class="line">165</div><div class="line">166</div><div class="line">167</div><div class="line">168</div><div class="line">169</div><div class="line">170</div><div class="line">171</div><div class="line">172</div><div class="line">173</div><div class="line">174</div><div class="line">175</div><div class="line">176</div><div class="line">177</div><div class="line">178</div><div class="line">179</div><div class="line">180</div><div class="line">181</div><div class="line">182</div><div class="line">183</div><div class="line">184</div><div class="line">185</div><div class="line">186</div><div class="line">187</div><div class="line">188</div><div class="line">189</div><div class="line">190</div><div class="line">191</div><div class="line">192</div><div class="line">193</div><div class="line">194</div><div class="line">195</div><div class="line">196</div><div class="line">197</div><div class="line">198</div><div class="line">199</div><div class="line">200</div><div class="line">201</div><div class="line">202</div><div class="line">203</div><div class="line">204</div><div class="line">205</div><div class="line">206</div><div class="line">207</div><div class="line">208</div><div class="line">209</div><div class="line">210</div><div class="line">211</div><div class="line">212</div><div class="line">213</div><div class="line">214</div><div class="line">215</div><div class="line">216</div><div class="line">217</div><div class="line">218</div><div class="line">219</div><div class="line">220</div><div class="line">221</div><div class="line">222</div><div class="line">223</div><div class="line">224</div><div class="line">225</div><div class="line">226</div><div class="line">227</div><div class="line">228</div><div class="line">229</div><div class="line">230</div><div class="line">231</div><div class="line">232</div><div class="line">233</div><div class="line">234</div><div class="line">235</div><div class="line">236</div><div class="line">237</div><div class="line">238</div><div class="line">239</div><div class="line">240</div><div class="line">241</div><div class="line">242</div><div class="line">243</div><div class="line">244</div><div class="line">245</div><div class="line">246</div><div class="line">247</div><div class="line">248</div><div class="line">249</div><div class="line">250</div><div class="line">251</div><div class="line">252</div><div class="line">253</div><div class="line">254</div><div class="line">255</div><div class="line">256</div><div class="line">257</div><div class="line">258</div><div class="line">259</div><div class="line">260</div><div class="line">261</div><div class="line">262</div><div class="line">263</div><div class="line">264</div><div class="line">265</div><div class="line">266</div><div class="line">267</div><div class="line">268</div><div class="line">269</div><div class="line">270</div><div class="line">271</div><div class="line">272</div><div class="line">273</div><div class="line">274</div><div class="line">275</div><div class="line">276</div><div class="line">277</div><div class="line">278</div><div class="line">279</div><div class="line">280</div><div class="line">281</div><div class="line">282</div><div class="line">283</div><div class="line">284</div><div class="line">285</div><div class="line">286</div><div class="line">287</div><div class="line">288</div><div class="line">289</div><div class="line">290</div><div class="line">291</div><div class="line">292</div><div class="line">293</div><div class="line">294</div><div class="line">295</div><div class="line">296</div><div class="line">297</div><div class="line">298</div><div class="line">299</div><div class="line">300</div><div class="line">301</div><div class="line">302</div><div class="line">303</div><div class="line">304</div><div class="line">305</div><div class="line">306</div><div class="line">307</div><div class="line">308</div><div class="line">309</div><div class="line">310</div><div class="line">311</div><div class="line">312</div><div class="line">313</div><div class="line">314</div><div class="line">315</div><div class="line">316</div><div class="line">317</div><div class="line">318</div><div class="line">319</div><div class="line">320</div><div class="line">321</div><div class="line">322</div><div class="line">323</div><div class="line">324</div><div class="line">325</div><div class="line">326</div><div class="line">327</div><div class="line">328</div><div class="line">329</div><div class="line">330</div><div class="line">331</div><div class="line">332</div><div class="line">333</div><div class="line">334</div><div class="line">335</div><div class="line">336</div><div class="line">337</div><div class="line">338</div><div class="line">339</div><div class="line">340</div><div class="line">341</div><div class="line">342</div><div class="line">343</div><div class="line">344</div><div class="line">345</div><div class="line">346</div><div class="line">347</div><div class="line">348</div><div class="line">349</div><div class="line">350</div><div class="line">351</div><div class="line">352</div><div class="line">353</div><div class="line">354</div><div class="line">355</div><div class="line">356</div><div class="line">357</div></pre></td><td class="code"><pre><div class="line">import java.io.IOException;</div><div class="line"></div><div class="line">import org.apache.hadoop.conf.Configuration;</div><div class="line">import org.apache.hadoop.hbase.HBaseConfiguration;</div><div class="line">import org.apache.hadoop.hbase.HColumnDescriptor;</div><div class="line">import org.apache.hadoop.hbase.HTableDescriptor;</div><div class="line">import org.apache.hadoop.hbase.KeyValue;</div><div class="line">import org.apache.hadoop.hbase.client.Delete;</div><div class="line">import org.apache.hadoop.hbase.client.Get;</div><div class="line">import org.apache.hadoop.hbase.client.HBaseAdmin;</div><div class="line">import org.apache.hadoop.hbase.client.HTable;</div><div class="line">import org.apache.hadoop.hbase.client.HTablePool;</div><div class="line">import org.apache.hadoop.hbase.client.Put;</div><div class="line">import org.apache.hadoop.hbase.client.Result;</div><div class="line">import org.apache.hadoop.hbase.client.ResultScanner;</div><div class="line">import org.apache.hadoop.hbase.client.Scan;</div><div class="line">import org.apache.hadoop.hbase.util.Bytes;</div><div class="line"></div><div class="line">public class Hbase &#123;</div><div class="line">    // 声明静态配置</div><div class="line">    static Configuration conf = null;</div><div class="line">    static &#123;</div><div class="line">        conf = HBaseConfiguration.create();</div><div class="line">        conf.set(<span class="string">"hbase.zookeeper.quorum"</span>, <span class="string">"localhost"</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    /*</div><div class="line">     * 创建表</div><div class="line">     *</div><div class="line">     * @tableName 表名</div><div class="line">     *</div><div class="line">     * @family 列族列表</div><div class="line">     */</div><div class="line">    public static void creatTable(String tableName, String[] family)</div><div class="line">            throws Exception &#123;</div><div class="line">        HBaseAdmin admin = new HBaseAdmin(conf);</div><div class="line">        HTableDescriptor desc = new HTableDescriptor(tableName);</div><div class="line">        <span class="keyword">for</span> (int i = 0; i &lt; family.length; i++) &#123;</div><div class="line">            desc.addFamily(new HColumnDescriptor(family[i]));</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">if</span> (admin.tableExists(tableName)) &#123;</div><div class="line">            System.out.println(<span class="string">"table Exists!"</span>);</div><div class="line">            System.exit(0);</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            admin.createTable(desc);</div><div class="line">            System.out.println(<span class="string">"create table Success!"</span>);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    /*</div><div class="line">     * 为表添加数据（适合知道有多少列族的固定表）</div><div class="line">     *</div><div class="line">     * @rowKey rowKey</div><div class="line">     *</div><div class="line">     * @tableName 表名</div><div class="line">     *</div><div class="line">     * @column1 第一个列族列表</div><div class="line">     *</div><div class="line">     * @value1 第一个列的值的列表</div><div class="line">     *</div><div class="line">     * @column2 第二个列族列表</div><div class="line">     *</div><div class="line">     * @value2 第二个列的值的列表</div><div class="line">     */</div><div class="line">    public static void addData(String rowKey, String tableName,</div><div class="line">            String[] column1, String[] value1, String[] column2, String[] value2)</div><div class="line">            throws IOException &#123;</div><div class="line">        Put put = new Put(Bytes.toBytes(rowKey));// 设置rowkey</div><div class="line">        HTable table = new HTable(conf, Bytes.toBytes(tableName));// HTabel负责跟记录相关的操作如增删改查等//</div><div class="line">                                                                    // 获取表</div><div class="line">        HColumnDescriptor[] columnFamilies = table.getTableDescriptor() // 获取所有的列族</div><div class="line">                .getColumnFamilies();</div><div class="line"></div><div class="line">        <span class="keyword">for</span> (int i = 0; i &lt; columnFamilies.length; i++) &#123;</div><div class="line">            String familyName = columnFamilies[i].getNameAsString(); // 获取列族名</div><div class="line">            <span class="keyword">if</span> (familyName.equals(<span class="string">"article"</span>)) &#123; // article列族put数据</div><div class="line">                <span class="keyword">for</span> (int j = 0; j &lt; column1.length; j++) &#123;</div><div class="line">                    put.add(Bytes.toBytes(familyName),</div><div class="line">                            Bytes.toBytes(column1[j]), Bytes.toBytes(value1[j]));</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">if</span> (familyName.equals(<span class="string">"author"</span>)) &#123; // author列族put数据</div><div class="line">                <span class="keyword">for</span> (int j = 0; j &lt; column2.length; j++) &#123;</div><div class="line">                    put.add(Bytes.toBytes(familyName),</div><div class="line">                            Bytes.toBytes(column2[j]), Bytes.toBytes(value2[j]));</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        table.put(put);</div><div class="line">        System.out.println(<span class="string">"add data Success!"</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    /*</div><div class="line">     * 根据rwokey查询</div><div class="line">     *</div><div class="line">     * @rowKey rowKey</div><div class="line">     *</div><div class="line">     * @tableName 表名</div><div class="line">     */</div><div class="line">    public static Result getResult(String tableName, String rowKey)</div><div class="line">            throws IOException &#123;</div><div class="line">        Get get = new Get(Bytes.toBytes(rowKey));</div><div class="line">        HTable table = new HTable(conf, Bytes.toBytes(tableName));// 获取表</div><div class="line">        Result result = table.get(get);</div><div class="line">        <span class="keyword">for</span> (KeyValue kv : result.list()) &#123;</div><div class="line">            System.out.println(<span class="string">"family:"</span> + Bytes.toString(kv.getFamily()));</div><div class="line">            System.out</div><div class="line">                    .println(<span class="string">"qualifier:"</span> + Bytes.toString(kv.getQualifier()));</div><div class="line">            System.out.println(<span class="string">"value:"</span> + Bytes.toString(kv.getValue()));</div><div class="line">            System.out.println(<span class="string">"Timestamp:"</span> + kv.getTimestamp());</div><div class="line">            System.out.println(<span class="string">"-------------------------------------------"</span>);</div><div class="line">        &#125;</div><div class="line">        <span class="built_in">return</span> result;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    /*</div><div class="line">     * 遍历查询hbase表</div><div class="line">     *</div><div class="line">     * @tableName 表名</div><div class="line">     */</div><div class="line">    public static void getResultScann(String tableName) throws IOException &#123;</div><div class="line">        Scan scan = new Scan();</div><div class="line">        ResultScanner rs = null;</div><div class="line">        HTable table = new HTable(conf, Bytes.toBytes(tableName));</div><div class="line">        try &#123;</div><div class="line">            rs = table.getScanner(scan);</div><div class="line">            <span class="keyword">for</span> (Result r : rs) &#123;</div><div class="line">                <span class="keyword">for</span> (KeyValue kv : r.list()) &#123;</div><div class="line">                    System.out.println(<span class="string">"row:"</span> + Bytes.toString(kv.getRow()));</div><div class="line">                    System.out.println(<span class="string">"family:"</span></div><div class="line">                            + Bytes.toString(kv.getFamily()));</div><div class="line">                    System.out.println(<span class="string">"qualifier:"</span></div><div class="line">                            + Bytes.toString(kv.getQualifier()));</div><div class="line">                    System.out</div><div class="line">                            .println(<span class="string">"value:"</span> + Bytes.toString(kv.getValue()));</div><div class="line">                    System.out.println(<span class="string">"timestamp:"</span> + kv.getTimestamp());</div><div class="line">                    System.out</div><div class="line">                            .println(<span class="string">"-------------------------------------------"</span>);</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125; finally &#123;</div><div class="line">            rs.close();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    /*</div><div class="line">     * 遍历查询hbase表</div><div class="line">     *</div><div class="line">     * @tableName 表名</div><div class="line">     */</div><div class="line">    public static void getResultScann(String tableName, String start_rowkey,</div><div class="line">            String stop_rowkey) throws IOException &#123;</div><div class="line">        Scan scan = new Scan();</div><div class="line">        scan.setStartRow(Bytes.toBytes(start_rowkey));</div><div class="line">        scan.setStopRow(Bytes.toBytes(stop_rowkey));</div><div class="line">        ResultScanner rs = null;</div><div class="line">        HTable table = new HTable(conf, Bytes.toBytes(tableName));</div><div class="line">        try &#123;</div><div class="line">            rs = table.getScanner(scan);</div><div class="line">            <span class="keyword">for</span> (Result r : rs) &#123;</div><div class="line">                <span class="keyword">for</span> (KeyValue kv : r.list()) &#123;</div><div class="line">                    System.out.println(<span class="string">"row:"</span> + Bytes.toString(kv.getRow()));</div><div class="line">                    System.out.println(<span class="string">"family:"</span></div><div class="line">                            + Bytes.toString(kv.getFamily()));</div><div class="line">                    System.out.println(<span class="string">"qualifier:"</span></div><div class="line">                            + Bytes.toString(kv.getQualifier()));</div><div class="line">                    System.out</div><div class="line">                            .println(<span class="string">"value:"</span> + Bytes.toString(kv.getValue()));</div><div class="line">                    System.out.println(<span class="string">"timestamp:"</span> + kv.getTimestamp());</div><div class="line">                    System.out</div><div class="line">                            .println(<span class="string">"-------------------------------------------"</span>);</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125; finally &#123;</div><div class="line">            rs.close();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    /*</div><div class="line">     * 查询表中的某一列</div><div class="line">     *</div><div class="line">     * @tableName 表名</div><div class="line">     *</div><div class="line">     * @rowKey rowKey</div><div class="line">     */</div><div class="line">    public static void getResultByColumn(String tableName, String rowKey,</div><div class="line">            String familyName, String columnName) throws IOException &#123;</div><div class="line">        HTable table = new HTable(conf, Bytes.toBytes(tableName));</div><div class="line">        Get get = new Get(Bytes.toBytes(rowKey));</div><div class="line">        get.addColumn(Bytes.toBytes(familyName), Bytes.toBytes(columnName)); // 获取指定列族和列修饰符对应的列</div><div class="line">        Result result = table.get(get);</div><div class="line">        <span class="keyword">for</span> (KeyValue kv : result.list()) &#123;</div><div class="line">            System.out.println(<span class="string">"family:"</span> + Bytes.toString(kv.getFamily()));</div><div class="line">            System.out</div><div class="line">                    .println(<span class="string">"qualifier:"</span> + Bytes.toString(kv.getQualifier()));</div><div class="line">            System.out.println(<span class="string">"value:"</span> + Bytes.toString(kv.getValue()));</div><div class="line">            System.out.println(<span class="string">"Timestamp:"</span> + kv.getTimestamp());</div><div class="line">            System.out.println(<span class="string">"-------------------------------------------"</span>);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    /*</div><div class="line">     * 更新表中的某一列</div><div class="line">     *</div><div class="line">     * @tableName 表名</div><div class="line">     *</div><div class="line">     * @rowKey rowKey</div><div class="line">     *</div><div class="line">     * @familyName 列族名</div><div class="line">     *</div><div class="line">     * @columnName 列名</div><div class="line">     *</div><div class="line">     * @value 更新后的值</div><div class="line">     */</div><div class="line">    public static void updateTable(String tableName, String rowKey,</div><div class="line">            String familyName, String columnName, String value)</div><div class="line">            throws IOException &#123;</div><div class="line">        HTable table = new HTable(conf, Bytes.toBytes(tableName));</div><div class="line">        Put put = new Put(Bytes.toBytes(rowKey));</div><div class="line">        put.add(Bytes.toBytes(familyName), Bytes.toBytes(columnName),</div><div class="line">                Bytes.toBytes(value));</div><div class="line">        table.put(put);</div><div class="line">        System.out.println(<span class="string">"update table Success!"</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    /*</div><div class="line">     * 查询某列数据的多个版本</div><div class="line">     *</div><div class="line">     * @tableName 表名</div><div class="line">     *</div><div class="line">     * @rowKey rowKey</div><div class="line">     *</div><div class="line">     * @familyName 列族名</div><div class="line">     *</div><div class="line">     * @columnName 列名</div><div class="line">     */</div><div class="line">    public static void getResultByVersion(String tableName, String rowKey,</div><div class="line">            String familyName, String columnName) throws IOException &#123;</div><div class="line">        HTable table = new HTable(conf, Bytes.toBytes(tableName));</div><div class="line">        Get get = new Get(Bytes.toBytes(rowKey));</div><div class="line">        get.addColumn(Bytes.toBytes(familyName), Bytes.toBytes(columnName));</div><div class="line">        get.setMaxVersions(5);</div><div class="line">        Result result = table.get(get);</div><div class="line">        <span class="keyword">for</span> (KeyValue kv : result.list()) &#123;</div><div class="line">            System.out.println(<span class="string">"family:"</span> + Bytes.toString(kv.getFamily()));</div><div class="line">            System.out</div><div class="line">                    .println(<span class="string">"qualifier:"</span> + Bytes.toString(kv.getQualifier()));</div><div class="line">            System.out.println(<span class="string">"value:"</span> + Bytes.toString(kv.getValue()));</div><div class="line">            System.out.println(<span class="string">"Timestamp:"</span> + kv.getTimestamp());</div><div class="line">            System.out.println(<span class="string">"-------------------------------------------"</span>);</div><div class="line">        &#125;</div><div class="line">        /*</div><div class="line">         * List&lt;?&gt; results = table.get(get).list(); Iterator&lt;?&gt; it =</div><div class="line">         * results.iterator(); <span class="keyword">while</span> (it.hasNext()) &#123;</div><div class="line">         * System.out.println(it.next().toString()); &#125;</div><div class="line">         */</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    /*</div><div class="line">     * 删除指定的列</div><div class="line">     *</div><div class="line">     * @tableName 表名</div><div class="line">     *</div><div class="line">     * @rowKey rowKey</div><div class="line">     *</div><div class="line">     * @familyName 列族名</div><div class="line">     *</div><div class="line">     * @columnName 列名</div><div class="line">     */</div><div class="line">    public static void deleteColumn(String tableName, String rowKey,</div><div class="line">            String falilyName, String columnName) throws IOException &#123;</div><div class="line">        HTable table = new HTable(conf, Bytes.toBytes(tableName));</div><div class="line">        Delete deleteColumn = new Delete(Bytes.toBytes(rowKey));</div><div class="line">        deleteColumn.deleteColumns(Bytes.toBytes(falilyName),</div><div class="line">                Bytes.toBytes(columnName));</div><div class="line">        table.delete(deleteColumn);</div><div class="line">        System.out.println(falilyName + <span class="string">":"</span> + columnName + <span class="string">"is deleted!"</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    /*</div><div class="line">     * 删除指定的列</div><div class="line">     *</div><div class="line">     * @tableName 表名</div><div class="line">     *</div><div class="line">     * @rowKey rowKey</div><div class="line">     */</div><div class="line">    public static void deleteAllColumn(String tableName, String rowKey)</div><div class="line">            throws IOException &#123;</div><div class="line">        HTable table = new HTable(conf, Bytes.toBytes(tableName));</div><div class="line">        Delete deleteAll = new Delete(Bytes.toBytes(rowKey));</div><div class="line">        table.delete(deleteAll);</div><div class="line">        System.out.println(<span class="string">"all columns are deleted!"</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    /*</div><div class="line">     * 删除表</div><div class="line">     *</div><div class="line">     * @tableName 表名</div><div class="line">     */</div><div class="line">    public static void deleteTable(String tableName) throws IOException &#123;</div><div class="line">        HBaseAdmin admin = new HBaseAdmin(conf);</div><div class="line">        admin.disableTable(tableName);</div><div class="line">        admin.deleteTable(tableName);</div><div class="line">        System.out.println(tableName + <span class="string">"is deleted!"</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public static void main(String[] args) throws Exception &#123;</div><div class="line"></div><div class="line">        // 创建表</div><div class="line">        String tableName = <span class="string">"blog2"</span>;</div><div class="line">        String[] family = &#123; <span class="string">"article"</span>, <span class="string">"author"</span> &#125;;</div><div class="line">        // creatTable(tableName, family);</div><div class="line"></div><div class="line">        // 为表添加数据</div><div class="line"></div><div class="line">        String[] column1 = &#123; <span class="string">"title"</span>, <span class="string">"content"</span>, <span class="string">"tag"</span> &#125;;</div><div class="line">        String[] value1 = &#123;</div><div class="line">                <span class="string">"Head First HBase"</span>,</div><div class="line">                <span class="string">"HBase is the Hadoop database. Use it when you need random, realtime read/write access to your Big Data."</span>,</div><div class="line">                <span class="string">"Hadoop,HBase,NoSQL"</span> &#125;;</div><div class="line">        String[] column2 = &#123; <span class="string">"name"</span>, <span class="string">"nickname"</span> &#125;;</div><div class="line">        String[] value2 = &#123; <span class="string">"nicholas"</span>, <span class="string">"lee"</span> &#125;;</div><div class="line">        addData(<span class="string">"rowkey1"</span>, <span class="string">"blog2"</span>, column1, value1, column2, value2);</div><div class="line">        addData(<span class="string">"rowkey2"</span>, <span class="string">"blog2"</span>, column1, value1, column2, value2);</div><div class="line">        addData(<span class="string">"rowkey3"</span>, <span class="string">"blog2"</span>, column1, value1, column2, value2);</div><div class="line"></div><div class="line">        // 遍历查询</div><div class="line">        getResultScann(<span class="string">"blog2"</span>, <span class="string">"rowkey4"</span>, <span class="string">"rowkey5"</span>);</div><div class="line">        // 根据row key范围遍历查询</div><div class="line">        getResultScann(<span class="string">"blog2"</span>, <span class="string">"rowkey4"</span>, <span class="string">"rowkey5"</span>);</div><div class="line"></div><div class="line">        // 查询</div><div class="line">        getResult(<span class="string">"blog2"</span>, <span class="string">"rowkey1"</span>);</div><div class="line"></div><div class="line">        // 查询某一列的值</div><div class="line">        getResultByColumn(<span class="string">"blog2"</span>, <span class="string">"rowkey1"</span>, <span class="string">"author"</span>, <span class="string">"name"</span>);</div><div class="line"></div><div class="line">        // 更新列</div><div class="line">        updateTable(<span class="string">"blog2"</span>, <span class="string">"rowkey1"</span>, <span class="string">"author"</span>, <span class="string">"name"</span>, <span class="string">"bin"</span>);</div><div class="line"></div><div class="line">        // 查询某一列的值</div><div class="line">        getResultByColumn(<span class="string">"blog2"</span>, <span class="string">"rowkey1"</span>, <span class="string">"author"</span>, <span class="string">"name"</span>);</div><div class="line"></div><div class="line">        // 查询某列的多版本</div><div class="line">        getResultByVersion(<span class="string">"blog2"</span>, <span class="string">"rowkey1"</span>, <span class="string">"author"</span>, <span class="string">"name"</span>);</div><div class="line"></div><div class="line">        // 删除一列</div><div class="line">        deleteColumn(<span class="string">"blog2"</span>, <span class="string">"rowkey1"</span>, <span class="string">"author"</span>, <span class="string">"nickname"</span>);</div><div class="line"></div><div class="line">        // 删除所有列</div><div class="line">        deleteAllColumn(<span class="string">"blog2"</span>, <span class="string">"rowkey1"</span>);</div><div class="line"></div><div class="line">        // 删除表</div><div class="line">        deleteTable(<span class="string">"blog2"</span>);</div><div class="line"></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="批量处理"><a href="#批量处理" class="headerlink" title="批量处理"></a>批量处理</h2><p>事实上，许多基于列表的操作，如delete(List <delete> deletes)或者get(List <get> gets)，都是基于batch()方法实现的。它们都是一些为了方便用户使用而保留的方法。如果你是新手，推荐使用batch()方法进行所有操作。<br>下面的客户端API方法提供了批量处理操作。用户可能注意到这里引入了一个新的名为Row的类，它是Put、Get和Delete的祖先，或者是父类。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">void batch(List&lt;Row&gt; actions,Object[] results) throws IOException,InterruptedException</div><div class="line">Object [] batch(List&lt;Row&gt; actions) throws IOException,InterruptedException</div></pre></td></tr></table></figure></get></delete></p>
+<p>使用同样的父类允许在列表中实现多态，即放入以上3种不同的子类。这种调用跟之前介绍的基于列表的调用方法一样简单调用。请注意，不可以将针对同一行的Put和Delete操作放在同一个批量处理请求中，为了保证最好的性能，这些操作的处理顺序可能不同，但是这样会产生不可预料的结果。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">public static void batchDone(HTable hTable,String[] family,String[] column1) throws IOException&#123;</div><div class="line"></div><div class="line">      List&lt;Row&gt; batch = new ArrayList&lt;Row&gt;();</div><div class="line">        Put put = new Put(<span class="string">"rowkey4"</span>.getBytes());</div><div class="line">        put.add(family[0].getBytes(), column1[1].getBytes(), Bytes.toBytes(<span class="string">"valTest"</span>));</div><div class="line">        batch.add(put);</div><div class="line">        Get get1 = new Get(<span class="string">"rowkey1"</span>.getBytes());</div><div class="line">        get1.addColumn(family[0].getBytes(), column1[1].getBytes());</div><div class="line">        batch.add(get1);</div><div class="line">        Delete delete = new Delete(<span class="string">"rowkey4"</span>.getBytes());</div><div class="line">        delete.deleteColumns(family[0].getBytes(), column1[1].getBytes());</div><div class="line">        batch.add(delete);</div><div class="line">        Get get2 = new Get(<span class="string">"rowkey1"</span>.getBytes());</div><div class="line">        get2.addFamily(family[0].getBytes());</div><div class="line">        batch.add(get2);</div><div class="line">        Object[] results = new Object[batch.size()];</div><div class="line">        try &#123;</div><div class="line">            hTable.batch(batch,results);</div><div class="line"></div><div class="line">        &#125; catch (Exception e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">for</span> (int i = 0; i &lt; results.length; i++) &#123;</div><div class="line">     System.out.println(results[i]);</div><div class="line">   &#125;</div><div class="line">   &#125;</div></pre></td></tr></table></figure></p>
+<p>results返回值有<br>null    操作与远程服务器的通信失败<br>EmptyResult    Put与Delete操作成功后的返回结果<br>Result    Get操作成功的返回结果，如果没有匹配的行或列，会返回空的Result<br>Throwable    当服务器端返回一个异常时，这个异常会按原样返回给客户端。用户可以使用这个异常检查哪里出了错，也许可以在自己的代码中自动处理异常<br>void batch(List<row> actions,Object[] results)和Object [] batch(List<row> actions)<br>不同点：后面那个批量操作一旦出现异常，将不会获取到结果<br>相同点：get、delete和put都支持，如果执行时出现问题，客户端将抛出异常并报告问题。</row></row></p>
+<h2 id="行锁"><a href="#行锁" class="headerlink" title="行锁"></a>行锁</h2><p>像put、delete、checkAndPut这样的修改操作是独立执行的，这意味者在一个串行方式的执行中，对于每一行必须保证行级别的操作是原子性，region服务器提供了行锁的特性，这个特性保证只有一个客户获得一行数据对应的锁，同时对该行进行修改。使用如下<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">RowLock lock=table.lockRow(row1);</div><div class="line">Put put=new Put(row1,lock);</div><div class="line">table.put(put);</div><div class="line">table.unlockRow(lock);</div></pre></td></tr></table></figure></p>
+<p>获取数据也可以加显式锁，历史提供了Get(byte[] row,RowLock lock)，但服务器根本用不到这个方法，首先不说加锁的性能影响，原因在于获取数据时，应用了多版本并发控制保证行级读操作。<br>备注：MVCC算法<br>HBase采用了MVCC算法来避免读操作去获取行锁。<br>对于写操作：<br>(w1) 获取行锁后，每个写操作都立即分配一个写序号<br>(w2) 写操作在保存每个数据cell时都要带上写序号<br>(w3) 写操作需要申明以这个写序号来完成本次写操作（标注该行）<br>对于读操作:<br>(r1) 每个读操作开始都分配一个读序号，也称为读取点<br>(r2) 读取点的值是所有的写操作完成序号中的最大整数(所有的写操作完成序号&lt;=读取点）<br>(r3) 对某个(row,column)的读取操作r来说，结果是满足写序号为“写序号&lt;=读取点这个范围内”的最大整数的所有cell值的组合</p>
+<h2 id="扫描"><a href="#扫描" class="headerlink" title="扫描"></a>扫描</h2><p>Put、Delete与Get对象都是Row的子类，从该继承关系中我们就可以了解到Get、Delete与Pu对象本身就只能进行单行的操作，HBase客户端还提供了一套能够进行全表扫描的API，方便用户能够快速对整张表进行扫描，以获取想要的结果—scan</p>
+<h3 id="流程介绍"><a href="#流程介绍" class="headerlink" title="流程介绍"></a>流程介绍</h3><p>全表扫描是一种不需要行键值的操作，因此初始化时不需要指定行键值，因此就产生了不同的使用方法<br>1、不进行Scan对象创建的全表扫描<br>在该过程中，Htable对象会在扫描请求发送前隐式的创建一个scan对象，然后传递给Hbase服务器集群。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">public void scanWithoutInit(String tableName,String family)  </div><div class="line">    &#123;  </div><div class="line">        Configuration conf=init();  </div><div class="line">        try &#123;  </div><div class="line">            HBaseAdmin admin=new HBaseAdmin(conf);  </div><div class="line">            <span class="keyword">if</span>(!admin.tableExists(tableName))  </div><div class="line">            &#123;  </div><div class="line">                System.err.println(<span class="string">"the table "</span>+tableName+<span class="string">" is not exist"</span>);  </div><div class="line">                admin.close();  </div><div class="line">                System.exit(1);  </div><div class="line">            &#125;  </div><div class="line">            //创建表连接  </div><div class="line">            HTable table=new HTable(conf, tableName);  </div><div class="line">            //获取全表扫描  </div><div class="line">            ResultScanner resultScanner=table.getScanner(Bytes.toBytes(family));  </div><div class="line">            //对结果进行显示  </div><div class="line">            Iterator&lt;Result&gt; results=resultScanner.iterator();  </div><div class="line">            <span class="keyword">while</span>(results.hasNext())  </div><div class="line">            &#123;  </div><div class="line">                Result result=results.next();  </div><div class="line">                <span class="keyword">for</span>(KeyValue kv:result.raw())  </div><div class="line">                &#123;  </div><div class="line">                    System.out.println(Bytes.toString(kv.getRow()));  </div><div class="line">                    System.out.println(Bytes.toString(kv.getFamily()));  </div><div class="line">                    System.out.println(Bytes.toString(kv.getQualifier()));  </div><div class="line">                    System.out.println(Bytes.toString(kv.getValue()));  </div><div class="line">                &#125;  </div><div class="line">            &#125;  </div><div class="line">        &#125; catch (Exception e) &#123;  </div><div class="line">            // TODO: handle exception  </div><div class="line">            e.printStackTrace();  </div><div class="line">        &#125;  </div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p>getScanner()方法时，如果不输入指定的scan对象，则需要输入相应的列簇或者列。因此在不进行scan对象创建的扫描中，需要明确指出列簇或者列，如果需要扫描多个列簇时，该方法就无法起到作用了。<br>2、进行初始化的全表扫描<br>初始化一个scan对象，然后对该对象进行相应的配置过，通过 getScanner(Scan scan) 函数进行全表扫描。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line">public void scanWithInit(String tableName)  </div><div class="line">    &#123;  </div><div class="line">        Configuration conf=init();  </div><div class="line">        try &#123;  </div><div class="line">            HBaseAdmin admin=new HBaseAdmin(conf);  </div><div class="line">            <span class="keyword">if</span>(!admin.tableExists(tableName))  </div><div class="line">            &#123;  </div><div class="line">                System.err.println(<span class="string">"the table "</span>+tableName+<span class="string">" is not exist"</span>);  </div><div class="line">                admin.close();  </div><div class="line">                System.exit(1);  </div><div class="line">            &#125;  </div><div class="line">            //创建扫描类  </div><div class="line">            Scan scan=new Scan();  </div><div class="line">            scan.setStartRow(Bytes.toBytes(<span class="string">"row-1"</span>));  </div><div class="line">            scan.setStopRow(Bytes.toBytes(<span class="string">"row-9"</span>));  </div><div class="line">            //创建表连接  </div><div class="line">            HTable table=new HTable(conf, tableName);  </div><div class="line">            ResultScanner rs=table.getScanner(scan);  </div><div class="line">            Result result;  </div><div class="line">            <span class="keyword">while</span>((result=rs.next())!=null)  </div><div class="line">            &#123;  </div><div class="line">                KeyValue[] kvs=result.raw();  </div><div class="line">                <span class="keyword">for</span>(KeyValue kv:kvs)  </div><div class="line">                &#123;  </div><div class="line">                    System.out.println(Bytes.toString(kv.getRow()));  </div><div class="line">                    System.out.println(Bytes.toString(kv.getFamily()));  </div><div class="line">                    System.out.println(Bytes.toString(kv.getQualifier()));  </div><div class="line">                    System.out.println(Bytes.toString(kv.getValue()));  </div><div class="line">                &#125;  </div><div class="line">            &#125;  </div><div class="line">            rs.close();  </div><div class="line">            table.close();  </div><div class="line">        &#125; catch (Exception e) &#123;  </div><div class="line">            // TODO: handle exception  </div><div class="line">            e.printStackTrace();  </div><div class="line">        &#125;  </div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p>在上段代码中，使用了setStartRow() 与 setStopRow() 两个函数进行调优。Scan有多个函数可以进行对全表扫描做出相应的规范。<br>3、数据遍历与显示ScannerResult<br>通过上述两种方法可以发送对一张表是遍历请求，当发送后，服务器会相应的启动全表扫面程序，从而准备向客户端返回相应的数据。因此根据客户端的遍历需要对数据尽心请求，然后将请求的结果进行返回，客户端拿到后进行展示<br>（1）next()的单行返回数据的方法<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">ResultScanner rs=table.getScanner(Bytes.toBytes(family));  </div><div class="line">//进项单行获取演示  </div><div class="line">Result result=null;  </div><div class="line"><span class="keyword">while</span>((result=rs.next())!=null)  </div><div class="line">&#123;  </div><div class="line">    KeyValue[] kvs=result.raw();  </div><div class="line">    <span class="keyword">for</span>(KeyValue kv:kvs)  </div><div class="line">    &#123;  </div><div class="line">        System.out.println(Bytes.toString(kv.getRow()));  </div><div class="line">        System.out.println(Bytes.toString(kv.getFamily()));  </div><div class="line">        System.out.println(Bytes.toString(kv.getQualifier()));  </div><div class="line">        System.out.println(Bytes.toString(kv.getValue()));  </div><div class="line">    &#125;  </div><div class="line">&#125;  </div><div class="line">rs.close();</div></pre></td></tr></table></figure></p>
+<p>next()方法会默认想客户端请求发送一行数据请求，刚服务器端的scan程序接收到请求后会将经需要返回的数据封装成一个result对象返回给客户端，因此客户端可以通过result对象去接受该行数据。接收到的数据则跟Get中的result使用方法是相同的。<br>（2）next(int n)的多行返回数据的方法<br>next(int n)：该函数会向服务器发送多个请求，以返回多条数据请求。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">//一次获取多个结果（行数据）进行展示  </div><div class="line">            rs=table.getScanner(Bytes.toBytes(family));  </div><div class="line">            Result[] results=null;  </div><div class="line">            <span class="keyword">while</span>((results=rs.next(2))!=null)  </div><div class="line">            &#123;  </div><div class="line">                <span class="keyword">for</span>(Result r:results)  </div><div class="line">                &#123;  </div><div class="line">                    KeyValue[] kvs=r.raw();  </div><div class="line">                    <span class="keyword">for</span>(KeyValue kv:kvs)  </div><div class="line">                    &#123;  </div><div class="line">                        System.out.println(Bytes.toString(kv.getRow()));  </div><div class="line">                        System.out.println(Bytes.toString(kv.getFamily()));  </div><div class="line">                        System.out.println(Bytes.toString(kv.getQualifier()));  </div><div class="line">                        System.out.println(Bytes.toString(kv.getValue()));  </div><div class="line">                    &#125;  </div><div class="line">                &#125;  </div><div class="line">            &#125;  </div><div class="line">            rs.close();</div></pre></td></tr></table></figure></p>
+<p>next(int n)函数返回的是一个result数组。用户接受到数据后可以进行相应的操作。<br>（3）迭代器遍历<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">//进行迭代的方式进行输出  </div><div class="line">            rs=table.getScanner(Bytes.toBytes(family));  </div><div class="line">            Iterator&lt;Result&gt; resultIterator=rs.iterator();  </div><div class="line">            <span class="keyword">while</span>(resultIterator.hasNext())  </div><div class="line">            &#123;  </div><div class="line">                result=resultIterator.next();  </div><div class="line">                KeyValue[] kvs=result.raw();  </div><div class="line">                <span class="keyword">for</span>(KeyValue kv:kvs)  </div><div class="line">                &#123;  </div><div class="line">                    System.out.println(Bytes.toString(kv.getRow()));  </div><div class="line">                    System.out.println(Bytes.toString(kv.getFamily()));  </div><div class="line">                    System.out.println(Bytes.toString(kv.getQualifier()));  </div><div class="line">                    System.out.println(Bytes.toString(kv.getValue()));  </div><div class="line">                &#125;  </div><div class="line">            &#125;  </div><div class="line">            //关闭表  </div><div class="line">            rs.close();</div></pre></td></tr></table></figure></p>
+<p>（4）注意点<br>因为当用户发送一个scan全表扫描后，region服务器会为全表扫描创建扫描资源，因此长时间启用全表扫描的话会占用region服务器的大量资源，所以在要求在使用完scanner扫描器后尽快释放掉资源。<br>rs.close() 会告知服务其扫描器租约已经结束，服务器就会释相应的全局扫描的资源。<br>三、Scan对象<br>（1）setStartRow() / setStopRow<br>设置扫描的开始行与结束行，通过这两个可以直接确scan在扫描的范围，通过缩小范围可以减少扫描到时间，从而提高扫描的效率<br>（2）addFamily() / addColumn()<br>通过这两个函数，可以在列或者列簇上的扫描位置。HBase是面向lie出书的数据库，而同一个列簇的数据全部存放在同一个位置文件中。因此如果可以确定扫描那个一列簇时，可以减少扫描的范围，从而缩短扫描的时间。而在确定到某一个列时也会因为HBase的面向列存储使得其效率提高。<br>（3）setMaxVersion() / setMaxVersion(int version)<br>设置返回的版本数量，默认为返回最新的数据。第一个函数则会返回所有的版本数据，第二个函数可以设置返回的版本数量<br>（4）setTimeStamp(long max)<br>返回该时间戳的数据<br>（5）setTimeRange(long min,long max)<br>设定返回的时间戳的范围，只有版本值在该范围之内的数据才会被返回到客户端<br>（6）setFilter(Filter f)<br>设置过滤器，有时候扫描全表返回的数量过大时，可以通过过滤器将不符合的数据进行过滤，这样可以减少从服务器到客户端的数据传送，挺高扫描效率。<br>（7）setCacheBlocks(boole open)<br>在进行全表扫描过程中，服务器端提供了一个缓存区，该缓存区可以将指定的数据量全部放入到内存中，这样可以提高读取效率。缓存区的打开也可以通过htable客户端进行打开。在开发后用户可以通过 setCache(int n)的方式设置每次缓存的数量为多少。通过调整该函数以提高读取的效率。<br>四、总结<br>scan的全表扫描区别于其他三个操作，虽然获取数据与Get获取的数据是相同的，其与Get也具有形似的属性，可以通过修改这些属性去对数据获取进行调优，从而使得提高数据获取的效率。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/01/hbase简介/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="李睿">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/11/01/hbase简介/" itemprop="url">hbase简介(第一章)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-01T09:38:49+08:00">
+                2017-11-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/hbase/" itemprop="url" rel="index">
+                    <span itemprop="name">hbase</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="海量数据的黎明"><a href="#海量数据的黎明" class="headerlink" title="海量数据的黎明"></a>海量数据的黎明</h2><p>hadoop项目有两个模块：HDFS和MapReduce。Hadoop擅长存储任意的、半结构化数据，可以帮助用户分析数据时决定如何解释这些数据，同时允许用户随时更改数据分类的方式；一旦用户更新了算法，只需要重新分析数据。Hadoop是现有数据库的一个补充，提供了数据存储无限的空间，并且针对大文件存储、批量访问和流式访问做了优化。<br>列式存储数据库，以列为单位聚合数据，然后将列值顺序存入磁盘，而行式数据库则是连续存储整行。<br>1.优点是：查询时只有涉及到的列会被读取；投影(projection)很高效；任何列都能作为索引。缺点：选择完成时，被选择的列要重新组装；INSERT/UPDATE比较麻烦。<br>2.更好的进行数据压缩：通过字典表压缩数据。经过字典表进行数据压缩后，表中的字符串才都变成数字了，比如我们的材料名可以用一张材料表，这样子在列存储就可以根据id来关联材料。<br>3.查询性能<br>我们能根据列查询结果通过为运算（&amp;或者|）进行结果合并，加快速度<br>关键步骤如下：<br>1.去字典表里找到字符串对应数字(只进行一次字符串比较)。<br>2.用数字去列表里匹配，匹配上的位置设为1。<br>3.把不同列的匹配结果进行位运算得到符合所有条件的记录下标。<br>4.使用这个下标组装出最终的结果集。<br>Hbase以列式存储的格式存储数据，传统的列式存储比较适合实时存储数据的场景，Hbase比较适合键值对的数据存取或者有序的数据存取。</p>
+<h2 id="关系数据库系统的问题"><a href="#关系数据库系统的问题" class="headerlink" title="关系数据库系统的问题"></a>关系数据库系统的问题</h2><p>数据量大时，索引量也大到足以让数据库的性能直线下降。最后能够提供的查询也只剩下主键查询，最后的采取的方案就是数据分区，也就是分库分表。</p>
+<h2 id="非关系型数据库系统"><a href="#非关系型数据库系统" class="headerlink" title="非关系型数据库系统"></a>非关系型数据库系统</h2><h3 id="维度"><a href="#维度" class="headerlink" title="维度"></a>维度</h3><p>包括数据模型、存储模型、一致性模型、物理模型、读写性能、辅助索引、故障处理、压缩、负载均衡、原子操作的读修改写、加锁等待死锁</p>
+<h3 id="可扩展性"><a href="#可扩展性" class="headerlink" title="可扩展性"></a>可扩展性</h3><h3 id="数据库的范式和反范式"><a href="#数据库的范式和反范式" class="headerlink" title="数据库的范式和反范式"></a>数据库的范式和反范式</h3><h2 id="Hbase结构"><a href="#Hbase结构" class="headerlink" title="Hbase结构"></a>Hbase结构</h2><h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><h3 id="表、行、列和单元格"><a href="#表、行、列和单元格" class="headerlink" title="表、行、列和单元格"></a>表、行、列和单元格</h3><p>最基本的单位是列，一列或者多列构成一行，并由唯一的行健来确定存储。反过来，一个表中有若干行，其中每列可能有多个版本，在每个单元格中存储了不同值。行序是按照字典顺序进行排序的，意思是从左到右一次对比每一个键。关于排序：排列顺序如果跟预期的不一样，需要补键，比如  row-1 永远小于 row-2，无论后面是什么，将始终按照这个顺序排列。行健总是唯一的，否则你就是在更新同一行。行健可以是任意的字节数组，但它不一定是人直接可读。<br>一行由若干列组成，若干列构成一个列族，有助于构建语义边界，还有助于给他们设置某些特性（压缩），或者指示他们存储在内存中。一个列族所有列存储在HFile。<br>常用的引用列的格式为family：qualifier，qualifier是任意字节数组。一个列族没有列的数量限制，可以有数百万列。列值没有类型和长度的限制。NUll值在Hbase不占任何空间。<br>每一列的值或者单元格都有时间戳，不同时间戳区分不同的版本值，同一个单元格的不同版本值按照时间戳降序排序，访问时候优先读取最新的值。这样优化使得新值比老值更容易读到。用户可以指定每个值能保存的最大版本数，此外还支持谓词删除（LSM树）。<br>Hbase是一个稀疏的、分布式的、持久化的、多维的映射、由行健列键和时间戳索引。数据存储模式：(Table,RowKey,Family,Column,TimeStamp)-&gt;value</p>
+<h3 id="自动分区"><a href="#自动分区" class="headerlink" title="自动分区"></a>自动分区</h3><p>Hbase中扩展和负载均衡的基本单元是region，region本质是以行键排序的连续存储的区间。如果region太大，系统会动态拆分，相反会合并region，减少存储文件数量。<br>一张表初始化只有一个region，用户不断插入数据，当数据量超过配置的最大值，会在中间键处将这个region拆分成两个大致相等的region。每一个region只能由一台regionServer加载，而一台RegionServer可以同时加载多个region。（每台regionServer1加载的最佳数量是10~1000，每个region最佳大小是1GB~2GB）。当某个region服务器由于负载过大等原因导致不可用时，系统会将该region转到其他服务器上。</p>
+<h3 id="存储API"><a href="#存储API" class="headerlink" title="存储API"></a>存储API</h3><p>API提供了建表、删表、增加列族、删除列族、修改表、修改列族元数据（压缩，设置块大小）、行键值的增加，删除，查找<br>scan可以限定返回的列或者返回的版本数，可以设置过滤器。系统支持单行事务，进一步实现单行键下存储的数据的 读-修改-写（read-modify-write）序列。单元格的值可以当计数器用，并且支持原子更新，意味着这个计数器可以在一个操作中实现读写，客户端可以基于此实现一个全局强一致的计数器。协处理器(coprocessor): 可以在服务器的地址空间执行来自客户端的代码。用于实现轻量级的批处理作业，或者使用表达式分析或者汇总数据。通过包装器可以将表转换成MapReduce的输入输出目标</p>
+<h3 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h3><p>数据存储在存储文件中，称为HFile，HFile存储的是经过排序的键值映射结构。文件内部由连续的块组成，块的索引信息放在尾部，当打开HFile并加载在内存中，索引信息会优先加载到内存中，每个块的大小为64k。每个HFile都有一个块索引，通过一个磁盘查询就可以实现查询，存储文件写在HDFS中。每次更新数据，都会将数据记录在提交日志中，然后在将数据写入内存memstore,一旦内存超过一定的大小，就会移除内存，作为HFile写入磁盘。移除内存后，就会丢弃提交日志，只保留未持久化的提交日志。数据移出memstore，丢弃提交日志。采用滚动memstore可以实现不阻塞系统读写，即用空的新memstore获取更新数据，将旧的满的memstore转换成一个文件，由于memstore中的数据本来就排序好了，所以存储的时候不用再次排序。删除是在做个删除标记，让客户端无法读取到值。<br>HFile过多的时候有管家机制来处理，合并有两种类型：<br>minor合并：多个小文件合并成一个大文件，由于是多路归并所以速度快<br>major压缩合并：将region中一个列族的若干个HFile重写为一个新HFile。合并扫描所有键值对，顺序重写所有数据，重写数据的过程中会略过做了删除标记的数据。断言删除此时生效。<br>master 负责负载均衡，将繁忙服务器中的region移到负载轻的服务器中。还提供元数据的管理，例如创建表和创建列族。<br>region服务器负责为他们提供的Region提供读写功能<br>数十亿行<em>数百万列</em>数千个版本=TB级别或者PB级别的存储</p>
+<h2 id="Hbase：Hadoop数据库"><a href="#Hbase：Hadoop数据库" class="headerlink" title="Hbase：Hadoop数据库"></a>Hbase：Hadoop数据库</h2><h3 id="命名"><a href="#命名" class="headerlink" title="命名"></a>命名</h3><h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>Hbase是一个分布式的、持久性的、强一致性的存储系统，具有近似最优的写性能和出色的读性能。它充分利用磁盘空间，支持特定列族切换可选压缩算法。Hbase支持行原子性</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/31/elasticSearch初步了解/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="李睿">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/10/31/elasticSearch初步了解/" itemprop="url">elasticSearch入门</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-31T23:10:46+08:00">
+                2017-10-31
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/elasticSearch/" itemprop="url" rel="index">
+                    <span itemprop="name">elasticSearch</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="elasticSearch简介"><a href="#elasticSearch简介" class="headerlink" title="elasticSearch简介"></a>elasticSearch简介</h2><p>1.基于Apache Lucene构建的开源搜索引擎<br>2.基于java编写，提供简单易用的Resful API<br>3.轻松的横向扩展，可支持PB级别的结构化和非结构化的数据处理</p>
+<h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><p>1.海量数据分析引擎<br>2.站内搜索引擎<br>3.数据仓库<br>备注应用：github站内搜索、维基百科、百度实时日志监控</p>
+<h2 id="版本问题"><a href="#版本问题" class="headerlink" title="版本问题"></a>版本问题</h2><p>版本历史 1.x-&gt;2.x-&gt;5.x</p>
+<h2 id="安装head插件"><a href="#安装head插件" class="headerlink" title="安装head插件"></a>安装head插件</h2><p>安装elasticsearch-head,github地址：<a href="https://github.com/mobz/elasticsearch-head.git，然后进行npm" target="_blank" rel="external">https://github.com/mobz/elasticsearch-head.git，然后进行npm</a> install，在启动head插件（npm run start），<a href="http://localhost:9100。" target="_blank" rel="external">http://localhost:9100。</a><br>同时更改elasticsearch.yml，新增以下内容支持跨域<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">http.cors.enabled: <span class="literal">true</span></div><div class="line">http.cors.allow-origin: <span class="string">"*"</span></div></pre></td></tr></table></figure></p>
+<h2 id="集群的搭建"><a href="#集群的搭建" class="headerlink" title="集群的搭建"></a>集群的搭建</h2><p>举个例子，三个节点<br>master节点配置如下，在elasticsearch.yml修改<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">cluster.name: lili</div><div class="line">node.name: master</div><div class="line">node.master: <span class="literal">true</span></div><div class="line">network.host: 127.0.0.1</div></pre></td></tr></table></figure></p>
+<p>slave节点的配置如下，在elasticsearch.yml修改<br>master节点配置如下，在elasticsearch.yml修改<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">cluster.name: lili</div><div class="line">node.name: slave1</div><div class="line">network.host: 127.0.0.1</div><div class="line">http.port: 8200</div><div class="line">discovery.zen.ping.unicast.hosts: [<span class="string">"127.0.0.1"</span>]</div></pre></td></tr></table></figure></p>
+<h2 id="集群和节点"><a href="#集群和节点" class="headerlink" title="集群和节点"></a>集群和节点</h2><p>集群有节点组成，每个集群有唯一的名字。 一个节点只是集群的一部分，节点通过集群名字加入集群</p>
+<ul>
+<li>索引(database)<br>含有相同属性的文档集合</li>
+<li>类型(table)<br>索引可以定义一个或者多个类型，文档必须属于一个类型</li>
+<li>文档(row)<br>文档是可以被索引的基本数据单位</li>
+<li>分片<br>每个索引都有多个分片，每个分片是lucene索引</li>
+<li>备份<br>拷贝一份分片就完成了分片的备份<br>备注：es默认五个分片一个备份<h2 id="es的基本用法"><a href="#es的基本用法" class="headerlink" title="es的基本用法"></a>es的基本用法</h2></li>
+<li>api的基本格式：http://<ip>:<port>/&lt;索引&gt;/&lt;类型&gt;/&lt;文档id&gt;</port></ip></li>
+<li>常用的动词有：GET/PUT/POST/DELETE<h3 id="创建索引"><a href="#创建索引" class="headerlink" title="创建索引"></a>创建索引</h3>在head插件创建索引<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">//localhost:9200:book put请求</div><div class="line">&#123;</div><div class="line">  <span class="string">"novel"</span>: &#123;</div><div class="line">    <span class="string">"properties"</span>: &#123;</div><div class="line">      <span class="string">"title"</span>: &#123;</div><div class="line">        <span class="string">"type"</span>: <span class="string">"text"</span></div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>使用postman插件，可视化插件<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">//localhost:9200:people put请求</div><div class="line">&#123;</div><div class="line">	<span class="string">"settings"</span>:&#123;</div><div class="line">		<span class="string">"number_of_shards"</span>:3,</div><div class="line">		<span class="string">"number_of_replicas"</span>:1</div><div class="line">	&#125;,</div><div class="line">	<span class="string">"mappings"</span>:&#123;</div><div class="line">		<span class="string">"man"</span>:&#123;</div><div class="line">			<span class="string">"properties"</span>:&#123;</div><div class="line">				<span class="string">"name"</span>:&#123;</div><div class="line">					<span class="string">"type"</span>:<span class="string">"text"</span></div><div class="line">				&#125;,</div><div class="line">			    <span class="string">"country"</span>:&#123;</div><div class="line">			    	<span class="string">"type"</span>:<span class="string">"keyword"</span></div><div class="line">			    &#125;,</div><div class="line">			    <span class="string">"age"</span>:&#123;</div><div class="line">			    	<span class="string">"type"</span>:<span class="string">"integer"</span></div><div class="line">			    &#125;,</div><div class="line">			    <span class="string">"date"</span>:&#123;</div><div class="line">			    	<span class="string">"type"</span>:<span class="string">"date"</span>,</div><div class="line">			    	<span class="string">"format"</span>:<span class="string">"yyyy-MM-dd HH:mm:ss"</span></div><div class="line">			    &#125;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="插入索引"><a href="#插入索引" class="headerlink" title="插入索引"></a>插入索引</h3><ul>
+<li><p>指定文档id插入</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">//127.0.0.1:9200/people/man/1 Put请求</div><div class="line">&#123;</div><div class="line">	<span class="string">"name"</span>:<span class="string">"lirui"</span>,</div><div class="line">	<span class="string">"country"</span>: <span class="string">"china"</span>,</div><div class="line">	<span class="string">"age"</span>: 24,</div><div class="line">	<span class="string">"date"</span>: <span class="string">"2000-09-01 11:00:23"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>自动产生文档id插入</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">//127.0.0.1:9200/people/man POST请求</div><div class="line">&#123;</div><div class="line">	<span class="string">"name"</span>:<span class="string">"李睿"</span>,</div><div class="line">	<span class="string">"country"</span>: <span class="string">"china"</span>,</div><div class="line">	<span class="string">"age"</span>: 25,</div><div class="line">	<span class="string">"date"</span>: <span class="string">"2000-06-01 11:00:23"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="修改文档"><a href="#修改文档" class="headerlink" title="修改文档"></a>修改文档</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">//127.0.0.1:9200/people/man/1/_update POST请求</div><div class="line">  &#123;</div><div class="line">  	<span class="string">"doc"</span>:&#123;</div><div class="line">       <span class="string">"name"</span>:<span class="string">"kobe_brant"</span></div><div class="line">    &#125;</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<h3 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h3><h4 id="删除文档"><a href="#删除文档" class="headerlink" title="删除文档"></a>删除文档</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">//127.0.0.1:9200/people/man/1/ DELETE请求</div></pre></td></tr></table></figure>
+<h4 id="删除索引"><a href="#删除索引" class="headerlink" title="删除索引"></a>删除索引</h4><p>使用head插件删除索引或者<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">//127.0.0.1:9200/people/ DELETE请求</div></pre></td></tr></table></figure></p>
+<h3 id="查询文档"><a href="#查询文档" class="headerlink" title="查询文档"></a>查询文档</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">//127.0.0.1:9200/people/_search POST</div><div class="line">//查询全部</div><div class="line">&#123;</div><div class="line">  <span class="string">"query"</span>:&#123;</div><div class="line">    <span class="string">"match_all"</span>:&#123;&#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line">//针对查询</div><div class="line">&#123;</div><div class="line">  <span class="string">"query"</span>:&#123;</div><div class="line">    <span class="string">"match"</span>:&#123;<span class="string">"name"</span>:<span class="string">"kobe"</span>&#125;</div><div class="line">  &#125;,</div><div class="line">  <span class="string">"sort"</span>:[</div><div class="line">    	   &#123;</div><div class="line">    	   	<span class="string">"date"</span>:&#123;</div><div class="line">    	   	  <span class="string">"order"</span>:<span class="string">"desc"</span></div><div class="line">    	   &#125;</div><div class="line">    	   &#125;</div><div class="line">    	]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="聚合函数"><a href="#聚合函数" class="headerlink" title="聚合函数"></a>聚合函数</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">	<span class="string">"aggs"</span>:&#123;</div><div class="line">		<span class="string">"group_by_name"</span>:&#123;</div><div class="line">			<span class="string">"terms"</span>:&#123;</div><div class="line">				<span class="string">"field"</span>:<span class="string">"country"</span></div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="高级查询"><a href="#高级查询" class="headerlink" title="高级查询"></a>高级查询</h3><ul>
+<li>子条件查询<br>特定字段查询所指的特定值<h4 id="query-context"><a href="#query-context" class="headerlink" title="query context"></a>query context</h4>查询过程中，除了判断文档是否满足条件外，es会计算一个_sore来标识匹配程度<br>分为全文本查询（文本类型数据）和字段级别查询（结构化数据如数字、日期）<h4 id="filter-context"><a href="#filter-context" class="headerlink" title="filter context"></a>filter context</h4>在查询时只需要判断文档是否满足条件，只有Yes或者No。</li>
+<li>复合条件查询<br>以一定逻辑组合子条件查询<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  <span class="string">"query"</span>:&#123;</div><div class="line">    <span class="string">"bool"</span>:&#123;</div><div class="line">      <span class="string">"should"</span>:[&#123;</div><div class="line">         <span class="string">"match"</span>:&#123;</div><div class="line">           <span class="string">"author"</span>:<span class="string">"瓦力"</span></div><div class="line">         &#125;</div><div class="line">       &#125;,</div><div class="line">       &#123;</div><div class="line">          <span class="string">"match"</span>:&#123;</div><div class="line">            <span class="string">"title"</span>:<span class="string">"瓦力"</span></div><div class="line">          &#125;</div><div class="line">        &#125;</div><div class="line">      ],</div><div class="line">    <span class="string">"filter"</span>:[</div><div class="line">      &#123;</div><div class="line">        <span class="string">"term"</span>:&#123;</div><div class="line">          <span class="string">"word_count"</span>:1000</div><div class="line">        &#125;</div><div class="line">      &#125;</div><div class="line">    ]</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/29/构建大型网站的其他要素/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1379,450 +1835,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/16/大型网站系统与中间件实践读书笔记/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="李睿">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/10/16/大型网站系统与中间件实践读书笔记/" itemprop="url">分布式系统介绍（第一章）</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-16T11:22:37+08:00">
-                2017-10-16
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/大型网站中间件/" itemprop="url" rel="index">
-                    <span itemprop="name">大型网站中间件</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="分布式系统的定义"><a href="#分布式系统的定义" class="headerlink" title="分布式系统的定义"></a>分布式系统的定义</h2><p>1.组件分布在网络计算机上；<br>2.组件之间仅仅通过消息传递来通信并协调行动</p>
-<h2 id="分布式系统的意义"><a href="#分布式系统的意义" class="headerlink" title="分布式系统的意义"></a>分布式系统的意义</h2><p>1.升级单机处理能力的性价比越来越低<br>2.单机处理能力存在瓶颈<br>3.出于稳定性和可用性的考虑</p>
-<h2 id="线程和进程的执行模式"><a href="#线程和进程的执行模式" class="headerlink" title="线程和进程的执行模式"></a>线程和进程的执行模式</h2><h3 id="阿姆达尔定律"><a href="#阿姆达尔定律" class="headerlink" title="阿姆达尔定律"></a>阿姆达尔定律</h3><p>s(N)=1/(1-p+p/n);n代表核数，p代表并行部分在单核占的时间</p>
-<h3 id="互不通信的多线程模式"><a href="#互不通信的多线程模式" class="headerlink" title="互不通信的多线程模式"></a>互不通信的多线程模式</h3><p>线程之间不需要处理共享的数据，也不需要进行动作协调，没有交集，各自执行自己的逻辑和任务。</p>
-<h3 id="基于共享容器协同的多线程模式"><a href="#基于共享容器协同的多线程模式" class="headerlink" title="基于共享容器协同的多线程模式"></a>基于共享容器协同的多线程模式</h3><p>多个线程之间对共享数据进行处理。例如经典的有生产者和消费者，我们有个队列用于生产和消费，这个队列就是共享的对象，多个线程会并发的访问这个队列。对于存储数据的容器或者对象，有线程安全和线程不安全之分。对于线程不安全的容器或者对象，一般通过加锁或者copy on write的方式来处理（CopyOnWrite容器即写时复制的容器。通俗的理解是当我们往一个容器添加元素的时候，不直接往当前容器添加，而是先将当前容器进行Copy，复制出一个新的容器，然后新的容器里添加元素，添加完元素之后，再将原容器的引用指向新的容器。这样做的好处是我们可以对CopyOnWrite容器进行并发的读，而不需要加锁，因为当前容器不会添加任何元素。所以CopyOnWrite容器也是一种读写分离的思想，读和写不同的容器。CopyOnWriteArrayList、CopyOnWriteArraySet。问题：内存占有问题:很明显，两个数组同时驻扎在内存中，如果实际应用中，数据比较多，而且比较大的情况下，占用内存会比较大，针对这个其实可以用ConcurrentHashMap来代替。数据一致性:CopyOnWrite容器只能保证数据的最终一致性，不能保证数据的实时一致性。所以如果你希望写入的的数据，马上能读到，请不要使用CopyOnWrite容器）</p>
-<h3 id="基于事件协同的多线程模式"><a href="#基于事件协同的多线程模式" class="headerlink" title="基于事件协同的多线程模式"></a>基于事件协同的多线程模式</h3><p>除了并发访问，线程之间会存在着协调的需求。例如线程B需要等到某个状态或者事件的发生后才能继续自己的工作。能够原子性的获取多个锁或者调整锁的顺序可以避免死锁。比如T1：A.lock();B.lock(); T2:B.lock();A.lock();这时候就发生死锁了。</p>
-<h3 id="多进程模式"><a href="#多进程模式" class="headerlink" title="多进程模式"></a>多进程模式</h3><p>多线程和多进程不同在于线程是属于进程，一个进程内的多个线程共享了进程的内存空间；多个进程的内存空间是独立的。多进程可以共享数据，但代价比多线程大，会涉及到序列化和反序列化的开销。分布式系统是多机系统，可以看成是多机多进程。</p>
-<h2 id="网络通信基础知识"><a href="#网络通信基础知识" class="headerlink" title="网络通信基础知识"></a>网络通信基础知识</h2><h3 id="osi和tcp-ip网络模型"><a href="#osi和tcp-ip网络模型" class="headerlink" title="osi和tcp/ip网络模型"></a>osi和tcp/ip网络模型</h3><p>osi是七层 物理层 数据链路层 网络层 运输层 会话层 展示层 应用层<br>tco/ip是四层 网络接口 网络层 运输层 应用层</p>
-<h3 id="网络io的实现"><a href="#网络io的实现" class="headerlink" title="网络io的实现"></a>网络io的实现</h3><h4 id="BIO的方式"><a href="#BIO的方式" class="headerlink" title="BIO的方式"></a>BIO的方式</h4><p>Blocking IO，采用阻塞的方式去实现，也就是一个套接字需要使用一个线程处理。发生建立连接、读数据、写数据时都可能会发生阻塞。</p>
-<h4 id="NIO的方式"><a href="#NIO的方式" class="headerlink" title="NIO的方式"></a>NIO的方式</h4><p>NonBlocking IO，基于事件驱动思想。相比较BIO，NIO不需要为每一个套接字分配一个线程，而可以在一个线程中处理多个套接字工作。reactor模式下，Reactor会管理所有的handler，并且把出现的事件交给相应的handler去处理。在NIO中统一通过reactor对所有客户端的套接字的事件做处理，然后在派发到不同的线程。这样解决了为了支撑更多套接字而打开更多线程的问题。</p>
-<h4 id="AIO的方式"><a href="#AIO的方式" class="headerlink" title="AIO的方式"></a>AIO的方式</h4><p>Asynchronous IO（异步IO），AIO采用Proactor模式，AIO在进行读/写操作时，只需要调用对应的read/write方法，并且传入completionHandler；在动作完成后，会调用completionHandler。NIO的通知是发生在动作之前，是在可读可写，selector发现这些事件调用handler来处理。</p>
-<h2 id="如何把应用从单机扩展到分布式"><a href="#如何把应用从单机扩展到分布式" class="headerlink" title="如何把应用从单机扩展到分布式"></a>如何把应用从单机扩展到分布式</h2><h3 id="输入设备的变化"><a href="#输入设备的变化" class="headerlink" title="输入设备的变化"></a>输入设备的变化</h3><p>两种：一种是互相连接的多个节点，接受其他节点信息的节点；一种是人机交互的输入设备</p>
-<h3 id="输出设备的变化"><a href="#输出设备的变化" class="headerlink" title="输出设备的变化"></a>输出设备的变化</h3><p>两种：向其他节点传递信息的节点；人机交互的输出设备</p>
-<h3 id="控制器的变化"><a href="#控制器的变化" class="headerlink" title="控制器的变化"></a>控制器的变化</h3><p>在单机中，控制器就是cpu，在分布式中，控制器就是协调和控制节点之间的动作和行为。</p>
-<h4 id="硬件负载均衡"><a href="#硬件负载均衡" class="headerlink" title="硬件负载均衡"></a>硬件负载均衡</h4><p>请求发起方需要确定谁来处理这个请求，请求发起方和请求处理方中间有一个硬件负载均衡设备，所有的请求都要经过这个负载均衡设备来完成请求转发的控制。</p>
-<h4 id="透明代理"><a href="#透明代理" class="headerlink" title="透明代理"></a>透明代理</h4><p>把硬件负载均衡器换为LVS；特点：代价低，可控性强，你可以相对自由地按照自己的需要去增加负载均衡策略。在集群中，对于发起请求的一方和处理请求的一方来说都是透明的。发送请求的一方会认为中间代理提供了服务，而处理请求的一方会认为中间代理请求服务。发起方不需要知道有几台机器提供服务，也不需要知道提供服务的地址，只需要知道中间代理的地址。有两个不足：第一个是增加网络的开销，一方面指的是流量，一方面指的是延迟。第二个是这个透明代理在请求的必经路径上，如果这个代理出现问题，那么所有请求都会出现问题。所以要考虑热备份</p>
-<h4 id="名称服务"><a href="#名称服务" class="headerlink" title="名称服务"></a>名称服务</h4><p>与透明服务最大的区别是，请求发起方和请求处理方两个集群间没有代理服务器这样的设备存在，而是请求方和处理方直接相连。除此之外，有一个名称服务的角色，主要作用有两个，收集请求服务处理的服务器的地址信息，和提供这些地址信息给请求发起方。名称服务只是起到地址交换的作用，在发起请求的机器上，需要根据从名称服务得到的地址进行负载均衡的工作。这种方案的优势是名称服务不在请求的必经路径上，就是说如果这个名称服务出现问题，很多时候我们有不少办法保证请求处理的正常。其次，发起请求的一方和处理请求的一方是直连的，减少了中间路径，以及可能的额外带宽消耗。劣势是升级代码复杂。</p>
-<h4 id="规则服务器"><a href="#规则服务器" class="headerlink" title="规则服务器"></a>规则服务器</h4><p>请求发起方根据规则服务器给的规则选择请求处理方，在请求发起的机器上，会有对规则进行处理从而进行请求处理服务机器的选择代码。与名称服务不同的是，规则服务器不和请求处理机器进行交互，只负责把规则提供给请求发起方。</p>
-<h4 id="master-worker"><a href="#master-worker" class="headerlink" title="master+worker"></a>master+worker</h4><p>存在一个master节点管理任务，由master分配给不同的woker去进行处理。</p>
-<h3 id="运算器的变化"><a href="#运算器的变化" class="headerlink" title="运算器的变化"></a>运算器的变化</h3><p>单机中，运算器就是具体的电子元件，而多机中，运算器由多个节点组成，分布式的运算器是运用多个节点的计算能力来协同完成整体的计算任务。</p>
-<h4 id="单台服务器"><a href="#单台服务器" class="headerlink" title="单台服务器"></a>单台服务器</h4><h4 id="多台服务器"><a href="#多台服务器" class="headerlink" title="多台服务器"></a>多台服务器</h4><p>方案一：通过DNS服务器进行调度控制，在用户解析dns时候，就会给予一个服务器地址。有点像名称服务和规则服务，中间没有代理。<br>方案二：在用户和服务器之间架起了负载均衡设备（硬件或者软件LVS）。DNS返回的是负载均衡的地址，用户的访问都是通过负载均衡器到达后面的网站服务器。</p>
-<h4 id="日志的处理"><a href="#日志的处理" class="headerlink" title="日志的处理"></a>日志的处理</h4><p>增加日志的处理服务器的数量来提升处理日志的能力。一种方案是利用 master+worker方式的控制器运用到这个日志处理的场景。除了master以外，还可以用规则服务器来分配问题。</p>
-<h4 id="存储器的变化"><a href="#存储器的变化" class="headerlink" title="存储器的变化"></a>存储器的变化</h4><p>存储器分为内存和外存，内存在断电、重启或者OS崩溃情况下会丢失，而外存是用来长久保存数据的。在分布式系统中，我们需要把承担存储功能的多个节点组织在一起，使之看起是一个存储器。以最基础的key-value为例。</p>
-<h4 id="单机的key-value"><a href="#单机的key-value" class="headerlink" title="单机的key-value"></a>单机的key-value</h4><h4 id="在应用服务器与key-value存储服务器之间加了一个代理服务器"><a href="#在应用服务器与key-value存储服务器之间加了一个代理服务器" class="headerlink" title="在应用服务器与key-value存储服务器之间加了一个代理服务器"></a>在应用服务器与key-value存储服务器之间加了一个代理服务器</h4><h4 id="名称服务的key-value服务"><a href="#名称服务的key-value服务" class="headerlink" title="名称服务的key-value服务"></a>名称服务的key-value服务</h4><h4 id="规则服务器的key-value服务"><a href="#规则服务器的key-value服务" class="headerlink" title="规则服务器的key-value服务"></a>规则服务器的key-value服务</h4><h4 id="master控制的key-value服务"><a href="#master控制的key-value服务" class="headerlink" title="master控制的key-value服务"></a>master控制的key-value服务</h4><h3 id="分布式系统的难点"><a href="#分布式系统的难点" class="headerlink" title="分布式系统的难点"></a>分布式系统的难点</h3><h4 id="缺乏全局时钟"><a href="#缺乏全局时钟" class="headerlink" title="缺乏全局时钟"></a>缺乏全局时钟</h4><p>单机的以单机的时钟为准控制时序。多机每个节点都有自己的时钟，如果依赖时序，将会难以处理。</p>
-<h4 id="面对故障的独立性"><a href="#面对故障的独立性" class="headerlink" title="面对故障的独立性"></a>面对故障的独立性</h4><p>在单机系统的单进程程序中，不会出现一些模块不行，一些模块正常。而在分布式系统中，整个系统一部分有问题而其他模块正常的情况是经常出现。我们称故障独立性。</p>
-<h4 id="处理单点故障"><a href="#处理单点故障" class="headerlink" title="处理单点故障"></a>处理单点故障</h4><p>在分布式系统中，如果某个角色或者功能只有单机在支撑，那么这个节点我们称之为单点。避免单点的关键就是把这个功能从单机实现变为集群实现。如果不能把单机实现变为集群实现，那一般还有另外两种选择：<br>1.给单点做好备份<br>2.降低单点故障的影响范围（比如，在交易网站中，交易信息放在一个数据库里，这就形成了单点，我们会给这个数据库增加一个备库以解决容灾问题。我们可以考虑拆分数据，把一份数据库拆分成多个数据库后，出现故障的影响面就更小了。从本质上说，这种方式更多是转移和交换）</p>
-<h4 id="分布式事务的挑战"><a href="#分布式事务的挑战" class="headerlink" title="分布式事务的挑战"></a>分布式事务的挑战</h4><p>2pc、3pc、最终一致、BASE、CAP、paxos算法</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/29/云取证第八周周报/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="李睿">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/29/云取证第八周周报/" itemprop="url">云取证第八周周报</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-29T19:54:42+08:00">
-                2017-06-29
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/云取证/" itemprop="url" rel="index">
-                    <span itemprop="name">云取证</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>本周主要阅读了云证据收集的一些文章。下面谈谈对这些论文的理解。<br>首先是Acquiring forensic evidence from infrastructure-as-a-service cloud。文章分这么个层次来阐述：1.创建一个模型来显示云中所需的信任层次。2.显示云测试的总体上下文；3.提供了包括Guidance EnCase和AccesData Forensic Toolkit在内的流行取证获取工具。<br>云计算使取证不同，特别是考虑到证据的远程性质，缺乏实体访问权限以及完整性和真实性所需的信任。虽然取证检查员的目标与以前相同，但非传统困难的问题包括：远程数据的取证知识获取，大量传播，分布式数据，监管链和数据所有权。检获和获取数字文物是取证进程的初步步骤。存在两种可能的情况：远程调查员可以从源头自己收集取证证据，或者提供者可以提供证据。每个场景需要对所返回数据的不同程度的信任。此外，每种情况都使用不同的技术实现来恢复数据。主要工作有亚马逊弹性计算云（EC2）在公共云中执行持续和非持久性数据收集的现有工具的三个实验结果。对于使用客户机操作系统的数据采集不够信任的情况，分析基础设施堆栈较低级别的取证方法。演示如何使用虚拟机内省来注入远程取证代理进行远程采集。用不受信任的管理程序探索取证数据采集的四个策略。<table><tr><td>Layer</td><td>Cloud layer</td><td>Acquisition method</td><td>Trust required</td></tr><br>    <tr><td>6</td><td>Guest application/data</td><td>Depends on data</td><td>Guest operating system (OS), hypervisor, host OS, hardware, network</td></tr>  <tr><td>5</td><td>Guest OS</td><td>Remote forensic software</td><td>Guest OS, hypervisor, host OS, hardware, network</td></tr><tr><td>4</td><td>Virtualization</td><td>Introspection</td><td>Hypervisor, host OS, hardware, network</td></tr><tr><td>3</td><td>Access virtual disk</td><td>Access virtual disk</td><td>Host OS, hardware, network</td></tr><tr><td>2</td><td>Physical hardware</td><td>Access physical disk</td><td>Hardware, network</td></tr><tr><td>1</td><td>Network</td><td>Packet capture </td><td>Network</td></tr></table><br>  在IaaS中，尽管没有物理访问，消费者仍保留对第5层（访客操作系统）和6（访客应用程序）的管理控制权。此外，各层次的取证行为将不同。每一层需要不同的信任，即该层是安全和信任的;堆栈越远，累积的信任就越少。在公共云中，所有层都需要提供商的一些信任，特别是对恶意内部人员的信任。防伪策略，病毒检测器应在多层次上检查证据。调查人员可以选择云层的哪一层进行取证处理。关于这一决定的考虑首先围绕在该级别进行取证的技术能力，再次对所返回数据的信任。该层还影响可用于收集的哪些类型的取证数据，例如第1层（网络）上的数据包捕获，第2层物理文件（物理硬件）或第3层（主机操作系统）上的虚拟文件。对于每种数据类型，数据必须遵守严格的监管链，并且必须包括完整性检查机制。云计算引入了一个强大的新选项：虚拟机快照。利用虚拟化的许多云实现可以拍摄正在运行的计算机的快照，然后像现在一样将该快照恢复并运行。这提供了创造历史记录的能力，以及事后做“活”取证。</p>
-<p>  接下来就是实验。能够远程获取aharddrive和内存映像。分析EnCase Forensic和FTK Investigator中的这些映像分别正确显示了活动的时间表，包括安装Apache和网页创建和删除。分析显示虚拟环境的异常现象，也没有任何明显的异议，引起对数据完整性的怀疑。采集过程的速度受到我们学习如何使用远程代理和网络带宽传输数据的限制。每个EnCase和FTK大约12小时，使用我们大学的OC-12连接传输30 GB磁盘映像和2 GB内存映像。实验2成功地形成了驱动器的完整图像和正确的时间线。 VM内省是取证学的强大工具，允许人的实时调查，而不会显露调查人员的存在。然而，内省是云服务提供商必须实施的一个特殊功能。这是我们能够验证图像完整性的唯一实验，因为我们可以访问物理磁盘，并且可以比较EnCase映像和原始磁盘的散列值。实验3中的AWS导出过程也成功地返回了驱动器的完整映像。我们能够将驱动器加载到EnCase和FTK中，没有任何困难，并验证了驱动器的内容。这种方法的另外一个好处是，AWS会为导出的每个文件生成一个具有元数据的日志报告。此报告包含以下每个文件：传输的日期和时间，存储设备上的位置，MD5校验和和字节数。使用快速运输，花了五天时间收到我们的数据，费用为125美元。我们设想这个过程将会严格地模仿AWS在遵守搜索令或传票时所采取的步骤。 EnCase和FTK最容易使用。尽管使用远程功能需要安装和学习时间，但工具的功能是熟悉且易于执行的。检索磁盘映像所需的12小时时间远远少于此数据卷的AWS导出过程所需的120小时。下载数据平均每小时2.5 GB。 AWSExport花了4小时加载了我们的数据，而剩下的116小时在运输过程中花费了时间。按照这些速率，最有效的选择是导出过程，当超过240 GB的数据将被检索。</p>
-<p>  A forensically robust method for acquisition of iCloud data主要讲一种方法，不仅使得下载数据到验证的计算机上然后验证数据的完整性，还可以定位到数据的来源。首先是采集云服务中存储的数据变得越来越重要数字取证调查。 苹果公司不断扩大其云端的功能服务，iCloud。 因此，确定取证获取的有效手段是至关重要的，来自该服务的数据的定义及其对原始文件数据和元数据的影响。本研究通过本机Mac OS X检查从iCloud服务获取的文件系统与服务同步。 目标是确定操作系统iCloud同步文件的位置。 一旦找到，次要目标是确定是否文件哈希值与原始文件匹配，特别是文件元数据时间戳，被改变。</p>
-<p>  研究人员使用不同的技术去获取数据。有两种技术是先是通过虚拟机创建镜像，然后用FTK工具去分析这些镜像。还有一种是根据AWS去导出数据。导出的还包括包括“日期和时间传输，存储设备上的位置，MD5校验和，和字节数“。如果哈希值相同则代表数据并未改变。接下来是实验，有两台虚拟机，第一台在整个过程进行快照拍摄，并且数据与云服务同步，第二台新创建的iCloud帐户。然后进行分析以定位iCloud 。下载的文件是与原始文件进行比较以确定文件是否相符<br>  和元数据是一样的，如果不是，初始化配置。</p>
-<p>  Side channels in cloud services, the case of deduplication in cloud storage云存储服务通常使用重复数据删除，通过仅存储每个文件或块的单个副本来消除冗余数据。重复数据删除减少了数据存储服务的空间和带宽需求，并且在跨多个用户应用时是最有效的，这是云存储产品的常见做法。我们研究跨用户重复数据删除的隐私含义。我们演示如何使用重复数据删除作为侧面通道，显示有关其他用户的文件内容的信息。在不同的情况下，重复数据删除可以用作隐藏通道，恶意软件可以通过该渠道与其控制中心进行通信，而不管受攻击机器上的任何防火墙设置如何。由于跨用户重复数据删除所带来的高额节省，云存储提供商不可能停止使用此技术。因此，我们提出了简单的机制，可以跨用户重复数据删除，同时大大降低数据泄露的风险。<br>  有两种主要的重复数据删除策略：（1）文件级重复数据删除，其中只存储每个文件的单个副本。如果两个或多个文件具有相同的哈希值，则它们将被标识为相同。这是一种非常受欢迎的多种产品提供的服务; （2）块级重复数据删除，将文件分割成块并仅存储每个块的单个副本。系统可以使用固定大小的块或可变大小的块。</p>
-<p>  我们描述的攻击可以应用于在文件级别或块级执行的重复数据删除（具体来说，我们假设从现在开始，在文件级别执行重复数据删除）。但是，重复数据删除服务有两个对攻击至关重要的功能：•基于源的重复数据删除。也就是说，重复数据消除必须在客户端进行。如上所述，此版本的重复数据删除功能节省了带宽，因此常用。应用此方法的结果是，客户端可以观察某个文件或块是否被重复数据删除（或简称为“重复数据删除”）。这可以通过检查通过网络传输的数据量，或通过观察存储软件的日志（如果该软件提供此类报告）来完成。 •对攻击至关重要的第二个功能是跨用户重复数据删除。也就是说，将每个文件或块与其他用户的数据进行比较，如果在服务器上已经可以使用相同的副本，则将其重新排除。这种方法是受欢迎的，因为它不仅在单个用户具有相同数据的多个副本时，而且当不同的用户存储数据的副本时，可以节省存储和带宽。 （企业客户端通常存储相同或相似数据的多个副本，我们发现即使对于私人客户也是如此：几乎每个常用的软件手册或我们试图使用流行备份服务进行备份的媒体文件都已经可以使用请注意，这些是巨大的文件，因此重复数据删除为服务提供商节省了巨大的成本。）识别易受攻击的存储提供商：我们进行了以下测试，以确定执行基于源和跨平台的服务，用户重复数据删除（测试可以由任何读者重复，他选择的存储服务）：（1）我们在两台不同的计算机上安装了该服务的客户端软件，并创建了两个不同的用户帐户; （2）我们使用一个帐号上传文件（在我们的测试中，这个文件是Sun的VirtualBox软件，大小接近73M）; （3）我们使用第二个帐号再次上传同一个文件，检查是否确实上传了。当文件没有通过网络重新发送时，我们得出结论，备份服务执行基于源的跨用户重复数据删除。 （事实上​​，当检查流行的存储服务时，不需要使用两个帐号，因为如上所述，在网络上发现的任何流行的文件很可能存在于服务器上，因为它以前是由其他用户上传的，因此测试可以包括从Web下载流行的文件，将其上传到服务并检查重复数据删除是否发生。）我们确定了三个领先的备份和文件同步提供程序的服务，它们执行跨用户，基于源的重复数据删除。这些服务是（1）DropBox，一种流行的文件共享和备份服务，超过了300万用户里程碑; 2 2）Mozy是面向消费者和企业的在线备份的领先提供商，为超过一百万客户和50,000名业务用户提供备份，并存储超过25 PB; 3和（3）备份审查作为欧洲最佳在线备份服务的Memopal，每天有近1000个新用户4值得注意的是，大多数供应商并不试图隐藏重复数据删除的事实，在我们的测试中容易地以几种简单的方式检测：（1）检查历史记录或日志文件（此方法与MozyHome 5配合使用）; （2）根据上传状态消息，上传和重复数据删除的文件有所不同（此方法与Memopal 6配合使用）; （3）根据上传速度，检查文件上传是否在比客户机上传带宽所需的时间短得多的时间内完成（DropBox 7就是这样）; （4）最终，最常用的重复数据删除检测方法适用于所有服务，无论其接口如何，都是监控网络流量并测量传输数据量。我们注意到，大多数服务具有额外的客户端 - 服务器通信流量，但与上传大型文件时传输的大量数据相比，可以忽略不计。<br>  第一次攻击允许识别攻击者已知的特定文件是否先前已上传到存储服务。攻击II：学习文件内容上述攻击仅允许检查特定文件是否存储在云存储服务中。此第一次攻击允许识别攻击者已知的特定文件是否先前已上传到存储服务。假设有一个攻击者，爱丽丝，谁想要了解有关Bob，云存储服务的用户的信息。那么显然，如果爱丽丝怀疑鲍勃有一些不太可能拥有任何其他用户的特定敏感文件X，她可以使用重复数据删除来检查这个猜想是否正确。 Alice应该做的是尝试备份X的副本，并检查是否发生重复数据删除。作为一个具体的例子，假设有一个文件证明一些非法活动（例如记录暴力事件，或者是具有一些被盗的敏感信息的文件，或与儿童色情相关的材料）。执法机关一旦掌握该文件的副本，就可以将文件上传到不同的云存储提供商，并识别存储文件副本的存储服务。然后，他们可以要求法院命令，要求服务提供商披露上传文件的用户的身份。 （如果文件被认为对于识别拥有该用户的用户来说太敏感，则如上所述，当局上传该文件的过程可以在确定是否在开始之后立即终止重复数据删除应用于此文件。）2.2攻击II：学习文件内容上述攻击仅允许检查特定文件是否存储在云存储服务中。但是，攻击者可能会将此攻击应用于同一文件的多个版本，对本文件内容的所有可能的值基本上执行强力攻击。例如，假设Alice和Bob在同一家公司工作，该公司使用云备份服务来备份所有员工的机器。每年一次，所有员工将收到一份新的标准合同副本，其中包含其更新的薪水。爱丽丝好奇地找到了鲍勃的新工资，这可能是$ 500- $ 200,000之间的$ 500的倍数。所有Alice必须做的是生成一个Bob的合同模板，Bob的名字和新合同的日期，然后为Bob的每个可能的工资（总共301个文件）生成合同的副本。然后，她运行备份到她和Bob使用的公司备份服务。发生重复数据删除的单个文件是包含Bob实际工资的单个文件。只要目标文件的可能版本数量适中，就可以应用此攻击。这对于企业环境来说似乎非常有用，通常文件是标准模板的小变体。请考虑以下三个示例：•网上银行服务向客户发送一个包含其登录名和PIN的文档，这是一个4位数字。因此，爱丽丝可以使用登录名“Bob”和PIN的所有可能值生成10,000个文档，并检查其中哪些文件已被存储。本文档对应于Bob的实际PIN码。相同的攻击可以应用于任意密码，如果它们来自中等大小的域。请注意，与在线字典攻击不同，受到攻击的银行服务不会注意到某人正在尝试某个用户的所有潜在密码。 •假设一个详细描述Bob的医学检查结果的文件存储在他的计算机上。爱丽丝可以使用这种攻击来查找测试的结果，这通常来自一个小域（例如，对于遗传性疾病的发生或怀孕测试的结果是一个是/否的答案，或来自一个范围，例如胆固醇测试的一百个可能的值）。转诊医生的姓名和转诊日期可能是爱丽丝所知，或者可能来自一个小领域。即使是测试的序列号，如果存在这样一个数字，可能会被Alice猜出，如果她有一个类似日期的测试结果的例子。 •假设爱丽丝和鲍勃都参与拍卖，要求投标人以包含其名称和出价的标准表格提交投标（这实际上是许多拍卖和采购流程中的常见做法）。如果爱丽丝可以推测出鲍勃的10,000个最有可能的出价值，她可以使用相同的攻击来查找鲍勃的实际出价，然后相应地设置出价。<br>  攻击III：隐蔽通道假设爱丽丝设法在Bob的机器上安装了一些恶意软件。然而，Bob运行防火墙，防止未经授权的程序连接到外部世界。即使这样的防火墙没有运行，Alice 3可能希望隐藏恶意软件与其命令和控制服务器之间的通信）。如果Bob正在使用使用跨用户重复数据删除的在线存储服务，则Alice可以使用重复数据删除攻击来建立从恶意软件到由其运行的远程控制中心的隐蔽通道。 （隐藏通道的存在可能是二次攻击，也可能有其他方法建立隐蔽通道，但是通过利用跨用户的重复数据删除来检查隐藏通道是如何建立起来的。我们先来描述一个位如何传输：软件生成文件的两个版本之一X 0或X 1，并将其保存在Bob的机器上。如果要传送消息“0”，则保存文件X 0;否则保存文件X 1。这些文件必须是足够随机的，因此任何其他用户不可能生成相同的文件。在某些时间点（例如每天），Bob运行备份并将文件存储在在线存储服务中。 Alice然后执行与Bob相同的服务的备份，并且学习以前存储哪些文件X 0或X 1，也就是说，她将学习软件发送的消息。隐藏通道可用于通过使软件保存多于一个文件，并为每个文件的内容使用两个以上的选项来传输任意长的消息。此方法的详细性能分析超出了本文的范围。我们在这里描述了恶意软件如何向其命令和控制中心发送消息。如果恶意软件有可能检查备份的日志文件，并在进行重复数据删除时进行观察，则可以使用相同的技术来发送相反方向的消息。</p>
-<p>  重复数据删除的安全风险源于以下事实：文件的重复数据删除会发生，如果并且只有此文件已经上传到存储服务。通过削弱重复数据删除与存储服务中文件的存在之间的相关性，可以降低风险。这是通过为每个文件分配一个随机阈值，并且只有当文件的副本超过此阈值时才执行重复数据删除。在更详细地检查此解决方案之前，要检查类似的方法，这是不安全的：这里，服务器设置全局阈值t（例如，t = 10），并且只有至少在文件中执行重复数据删除t文件的副本已上传。在这种情况下，确实，Alice上传文件的单个副本并不能显示Bob先前是否已经上传过该文件。然而，Alice可以上传许多文件副本（甚至使用多个用户身份），并检查是否在t或t-1之后重复数据删除，文件副本由她上传。后一种情况表示该文件的副本以前由其他用户上传。 （我们可以放心地假设爱丽丝知道阈值t，因为她可以进行简单的实验来揭示t的价值。）解决方案：现在让我们更详细地描述随机解。对于每个文件X，存储服务器分配在[2，d]范围内随机均匀选择的阈值t X，其中d是可能是公共的参数。 （例如，假设d = 20）重要的是，除了服务器之外，没有人可以计算t X，即使X的内容是已知的。实现此属性的一种方式是服务器随机选择t X并私有存储该值。另一种方法是使用秘密密钥的服务器，并且根据文件的内容或其散列值和密钥的计算阈值。即，计算t X = F（X，s）。在这种情况下，不需要显式存储X的阈值，因为服务器可以轻松地重新计算它。现在，对于每个文件X，服务器保留先前已经上传X副本的客户端数量的计数器X.当上传文件的新副本时，如果存在以下两个条件之一，则在客户端进行重复数据删除保持：（1）c X≥t X，或（2）由以前上传过X的客户端上传副本。否则不会发生重复数据删除。请注意，重复数据删除的最小份数为2，因为在上传文件的第一个副本时，不可能执行5次重复数据删除。该解决方案在X上传的第一个t X - 1次中隐藏了用户重复数据删除的发生，因为该文件被上传，就像在服务器上没有可用的副本一样。然而，一旦将数据传输到服务器端，就可以执行重复数据删除。因此，此解决方案提供的整体磁盘空间节省与基本重复数据删除方案完全相同。唯一的赔偿是带宽利用率较小，因为与tp重复数据删除解决方案相比，（t X -1）·X个文件的多个副本被上传。图1说明了提出的解决方案及其数据流。处理删除：文件删除也必须加以修饰。当删除发生时，减少文件副本的计数器c X似乎是很自然的。但是，此设置可以进行以下攻击：Alice上传文件X的副本，并注意到t副本上传后会发生重复数据删除。然后，她再次从在线存储中删除X的两个副本，并再次上传这两个副本。如果在其中一个测试中，她注意到在上传两个副本中只有一个之后发生重复数据删除，则必须是其他用户刚刚上传了X的副本。同样，如果重复数据删除在上传三个之后发生，而不是两个，X的副本，那么另一个用户必须删除这个文件的副本。这种攻击并不实用，因为在删除后，在线存储服务通常会保留已删除文件的副本一段时间。例如，包括Mozy，DropBox和Memopal在内的大多数服务的策略是删除文件至少要保留30天。因此，攻击的每次迭代都需要至少30天才能执行。攻击的一个简单的解决方案是以下修改的策略：在计数器c X达到阈值t X之后，始终执行去除，而不管是否发生了删除。此解决方案的缺点是，即使在文件的所有副本被删除之后，也必须执行重复数据删除。这意味着一旦拷贝数达到阈值，即使被删除，服务器也必须保留该文件的副本。这种政策在实践中的含义可能不是太贵，因为（1）删除的文件的副本已经被长时间保留了，以及（2）该政策适用于已经上传的相对流行的文件t X次，因此这些文件的所有副本将不太可能被删除。安全性：上述随机化解决方案仍然允许攻击者区分文件X已由d个用户上传的情况以及没有用户上传X的情况。然而，这种信息告诉该文件的受欢迎程度，但是不太可能告诉任何特定的用户，因此防止这些信息的发布可能不太重要。我们希望显示该解决方案不会显示关于将任何文件X包含在服务器存储的数据中的太多信息。为了分析安全性，我们在两个实例中比较攻击者的视图：一个文件X已经被另一个用户上传，另一个没有X的副本先前已被上传。区分这两种情况似乎是违反任何单一用户隐私的最相关的。如果我们确保很难区分这两种情况，那么每个用户都可以放心，上传其文件副本并不会对攻击者的视图产生实质的影响，因此无法被它检测到。实际上，这种措施在差异隐私（见[4]和参考文献）的概念中被使用，其将大量数据库的统计查询中的隐私问题考虑在内。为了分析隐私，我们考虑在攻击者想要识别文档的（单个）副本是否上传的设置中的三种类型的事件。攻击的一个简单的解决方案是以下修改的策略：在计数器c X达到阈值t X之后，始终执行去除，而不管是否发生了删除。此解决方案的缺点是，即使在文件的所有副本被删除之后，也必须执行重复数据删除。这意味着一旦拷贝数达到阈值，即使被删除，服务器也必须保留该文件的副本。这种政策在实践中的含义可能不是太贵，因为（1）删除的文件的副本已经被长时间保留了，以及（2）该政策适用于已经上传的相对流行的文件t X次，因此这些文件的所有副本将不太可能被删除。安全性：上述随机化解决方案仍然允许攻击者区分文件X已由d个用户上传的情况以及没有用户上传X的情况。然而，这种信息告诉该文件的受欢迎程度，但是不太可能告诉任何特定的用户，因此防止这些信息的发布可能不太重要。我们希望显示该解决方案不会显示关于将任何文件X包含在服务器存储的数据中的太多信息。为了分析安全性，我们在两个实例中比较攻击者的视图：一个文件X已经被另一个用户上传，另一个没有X的副本先前已被上传。区分这两种情况似乎是违反任何单一用户隐私的最相关的。如果我们确保很难区分这两种情况，那么每个用户都可以放心，上传其文件副本并不会对攻击者的视图产生实质的影响，因此无法被它检测到。实际上，这种措施在差异隐私（见[4]和参考文献）的概念中被使用，其将大量数据库的统计查询中的隐私问题考虑在内。为了分析隐私，我们考虑在攻击者想要识别文档的（单个）副本是否上传的设置中的三种类型的事件。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/29/云取证第七周周报/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="李睿">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/29/云取证第七周周报/" itemprop="url">云取证第七周周报</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-29T19:54:30+08:00">
-                2017-06-29
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/云取证/" itemprop="url" rel="index">
-                    <span itemprop="name">云取证</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>本周主要看了一些云安全综述的文章，云计算安全研究、云计算_系统实例与研究现状、Dependability in the Cloud: Challenges and Opportunitie、The Challenge of Cloud Control。</p>
-<p>云计算安全研究主要讲云计算的趋势、云安全挑战、云安全现状、云计算安全框架的建议、云安全的技术研究。这里面我觉得这几点是比较重要的，例如云安全的挑战和云计算安全关键技术研究。<br>首先在于云安全的挑战，在于以下三点：1.建立以数据安全和隐私保护为主要目标的云安全技术框架，具体体现在：云计算服务计算模式所引发的安全问题、云计算的动态虚拟化管理方式引发的安全问题、 云计算中多层服务模式引发的安全问题；2.建立以安全目标验证、安全服务等级测评为核心的云计算安全标准及其测评体系；3.建立可控的云计算安全监管体系，具体体现在：实现基于云计算的安全攻击的快速识别、预警与防护；实现云计算内容监控的难度；识别并防止基于云计算的密码类犯罪活动。<br>接着是云计算安全关键技术研究，主要有以下几点：1.可信访问控制；2.密文检索与处理；3.数据存在与可使用性证明；4.数据隐私保护；5.虚拟安全技术；6.云资源访问控制；7.可信云计算；</p>
-<p>云计算:系统实例与研究现状主要讲了针对云计算这样一个范畴综述了当前云计算所采用的技术,剖析其背后的技术含义以及当前云计算参与企业所采用的云计算实现方案。现有的云计算实现使用的技术体现了以下 3 个方面的特征:1) 硬件基础设施架构在大规模的廉价服务器集群之上.2) 应用程序与底层服务协作开发,最大限度地利用资源.3) 通过多个廉价服务器之间的冗余,使用软件获得高可用性.这里面讲了一下几个项目：清华大学透明计算平台、Google的云计算平台、IBM“蓝云”计算平台、Amazon的弹性计算云。.从平台技术构建来看,云计算具有3 个基本特征,即系统建立在大规模的廉价服务器集群之上,通过基础设施与上层应用程序的协同构建以达到最大效率利用硬件资源的目的,以及通过软件的方法容忍多个节点的错误.通过云计算对这 3 个方面基本特征的体现,达到了分布式系统两个方面的目标,即系统的可扩展性和可靠性。</p>
-<p>Dependability in the Cloud: Challenges and Opportunitie主要讲了几个比较流行的问题，监控大量应用程序的能力可以使“人群智慧”方法提供更强大的安全性，其方式与网络提供商能够进行蠕虫和DDoS攻击相同，其中一些例子如下：几个大型云基础架构提供商的环境不仅增加了影响大量应用程序的103次共模中断的风险，而且为攻击者提供了高度可见的目标。社区驱动的网站，如主要云提供商的跟踪中断，并记录了过去两年影响数百个互联网站点的一些中断和安全漏洞。从事广泛的行为，并采用不同程度的最佳做法可以暴露云应用提高风险水平。例如，2008年4月26日，亚马逊的弹性云（EC2）在几个实例中出现了中断，原因是单个客户应用了一大批异常的防火墙规则，同时实例化了大量实例引发亚马逊分布式防火墙中的性能下降错误。</p>
-<p>The Challenge of Cloud Control主要讨论了资源优化云数据中心的一些主要挑战。我们提出了一个称为云控制的新研究领域，这是一系列云管理问题的控制理论方法，旨在将当今的静态和能耗云数据中心转变为自我管理，动态和可靠的基础设施。<br>第一个挑战是性能模型，这对设计和开发至关重要稳健的控制系统。值得注意的是，云数据中心的规模大大增加，工作量动态变化比以前的电信和互联网系统多。服务器系统上的以前的结果表明，可以使用黑匣子方法和相当简单的队列模型或使用流模型。第二个挑战是服务准入控制，这在本质上是长期容量规划，控制系统根据预期的利润决定是否接受服务。此外，弹性控制器应该为正在运行的应用程序分配足够的资源，以提供可接受的QoS，同时避免昂贵的过度配置。这些解决方案分为三大类：基于机器学习算法的解决方案，基于控制理论的解决方案和基于统计工作负载分析的解决方案。此外，还有一些VM安置问题需要解决，以确定哪些部署新的VM以及要关闭的VM 。鉴于云的动态性质，随着需求和供应的变化随着时间的推移发生重大变化，VM布局决策需要频繁更新。最近关于重新布置的工作包括通过限制可以同时迁移的VM数量来实现VM迁移和性能转向的性能建模。其他动态方法包括使用随机整数规划来处理不确定性和遗传算法，以减少负载波动时的重新迁移。另一个挑战是提供云服务的大型数据中心不仅具有购买设备的成本，而且能源成本大幅提高，这意味着能源优化将至关重要。</p>
-<p>首先，服务准入控制器决定是否接受弹性服务，随着时间的推移可能会有很大的变化。云提供商必须确定要承认的最佳服务数量，以最大限度地发挥其效用（收入，利用率等），而不会危及已提供服务的服务水平协议（SLA）。服务增加了云基础设施的随机负载。因此，需要接纳管制计划，以评估新服务的长期影响，具体取决于他们估计的工作量。第二，弹性控制系统的目标是分配足够的所谓的计算单位（CU），以便符合某些控制目标，以系统的性能期望为目标。我们提出定义CU术语，以便满足能力需求的要求，这与维护虚拟机的定义无关。后续的CU将被映射到合适的VM。如果假定系统状态和工作负荷可以用一定的精度来估计，则控制器设计基本上成为随机的最优控制问题。第三，VM布局控制器都执行从CU到适当的VM集的映射，以在本地或远程数据中心运行，并确定物理机器上的虚拟机的打包。在将VM分配到数据中心内的PM之前，我们考虑从CU到VM和从VM到数据中心的映射。可以制定的这些容量分配（分配）问题，例如作为限制线性问题，用于优化成本受制于容量和可能的其他约束，从而实现特定的负载平衡亲和力和抗亲和力的客观或要求（例如，在同一数据中心（或主机）中，而不是在相同的数据中心）。第四，数据中心能源优化器模型，优化机房定位决策的机房能量温度相互作用。能量优化将需要一个网络身体的看法。最后，整体管理系统监控整个系统的行为，并优化管理工具在整体数据中心管理目标方面的协同运作。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/3/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/5/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/3/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/5/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1867,7 +1884,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">48</span>
+                <span class="site-state-item-count">51</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1889,7 +1906,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">20</span>
+                <span class="site-state-item-count">22</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

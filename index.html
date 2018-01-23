@@ -273,6 +273,477 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/22/feign和zuul/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="李睿">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/22/feign和zuul/" itemprop="url">feign和zuul</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-22T22:06:30+08:00">
+                2018-01-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Feign"><a href="#Feign" class="headerlink" title="Feign"></a>Feign</h1><p>我们在使用Ribbon时，通常会利用它来对RestTemplate的请求拦截来实现对依赖服务的接口调用。RestTemplate已经实现了对http请求的封装处理，形成一套模板化的调用方法。在实际开发中，对服务依赖的调用可能不止一处，往往一个接口会被多处调用，我们需要封装一些客户端类来包装这些依赖服务的调用。在Feign实现下，我们只需要创建一个接口并用注解配置它，即可完成对服务提供方的接口绑定。</p>
+<h2 id="快速启动"><a href="#快速启动" class="headerlink" title="快速启动"></a>快速启动</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">      //pom文件</div><div class="line">      &lt;!--feign--&gt;</div><div class="line">      &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-cloud-starter-feign&lt;/artifactId&gt;</div><div class="line">      &lt;/dependency&gt;</div><div class="line">@EnableFeignClients</div><div class="line">@EnableDiscoveryClient</div><div class="line">@SpringBootApplication</div><div class="line">public class ConsumerApplication &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		SpringApplication.run(ConsumerApplication.class, args);</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line">@FeignClient(<span class="string">"hello-service"</span>)</div><div class="line">public interface HelloService&#123;</div><div class="line">  @RequestMapping(<span class="string">"/hello"</span>)</div><div class="line">  String hello();</div><div class="line">&#125;</div><div class="line">@RestController</div><div class="line">public class ConsumerController &#123;</div><div class="line"></div><div class="line">	@Autowired</div><div class="line">	HelloService helloService;</div><div class="line"></div><div class="line">	@RequestMapping(value=<span class="string">"/ribbon-consumer"</span>,method= RequestMethod.GET)</div><div class="line">	public String <span class="function"><span class="title">sayHello</span></span>()&#123;</div><div class="line">     <span class="built_in">return</span> helloService.hello();</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="继承"><a href="#继承" class="headerlink" title="继承"></a>继承</h2><p>[<a href="http://blog.didispace.com/spring-cloud-tips-feign-rpc/" target="_blank" rel="external">http://blog.didispace.com/spring-cloud-tips-feign-rpc/</a>]</p>
+<h2 id="Ribbon配置"><a href="#Ribbon配置" class="headerlink" title="Ribbon配置"></a>Ribbon配置</h2><h3 id="全局配置"><a href="#全局配置" class="headerlink" title="全局配置"></a>全局配置</h3><p>ribbon.key=value<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">ribbon.ConnectTimeout=500</div><div class="line">ribbon.readTimeout=5000</div></pre></td></tr></table></figure></p>
+<h3 id="指定服务配置"><a href="#指定服务配置" class="headerlink" title="指定服务配置"></a>指定服务配置</h3><p><client>.ribbon.key=value<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">hello-service.ribbon.ConnectTimeout=500</div><div class="line">hello-service.ribbon.readTimeout=5000</div></pre></td></tr></table></figure></client></p>
+<h2 id="Hystrix"><a href="#Hystrix" class="headerlink" title="Hystrix"></a>Hystrix</h2><h3 id="全局配置-1"><a href="#全局配置-1" class="headerlink" title="全局配置"></a>全局配置</h3><p>跟ribbon全局配置一样，使用hystrix.command.default.xxx</p>
+<h3 id="禁用"><a href="#禁用" class="headerlink" title="禁用"></a>禁用</h3><p>通过feign.hystrix.enabled=false关闭</p>
+<h2 id="服务降级配置"><a href="#服务降级配置" class="headerlink" title="服务降级配置"></a>服务降级配置</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">@FeignClient(<span class="string">"hello-service"</span>,fallback=HelloServiceFallback.class)</div><div class="line">public interface HelloService&#123;</div><div class="line">  @RequestMapping(<span class="string">"/hello"</span>)</div><div class="line">  String hello();</div><div class="line">&#125;</div><div class="line">@Component</div><div class="line">public HelloServiceFallback implements HelloService&#123;</div><div class="line">String <span class="function"><span class="title">hello</span></span>()&#123;</div><div class="line">retur <span class="string">"error"</span>;</div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h1 id="Zuul"><a href="#Zuul" class="headerlink" title="Zuul"></a>Zuul</h1><p>大多数情况下，为了保证对外服务的安全性，我们在服务端实现的微服务接口，往往都会有一定的权限验证机制，比如用户登录状态的校验。同时为了防止客户端在发起请求时防止篡改等安全方面的考虑，还会有一些签名验证的机制存在。由于微服务，我们将一个应用拆成多个应用，但这些应用都需要这些校验逻辑，随着微服务规模扩大，校验逻辑冗余越来越多，不便于扩展和优化。<br>API网关是一个更为智能的应用服务器，它的定义有点像设计模式的Facade模式，它的存在就像整个微服务架构系统的门面一样，所有外部客户端访问都需要经过它来进行调度和过滤。它除了要实现请求路由、负载均衡、验证校验等功能，还需要跟服务治理框架、熔断机制的结合。</p>
+<h2 id="快速入门"><a href="#快速入门" class="headerlink" title="快速入门"></a>快速入门</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">&lt;dependencies&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-cloud-starter-zuul&lt;/artifactId&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-cloud-starter-eureka&lt;/artifactId&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">&lt;/dependencies&gt;</div><div class="line"></div><div class="line">@EnableZuulProxy</div><div class="line">@SpringCloudApplication</div><div class="line">public class Application &#123;</div><div class="line">    public static void main(String[] args) &#123;</div><div class="line">        new SpringApplicationBuilder(Application.class).web(<span class="literal">true</span>).run(args);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">spring.application.name=api-gateway</div><div class="line">server.port=5555</div><div class="line"></div><div class="line">zuul.routes.a.path=/a/**</div><div class="line">zuul.routes.a.url=ribbon-consumer</div><div class="line"></div><div class="line">zuul.routes.b.path=/b/**</div><div class="line">zuul.routes.b.url=feign-consumer</div><div class="line"></div><div class="line">eureka.client.serviceUrl.defaultZone=http://localhost:1111/eureka/</div></pre></td></tr></table></figure>
+<h2 id="请求过滤"><a href="#请求过滤" class="headerlink" title="请求过滤"></a>请求过滤</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div></pre></td><td class="code"><pre><div class="line">@Component</div><div class="line">public class AccessFilter extends ZuulFilter &#123;</div><div class="line"></div><div class="line">    private static final Logger logger = LoggerFactory.getLogger(AccessFilter.class);</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public String <span class="function"><span class="title">filterType</span></span>() &#123;</div><div class="line">        <span class="built_in">return</span> <span class="string">"pre"</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public int <span class="function"><span class="title">filterOrder</span></span>() &#123;</div><div class="line">        <span class="built_in">return</span> 0;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public boolean <span class="function"><span class="title">shouldFilter</span></span>() &#123;</div><div class="line">        <span class="built_in">return</span> <span class="literal">true</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public Object <span class="function"><span class="title">run</span></span>() &#123;</div><div class="line">        logger.info(<span class="string">"AccessFilter run"</span>);</div><div class="line"></div><div class="line">        RequestContext requestContext = RequestContext.getCurrentContext();</div><div class="line">        HttpServletRequest httpServletRequest = requestContext.getRequest();</div><div class="line"></div><div class="line">        logger.info(httpServletRequest.getRequestURI());</div><div class="line"></div><div class="line">        Object accessToken = httpServletRequest.getParameter(<span class="string">"accessToken"</span>);</div><div class="line">        <span class="keyword">if</span>(accessToken == null) &#123;</div><div class="line">            requestContext.setSendZuulResponse(<span class="literal">false</span>);</div><div class="line">            requestContext.setResponseStatusCode(401);</div><div class="line">            <span class="built_in">return</span> null;</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        logger.info(<span class="string">"access token ok"</span>);</div><div class="line">        <span class="built_in">return</span> null;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">@EnableZuulProxy</div><div class="line">@SpringCloudApplication</div><div class="line">public class Application &#123;</div><div class="line">    public static void main(String[] args) &#123;</div><div class="line">        new SpringApplicationBuilder(Application.class).web(<span class="literal">true</span>).run(args);</div><div class="line">    &#125;</div><div class="line">    @Bean</div><div class="line">    public AccessFilter <span class="function"><span class="title">accessFilter</span></span>()&#123;</div><div class="line">       <span class="built_in">return</span> new AccessFilter();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>filterType：过滤器的类型，pre代表请求在被路由之前执行<br>filterOrder：过滤器的执行顺序，根据这个返回值来依次执行<br>shouldFilter：判断是否需要被过滤<br>run：过滤的具体逻辑，这里通过requestContext.setSendZuulResponse(false);来过滤请求，不对骑进行路由，通过requestContext.setResponseStatusCode(401);设置返回状态码，也可以通过requestContext.setResponseBody(body);来设置内容</p>
+<h2 id="路由详解"><a href="#路由详解" class="headerlink" title="路由详解"></a>路由详解</h2><h3 id="传统路由配置"><a href="#传统路由配置" class="headerlink" title="传统路由配置"></a>传统路由配置</h3><ul>
+<li>单实例配置<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">zuul.routes.user-service.path=/user-service/**</div><div class="line">zuul.routes.user-service.url=http://localhost:8080/</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>对符合/user-service/** 规则的请求路径，转发到<a href="http://localhost:8080/地址的路由规则上，比如，当有一个请求http://localhost:5555/user-service/hello,能够匹配，因而api网关会转发请求到http://localhost:8080/hello" target="_blank" rel="external">http://localhost:8080/地址的路由规则上，比如，当有一个请求http://localhost:5555/user-service/hello,能够匹配，因而api网关会转发请求到http://localhost:8080/hello</a></p>
+<ul>
+<li>多实例配置<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">zuul.routes.user-service.path=/user-service/**</div><div class="line">zuul.routes.user-service.serviceId=user-service</div><div class="line">ribbon.eureka.enabled=<span class="literal">false</span></div><div class="line">user-service.ribbon.listOfServers=http://localhost:8080,http://localhost:8081</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="服务路由配置"><a href="#服务路由配置" class="headerlink" title="服务路由配置"></a>服务路由配置</h3><p>在使用服务路由配置的时候，我们不需要向传统路由配置方式那样为serviceId指定具体的服务实例地址，只需要通过zuul.routes.<route>.path与zuul.routes.<route>.serviceId参数对进行配置就好。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">zuul.routes.user-service.path=/user-service/**</div><div class="line">zuul.routes.user-service.serviceId=user-service</div></pre></td></tr></table></figure></route></route></p>
+<h2 id="服务路由的默认规则"><a href="#服务路由的默认规则" class="headerlink" title="服务路由的默认规则"></a>服务路由的默认规则</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">zuul.routes.user-service.path=/user-service/**</div><div class="line">zuul.routes.user-service.serviceId=user-service</div></pre></td></tr></table></figure>
+<p>对于这样具备规则性的配置内容，我们总是希望可以自动完成，在zuul构建的网关引入Eureka后，它会为每个服务自动创建一个默认路由规则，这些默认路由会使用serviceId配置的服务名作为请求前缀。<br>由于默认情况下，所有Eureka上的服务都会被Zuul自动创建映射关系进行路由，这会使得我们不希望对外开放的服务也可能被外部访问。这个时候，我们需要使用zuul.ignored-services参数来设置一个匹配表达式来定义不自动创建路由的规则。如果服务名匹配，将不为创建路由规则。</p>
+<h2 id="路径匹配"><a href="#路径匹配" class="headerlink" title="路径匹配"></a>路径匹配</h2><p>?是匹配任意单个字符，<em> 匹配任意数量字符，*</em> 匹配任意数量字符，支持多级目录。</p>
+<h2 id="路由前缀"><a href="#路由前缀" class="headerlink" title="路由前缀"></a>路由前缀</h2><p>全局为路由规则增加前缀信息，提供zuul.prefix参数进行设置。</p>
+<h2 id="本地跳转"><a href="#本地跳转" class="headerlink" title="本地跳转"></a>本地跳转</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">zuul.routes.api-b.path=/api-b/**</div><div class="line">zuul.routes.api-b.url=forward:/<span class="built_in">local</span></div></pre></td></tr></table></figure>
+<h2 id="Cookie与头信息"><a href="#Cookie与头信息" class="headerlink" title="Cookie与头信息"></a>Cookie与头信息</h2><p>zuul在请求路由时，或过滤掉http请求头信息的一些敏感信息。默认的敏感头信息通过zuul.sensitiveHeaders参数定义，包括set-cookie、cookie、Authorization三个属性。</p>
+<ul>
+<li><p>通过全局设置</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">zuul.sensitiveHeaders=</div></pre></td></tr></table></figure>
+</li>
+<li><p>通过制定路由</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">zuul.routes.&lt;router&gt;.customSensitiveHeaders=<span class="literal">true</span></div><div class="line">或</div><div class="line">zuul.routes.&lt;router&gt;.sensitiveHeaders=</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>重定向问题，避免跳转暴露内部调用细节<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">zuul.addHostHeader=<span class="literal">true</span></div></pre></td></tr></table></figure></p>
+<h2 id="过滤器"><a href="#过滤器" class="headerlink" title="过滤器"></a>过滤器</h2><h3 id="过滤器详解"><a href="#过滤器详解" class="headerlink" title="过滤器详解"></a>过滤器详解</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">public String filterType();</div><div class="line">public int filterOrder();</div><div class="line">public boolean shouldFilter();</div><div class="line">public Object run();</div></pre></td></tr></table></figure>
+<p>filterType：返回一个字符串代表过滤器的类型，在zuul中定义了四种不同生命周期的过滤器类型，具体如下：<br>pre：路由之前<br>routing：路由之时<br>post： 路由之后<br>error：发送错误调用<br>filterOrder：过滤的顺序，数值越小优先级越高<br>shouldFilter：这里可以写逻辑判断，是否要过滤，true,永远过滤。<br>run：过滤器的具体逻辑。可用很复杂，包括查sql，nosql去判断该请求到底有没有权限访问。</p>
+<h3 id="请求生命周期"><a href="#请求生命周期" class="headerlink" title="请求生命周期"></a>请求生命周期</h3><p>第一阶段是pre，会被pre过滤器进行处理，该过滤器主要是在请求路由之前做一些前置工作，比如请求校验。<br>第二阶段是routing，路由请求转发阶段，请求会被routing过滤器处理，当服务实例请求结果都返回之后，routing阶段结束。<br>第三阶段是post，此时请求会被post类型的过滤器处理，我们可以对处理结果进行加工或者转换。<br>还有个特殊的阶段error阶段，前面三个阶段发生异常时才会触发。</p>
+<h2 id="核心过滤器"><a href="#核心过滤器" class="headerlink" title="核心过滤器"></a>核心过滤器</h2><h2 id="动态路由"><a href="#动态路由" class="headerlink" title="动态路由"></a>动态路由</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">// pom</div><div class="line">&lt;dependencies&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-cloud-starter-zuul&lt;/artifactId&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-cloud-starter-config&lt;/artifactId&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-cloud-starter-eureka&lt;/artifactId&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">&lt;/dependencies&gt;</div><div class="line"></div><div class="line">@EnableZuulProxy</div><div class="line">@SpringCloudApplication</div><div class="line">public class Application &#123;</div><div class="line">    public static void main(String[] args) &#123;</div><div class="line">        new SpringApplicationBuilder(Application.class).web(<span class="literal">true</span>).run(args);</div><div class="line">    &#125;</div><div class="line">    @RefreshScope</div><div class="line">    @ConfigurationProperties(<span class="string">"zuul"</span>)</div><div class="line">    public ZuulProperties <span class="function"><span class="title">zuulProperties</span></span>()&#123;</div><div class="line">      <span class="built_in">return</span> new ZuulProperties();</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">spring.application.name=api-gateway</div><div class="line">server.port=5555</div><div class="line">spring.cloud.config.uri=http://localhost:7001/</div><div class="line">eureka.client.serviceUrl.defaultZone=http://localhost:1111/eureka/</div></pre></td></tr></table></figure>
+<p>在git仓库上增加网关配置文件<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">zuul.routes.a.path=/a/**</div><div class="line">zuul.routes.a.url=ribbon-consumer</div><div class="line"></div><div class="line">zuul.routes.b.path=/b/**</div><div class="line">zuul.routes.b.url=feign-consumer</div></pre></td></tr></table></figure></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/22/服务容错保护-Hystrix/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="李睿">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/22/服务容错保护-Hystrix/" itemprop="url">服务容错保护-Hystrix</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-22T11:11:14+08:00">
+                2018-01-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/spring-cloud-微服务实战/" itemprop="url" rel="index">
+                    <span itemprop="name">spring cloud 微服务实战</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>在微服务架构中，存在很多单元，若一个单元出现故障，就很容易因依赖关系而引发故障的蔓延，最终导致整个系统的瘫痪。为了解决这个问题，产生了断路器等一系列的服务保护机制。<br>Hystrix实现了断路器、线程隔离等一系列服务保护功能。Hystrix具备服务降级、服务熔断、线程和信号隔离、请求缓存、请求合并和请求监控<br>[<a href="http://blog.csdn.net/forezp/article/details/69934399" target="_blank" rel="external">http://blog.csdn.net/forezp/article/details/69934399</a>]</p>
+<h1 id="快速入门"><a href="#快速入门" class="headerlink" title="快速入门"></a>快速入门</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div></pre></td><td class="code"><pre><div class="line">//pom 文件</div><div class="line">      &lt;!--hystrix--&gt;</div><div class="line">      &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-cloud-starter-hystrix&lt;/artifactId&gt;</div><div class="line">      &lt;/dependency&gt;</div><div class="line">      &lt;!--hystrix-dashboard 监控--&gt;</div><div class="line">      &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-cloud-starter-hystrix-dashboard&lt;/artifactId&gt;</div><div class="line">      &lt;/dependency&gt;</div><div class="line">//开启断路器</div><div class="line">@EnableCircuitBreaker</div><div class="line">@EnableDiscoveryClient</div><div class="line">@SpringBootApplication</div><div class="line">public class ConsumerApplication &#123;</div><div class="line"></div><div class="line">	@Bean</div><div class="line">	@LoadBalanced</div><div class="line">	RestTemplate <span class="function"><span class="title">restTemplate</span></span>()&#123;</div><div class="line">		<span class="built_in">return</span> new RestTemplate();</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		SpringApplication.run(ConsumerApplication.class, args);</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line">//改造服务器消费规则，Hystrix默认的超时时间是2000毫秒</div><div class="line">@RestController</div><div class="line">public class ConsumerController &#123;</div><div class="line"></div><div class="line">	@Autowired</div><div class="line">	RestTemplate restTemplate;</div><div class="line"></div><div class="line">	@HystrixCommand(fallbackMethod=<span class="string">"helloFallback"</span>)</div><div class="line">	@RequestMapping(value=<span class="string">"/ribbon-consumer"</span>,method= RequestMethod.GET)</div><div class="line">	public String <span class="function"><span class="title">sayHello</span></span>()&#123;</div><div class="line">		String serviceString=<span class="string">"http://PROVIDER-SERVICE/hello"</span>;</div><div class="line">		<span class="built_in">return</span> restTemplate.getForEntity(serviceString,String.class).getBody();</div><div class="line">	&#125;</div><div class="line">  public String <span class="function"><span class="title">helloFallback</span></span>()&#123;</div><div class="line">    <span class="built_in">return</span> <span class="string">"error"</span>;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><img src="/2018/01/22/服务容错保护-Hystrix/hystrix1.png" alt=""></p>
+<ol>
+<li>创建HystrixCommand或HystrixObservableCommand对象<br>使用命令模式，HystrixCommand用在依赖的服务返回单个操作结果的时候，HystrixObservableCommand用在依赖的服务返回多个操作结果的时候。</li>
+<li>命令执行<br>以上存在四种命令的执行方式，HystrixCommand实现两个执行方式，<br>execute:同步执行，从依赖的服务返回一个单一的结果对象或是在发生错误的时候抛出异常。<br>queue：异步执行，直接返回一个Future对象。其中包含一个服务执行结束时要返回的单一结果对象<br>HystrixObservableCommand<br>observer：是一个hot Observable<br>toObservable：cold Observable</li>
+<li>结果是否被缓存<br>若当前命令的请求缓存功能被启用，并且该命令缓存命中，那么缓存结果立即以Observable对象的形式返回。</li>
+<li>断路器是否打开<br>在命令结果没有缓存命中时，Hystrix需要检测断路器是否打开，如果打开调到第8步，如果没有打开，跳到第5步。</li>
+<li>线程池或请求队列或信号量是否占满<br>如果已被占满，则不会执行命令，转向fallback。</li>
+<li>HystrixObservable.construct()或HystrixObservable.run()<br>run返回单一结果，construct返回多个结果，如果执行时间超过命令设置的超时阈值，会抛出一个异常，Hystrix就会转向fallback处理逻辑。</li>
+<li>计算断路器的健康度<br>Hystrix会将成功、失败、拒绝、超时等信息报告给断路器，而断路器会维护一组计数器来统计这些数据。断路器会根据这些数据来决定是否要将断路器打开，来对某个依赖服务进行熔断/短路，直到恢复期结束。</li>
+<li>fallback处理<br>当命令执行失败后，Hystrix会进入fallback尝试回退处理，我们也称为服务降级。<br>以下四种情况将触发getFallback调用：<br>(1):run()方法抛出非HystrixBadRequestException异常。<br>(2):run()方法调用超时<br>(3):熔断器开启拦截调用<br>(4):线程池/队列/信号量是否饱满</li>
+<li>返回成功的响应</li>
+</ol>
+<h1 id="断路器原理"><a href="#断路器原理" class="headerlink" title="断路器原理"></a>断路器原理</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">public interface HystrixCircuitBreaker &#123;</div><div class="line">      //判断命令的请求是否被执行</div><div class="line">      boolean allowRequest();</div><div class="line">      //判断当前断路器是否被打开</div><div class="line">      boolean isOpen();</div><div class="line">      //用来闭合断路器</div><div class="line">      void markSuccess();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>断路器打开逻辑主要看请求总数、错误百分比，如果QPS大于20或者错误百分比大于50，则打开</p>
+<h1 id="依赖隔离"><a href="#依赖隔离" class="headerlink" title="依赖隔离"></a>依赖隔离</h1><p>使用舱壁模式实现线程池的隔离，它会为每个依赖服务创建一个独立的线程池，这样就算某个服务延迟过高，也只是对该依赖服务的调用产生影响，而不会拖慢其他的依赖服务</p>
+<h1 id="自定义请求命令"><a href="#自定义请求命令" class="headerlink" title="自定义请求命令"></a>自定义请求命令</h1><p>[<a href="http://blog.csdn.net/u012702547/article/details/78032191?utm_source=tuicool&amp;utm_medium=referral" target="_blank" rel="external">http://blog.csdn.net/u012702547/article/details/78032191?utm_source=tuicool&amp;utm_medium=referral</a>]</p>
+<h1 id="请求缓存"><a href="#请求缓存" class="headerlink" title="请求缓存"></a>请求缓存</h1><h2 id="开启缓存功能"><a href="#开启缓存功能" class="headerlink" title="开启缓存功能"></a>开启缓存功能</h2><p>Spring Cloud Hystrix 请求缓存的使用非常简单，我们只需要在实现 HystrixCommand 或 HystrixObservableCommand 时，通过重载 getCacheKey()方法来开启请求缓存。</p>
+<h2 id="缓存失效功能"><a href="#缓存失效功能" class="headerlink" title="缓存失效功能"></a>缓存失效功能</h2><p>在请求缓存时，如果只是读操作，那么不需要考虑缓存内容是否正确的问题，但是如果请求命令中还有更新数据的写操作，那么缓存中的数据就需要我们在进行写操作时及时处理，以防止读操作的请求命令获取到失效的数据，我们可以使用 HystrixRequestCache.clear 方法来进行缓存清理。<br>可以通过注解开启cache和清除缓存，例如@CacheResult,@CacheRemove</p>
+<h1 id="请求合并"><a href="#请求合并" class="headerlink" title="请求合并"></a>请求合并</h1><p>通过HystrixCollasper来实现请求的合并，以减少通信消耗和线程数的占用。<br>[<a href="http://blog.csdn.net/zhuchuangang/article/details/74663755" target="_blank" rel="external">http://blog.csdn.net/zhuchuangang/article/details/74663755</a>]</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/21/客户端负载均衡-ribbon/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="李睿">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/21/客户端负载均衡-ribbon/" itemprop="url">客户端负载均衡:ribbon</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-21T18:07:05+08:00">
+                2018-01-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/spring-cloud-微服务实战/" itemprop="url" rel="index">
+                    <span itemprop="name">spring cloud 微服务实战</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>例子参考：[<a href="http://blog.csdn.net/forezp/article/details/69934399" target="_blank" rel="external">http://blog.csdn.net/forezp/article/details/69934399</a>]</p>
+<h1 id="客户端负载均衡"><a href="#客户端负载均衡" class="headerlink" title="客户端负载均衡"></a>客户端负载均衡</h1><p>负载均衡指的是服务端负载均衡，其中分为硬件负载均衡、软件负载均衡。硬件负载均衡是通过服务器节点之间安装专门用于负载均衡的设备，比如F5等；而软件负载均衡是通过在服务器上安装一些具有均衡负载的模块或软件来完成请求分发工作，比如Nginx。<br>硬件负载均衡设备或是软件负载均衡的软件模块都会维护一个下挂可用的服务端清单，通过心跳检测来剔除故障的服务端节点以保证清单中都是可以正常访问的服务端节点。当客户端发送请求给负载均衡设备时，从维护可用的列表中取出一台服务器的地址，然后进行转发。<br>客户端负载均衡和服务端负载均衡最大不同是在于上面所提到的服务清单所存储的位置。在客户端负载均衡中，所有客户端节点都要维护着自己访问的服务端清单，而这些服务端清单来自于服务注册中心。<br>spring ribbon的封装，使得使用客户端负载均衡调用非常简单，只需两步：</p>
+<ul>
+<li>服务提供者只需要启动多个实例并注册在一个注册中心或多个相关联的注册中心。</li>
+<li>服务消费者直接通过调用被@LoadBalanced注解修饰过的RestTemplate来实现面向服务的接口调用。<h1 id="RestTemplate详解"><a href="#RestTemplate详解" class="headerlink" title="RestTemplate详解"></a>RestTemplate详解</h1><h1 id="Get请求"><a href="#Get请求" class="headerlink" title="Get请求"></a>Get请求</h1>getForEntity函数<br>该方法返回ResponseEntity，该对象是Spring对Http请求响应的封装，其中主要存储了HTTP的几个重要元素，比如说HTTP请求码的枚举对象HttpStatus（404，405，500等错误码），它的父类事HttpEntity中还存储着HTTP请求的头信息对象HttpHeaders以及泛型类型的请求体对象。<br>getForEntity有三种重载的方法：具体例子[<a href="https://www.jianshu.com/p/470a30f493cf" target="_blank" rel="external">https://www.jianshu.com/p/470a30f493cf</a>]<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">getForEntity(String url, Class&lt;T&gt; responseType, Object... uriVariables)</div><div class="line">getForEntity(String url, Class&lt;T&gt; responseType, Map&lt;String, ?&gt; uriVariables)</div><div class="line">getForEntity(URI url, Class&lt;T&gt; responseType)</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>也可以通过getForObject</p>
+<h1 id="POST请求"><a href="#POST请求" class="headerlink" title="POST请求"></a>POST请求</h1><p>具体也通过postForEntity和postForObject，例子如上链接</p>
+<h1 id="PUT请求"><a href="#PUT请求" class="headerlink" title="PUT请求"></a>PUT请求</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">put(String url, Object request, Object... uriVariables)</div><div class="line">put(String url, Object request, Map&lt;String, ?&gt; uriVariables)</div><div class="line">put(URI url, Object request)</div></pre></td></tr></table></figure>
+<h1 id="Delete请求"><a href="#Delete请求" class="headerlink" title="Delete请求"></a>Delete请求</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">delete(String url, Object... uriVariables)</div><div class="line">delete(String url, Map&lt;String, ?&gt; uriVariables)</div><div class="line">delete(URI url)</div></pre></td></tr></table></figure>
+<h1 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h1><p>[<a href="http://blog.csdn.net/dyc87112/article/details/73739482" target="_blank" rel="external">http://blog.csdn.net/dyc87112/article/details/73739482</a>]</p>
+<h1 id="负载均衡器"><a href="#负载均衡器" class="headerlink" title="负载均衡器"></a>负载均衡器</h1><p>当一个请求发送，通过拦截这个请求，随机或者算法到其中的一个服务上去处理<br>那么，这中间关键的一点就是：拦截<br>最精简的LB需求：</p>
+<ul>
+<li>设置添加和读取后端服务器的列表</li>
+<li>能从中选择一个服务器去执行<br>代码实现思路就是：<br>读取后端服务，标记一个服务不可用，最主要是选择一个后端服务来提供服务<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">//使用负载均衡加载服务</div><div class="line">public interface ILoadBalancer &#123;</div><div class="line">void addServers(List var1);向负载均衡器中维护的实例列表增加服务实例。</div><div class="line">Server chooseServer(Object var1);通过某种策略，从负载均衡器中挑选出一个具体的服务实例。</div><div class="line">void markServerDown(Server var1);用来通知和标识负载均衡器中某个具体实例已经停止服务，不然负载均衡器在下一次获取服务实例清单前都会认为服务实例均是正常服务的。</div><div class="line">List getServerList(boolean var1);//目的兼容2.1.3以前的。（之后本方法拆分下面两个）</div><div class="line">List getReachableServers();获取当前正常服务的实例列表。</div><div class="line">List getAllServers();获取所有已知的服务实例列表，包括正常服务和停止服务的实例。</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="AbstractLoadBalancer"><a href="#AbstractLoadBalancer" class="headerlink" title="AbstractLoadBalancer"></a>AbstractLoadBalancer</h2><p>是ILoadBalancer的实现，定义了分组枚举类，分别为ALL、STATUS_UP、STATUS_NOT_UP<br><img src="/2018/01/21/客户端负载均衡-ribbon/AbstractLoadBalancer.png" alt=""></p>
+<h2 id="BaseLoadBalancer"><a href="#BaseLoadBalancer" class="headerlink" title="BaseLoadBalancer"></a>BaseLoadBalancer</h2><h2 id="DynamicServerListLoadBalancer"><a href="#DynamicServerListLoadBalancer" class="headerlink" title="DynamicServerListLoadBalancer"></a>DynamicServerListLoadBalancer</h2><p>服务实例清单在运行期的动态更新，还能过滤</p>
+<h2 id="ZoneAwareLoadBalancer"><a href="#ZoneAwareLoadBalancer" class="headerlink" title="ZoneAwareLoadBalancer"></a>ZoneAwareLoadBalancer</h2><h1 id="负载均衡策略"><a href="#负载均衡策略" class="headerlink" title="负载均衡策略"></a>负载均衡策略</h1><ul>
+<li>RandomRule：随机选择一个server</li>
+<li>RoundRobinRule：roundRobin方式轮询选择， 轮询index，选择index对应位置的server</li>
+<li>WeightedResponseTimeRule：根据响应时间分配一个weight(权重)，响应时间越长，weight越小，被选中的可能性越低</li>
+<li>RetryRule：对选定的负载均衡策略机上重试机制，在一个配置时间段内当选择server不成功，则一直尝试使用subRule的方式选择一个可用的server</li>
+<li>BestAvailable：选择一个最小的并发请求的server，逐个考察Server，如果Server被tripped了，则忽略</li>
+<li>AvailabilityFilteringRule：过滤掉那些因为一直连接失败的被标记为circuit tripped的后端server，并过滤掉那些高并发的的后端server（active connections 超过配置的阈值） | 使用一个AvailabilityPredicate来包含过滤server的逻辑，其实就就是检查status里记录的各个server的运行状态</li>
+<li>ZoneAvoidanceRule：复合判断server所在区域的性能和server的可用性选择server ResponseTimeWeightedRule：作用同WeightedResponseTimeRule，二者作用是一样的，ResponseTimeWeightedRule后来改名为WeightedResponseTimeRule</li>
+</ul>
+<h1 id="自动化配置"><a href="#自动化配置" class="headerlink" title="自动化配置"></a>自动化配置</h1><p><img src="/2018/01/21/客户端负载均衡-ribbon/自动化配置.png" alt=""></p>
+<h1 id="重试机制"><a href="#重试机制" class="headerlink" title="重试机制"></a>重试机制</h1><p>由于Eureka实现的服务治理机制强调了CAP原理的AP，即可用性和可靠性，与zookeeper这类强调CP（一致性、可靠性）最大的区别是Eureka为了实现更高的服务可用性，牺牲了一定的一致性，在极端情况下，它宁愿接受故障实例，也不要丢掉健康实例，比如，当服务注册中心发生故障断开时，由于所有的服务实例无法维持续约心跳，在强调AP的服务治理中，将会把所有的服务实例剔除掉，而Eureka则会因为超过百分之85的实例丢失心跳而触发保护机制，注册中心将会保留此时的所有节点，以实现服务间依然可以进行相互调用的场景，即使其中有部分故障节点，但这样做仍然能够保障大多数服务能正常消费。<br>由于在可用性和一致性上的取舍，不论是由于触发了保护机制或是服务剔除的延迟，引起服务调用到失败的实例时候，我们希望还是能够增强对这类问题的容错。所以我们会在服务调用时候加入一些重试机制。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">spring.cloud.loadbalancer.retry.enabled=<span class="literal">true</span></div><div class="line">xxService.ribbon.ConnectTimeout //请求连接超时时间</div><div class="line">xxService.ribbon.ReadTimeout //请求处理超时时间</div><div class="line">xxxService.ribbon.maxAutoRetriesNextServer //切换实例重试次数</div><div class="line">xxxService.ribbon.maxAutoRetries //重试次数</div></pre></td></tr></table></figure></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/17/服务治理Eureka/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -391,7 +862,7 @@
 <h3 id="服务调用"><a href="#服务调用" class="headerlink" title="服务调用"></a>服务调用</h3><p>服务消费者在获取服务清单后，通过服务名可以获得具体提供服务的实例名和该实例的元数据信息。因为有这些服务实例的详细信息，所以客户端可以根据自己的需要决定具体调用哪个实例，在ribbon会默认采用轮询的方式调用，从而实现客户端的负载均衡。<br>对于访问实例的选择，Eureka中有region和zone的概念，一个region中可以包含多个zone，每个服务客户端需要被注册一个Zone，所以每个客户端对应一个region和一个zone。</p>
 <h3 id="服务下线"><a href="#服务下线" class="headerlink" title="服务下线"></a>服务下线</h3><p>在系统运行过程中必然会面临关闭或重启服务的某个实例的情况，在服务关闭期间，我们自然不希望客户端会继续调用关闭了的实例。在客户端程序中，在服务实例进行正常的关闭操作，它会触发一个服务下线的REST请求给Eureka Server，告诉服务中心：我要下线了，服务端在接收请求之后，将该服务状态置为下线，并把该下线时间传播出去。</p>
 <h2 id="服务注册中心"><a href="#服务注册中心" class="headerlink" title="服务注册中心"></a>服务注册中心</h2><h3 id="失效剔除"><a href="#失效剔除" class="headerlink" title="失效剔除"></a>失效剔除</h3><p>服务器可能由于内存溢出、网络故障等原因使得服务不能正常工作。为了从服务列表中将这些无法提供服务的实例剔除，Eureka在启动时会创建一个定时任务，默认每隔一段时间（60s）将当前清单中超时（默认是90s）没有续约的服务剔除出去。</p>
-<h3 id="自我保护"><a href="#自我保护" class="headerlink" title="自我保护"></a>自我保护</h3><p>当在服务注册中心出现红色警告信息，实际上，该警告就是触发了Eureka的自我保护机制。Eureka server会统计心跳失败比例在十五分钟内是否低于百分之八十五，如果出现这些情况，会把当前实例注册信息保护起来，让这些实例不会过期，尽可能保护这些信息。但在本地开发，会使得注册中心维护的服务实例不那么准确，下面关闭保护机制<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">eureka.server.enable-self-preservation=<span class="literal">false</span></div></pre></td></tr></table></figure></p>
+<h3 id="自我保护"><a href="#自我保护" class="headerlink" title="自我保护"></a>自我保护</h3><p>自我保护机制的工作机制是如果在15分钟内超过85%的客户端节点都没有正常的心跳，那么Eureka就认为客户端与注册中心出现了网络故障，Eureka Server自动进入自我保护机制，此时会出现以下几种情况：<br>1、Eureka Server不再从注册列表中移除因为长时间没收到心跳而应该过期的服务。<br>2、Eureka Server仍然能够接受新服务的注册和查询请求，但是不会被同步到其它节点上，保证当前节点依然可用。<br>3、当网络稳定时，当前Eureka Server新的注册信息会被同步到其它节点中。<br>但在本地开发，会使得注册中心维护的服务实例不那么准确，下面关闭保护机制<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">eureka.server.enable-self-preservation=<span class="literal">false</span></div></pre></td></tr></table></figure></p>
 <h1 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h1><p>[<a href="https://www.jianshu.com/p/ef2591899597" target="_blank" rel="external">https://www.jianshu.com/p/ef2591899597</a>]</p>
 <h1 id="配置详解"><a href="#配置详解" class="headerlink" title="配置详解"></a>配置详解</h1><p>在Eureka的服务治理体系中，主要分为客户端和服务器端两个不同的角色，服务端为服务注册中心，客户端为各个提供接口的微服务应用。Eureka客户端的配置如下：1.服务注册相关的配置信息。包括服务注册中心的地址、服务获取的间隔时间、可用区域。2.服务实例相关的配置信息。包括服务实例的名称、IP地址、端口号、健康检查路径。</p>
 <h1 id="服务注册类配置"><a href="#服务注册类配置" class="headerlink" title="服务注册类配置"></a>服务注册类配置</h1><p>这些配置信息主要以eureka.client为前缀，以指定注册中心为例，主要通过eureka.client.serviceUrl参数实现，默认的值为defaultZone，value为<a href="http://127.0.0.1:8761/eureka/。当然也可以更改" target="_blank" rel="external">http://127.0.0.1:8761/eureka/。当然也可以更改</a><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">eureka.client.serviceUrl.defaultZone=http://localhost:11111/eureka/</div></pre></td></tr></table></figure></p>
@@ -1797,472 +2268,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/21/分布式系统基础设施/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="李睿">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/21/分布式系统基础设施/" itemprop="url">分布式系统基础设施</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-21T23:01:53+08:00">
-                2017-12-21
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/大型分布式网站架构/" itemprop="url" rel="index">
-                    <span itemprop="name">大型分布式网站架构</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="分布式缓存"><a href="#分布式缓存" class="headerlink" title="分布式缓存"></a>分布式缓存</h2><p>在高并发环境下，大量的读、写请求涌向数据库，磁盘的读写速度与内存显然不在一个量级，从减轻数据库的压力和提高系统响应两个角度来考虑，一般都会在数据库层加一层缓存。由于单台机器的内存资源和承载有限，并且如果大量使用本地缓存，也会使相同数据被不同的节点存储多份，对内存资源造成较大的浪费，因此催生出分布式缓存。分布式缓存的经典代表是memcache，最经典的场景是分布式session。</p>
-<h3 id="memchache简介及安装"><a href="#memchache简介及安装" class="headerlink" title="memchache简介及安装"></a>memchache简介及安装</h3><p>memcache使用key-value的形式存储和访问数据，在内存中维护一张巨大的hashtable，使得数据查询的时间复杂度降低到O(1),保证高性能的访问。内存的空间是有限的，当内存没有足够空间存储新的数据，memcache就会使用LRU算法，将最近步长访问的数据淘汰掉，以腾出新的空间存放。memcache支持的数据格式多样化，通过对象序列化转成二进制数据，又可以通过反序列化还原原有对象。<br>windows安装：[<a href="http://kimi.it/258.html" target="_blank" rel="external">http://kimi.it/258.html</a>]<br>linux安装：[<a href="http://kimi.it/257.html" target="_blank" rel="external">http://kimi.it/257.html</a>]<br>备注：windows安装要在管理员命令行安装</p>
-<h3 id="memcache-java-api与分布式"><a href="#memcache-java-api与分布式" class="headerlink" title="memcache java api与分布式"></a>memcache java api与分布式</h3><p>java api：<br>[<a href="http://blog.csdn.net/seelye/article/details/8511073" target="_blank" rel="external">http://blog.csdn.net/seelye/article/details/8511073</a>], [<a href="http://acooly.iteye.com/blog/1120347" target="_blank" rel="external">http://acooly.iteye.com/blog/1120347</a>]<br>memcache本身不是分布式缓存系统，它的分布式是由访问的客户端来实现，一种比较简单的方式是通过缓存的key来进行哈希，当后端有N台缓存服务器时，访问的服务器为hash(key)%N,这样请求就均衡地映射到后端缓存服务器，但是需要新增时服务器时，大部分的key将会重新分布，会导致请求访问不到缓存进而访问数据库，导致雪崩。<br>一致性哈希算法可以改善这个问题：将哈希函数的值域空间组织成一个圆环，整个空间按照瞬时间方向组织，然后对应的服务器节点进行哈希，将他们映射在哈希环上。<br><img src="/2017/12/21/分布式系统基础设施/一致性哈希.png" alt=""><br>这样子当新增一个节点后，只影响局部的节点，避免大量key重新映射。当节点数量很少时，可能导致分布不均匀，引入虚拟节点机制，key的映射不变，只是多了虚拟节点映射到真实节点的过程。<br>java中一致性哈希的实现：<br>[<a href="http://blog.csdn.net/kinger0/article/details/49760751" target="_blank" rel="external">http://blog.csdn.net/kinger0/article/details/49760751</a>]</p>
-<h3 id="分布式session"><a href="#分布式session" class="headerlink" title="分布式session"></a>分布式session</h3><p>传统的应用服务器，如tomcat、jboss，其自身实现的session管理大部分是基于单机的。对于大型分布式网站来说，支撑其业务的远远不止一台服务器，而是分布式集群，请求在不同服务器之间跳转。传统的做法是通过cookie进行session同步，但是cooie有安全性问题，还有存储的数据大小是有限制的，加上需要兼容移动端的session。<br>对于系统可靠性要求较高的用户，可以将session持久化到DB中，这样可以保证宕机时不易丢失，但是系统整体吞吐量会受到影响。另一种方式是session统一存储到缓存集群里，如memcache，这样可以保证有较高的读、写性能，从安全性角度看，session是有有效期的，使用缓存存储便于利用缓存失效机制。<br><img src="/2017/12/21/分布式系统基础设施/分布式session.png" alt=""><br>tomcat的web server举例，通过memcached-session-manager实现分布式session。<br>[<a href="http://chenzhou123520.iteye.com/blog/1650212" target="_blank" rel="external">http://chenzhou123520.iteye.com/blog/1650212</a>]</p>
-<h2 id="持久化存储"><a href="#持久化存储" class="headerlink" title="持久化存储"></a>持久化存储</h2><h3 id="mysql扩展"><a href="#mysql扩展" class="headerlink" title="mysql扩展"></a>mysql扩展</h3><h4 id="业务拆分"><a href="#业务拆分" class="headerlink" title="业务拆分"></a>业务拆分</h4><p><img src="/2017/12/21/分布式系统基础设施/业务拆分.png" alt=""></p>
-<h4 id="复制策略"><a href="#复制策略" class="headerlink" title="复制策略"></a>复制策略</h4><p>通过数据库的复制策略，可以将一台mysql数据库服务器中的数据复制到其他mysql数据库服务器，通过读写分离。前端服务器通过master执行数据写入，数据的更新通过binary log同步到slave集群，对于数据读取请求，交由slave处理。master-slave架构能减轻单库读的压力。<br><img src="/2017/12/21/分布式系统基础设施/master-slave.png" alt=""><br>master-slaves架构存在着单点故障的问题。最佳的方式是采用dual-master架构。<br>这种架构下，两台服务器互相将对方视为自己的master，这样就可以互相同步消息，并且通过server-id，就不会出现循环复制。通常情况下，我们仅开启一台master的写入，另一台master作为standby或者读库开放，这样可以避免数据写入冲突，防止数据不一致。</p>
-<h3 id="分库分表"><a href="#分库分表" class="headerlink" title="分库分表"></a>分库分表</h3><p>对于访问频繁且数据量巨大的单表来说，首先要做的是减少单表的记录条数，以便减少数据查询所需要的时间，提高数据库的吞吐量。<br><img src="/2017/12/21/分布式系统基础设施/分表.png" alt=""><br>分表能解决单表数据量过大带来的查询效率下降的问题。却无法给数据库的并发处理能力带来质的提升。面对高并发的读写访问，当数据库Master服务器无法承载写操作压力时，不管怎么扩展slave服务器，此时都没有意义。所以我们可以采用分库。<br><img src="/2017/12/21/分布式系统基础设施/分库.png" alt=""></p>
-<h3 id="Hbase"><a href="#Hbase" class="headerlink" title="Hbase"></a>Hbase</h3><p><img src="/2017/12/21/分布式系统基础设施/hbase.png" alt=""></p>
-<h3 id="redis"><a href="#redis" class="headerlink" title="redis"></a>redis</h3><h4 id="redis安装"><a href="#redis安装" class="headerlink" title="redis安装"></a>redis安装</h4><p>[<a href="http://www.runoob.com/redis/redis-install.html" target="_blank" rel="external">http://www.runoob.com/redis/redis-install.html</a>]</p>
-<h4 id="redis-java-api"><a href="#redis-java-api" class="headerlink" title="redis java api"></a>redis java api</h4><p>[<a href="https://www.cnblogs.com/libaoting/p/4418007.html" target="_blank" rel="external">https://www.cnblogs.com/libaoting/p/4418007.html</a>]</p>
-<h2 id="消息队列"><a href="#消息队列" class="headerlink" title="消息队列"></a>消息队列</h2><p><img src="/2017/12/21/分布式系统基础设施/jms和amqp.png" alt=""><br><img src="/2017/12/21/分布式系统基础设施/mq对比2.png" alt=""><br><img src="/2017/12/21/分布式系统基础设施/mq对比.png" alt=""></p>
-<h2 id="垂直化搜索引擎"><a href="#垂直化搜索引擎" class="headerlink" title="垂直化搜索引擎"></a>垂直化搜索引擎</h2><p>垂直搜索引擎既能满足用户对于全文检索、模糊匹配的需求，解决数据库like查询效率低下问题。又能解决分布式分库分表后或者使用nosql无法进行多表关联和复杂查询。<br><img src="/2017/12/21/分布式系统基础设施/luecene.png" alt=""></p>
-<h3 id="搜索引擎的重要概念"><a href="#搜索引擎的重要概念" class="headerlink" title="搜索引擎的重要概念"></a>搜索引擎的重要概念</h3><h4 id="倒排索引"><a href="#倒排索引" class="headerlink" title="倒排索引"></a>倒排索引</h4><p>将文档的词作为关键字，建立词与文档的映射关系，通过对倒排索引的检索，可以根据词可以迅速获取包含这个词的文档列表。</p>
-<h4 id="分词"><a href="#分词" class="headerlink" title="分词"></a>分词</h4><p>分词就是将句子或者段落进行切割，从中提取出包含固定语义的词。对于英语来说，语言的基本单位是单词。但对于中文来说，多个中文字组合一起才能表达一个具体含义的词。这里推荐使用ik-analyer分词库。</p>
-<h4 id="停用词"><a href="#停用词" class="headerlink" title="停用词"></a>停用词</h4><p>对于没有具体含义、区分度低的词，搜索引擎对这些词进行检索没有意义，因此停用词可以忽略。</p>
-<h4 id="排序"><a href="#排序" class="headerlink" title="排序"></a>排序</h4><p>最经典的是tf-idf算法。</p>
-<h4 id="文档"><a href="#文档" class="headerlink" title="文档"></a>文档</h4><p>文档是一切域的组合</p>
-<h4 id="域"><a href="#域" class="headerlink" title="域"></a>域</h4><p>每个文档包含了域的名称和域的对应值，域可以是不同值，如整数，浮点数，字符串</p>
-<h4 id="词"><a href="#词" class="headerlink" title="词"></a>词</h4><p>term是搜索的基本单元</p>
-<h4 id="查询"><a href="#查询" class="headerlink" title="查询"></a>查询</h4><p>TermQuery、phraseQuery、BoolQuery、TermRangeQuery、NumericRangeQuery、PrefixQuery</p>
-<h4 id="分词器"><a href="#分词器" class="headerlink" title="分词器"></a>分词器</h4><p>文档在被索引之前，需要经过分词器处理建立索引<br><img src="/2017/12/21/分布式系统基础设施/建立索引.png" alt=""><br><img src="/2017/12/21/分布式系统基础设施/search.png" alt=""></p>
-<h3 id="lucene的使用"><a href="#lucene的使用" class="headerlink" title="lucene的使用"></a>lucene的使用</h3><ol>
-<li>建立索引</li>
-<li>索引更新与删除<br>lucene还不支持单个阈的更新，而是先删除，后添加</li>
-<li>条件查询</li>
-<li>结果排序</li>
-<li>高亮</li>
-<li>中文分词（推荐ik-analyer）</li>
-<li>索引优化<br>Lucene索引是由段组成，每个段可能有多个索引文件，即每个段包含一个或者多个document；段结构可以使lucene很好的支持增量索引，新增的document将被添加到新的索引段当中。但是越来越多的段被添加到索引当中，索引文件也越来越多。但是操作系统打开文件的句柄数是有限的。lucene在执行搜索时，分别搜索每一段，然后将结果合并，这样查询的性能会降低。<br>为了提高查询性能，当索引段到达一个上限后，Lucene会自动进行索引段的优化，将索引段合并成一个，以提高查询性能，并减少打开文件句柄数量。但是索引段合并需要大量的io操作，使得查询性能受损。我们可以每隔一段时间对索引进行一次全量的重建操作，以将增量更新所生成的索引段合并。</li>
-<li>分布式扩展<br>搜索应用的大部分场景都能接受一定的时间延迟，可以采用最终一致性。<br>索引读写分离架构：<br><img src="/2017/12/21/分布式系统基础设施/lucene读写分离.png" alt=""><br>每份query server保存一份完整的索引，该索引由dump server周期性生成，并进行索引段的合并，索引生成好后推送到每台query server进行替换，这样避免集群索引dump对后端存储造成的压力。当然对于增量索引的更新，dump server可以异步更新推送到每台query server。对于前端应用中，通过对请求进行哈希，将请求均衡地分布到集群的每台服务器。<br>索引切分架构：<br><img src="/2017/12/21/分布式系统基础设施/lucene切分.png" alt=""><br>单机对索引的存储能力有限，随着索引数量的增加，索引的速度也会下降，此时索引本身已经成为系统的瓶颈，这时需要对索引进行切分，将索引分布到各个集群机器上，提高查询性能，降低存储压力。<br>merge server将索引分发给index server，最后将查询结果合并，返回给client应用。但是这有时候会导致排序和真实的结果会存在不一样。<br>综合两种架构：<br><img src="/2017/12/21/分布式系统基础设施/lucene综合.png" alt=""><h3 id="solr"><a href="#solr" class="headerlink" title="solr"></a>solr</h3>安装配置：[<a href="http://blog.csdn.net/jack__ming/article/details/72615162" target="_blank" rel="external">http://blog.csdn.net/jack__ming/article/details/72615162</a>]<h3 id="es和solr的优缺点"><a href="#es和solr的优缺点" class="headerlink" title="es和solr的优缺点"></a>es和solr的优缺点</h3>[<a href="http://www.cnblogs.com/chowmin/articles/4629220.html" target="_blank" rel="external">http://www.cnblogs.com/chowmin/articles/4629220.html</a>]<h2 id="其他设施"><a href="#其他设施" class="headerlink" title="其他设施"></a>其他设施</h2></li>
-</ol>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/21/面向服务的体系架构-SOA/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="李睿">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/21/面向服务的体系架构-SOA/" itemprop="url">面向服务的体系架构-SOA(第一章)</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-21T10:57:29+08:00">
-                2017-12-21
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/大型分布式网站架构/" itemprop="url" rel="index">
-                    <span itemprop="name">大型分布式网站架构</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>伴随着业务体系的发展，系统拆分变成了不可避免的事，由此演变成了垂直应用架构体系。但是随着垂直应用的增多，达到一定的规模，应用之间的相互交互、相互调用不可避免。否则，不同系统之间存在着重复的业务，容易形成信息孤岛，重复造轮子。此时相对核心的业务会被抽出来，作为单独的系统对外提供服务，达成业务之间相互复用，系统也因此演变为分布式应用架构体系。<br>基于http协议之间的系统间的RPC，具有使用灵活、实现便捷、开放且天生支持异构平台间的调用等多个优点。与之对应的是tcp协议的实现版本，效率更高，实现更复杂，但由于协议和标准不同，很难跨平台和企业间的通信。</p>
-<h2 id="基于TCP协议的RPC"><a href="#基于TCP协议的RPC" class="headerlink" title="基于TCP协议的RPC"></a>基于TCP协议的RPC</h2><h3 id="RPC名词解释"><a href="#RPC名词解释" class="headerlink" title="RPC名词解释"></a>RPC名词解释</h3><p>remote process call，远程过程调用，拥有着RMI、webservice等诸多成熟的方案。RPC将原来的本地调用转变为调用远端的服务器上的方法。<br>RPC的实现包括客户端和服务器端，即服务的调用方和服务提供方。服务调用方发送RPC请求到服务提供方，服务提供方根据调用方提供的参数执行请求方法，将执行结果返回给调用方。其中参数和返回结果序列化。</p>
-<h3 id="对象的序列化"><a href="#对象的序列化" class="headerlink" title="对象的序列化"></a>对象的序列化</h3><p>将对象转成二进制流的过程称为对象的序列化<br>将二进制流转成对象的过程称为对象的反序列化<br>对象的序列化和反序列化有很多成熟的方案：Google protocol Buffers协议、java内置的序列化方式、Hessian、json以及xml。</p>
-<h3 id="基于TCP实现的RPC"><a href="#基于TCP实现的RPC" class="headerlink" title="基于TCP实现的RPC"></a>基于TCP实现的RPC</h3><p>基于java socket的api，能够实现简单的RPC调用。</p>
-<h2 id="基于http协议的RPC"><a href="#基于http协议的RPC" class="headerlink" title="基于http协议的RPC"></a>基于http协议的RPC</h2><h3 id="http协议栈"><a href="#http协议栈" class="headerlink" title="http协议栈"></a>http协议栈</h3><p>Http是Hypertext Transfer Protocol（超文本传输协议）的缩写，当今采用的版本主要是http1.1。<br>http属于应用层，构建在tcp和ip协议之上，处于tcp/ip协议的最顶层，它不需要处理下层协议间诸如丢包补发、握手及数据分段和重新组装的细节。<br><img src="/2017/12/21/面向服务的体系架构-SOA/协议.png" alt=""></p>
-<h3 id="http请求与响应"><a href="#http请求与响应" class="headerlink" title="http请求与响应"></a>http请求与响应</h3><p><img src="面向服务的体系架构-SOA/http请求.png" alt=""></p>
-<h3 id="通过HttpClient发送http请求"><a href="#通过HttpClient发送http请求" class="headerlink" title="通过HttpClient发送http请求"></a>通过HttpClient发送http请求</h3><h3 id="使用Http协议的优势"><a href="#使用Http协议的优势" class="headerlink" title="使用Http协议的优势"></a>使用Http协议的优势</h3><p>基于http协议的，很多成熟的开源web容器已经帮助解决了很多问题，如tomcat、jboss、Apache，这使得开发人员将更多的精力集中在业务的实现而非处理底层细节。<br>但http也有其劣势的一面，相同内容信息，http协议传输用的字节数肯定比tcp用的字节数更多，同等网络下，效率也比较低，信息传输用的时间更长。</p>
-<h3 id="Json和xml"><a href="#Json和xml" class="headerlink" title="Json和xml"></a>Json和xml</h3><h4 id="json"><a href="#json" class="headerlink" title="json"></a>json</h4><p>json是一种轻量级的数据交换语言，以文字为基础，易于阅读。将对象序列化为json格式，可以在网络上很方便的传输，且各个平台几乎都拥有成熟的工具，能很快地将json反序列化为其对应语言的所需要的格式。<br>使用jackson包</p>
-<h4 id="xml"><a href="#xml" class="headerlink" title="xml"></a>xml</h4><p>xml的全称是可扩展标记语言（extensible markup language），可以标记数据、定义数据类型，是允许用户对自己的标记语言进行定义，用于标记电子文件使其具有结构性的源语言。xml提供统一的方法来描述和交换独立于应用程序和供应商的结构化数据，非常适合web传输。<br>可以使用xstream包</p>
-<h3 id="restful和RPC"><a href="#restful和RPC" class="headerlink" title="restful和RPC"></a>restful和RPC</h3><p>主流url链接风格主要有两种：一种是RPC风格，另一种是Rest风格。</p>
-<h4 id="RPC风格"><a href="#RPC风格" class="headerlink" title="RPC风格"></a>RPC风格</h4><p>RPC的风格是直接在http请求参数标明需要远程调用的服务接口名称、服务参数即可<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">http://hostname/provider.do?service=xxx.sayHello&amp;arg1=xxx</div></pre></td></tr></table></figure></p>
-<h4 id="Rest风格"><a href="#Rest风格" class="headerlink" title="Rest风格"></a>Rest风格</h4><p>Rest是Representation state transform，表现层状态转移。<br>在表现层状态转移过程中，表现层指的是资源的表现层，资源是网络的实体，是一张图片、一首歌曲、一段文本，你可以用url进行访问。资源通过表现层呈现出来，比如图片通过png表现，文本通过html表现。访问一个资源，需要客户端和服务器端进行一定的交互，势必涉及数据和状态的变化，http是无状态协议，因此所有的状态都保存在服务器端。如果客户端想要操作服务端，必须通过某种手段，这种手段就是http协议的集中操作方式，如GET、PUT、POST、DELETE。这便是rest原则的思想，符合rest原则设计的就是restful风格。<br>restful风格就是通过http请求对应的GET、POST、PUT、DELETE方法，完成对应的CRUD操作。<br><img src="/2017/12/21/面向服务的体系架构-SOA/restful.png" alt=""></p>
-<h3 id="基于http协议的RPC实现"><a href="#基于http协议的RPC实现" class="headerlink" title="基于http协议的RPC实现"></a>基于http协议的RPC实现</h3><p>类似我开发的数据交换平台的http接口</p>
-<h2 id="服务的路由和负载均衡"><a href="#服务的路由和负载均衡" class="headerlink" title="服务的路由和负载均衡"></a>服务的路由和负载均衡</h2><h3 id="服务化的演变"><a href="#服务化的演变" class="headerlink" title="服务化的演变"></a>服务化的演变</h3><p>分布式应用架构体系对于业务逻辑复用的需求十分强烈，上层应用都想借用已有的底层服务，来搭建更多、更丰富的应用。公共的业务被拆分出来，形成可共用的服务，最大程度的保障了代码和逻辑的复用，避免重复建设，这种设计也称SOA。<br>SOA架构中，服务消费者通过服务名称，在众多服务中找到要调用的服务的地址列表，称为服务的路由。<br><img src="/2017/12/21/面向服务的体系架构-SOA/服务路由.png" alt=""><br>对于负载比较高的服务来说，往往对应着多台服务器的集群，在请求到来时，为了将请求均衡地分配到后端服务器，负载均衡服务器将从服务对应的地址列表中，通过相应的负载均衡算法和规则，选择一台服务器进行访问，这个过程称为服务的负载均衡。<br>当服务的规模比较小时，可以采用硬编码的方式将服务地址和配置写在代码中，通过编码的方式来解决服务的路由和负载均衡问题，也可以通过传统的硬件负载均衡设备如F5或者采用LVS或者Nginx等软件解决方案，通过相关配置来解决服务的路由和负载均衡问题。<br>当服务越来越多，规模越来越大时，对应的机器数量也越来越大，单靠人工来管理和维护服务和地址的配置信息也越来越困难，依赖单点设备或者使用LVS、Nginx等软件方案进行路由和负载均衡调度，单点问题也开始出现，一旦服务路由和负载均衡服务器宕机，依赖它的所有服务均将失效。<br>此时需要一个能够动态注册和获取服务信息的地方，来统一管理服务名称和其对应的服务器列表信息，称之为服务配置中心。服务在启动时将其服务名、服务器地址注册到配置中心，服务消费者通过服务配置中心获取需要获取服务的机器列表，通过相应的负载均衡列表，选取其中一台服务器进行调用。当服务器进行宕机或者下线时，相应的机器需要能够动态地从服务配置中心里面移除，并通知相应的服务消费者。在这个过程中，服务消费者只有第一次调用需要查询服务配置中心，然后将查询的信息缓存到本地，后面的调用直接使用本地缓存的服务地址信息列表，知道服务的地址列表更新，这种无中心化的结构解决了之前负载均衡的设备导致的单点问题。<br>基于zookeeper的的持久节点和非持久节点，我们能够近乎实时地感觉到后端服务器的状态。通过集群间的zab协议，使得服务配置信息能够保持一致，zookeeper本身的容错和leader选举机制，保障了扩容性。<br><img src="/2017/12/21/面向服务的体系架构-SOA/zookeeper负载均衡.png" alt=""></p>
-<h3 id="负载均衡算法"><a href="#负载均衡算法" class="headerlink" title="负载均衡算法"></a>负载均衡算法</h3><h4 id="轮询法"><a href="#轮询法" class="headerlink" title="轮询法"></a>轮询法</h4><p>将请求按顺序轮流的分配到后端服务器，它均衡地对待后端每一台服务器，而不关心服务器实际的连接数和当前的系统负载</p>
-<h4 id="随机法"><a href="#随机法" class="headerlink" title="随机法"></a>随机法</h4><p>通过系统函数，根据后端服务器列表大小值来随机选取一台访问</p>
-<h4 id="源地址哈希表"><a href="#源地址哈希表" class="headerlink" title="源地址哈希表"></a>源地址哈希表</h4><p>获取客户端访问的ip地址值，通过哈希函数计算得到一个数值，用该数值对服务器列表大小进行取模运算，得到的结果就是要访问的服务器序号。同一ip地址的客户端当服务器的列表不变时，它每次都会映射到同一台后端服务器访问。</p>
-<h4 id="加权轮询法"><a href="#加权轮询法" class="headerlink" title="加权轮询法"></a>加权轮询法</h4><p>不同的后端服务器可能机器的配置和当前系统的负载并不相同，因此他们的抗压能力也不尽相同。给配置高负载低的机器配置更高的权重，让其处理更多的请求，给配置低负载高的配置更低的权重，降低其系统的负载，</p>
-<h4 id="加权随机法"><a href="#加权随机法" class="headerlink" title="加权随机法"></a>加权随机法</h4><h4 id="最小连接数法"><a href="#最小连接数法" class="headerlink" title="最小连接数法"></a>最小连接数法</h4><p>最小连接数算法比较灵活和智能，由于后端的服务器不尽相同，对于请求的处理有快有慢，它根据后端服务器当前连接的情况，动态的选取当前积压连接数最小的服务器来处理当前请求，尽可能提高后端服务器的利用效率，将负载合理地分流给每一台机器。</p>
-<h3 id="动态配置规则"><a href="#动态配置规则" class="headerlink" title="动态配置规则"></a>动态配置规则</h3><p>把这部分代码剥离出来，采用动态配置规则，使用groovy脚本语言直接编译成java的class字节码，运行在java虚拟机上。</p>
-<h3 id="zookeeper介绍和环境搭建"><a href="#zookeeper介绍和环境搭建" class="headerlink" title="zookeeper介绍和环境搭建"></a>zookeeper介绍和环境搭建</h3><h3 id="zk的api使用"><a href="#zk的api使用" class="headerlink" title="zk的api使用"></a>zk的api使用</h3><h3 id="zkclient的使用"><a href="#zkclient的使用" class="headerlink" title="zkclient的使用"></a>zkclient的使用</h3><p>github源码：<a href="https://github.com/sgroschupf/zkclient.git" target="_blank" rel="external">https://github.com/sgroschupf/zkclient.git</a></p>
-<h3 id="路由和负载均衡的实现"><a href="#路由和负载均衡的实现" class="headerlink" title="路由和负载均衡的实现"></a>路由和负载均衡的实现</h3><p>通过注册相应的watcher，服务消费者能够第一时间获知服务提供者机器信息的变更。利用其znode的特点和watcher机制，将其作为动态注册和获取服务信息的配置中心。<br><img src="/2017/12/21/面向服务的体系架构-SOA/服务配置节点树.png" alt=""><br>配置中心分三层，根节点为用来聚集服务的节点，通过它可以查询到所有服务，而节点名称挂载的是服务提供者提供的服务地址，服务消费者通过负载均衡算法选择其中一个地址发起远程调用。根节点和服务名称采用的是zk的持久化节点，服务提供者的地址节点是zk的非持久化节点，一旦服务器宕机或者下线，节点就会消失。<br><img src="/2017/12/21/面向服务的体系架构-SOA/zk节点.png" alt=""><br>增加一层，用来表示节点类型，每个服务包含两种节点类型，即consumer和provider，当服务消费者启动时，即在服务配置中心里，在其调用的所有服务的consumer节点下增加自己的机器地址，只需要后台监控程序解析出对应服务的consumer节点的子节点，便能清楚的知道某一服务被哪些机器消费了。</p>
-<h2 id="http服务网关"><a href="#http服务网关" class="headerlink" title="http服务网关"></a>http服务网关</h2><p><img src="/2017/12/21/面向服务的体系架构-SOA/网关1.png" alt=""><br>gateway外部各种app的http请求，完成相应的权限和安全验证，当验证通过，根据传过的服务名称，到服务配置中心找到相应的服务名称节点，并加载对应服务提供者提供的地址列表，通过前面的负载均衡算法选取机器发起远程调用，将客户端参数传到服务端。服务提供方根据传入的参数，给出响应，当gateway收到响应后，再将响应返回给App<br>一方面通过网关可以很好解决安全问题，在恶意请求或者非授权请求到达后端会进行拦截。另一方面网关可以通过服务的路由进行负载均衡<br><img src="/2017/12/21/面向服务的体系架构-SOA/网关集群.png" alt=""></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/20/优化ActiveMQ性能/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="李睿">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/20/优化ActiveMQ性能/" itemprop="url">优化ActiveMQ性能</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-20T22:25:04+08:00">
-                2017-12-20
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/消息中间件/" itemprop="url" rel="index">
-                    <span itemprop="name">消息中间件</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="持久化和非持久化传递"><a href="#持久化和非持久化传递" class="headerlink" title="持久化和非持久化传递"></a>持久化和非持久化传递</h2><h3 id="持久化消息"><a href="#持久化消息" class="headerlink" title="持久化消息"></a>持久化消息</h3><p>这是 ActiveMQ 的默认传送模式，此模式保证这些消息只被传送一次和成功使用一次。对于这些消息，可靠性是优先考虑的因素。可靠性的另一个重要方面是确保持久性消息传送至目标后，消息服务在向消费者传送它们之前不会丢失这些消息。这意味着在持久性消息传送至目标时，消息服务将其放入持久性数据存储。如果消息服务由于某种原因导致失败，它可以恢复此消息并将此消息传送至相应的消费者。虽然这样增加了消息传送的开销，但却增加了可靠性。</p>
-<h3 id="非持久化消息"><a href="#非持久化消息" class="headerlink" title="非持久化消息"></a>非持久化消息</h3><p>保证这些消息最多被传送一次。对于这些消息，可靠性并非主要的考虑因素。此模式并不要求持久性的数据存储，也不保证消息服务由于某种原因导致失败后消息不会丢失。<br>Non-persistent 传递消息比 Persistents 传递消息速度更快，原因如下：<br>Non-persistent 发送消息是异步的， Producer 不需要等待 Consumer 的 receipt消息。<br>Persisting 传递消息是需要把消息存储起来。然后在传递，这样很慢 。</p>
-<h2 id="超快回应消息"><a href="#超快回应消息" class="headerlink" title="超快回应消息"></a>超快回应消息</h2><p>内嵌 broker</p>
-<h2 id="Transactions"><a href="#Transactions" class="headerlink" title="Transactions"></a>Transactions</h2><p>Transaction 比 Non-transaction 的性能高</p>
-<h2 id="Tuning-the-OpenWire-protocol"><a href="#Tuning-the-OpenWire-protocol" class="headerlink" title="Tuning the OpenWire protocol"></a>Tuning the OpenWire protocol</h2><p>跨语言协议</p>
-<h2 id="uning-the-TCP-Transport"><a href="#uning-the-TCP-Transport" class="headerlink" title="uning the TCP Transport"></a>uning the TCP Transport</h2><p>TCP 协议是 ActiveMQ 使用最常见的协议。<br>有以下两点影响 TCP 协议性能：<br>1) socketBufferSize=缓存，默认是 65536。<br>2) tcpNoDelay=默认是 false，</p>
-<h2 id="优化消息消费者"><a href="#优化消息消费者" class="headerlink" title="优化消息消费者"></a>优化消息消费者</h2><h3 id="Prefetch-Limit"><a href="#Prefetch-Limit" class="headerlink" title="Prefetch Limit"></a>Prefetch Limit</h3><p>ActiveMQ 默认的 prefetch 大小不同的：<br>Queue Consumer 默认大小=1000<br>Queue Browser Consumer 默认大小=500<br>Persistent Topic Consumer 默认大小=100<br>Non-persistent Topic Consumer 默认大小=32766</p>
-<h3 id="Delivery-and-Acknowledgement-of-messages"><a href="#Delivery-and-Acknowledgement-of-messages" class="headerlink" title="Delivery and Acknowledgement of messages"></a>Delivery and Acknowledgement of messages</h3><p>建议使用 Session.DUPS_ACKNOWLEDGE。<br>JMS 消息只有在被确认之后，才认为已经被成功地消费了。消息的成功消费通常包含三个阶段：客户接收消息、客户处理消息和消息被确认。在事务性会话中，当一个事务被提交的时候，确认自动发生。在非事务性会话中， 消息何时被确认取决于创建会话时的应答模式 （acknowledgement mode） 。<br>该参数有以下三个可选值：<br>Session.AUTO_ACKNOWLEDGE。当客户成功的从 receive 方法返回的时候，或者从MessageListener.onMessage 方法成功返回的时候，会话自动确认客户收到的消息<br>Sessiion.TRANSACTION。用 session.commit()回执确认。<br>Session.CLIENT_ACKNOWLEDGE。客户通过消息的 acknowledge 方法确认消息。需要注意的是，在这种模式中，确认是在会话层上进行：确认一个被消费的消息将自动确认所有已被会话消费的消息。例如，如果一个消息消费者消费了 10 个消息，然后确认第 5 个消息，那么所有 10 个消息都被确认。<br>Session.DUPS_ACKNOWLEDGE。该选择只是会话迟钝第确认消息的提交。当消息到达一定数量后，才开始消费该消息。如果 JMS provider 失败，那么可能会导致一些重复的消息。如果是重复的消息，那么 JMS provider 必须把消息头的 JMSRedelivered 字段设置为 true。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2307,7 +2317,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">48</span>
+                <span class="site-state-item-count">51</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2329,7 +2339,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">20</span>
+                <span class="site-state-item-count">22</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

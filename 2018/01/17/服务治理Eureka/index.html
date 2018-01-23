@@ -74,7 +74,7 @@
 <link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="微服务,spring cloud," />
+  <meta name="keywords" content="微服务,spring cloud，eureka," />
 
 
 
@@ -93,7 +93,7 @@
 
 
 <meta name="description" content="服务治理服务注册通常会构建一个注册中心，每个服务单元向注册中心注册自己的服务，将主机与端口号、版本号、通信协议等一些信息按服务名分类组织服务清单。另外，服务注册中心还需要以心跳的方式监测清单中的服务是否可用，若不可用需要将服务清单剔除，达到排除故障的效果。 服务发现服务间的调用不再指定具体实例地址来实现，而是通过服务名发起请求调用。 Netflix EurekaEureka用来实现服务注册和发现，">
-<meta name="keywords" content="微服务,spring cloud">
+<meta name="keywords" content="微服务,spring cloud，eureka">
 <meta property="og:type" content="article">
 <meta property="og:title" content="服务治理Eureka">
 <meta property="og:url" content="http://yoursite.com/2018/01/17/服务治理Eureka/index.html">
@@ -104,7 +104,7 @@
 <meta property="og:image" content="http://yoursite.com/2018/01/17/服务治理Eureka/高可用2.png">
 <meta property="og:image" content="http://yoursite.com/2018/01/17/服务治理Eureka/高可用.png">
 <meta property="og:image" content="http://yoursite.com/2018/01/17/服务治理Eureka/eureka服务治理.png">
-<meta property="og:updated_time" content="2018-01-21T08:02:14.255Z">
+<meta property="og:updated_time" content="2018-01-22T01:48:51.884Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="服务治理Eureka">
 <meta name="twitter:description" content="服务治理服务注册通常会构建一个注册中心，每个服务单元向注册中心注册自己的服务，将主机与端口号、版本号、通信协议等一些信息按服务名分类组织服务清单。另外，服务注册中心还需要以心跳的方式监测清单中的服务是否可用，若不可用需要将服务清单剔除，达到排除故障的效果。 服务发现服务间的调用不再指定具体实例地址来实现，而是通过服务名发起请求调用。 Netflix EurekaEureka用来实现服务注册和发现，">
@@ -396,7 +396,7 @@
 <h3 id="服务调用"><a href="#服务调用" class="headerlink" title="服务调用"></a>服务调用</h3><p>服务消费者在获取服务清单后，通过服务名可以获得具体提供服务的实例名和该实例的元数据信息。因为有这些服务实例的详细信息，所以客户端可以根据自己的需要决定具体调用哪个实例，在ribbon会默认采用轮询的方式调用，从而实现客户端的负载均衡。<br>对于访问实例的选择，Eureka中有region和zone的概念，一个region中可以包含多个zone，每个服务客户端需要被注册一个Zone，所以每个客户端对应一个region和一个zone。</p>
 <h3 id="服务下线"><a href="#服务下线" class="headerlink" title="服务下线"></a>服务下线</h3><p>在系统运行过程中必然会面临关闭或重启服务的某个实例的情况，在服务关闭期间，我们自然不希望客户端会继续调用关闭了的实例。在客户端程序中，在服务实例进行正常的关闭操作，它会触发一个服务下线的REST请求给Eureka Server，告诉服务中心：我要下线了，服务端在接收请求之后，将该服务状态置为下线，并把该下线时间传播出去。</p>
 <h2 id="服务注册中心"><a href="#服务注册中心" class="headerlink" title="服务注册中心"></a>服务注册中心</h2><h3 id="失效剔除"><a href="#失效剔除" class="headerlink" title="失效剔除"></a>失效剔除</h3><p>服务器可能由于内存溢出、网络故障等原因使得服务不能正常工作。为了从服务列表中将这些无法提供服务的实例剔除，Eureka在启动时会创建一个定时任务，默认每隔一段时间（60s）将当前清单中超时（默认是90s）没有续约的服务剔除出去。</p>
-<h3 id="自我保护"><a href="#自我保护" class="headerlink" title="自我保护"></a>自我保护</h3><p>当在服务注册中心出现红色警告信息，实际上，该警告就是触发了Eureka的自我保护机制。Eureka server会统计心跳失败比例在十五分钟内是否低于百分之八十五，如果出现这些情况，会把当前实例注册信息保护起来，让这些实例不会过期，尽可能保护这些信息。但在本地开发，会使得注册中心维护的服务实例不那么准确，下面关闭保护机制<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">eureka.server.enable-self-preservation=<span class="literal">false</span></div></pre></td></tr></table></figure></p>
+<h3 id="自我保护"><a href="#自我保护" class="headerlink" title="自我保护"></a>自我保护</h3><p>自我保护机制的工作机制是如果在15分钟内超过85%的客户端节点都没有正常的心跳，那么Eureka就认为客户端与注册中心出现了网络故障，Eureka Server自动进入自我保护机制，此时会出现以下几种情况：<br>1、Eureka Server不再从注册列表中移除因为长时间没收到心跳而应该过期的服务。<br>2、Eureka Server仍然能够接受新服务的注册和查询请求，但是不会被同步到其它节点上，保证当前节点依然可用。<br>3、当网络稳定时，当前Eureka Server新的注册信息会被同步到其它节点中。<br>但在本地开发，会使得注册中心维护的服务实例不那么准确，下面关闭保护机制<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">eureka.server.enable-self-preservation=<span class="literal">false</span></div></pre></td></tr></table></figure></p>
 <h1 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h1><p>[<a href="https://www.jianshu.com/p/ef2591899597" target="_blank" rel="external">https://www.jianshu.com/p/ef2591899597</a>]</p>
 <h1 id="配置详解"><a href="#配置详解" class="headerlink" title="配置详解"></a>配置详解</h1><p>在Eureka的服务治理体系中，主要分为客户端和服务器端两个不同的角色，服务端为服务注册中心，客户端为各个提供接口的微服务应用。Eureka客户端的配置如下：1.服务注册相关的配置信息。包括服务注册中心的地址、服务获取的间隔时间、可用区域。2.服务实例相关的配置信息。包括服务实例的名称、IP地址、端口号、健康检查路径。</p>
 <h1 id="服务注册类配置"><a href="#服务注册类配置" class="headerlink" title="服务注册类配置"></a>服务注册类配置</h1><p>这些配置信息主要以eureka.client为前缀，以指定注册中心为例，主要通过eureka.client.serviceUrl参数实现，默认的值为defaultZone，value为<a href="http://127.0.0.1:8761/eureka/。当然也可以更改" target="_blank" rel="external">http://127.0.0.1:8761/eureka/。当然也可以更改</a><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">eureka.client.serviceUrl.defaultZone=http://localhost:11111/eureka/</div></pre></td></tr></table></figure></p>
@@ -441,7 +441,7 @@
           
             <a href="/tags/微服务/" rel="tag"># 微服务</a>
           
-            <a href="/tags/spring-cloud/" rel="tag"># spring cloud</a>
+            <a href="/tags/spring-cloud，eureka/" rel="tag"># spring cloud，eureka</a>
           
         </div>
       
@@ -463,6 +463,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/01/21/客户端负载均衡-ribbon/" rel="prev" title="客户端负载均衡:ribbon">
+                客户端负载均衡:ribbon <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -534,7 +538,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">48</span>
+                <span class="site-state-item-count">51</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -556,7 +560,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">20</span>
+                <span class="site-state-item-count">22</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

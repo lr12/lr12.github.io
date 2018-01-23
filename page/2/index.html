@@ -273,6 +273,467 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/21/分布式系统基础设施/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="李睿">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/21/分布式系统基础设施/" itemprop="url">分布式系统基础设施</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-21T23:01:53+08:00">
+                2017-12-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/大型分布式网站架构/" itemprop="url" rel="index">
+                    <span itemprop="name">大型分布式网站架构</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="分布式缓存"><a href="#分布式缓存" class="headerlink" title="分布式缓存"></a>分布式缓存</h2><p>在高并发环境下，大量的读、写请求涌向数据库，磁盘的读写速度与内存显然不在一个量级，从减轻数据库的压力和提高系统响应两个角度来考虑，一般都会在数据库层加一层缓存。由于单台机器的内存资源和承载有限，并且如果大量使用本地缓存，也会使相同数据被不同的节点存储多份，对内存资源造成较大的浪费，因此催生出分布式缓存。分布式缓存的经典代表是memcache，最经典的场景是分布式session。</p>
+<h3 id="memchache简介及安装"><a href="#memchache简介及安装" class="headerlink" title="memchache简介及安装"></a>memchache简介及安装</h3><p>memcache使用key-value的形式存储和访问数据，在内存中维护一张巨大的hashtable，使得数据查询的时间复杂度降低到O(1),保证高性能的访问。内存的空间是有限的，当内存没有足够空间存储新的数据，memcache就会使用LRU算法，将最近步长访问的数据淘汰掉，以腾出新的空间存放。memcache支持的数据格式多样化，通过对象序列化转成二进制数据，又可以通过反序列化还原原有对象。<br>windows安装：[<a href="http://kimi.it/258.html" target="_blank" rel="external">http://kimi.it/258.html</a>]<br>linux安装：[<a href="http://kimi.it/257.html" target="_blank" rel="external">http://kimi.it/257.html</a>]<br>备注：windows安装要在管理员命令行安装</p>
+<h3 id="memcache-java-api与分布式"><a href="#memcache-java-api与分布式" class="headerlink" title="memcache java api与分布式"></a>memcache java api与分布式</h3><p>java api：<br>[<a href="http://blog.csdn.net/seelye/article/details/8511073" target="_blank" rel="external">http://blog.csdn.net/seelye/article/details/8511073</a>], [<a href="http://acooly.iteye.com/blog/1120347" target="_blank" rel="external">http://acooly.iteye.com/blog/1120347</a>]<br>memcache本身不是分布式缓存系统，它的分布式是由访问的客户端来实现，一种比较简单的方式是通过缓存的key来进行哈希，当后端有N台缓存服务器时，访问的服务器为hash(key)%N,这样请求就均衡地映射到后端缓存服务器，但是需要新增时服务器时，大部分的key将会重新分布，会导致请求访问不到缓存进而访问数据库，导致雪崩。<br>一致性哈希算法可以改善这个问题：将哈希函数的值域空间组织成一个圆环，整个空间按照瞬时间方向组织，然后对应的服务器节点进行哈希，将他们映射在哈希环上。<br><img src="/2017/12/21/分布式系统基础设施/一致性哈希.png" alt=""><br>这样子当新增一个节点后，只影响局部的节点，避免大量key重新映射。当节点数量很少时，可能导致分布不均匀，引入虚拟节点机制，key的映射不变，只是多了虚拟节点映射到真实节点的过程。<br>java中一致性哈希的实现：<br>[<a href="http://blog.csdn.net/kinger0/article/details/49760751" target="_blank" rel="external">http://blog.csdn.net/kinger0/article/details/49760751</a>]</p>
+<h3 id="分布式session"><a href="#分布式session" class="headerlink" title="分布式session"></a>分布式session</h3><p>传统的应用服务器，如tomcat、jboss，其自身实现的session管理大部分是基于单机的。对于大型分布式网站来说，支撑其业务的远远不止一台服务器，而是分布式集群，请求在不同服务器之间跳转。传统的做法是通过cookie进行session同步，但是cooie有安全性问题，还有存储的数据大小是有限制的，加上需要兼容移动端的session。<br>对于系统可靠性要求较高的用户，可以将session持久化到DB中，这样可以保证宕机时不易丢失，但是系统整体吞吐量会受到影响。另一种方式是session统一存储到缓存集群里，如memcache，这样可以保证有较高的读、写性能，从安全性角度看，session是有有效期的，使用缓存存储便于利用缓存失效机制。<br><img src="/2017/12/21/分布式系统基础设施/分布式session.png" alt=""><br>tomcat的web server举例，通过memcached-session-manager实现分布式session。<br>[<a href="http://chenzhou123520.iteye.com/blog/1650212" target="_blank" rel="external">http://chenzhou123520.iteye.com/blog/1650212</a>]</p>
+<h2 id="持久化存储"><a href="#持久化存储" class="headerlink" title="持久化存储"></a>持久化存储</h2><h3 id="mysql扩展"><a href="#mysql扩展" class="headerlink" title="mysql扩展"></a>mysql扩展</h3><h4 id="业务拆分"><a href="#业务拆分" class="headerlink" title="业务拆分"></a>业务拆分</h4><p><img src="/2017/12/21/分布式系统基础设施/业务拆分.png" alt=""></p>
+<h4 id="复制策略"><a href="#复制策略" class="headerlink" title="复制策略"></a>复制策略</h4><p>通过数据库的复制策略，可以将一台mysql数据库服务器中的数据复制到其他mysql数据库服务器，通过读写分离。前端服务器通过master执行数据写入，数据的更新通过binary log同步到slave集群，对于数据读取请求，交由slave处理。master-slave架构能减轻单库读的压力。<br><img src="/2017/12/21/分布式系统基础设施/master-slave.png" alt=""><br>master-slaves架构存在着单点故障的问题。最佳的方式是采用dual-master架构。<br>这种架构下，两台服务器互相将对方视为自己的master，这样就可以互相同步消息，并且通过server-id，就不会出现循环复制。通常情况下，我们仅开启一台master的写入，另一台master作为standby或者读库开放，这样可以避免数据写入冲突，防止数据不一致。</p>
+<h3 id="分库分表"><a href="#分库分表" class="headerlink" title="分库分表"></a>分库分表</h3><p>对于访问频繁且数据量巨大的单表来说，首先要做的是减少单表的记录条数，以便减少数据查询所需要的时间，提高数据库的吞吐量。<br><img src="/2017/12/21/分布式系统基础设施/分表.png" alt=""><br>分表能解决单表数据量过大带来的查询效率下降的问题。却无法给数据库的并发处理能力带来质的提升。面对高并发的读写访问，当数据库Master服务器无法承载写操作压力时，不管怎么扩展slave服务器，此时都没有意义。所以我们可以采用分库。<br><img src="/2017/12/21/分布式系统基础设施/分库.png" alt=""></p>
+<h3 id="Hbase"><a href="#Hbase" class="headerlink" title="Hbase"></a>Hbase</h3><p><img src="/2017/12/21/分布式系统基础设施/hbase.png" alt=""></p>
+<h3 id="redis"><a href="#redis" class="headerlink" title="redis"></a>redis</h3><h4 id="redis安装"><a href="#redis安装" class="headerlink" title="redis安装"></a>redis安装</h4><p>[<a href="http://www.runoob.com/redis/redis-install.html" target="_blank" rel="external">http://www.runoob.com/redis/redis-install.html</a>]</p>
+<h4 id="redis-java-api"><a href="#redis-java-api" class="headerlink" title="redis java api"></a>redis java api</h4><p>[<a href="https://www.cnblogs.com/libaoting/p/4418007.html" target="_blank" rel="external">https://www.cnblogs.com/libaoting/p/4418007.html</a>]</p>
+<h2 id="消息队列"><a href="#消息队列" class="headerlink" title="消息队列"></a>消息队列</h2><p><img src="/2017/12/21/分布式系统基础设施/jms和amqp.png" alt=""><br><img src="/2017/12/21/分布式系统基础设施/mq对比2.png" alt=""><br><img src="/2017/12/21/分布式系统基础设施/mq对比.png" alt=""></p>
+<h2 id="垂直化搜索引擎"><a href="#垂直化搜索引擎" class="headerlink" title="垂直化搜索引擎"></a>垂直化搜索引擎</h2><p>垂直搜索引擎既能满足用户对于全文检索、模糊匹配的需求，解决数据库like查询效率低下问题。又能解决分布式分库分表后或者使用nosql无法进行多表关联和复杂查询。<br><img src="/2017/12/21/分布式系统基础设施/luecene.png" alt=""></p>
+<h3 id="搜索引擎的重要概念"><a href="#搜索引擎的重要概念" class="headerlink" title="搜索引擎的重要概念"></a>搜索引擎的重要概念</h3><h4 id="倒排索引"><a href="#倒排索引" class="headerlink" title="倒排索引"></a>倒排索引</h4><p>将文档的词作为关键字，建立词与文档的映射关系，通过对倒排索引的检索，可以根据词可以迅速获取包含这个词的文档列表。</p>
+<h4 id="分词"><a href="#分词" class="headerlink" title="分词"></a>分词</h4><p>分词就是将句子或者段落进行切割，从中提取出包含固定语义的词。对于英语来说，语言的基本单位是单词。但对于中文来说，多个中文字组合一起才能表达一个具体含义的词。这里推荐使用ik-analyer分词库。</p>
+<h4 id="停用词"><a href="#停用词" class="headerlink" title="停用词"></a>停用词</h4><p>对于没有具体含义、区分度低的词，搜索引擎对这些词进行检索没有意义，因此停用词可以忽略。</p>
+<h4 id="排序"><a href="#排序" class="headerlink" title="排序"></a>排序</h4><p>最经典的是tf-idf算法。</p>
+<h4 id="文档"><a href="#文档" class="headerlink" title="文档"></a>文档</h4><p>文档是一切域的组合</p>
+<h4 id="域"><a href="#域" class="headerlink" title="域"></a>域</h4><p>每个文档包含了域的名称和域的对应值，域可以是不同值，如整数，浮点数，字符串</p>
+<h4 id="词"><a href="#词" class="headerlink" title="词"></a>词</h4><p>term是搜索的基本单元</p>
+<h4 id="查询"><a href="#查询" class="headerlink" title="查询"></a>查询</h4><p>TermQuery、phraseQuery、BoolQuery、TermRangeQuery、NumericRangeQuery、PrefixQuery</p>
+<h4 id="分词器"><a href="#分词器" class="headerlink" title="分词器"></a>分词器</h4><p>文档在被索引之前，需要经过分词器处理建立索引<br><img src="/2017/12/21/分布式系统基础设施/建立索引.png" alt=""><br><img src="/2017/12/21/分布式系统基础设施/search.png" alt=""></p>
+<h3 id="lucene的使用"><a href="#lucene的使用" class="headerlink" title="lucene的使用"></a>lucene的使用</h3><ol>
+<li>建立索引</li>
+<li>索引更新与删除<br>lucene还不支持单个阈的更新，而是先删除，后添加</li>
+<li>条件查询</li>
+<li>结果排序</li>
+<li>高亮</li>
+<li>中文分词（推荐ik-analyer）</li>
+<li>索引优化<br>Lucene索引是由段组成，每个段可能有多个索引文件，即每个段包含一个或者多个document；段结构可以使lucene很好的支持增量索引，新增的document将被添加到新的索引段当中。但是越来越多的段被添加到索引当中，索引文件也越来越多。但是操作系统打开文件的句柄数是有限的。lucene在执行搜索时，分别搜索每一段，然后将结果合并，这样查询的性能会降低。<br>为了提高查询性能，当索引段到达一个上限后，Lucene会自动进行索引段的优化，将索引段合并成一个，以提高查询性能，并减少打开文件句柄数量。但是索引段合并需要大量的io操作，使得查询性能受损。我们可以每隔一段时间对索引进行一次全量的重建操作，以将增量更新所生成的索引段合并。</li>
+<li>分布式扩展<br>搜索应用的大部分场景都能接受一定的时间延迟，可以采用最终一致性。<br>索引读写分离架构：<br><img src="/2017/12/21/分布式系统基础设施/lucene读写分离.png" alt=""><br>每份query server保存一份完整的索引，该索引由dump server周期性生成，并进行索引段的合并，索引生成好后推送到每台query server进行替换，这样避免集群索引dump对后端存储造成的压力。当然对于增量索引的更新，dump server可以异步更新推送到每台query server。对于前端应用中，通过对请求进行哈希，将请求均衡地分布到集群的每台服务器。<br>索引切分架构：<br><img src="/2017/12/21/分布式系统基础设施/lucene切分.png" alt=""><br>单机对索引的存储能力有限，随着索引数量的增加，索引的速度也会下降，此时索引本身已经成为系统的瓶颈，这时需要对索引进行切分，将索引分布到各个集群机器上，提高查询性能，降低存储压力。<br>merge server将索引分发给index server，最后将查询结果合并，返回给client应用。但是这有时候会导致排序和真实的结果会存在不一样。<br>综合两种架构：<br><img src="/2017/12/21/分布式系统基础设施/lucene综合.png" alt=""><h3 id="solr"><a href="#solr" class="headerlink" title="solr"></a>solr</h3>安装配置：[<a href="http://blog.csdn.net/jack__ming/article/details/72615162" target="_blank" rel="external">http://blog.csdn.net/jack__ming/article/details/72615162</a>]<h3 id="es和solr的优缺点"><a href="#es和solr的优缺点" class="headerlink" title="es和solr的优缺点"></a>es和solr的优缺点</h3>[<a href="http://www.cnblogs.com/chowmin/articles/4629220.html" target="_blank" rel="external">http://www.cnblogs.com/chowmin/articles/4629220.html</a>]<h2 id="其他设施"><a href="#其他设施" class="headerlink" title="其他设施"></a>其他设施</h2></li>
+</ol>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/21/面向服务的体系架构-SOA/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="李睿">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/21/面向服务的体系架构-SOA/" itemprop="url">面向服务的体系架构-SOA(第一章)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-21T10:57:29+08:00">
+                2017-12-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/大型分布式网站架构/" itemprop="url" rel="index">
+                    <span itemprop="name">大型分布式网站架构</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>伴随着业务体系的发展，系统拆分变成了不可避免的事，由此演变成了垂直应用架构体系。但是随着垂直应用的增多，达到一定的规模，应用之间的相互交互、相互调用不可避免。否则，不同系统之间存在着重复的业务，容易形成信息孤岛，重复造轮子。此时相对核心的业务会被抽出来，作为单独的系统对外提供服务，达成业务之间相互复用，系统也因此演变为分布式应用架构体系。<br>基于http协议之间的系统间的RPC，具有使用灵活、实现便捷、开放且天生支持异构平台间的调用等多个优点。与之对应的是tcp协议的实现版本，效率更高，实现更复杂，但由于协议和标准不同，很难跨平台和企业间的通信。</p>
+<h2 id="基于TCP协议的RPC"><a href="#基于TCP协议的RPC" class="headerlink" title="基于TCP协议的RPC"></a>基于TCP协议的RPC</h2><h3 id="RPC名词解释"><a href="#RPC名词解释" class="headerlink" title="RPC名词解释"></a>RPC名词解释</h3><p>remote process call，远程过程调用，拥有着RMI、webservice等诸多成熟的方案。RPC将原来的本地调用转变为调用远端的服务器上的方法。<br>RPC的实现包括客户端和服务器端，即服务的调用方和服务提供方。服务调用方发送RPC请求到服务提供方，服务提供方根据调用方提供的参数执行请求方法，将执行结果返回给调用方。其中参数和返回结果序列化。</p>
+<h3 id="对象的序列化"><a href="#对象的序列化" class="headerlink" title="对象的序列化"></a>对象的序列化</h3><p>将对象转成二进制流的过程称为对象的序列化<br>将二进制流转成对象的过程称为对象的反序列化<br>对象的序列化和反序列化有很多成熟的方案：Google protocol Buffers协议、java内置的序列化方式、Hessian、json以及xml。</p>
+<h3 id="基于TCP实现的RPC"><a href="#基于TCP实现的RPC" class="headerlink" title="基于TCP实现的RPC"></a>基于TCP实现的RPC</h3><p>基于java socket的api，能够实现简单的RPC调用。</p>
+<h2 id="基于http协议的RPC"><a href="#基于http协议的RPC" class="headerlink" title="基于http协议的RPC"></a>基于http协议的RPC</h2><h3 id="http协议栈"><a href="#http协议栈" class="headerlink" title="http协议栈"></a>http协议栈</h3><p>Http是Hypertext Transfer Protocol（超文本传输协议）的缩写，当今采用的版本主要是http1.1。<br>http属于应用层，构建在tcp和ip协议之上，处于tcp/ip协议的最顶层，它不需要处理下层协议间诸如丢包补发、握手及数据分段和重新组装的细节。<br><img src="/2017/12/21/面向服务的体系架构-SOA/协议.png" alt=""></p>
+<h3 id="http请求与响应"><a href="#http请求与响应" class="headerlink" title="http请求与响应"></a>http请求与响应</h3><p><img src="面向服务的体系架构-SOA/http请求.png" alt=""></p>
+<h3 id="通过HttpClient发送http请求"><a href="#通过HttpClient发送http请求" class="headerlink" title="通过HttpClient发送http请求"></a>通过HttpClient发送http请求</h3><h3 id="使用Http协议的优势"><a href="#使用Http协议的优势" class="headerlink" title="使用Http协议的优势"></a>使用Http协议的优势</h3><p>基于http协议的，很多成熟的开源web容器已经帮助解决了很多问题，如tomcat、jboss、Apache，这使得开发人员将更多的精力集中在业务的实现而非处理底层细节。<br>但http也有其劣势的一面，相同内容信息，http协议传输用的字节数肯定比tcp用的字节数更多，同等网络下，效率也比较低，信息传输用的时间更长。</p>
+<h3 id="Json和xml"><a href="#Json和xml" class="headerlink" title="Json和xml"></a>Json和xml</h3><h4 id="json"><a href="#json" class="headerlink" title="json"></a>json</h4><p>json是一种轻量级的数据交换语言，以文字为基础，易于阅读。将对象序列化为json格式，可以在网络上很方便的传输，且各个平台几乎都拥有成熟的工具，能很快地将json反序列化为其对应语言的所需要的格式。<br>使用jackson包</p>
+<h4 id="xml"><a href="#xml" class="headerlink" title="xml"></a>xml</h4><p>xml的全称是可扩展标记语言（extensible markup language），可以标记数据、定义数据类型，是允许用户对自己的标记语言进行定义，用于标记电子文件使其具有结构性的源语言。xml提供统一的方法来描述和交换独立于应用程序和供应商的结构化数据，非常适合web传输。<br>可以使用xstream包</p>
+<h3 id="restful和RPC"><a href="#restful和RPC" class="headerlink" title="restful和RPC"></a>restful和RPC</h3><p>主流url链接风格主要有两种：一种是RPC风格，另一种是Rest风格。</p>
+<h4 id="RPC风格"><a href="#RPC风格" class="headerlink" title="RPC风格"></a>RPC风格</h4><p>RPC的风格是直接在http请求参数标明需要远程调用的服务接口名称、服务参数即可<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">http://hostname/provider.do?service=xxx.sayHello&amp;arg1=xxx</div></pre></td></tr></table></figure></p>
+<h4 id="Rest风格"><a href="#Rest风格" class="headerlink" title="Rest风格"></a>Rest风格</h4><p>Rest是Representation state transform，表现层状态转移。<br>在表现层状态转移过程中，表现层指的是资源的表现层，资源是网络的实体，是一张图片、一首歌曲、一段文本，你可以用url进行访问。资源通过表现层呈现出来，比如图片通过png表现，文本通过html表现。访问一个资源，需要客户端和服务器端进行一定的交互，势必涉及数据和状态的变化，http是无状态协议，因此所有的状态都保存在服务器端。如果客户端想要操作服务端，必须通过某种手段，这种手段就是http协议的集中操作方式，如GET、PUT、POST、DELETE。这便是rest原则的思想，符合rest原则设计的就是restful风格。<br>restful风格就是通过http请求对应的GET、POST、PUT、DELETE方法，完成对应的CRUD操作。<br><img src="/2017/12/21/面向服务的体系架构-SOA/restful.png" alt=""></p>
+<h3 id="基于http协议的RPC实现"><a href="#基于http协议的RPC实现" class="headerlink" title="基于http协议的RPC实现"></a>基于http协议的RPC实现</h3><p>类似我开发的数据交换平台的http接口</p>
+<h2 id="服务的路由和负载均衡"><a href="#服务的路由和负载均衡" class="headerlink" title="服务的路由和负载均衡"></a>服务的路由和负载均衡</h2><h3 id="服务化的演变"><a href="#服务化的演变" class="headerlink" title="服务化的演变"></a>服务化的演变</h3><p>分布式应用架构体系对于业务逻辑复用的需求十分强烈，上层应用都想借用已有的底层服务，来搭建更多、更丰富的应用。公共的业务被拆分出来，形成可共用的服务，最大程度的保障了代码和逻辑的复用，避免重复建设，这种设计也称SOA。<br>SOA架构中，服务消费者通过服务名称，在众多服务中找到要调用的服务的地址列表，称为服务的路由。<br><img src="/2017/12/21/面向服务的体系架构-SOA/服务路由.png" alt=""><br>对于负载比较高的服务来说，往往对应着多台服务器的集群，在请求到来时，为了将请求均衡地分配到后端服务器，负载均衡服务器将从服务对应的地址列表中，通过相应的负载均衡算法和规则，选择一台服务器进行访问，这个过程称为服务的负载均衡。<br>当服务的规模比较小时，可以采用硬编码的方式将服务地址和配置写在代码中，通过编码的方式来解决服务的路由和负载均衡问题，也可以通过传统的硬件负载均衡设备如F5或者采用LVS或者Nginx等软件解决方案，通过相关配置来解决服务的路由和负载均衡问题。<br>当服务越来越多，规模越来越大时，对应的机器数量也越来越大，单靠人工来管理和维护服务和地址的配置信息也越来越困难，依赖单点设备或者使用LVS、Nginx等软件方案进行路由和负载均衡调度，单点问题也开始出现，一旦服务路由和负载均衡服务器宕机，依赖它的所有服务均将失效。<br>此时需要一个能够动态注册和获取服务信息的地方，来统一管理服务名称和其对应的服务器列表信息，称之为服务配置中心。服务在启动时将其服务名、服务器地址注册到配置中心，服务消费者通过服务配置中心获取需要获取服务的机器列表，通过相应的负载均衡列表，选取其中一台服务器进行调用。当服务器进行宕机或者下线时，相应的机器需要能够动态地从服务配置中心里面移除，并通知相应的服务消费者。在这个过程中，服务消费者只有第一次调用需要查询服务配置中心，然后将查询的信息缓存到本地，后面的调用直接使用本地缓存的服务地址信息列表，知道服务的地址列表更新，这种无中心化的结构解决了之前负载均衡的设备导致的单点问题。<br>基于zookeeper的的持久节点和非持久节点，我们能够近乎实时地感觉到后端服务器的状态。通过集群间的zab协议，使得服务配置信息能够保持一致，zookeeper本身的容错和leader选举机制，保障了扩容性。<br><img src="/2017/12/21/面向服务的体系架构-SOA/zookeeper负载均衡.png" alt=""></p>
+<h3 id="负载均衡算法"><a href="#负载均衡算法" class="headerlink" title="负载均衡算法"></a>负载均衡算法</h3><h4 id="轮询法"><a href="#轮询法" class="headerlink" title="轮询法"></a>轮询法</h4><p>将请求按顺序轮流的分配到后端服务器，它均衡地对待后端每一台服务器，而不关心服务器实际的连接数和当前的系统负载</p>
+<h4 id="随机法"><a href="#随机法" class="headerlink" title="随机法"></a>随机法</h4><p>通过系统函数，根据后端服务器列表大小值来随机选取一台访问</p>
+<h4 id="源地址哈希表"><a href="#源地址哈希表" class="headerlink" title="源地址哈希表"></a>源地址哈希表</h4><p>获取客户端访问的ip地址值，通过哈希函数计算得到一个数值，用该数值对服务器列表大小进行取模运算，得到的结果就是要访问的服务器序号。同一ip地址的客户端当服务器的列表不变时，它每次都会映射到同一台后端服务器访问。</p>
+<h4 id="加权轮询法"><a href="#加权轮询法" class="headerlink" title="加权轮询法"></a>加权轮询法</h4><p>不同的后端服务器可能机器的配置和当前系统的负载并不相同，因此他们的抗压能力也不尽相同。给配置高负载低的机器配置更高的权重，让其处理更多的请求，给配置低负载高的配置更低的权重，降低其系统的负载，</p>
+<h4 id="加权随机法"><a href="#加权随机法" class="headerlink" title="加权随机法"></a>加权随机法</h4><h4 id="最小连接数法"><a href="#最小连接数法" class="headerlink" title="最小连接数法"></a>最小连接数法</h4><p>最小连接数算法比较灵活和智能，由于后端的服务器不尽相同，对于请求的处理有快有慢，它根据后端服务器当前连接的情况，动态的选取当前积压连接数最小的服务器来处理当前请求，尽可能提高后端服务器的利用效率，将负载合理地分流给每一台机器。</p>
+<h3 id="动态配置规则"><a href="#动态配置规则" class="headerlink" title="动态配置规则"></a>动态配置规则</h3><p>把这部分代码剥离出来，采用动态配置规则，使用groovy脚本语言直接编译成java的class字节码，运行在java虚拟机上。</p>
+<h3 id="zookeeper介绍和环境搭建"><a href="#zookeeper介绍和环境搭建" class="headerlink" title="zookeeper介绍和环境搭建"></a>zookeeper介绍和环境搭建</h3><h3 id="zk的api使用"><a href="#zk的api使用" class="headerlink" title="zk的api使用"></a>zk的api使用</h3><h3 id="zkclient的使用"><a href="#zkclient的使用" class="headerlink" title="zkclient的使用"></a>zkclient的使用</h3><p>github源码：<a href="https://github.com/sgroschupf/zkclient.git" target="_blank" rel="external">https://github.com/sgroschupf/zkclient.git</a></p>
+<h3 id="路由和负载均衡的实现"><a href="#路由和负载均衡的实现" class="headerlink" title="路由和负载均衡的实现"></a>路由和负载均衡的实现</h3><p>通过注册相应的watcher，服务消费者能够第一时间获知服务提供者机器信息的变更。利用其znode的特点和watcher机制，将其作为动态注册和获取服务信息的配置中心。<br><img src="/2017/12/21/面向服务的体系架构-SOA/服务配置节点树.png" alt=""><br>配置中心分三层，根节点为用来聚集服务的节点，通过它可以查询到所有服务，而节点名称挂载的是服务提供者提供的服务地址，服务消费者通过负载均衡算法选择其中一个地址发起远程调用。根节点和服务名称采用的是zk的持久化节点，服务提供者的地址节点是zk的非持久化节点，一旦服务器宕机或者下线，节点就会消失。<br><img src="/2017/12/21/面向服务的体系架构-SOA/zk节点.png" alt=""><br>增加一层，用来表示节点类型，每个服务包含两种节点类型，即consumer和provider，当服务消费者启动时，即在服务配置中心里，在其调用的所有服务的consumer节点下增加自己的机器地址，只需要后台监控程序解析出对应服务的consumer节点的子节点，便能清楚的知道某一服务被哪些机器消费了。</p>
+<h2 id="http服务网关"><a href="#http服务网关" class="headerlink" title="http服务网关"></a>http服务网关</h2><p><img src="/2017/12/21/面向服务的体系架构-SOA/网关1.png" alt=""><br>gateway外部各种app的http请求，完成相应的权限和安全验证，当验证通过，根据传过的服务名称，到服务配置中心找到相应的服务名称节点，并加载对应服务提供者提供的地址列表，通过前面的负载均衡算法选取机器发起远程调用，将客户端参数传到服务端。服务提供方根据传入的参数，给出响应，当gateway收到响应后，再将响应返回给App<br>一方面通过网关可以很好解决安全问题，在恶意请求或者非授权请求到达后端会进行拦截。另一方面网关可以通过服务的路由进行负载均衡<br><img src="/2017/12/21/面向服务的体系架构-SOA/网关集群.png" alt=""></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/20/优化ActiveMQ性能/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="李睿">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/20/优化ActiveMQ性能/" itemprop="url">优化ActiveMQ性能</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-20T22:25:04+08:00">
+                2017-12-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/消息中间件/" itemprop="url" rel="index">
+                    <span itemprop="name">消息中间件</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="持久化和非持久化传递"><a href="#持久化和非持久化传递" class="headerlink" title="持久化和非持久化传递"></a>持久化和非持久化传递</h2><h3 id="持久化消息"><a href="#持久化消息" class="headerlink" title="持久化消息"></a>持久化消息</h3><p>这是 ActiveMQ 的默认传送模式，此模式保证这些消息只被传送一次和成功使用一次。对于这些消息，可靠性是优先考虑的因素。可靠性的另一个重要方面是确保持久性消息传送至目标后，消息服务在向消费者传送它们之前不会丢失这些消息。这意味着在持久性消息传送至目标时，消息服务将其放入持久性数据存储。如果消息服务由于某种原因导致失败，它可以恢复此消息并将此消息传送至相应的消费者。虽然这样增加了消息传送的开销，但却增加了可靠性。</p>
+<h3 id="非持久化消息"><a href="#非持久化消息" class="headerlink" title="非持久化消息"></a>非持久化消息</h3><p>保证这些消息最多被传送一次。对于这些消息，可靠性并非主要的考虑因素。此模式并不要求持久性的数据存储，也不保证消息服务由于某种原因导致失败后消息不会丢失。<br>Non-persistent 传递消息比 Persistents 传递消息速度更快，原因如下：<br>Non-persistent 发送消息是异步的， Producer 不需要等待 Consumer 的 receipt消息。<br>Persisting 传递消息是需要把消息存储起来。然后在传递，这样很慢 。</p>
+<h2 id="超快回应消息"><a href="#超快回应消息" class="headerlink" title="超快回应消息"></a>超快回应消息</h2><p>内嵌 broker</p>
+<h2 id="Transactions"><a href="#Transactions" class="headerlink" title="Transactions"></a>Transactions</h2><p>Transaction 比 Non-transaction 的性能高</p>
+<h2 id="Tuning-the-OpenWire-protocol"><a href="#Tuning-the-OpenWire-protocol" class="headerlink" title="Tuning the OpenWire protocol"></a>Tuning the OpenWire protocol</h2><p>跨语言协议</p>
+<h2 id="uning-the-TCP-Transport"><a href="#uning-the-TCP-Transport" class="headerlink" title="uning the TCP Transport"></a>uning the TCP Transport</h2><p>TCP 协议是 ActiveMQ 使用最常见的协议。<br>有以下两点影响 TCP 协议性能：<br>1) socketBufferSize=缓存，默认是 65536。<br>2) tcpNoDelay=默认是 false，</p>
+<h2 id="优化消息消费者"><a href="#优化消息消费者" class="headerlink" title="优化消息消费者"></a>优化消息消费者</h2><h3 id="Prefetch-Limit"><a href="#Prefetch-Limit" class="headerlink" title="Prefetch Limit"></a>Prefetch Limit</h3><p>ActiveMQ 默认的 prefetch 大小不同的：<br>Queue Consumer 默认大小=1000<br>Queue Browser Consumer 默认大小=500<br>Persistent Topic Consumer 默认大小=100<br>Non-persistent Topic Consumer 默认大小=32766</p>
+<h3 id="Delivery-and-Acknowledgement-of-messages"><a href="#Delivery-and-Acknowledgement-of-messages" class="headerlink" title="Delivery and Acknowledgement of messages"></a>Delivery and Acknowledgement of messages</h3><p>建议使用 Session.DUPS_ACKNOWLEDGE。<br>JMS 消息只有在被确认之后，才认为已经被成功地消费了。消息的成功消费通常包含三个阶段：客户接收消息、客户处理消息和消息被确认。在事务性会话中，当一个事务被提交的时候，确认自动发生。在非事务性会话中， 消息何时被确认取决于创建会话时的应答模式 （acknowledgement mode） 。<br>该参数有以下三个可选值：<br>Session.AUTO_ACKNOWLEDGE。当客户成功的从 receive 方法返回的时候，或者从MessageListener.onMessage 方法成功返回的时候，会话自动确认客户收到的消息<br>Sessiion.TRANSACTION。用 session.commit()回执确认。<br>Session.CLIENT_ACKNOWLEDGE。客户通过消息的 acknowledge 方法确认消息。需要注意的是，在这种模式中，确认是在会话层上进行：确认一个被消费的消息将自动确认所有已被会话消费的消息。例如，如果一个消息消费者消费了 10 个消息，然后确认第 5 个消息，那么所有 10 个消息都被确认。<br>Session.DUPS_ACKNOWLEDGE。该选择只是会话迟钝第确认消息的提交。当消息到达一定数量后，才开始消费该消息。如果 JMS provider 失败，那么可能会导致一些重复的消息。如果是重复的消息，那么 JMS provider 必须把消息头的 JMSRedelivered 字段设置为 true。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/19/activemq先进特性/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1966,782 +2427,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/27/dubbo-framework-extensions/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="李睿">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/27/dubbo-framework-extensions/" itemprop="url">dubbo_framework_extensions</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-27T10:41:29+08:00">
-                2017-11-27
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/dubbo/" itemprop="url" rel="index">
-                    <span itemprop="name">dubbo</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p><img src="/2017/11/27/dubbo-framework-extensions/do.png" alt="do"></p>
-<h2 id="framework"><a href="#framework" class="headerlink" title="framework"></a>framework</h2><h3 id="layers"><a href="#layers" class="headerlink" title="layers"></a>layers</h3><p><img src="/2017/11/27/dubbo-framework-extensions/framework1.png" alt="do"><br><img src="/2017/11/27/dubbo-framework-extensions/extension.png" alt="do"></p>
-<h3 id="modules"><a href="#modules" class="headerlink" title="modules"></a>modules</h3><p><img src="/2017/11/27/dubbo-framework-extensions/modules.png" alt="do"></p>
-<h2 id="SPI"><a href="#SPI" class="headerlink" title="SPI"></a>SPI</h2><h3 id="IOC-amp-AOP"><a href="#IOC-amp-AOP" class="headerlink" title="IOC&amp;AOP"></a>IOC&amp;AOP</h3><p>对于扩展实现IOC依赖注入功能：<br>举例来说：接口A，实现者A1、A2。接口B，实现者B1、B2。<br>现在实现者A1含有setB()方法，会自动注入一个接口B的实现者，此时注入B1还是B2呢？都不是，而是注入一个动态生成的接口B的实现者B$Adpative，该实现者能够根据参数的不同，自动引用B1或者B2来完成相应的功能.对扩展采用装饰器模式进行功能增强，类似AOP实现的功能.<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">//IOC</div><div class="line">public XxxCluster implements Cluster &#123;</div><div class="line">   private LoadBalance loadbalance;</div><div class="line">   public void <span class="built_in">set</span>LoadBalance(LoadBalance loadbalance) &#123;</div><div class="line">       this.loadbalance = loadbalance;</div><div class="line">     &#125;</div><div class="line">&#125;</div><div class="line">//AOP</div><div class="line">public XxxCluster implements Cluster &#123;</div><div class="line">   private Cluster cluster;</div><div class="line">   public XxxCluster(Cluster cluster) &#123;</div><div class="line">      this.cluster = cluster;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p><img src="/2017/11/27/dubbo-framework-extensions/protocol.png" alt="protocol"><br><img src="/2017/11/27/dubbo-framework-extensions/filter.png" alt=""><br><img src="/2017/11/27/dubbo-framework-extensions/proxyFactory.png" alt=""><br><img src="/2017/11/27/dubbo-framework-extensions/javassist.png" alt=""><br><img src="/2017/11/27/dubbo-framework-extensions/cluster.png" alt=""><br><img src="/2017/11/27/dubbo-framework-extensions/remoting.png" alt=""></p>
-<h2 id="API"><a href="#API" class="headerlink" title="API"></a>API</h2><h3 id="config"><a href="#config" class="headerlink" title="config"></a>config</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">//Application shared</div><div class="line">&lt;dubbo:application name=<span class="string">"xxx"</span> /&gt;</div><div class="line">&lt;dubbo:registry address=<span class="string">"127.0.0.1"</span> /&gt;</div><div class="line">//provider</div><div class="line">&lt;dubbo:protocol name=<span class="string">"dubbo"</span> port=<span class="string">"7777"</span> /&gt;</div><div class="line">&lt;dubbo:service interface=<span class="string">"xxxx"</span> /&gt;</div><div class="line">&lt;dubbo:provider protocol=<span class="string">"dubbo"</span> /&gt;</div><div class="line">//consumer</div><div class="line">&lt;dubbo:reference interface=<span class="string">"xxxx"</span> /&gt;</div><div class="line">&lt;dubbo:consumer timeout /&gt;</div></pre></td></tr></table></figure>
-<h3 id="config-type"><a href="#config-type" class="headerlink" title="config type"></a>config type</h3><ul>
-<li>Service Identification<br>group<br>version<br>interface</li>
-<li>Service Governance<br>deprecated<br>application</li>
-<li>performance optimize<br>timeout<br>threads</li>
-</ul>
-<h3 id="config-Override"><a href="#config-Override" class="headerlink" title="config Override"></a>config Override</h3><p>method 继承 接口 继承缺失，消费者继承服务提供者</p>
-<h3 id="编程配置"><a href="#编程配置" class="headerlink" title="编程配置"></a>编程配置</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">ServiceConfig</div><div class="line">– <span class="built_in">set</span>Application(new ApplicationConfig(“xxx”));</div><div class="line">– <span class="built_in">set</span>Registry(new RegistryConfig(“10.20.153.186”));</div><div class="line">– <span class="built_in">set</span>Interface(“com.xxx.XxxService”);</div><div class="line">– <span class="built_in">export</span>();</div><div class="line">• ReferenceConfig</div><div class="line">– <span class="built_in">set</span>Application(new ApplicationConfig(“yyy”));</div><div class="line">– <span class="built_in">set</span>Registry(new RegistryConfig(“10.20.153.186”));</div><div class="line">– <span class="built_in">set</span>Interface(“com.xxx.XxxService”);</div><div class="line">– get();</div></pre></td></tr></table></figure>
-<h3 id="context-amp-trace"><a href="#context-amp-trace" class="headerlink" title="context&amp;trace"></a>context&amp;trace</h3><p><img src="/2017/11/27/dubbo-framework-extensions/context&amp;trace.png" alt=""><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">ThreadLocal context</div><div class="line">RpcContext.getContext().getRemoteHost();</div><div class="line">RpcContext.getContext().setAttachment(<span class="string">"index"</span>,<span class="string">"1"</span>);</div><div class="line">RpcContext.getContext().getAttachment(<span class="string">"index"</span>);</div><div class="line">like http cookie</div></pre></td></tr></table></figure></p>
-<h3 id="GenericService"><a href="#GenericService" class="headerlink" title="GenericService"></a>GenericService</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">// java interface</div><div class="line">MemberService memberService=application.getBean(<span class="string">"memberService"</span>);</div><div class="line">memberService.findPeople(memberId);</div><div class="line">//Generic interface POJO需要转化为map</div><div class="line">GenericService genericService=application.getBean(<span class="string">"memberService"</span>);</div><div class="line">genericService.invoke(<span class="string">"findPeople"</span>,new String[]&#123;<span class="string">"java.lang.String"</span>&#125;,new Object[]&#123;memberId&#125;);</div><div class="line">//java implement</div><div class="line">public class MemberServiceImpl implements MemberService&#123;</div><div class="line"></div><div class="line">&#125;</div><div class="line">//Generic implement</div><div class="line">public class MemberServiceImpl implement GenericService&#123;</div><div class="line">  public Object invoke(String method,String[] ptypes,Object[] args)&#123;</div><div class="line"></div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="local-amp-mock"><a href="#local-amp-mock" class="headerlink" title="local&amp;mock"></a>local&amp;mock</h3><p><img src="/2017/11/27/dubbo-framework-extensions/mock.png" alt=""><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">dubbo://10.20.153.10?<span class="built_in">local</span>=<span class="literal">true</span>&amp;mock=<span class="literal">true</span></div><div class="line">Constructor:</div><div class="line">public XxxServiceLocal(XxxService xxxService)&#123;</div><div class="line"></div><div class="line">&#125;</div><div class="line">public <span class="function"><span class="title">XxxServiceMock</span></span>()&#123;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/24/dubbo功能介绍/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="李睿">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/24/dubbo功能介绍/" itemprop="url">dubbo功能介绍</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-24T22:53:33+08:00">
-                2017-11-24
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/dubbo/" itemprop="url" rel="index">
-                    <span itemprop="name">dubbo</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="dubbo简要介绍"><a href="#dubbo简要介绍" class="headerlink" title="dubbo简要介绍"></a>dubbo简要介绍</h1><h2 id="dubbo是什么"><a href="#dubbo是什么" class="headerlink" title="dubbo是什么"></a>dubbo是什么</h2><p>它是分布式服务框架，高性能和透明化的RPC远程服务调用方案；SOA服务治理方案</p>
-<h2 id="如何使用dubbo"><a href="#如何使用dubbo" class="headerlink" title="如何使用dubbo"></a>如何使用dubbo</h2><p>本地服务<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;bean id=<span class="string">"xxxService"</span> class=<span class="string">"xxxServiceImpl"</span> /&gt;</div></pre></td></tr></table></figure></p>
-<p>远程服务<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">//服务提供者</div><div class="line">&lt;bean id=<span class="string">"xxxService"</span> class=<span class="string">"xxxServiceImpl"</span> /&gt;</div><div class="line">&lt;dubbo:service interface=<span class="string">"xxxInterface"</span> ref=<span class="string">"xxxService"</span>&gt;</div><div class="line">//服务消费者</div><div class="line">&lt;dubbo:reference id=<span class="string">"xxxService"</span> interface=<span class="string">"xxxInterface"</span>&gt;</div></pre></td></tr></table></figure></p>
-<h2 id="dubbo能做什么"><a href="#dubbo能做什么" class="headerlink" title="dubbo能做什么"></a>dubbo能做什么</h2><h3 id="透明化的远程调用"><a href="#透明化的远程调用" class="headerlink" title="透明化的远程调用"></a>透明化的远程调用</h3><p>就像调用本地方法一样调用远程方法；只需简单配置，没有任何API侵入。</p>
-<h3 id="软负载均衡和容错机制"><a href="#软负载均衡和容错机制" class="headerlink" title="软负载均衡和容错机制"></a>软负载均衡和容错机制</h3><p>可在内网替代F5等硬件负载均衡器</p>
-<h3 id="服务自动注册与发现"><a href="#服务自动注册与发现" class="headerlink" title="服务自动注册与发现"></a>服务自动注册与发现</h3><p>不再需要写死服务提供方地址，注册中心基于接口名查询服务提供者的ip地址，并且能够平滑添加和删除服务提供者。</p>
-<h2 id="dubbo基本原理"><a href="#dubbo基本原理" class="headerlink" title="dubbo基本原理"></a>dubbo基本原理</h2><p><img src="/2017/11/24/dubbo功能介绍/dubbo基本原理.png" alt="dubbo基本原理"></p>
-<h2 id="dubbo-rpc基本功能"><a href="#dubbo-rpc基本功能" class="headerlink" title="dubbo rpc基本功能"></a>dubbo rpc基本功能</h2><p><img src="/2017/11/24/dubbo功能介绍/dubbo基本功能.png" alt="dubbo-rpc 基本功能"></p>
-<h3 id="配置继承"><a href="#配置继承" class="headerlink" title="配置继承"></a>配置继承</h3><p>实际使用中发现服务器比消费者更清楚一个方法的执行时间和是否允许重试等信息，所以增加允许服务提供者为消费者设置缺省值，并采用继承风格<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">//服务提供者配置</div><div class="line">&lt;dubbo:service timeout=<span class="string">"3000"</span> retries=<span class="string">"0"</span> /&gt;</div><div class="line">dubbo://10.20.130.230:20880/xxxService?timeout=3000&amp;retries=0</div><div class="line">服务提供者提供配置参考值</div><div class="line">//注册中心</div><div class="line">dubbo://10.20.130.230:20880/xxxService?timeout=4000&amp;retries=1</div><div class="line">注册中心可在服务治理过程中修改配置值，如果不修改则使用provider的配置值</div><div class="line">//服务消费者</div><div class="line">&lt;dubbo:reference id=<span class="string">""</span> interface=<span class="string">""</span> timeout=<span class="string">"5000"</span> retries=<span class="string">"2"</span> /&gt;</div><div class="line">dubbo://10.20.130.230:20880/xxxService?timeout=5000&amp;retries=2</div><div class="line">服务消费者如果出现网络慢等因素，可再修改配置值，如果不修改使用前面的配置值</div></pre></td></tr></table></figure></p>
-<h3 id="可编程配置"><a href="#可编程配置" class="headerlink" title="可编程配置"></a>可编程配置</h3><h4 id="暴露服务"><a href="#暴露服务" class="headerlink" title="暴露服务"></a>暴露服务</h4><ol>
-<li><p>编程配置</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">// 服务实现</div><div class="line">XxxService xxxService = new XxxServiceImpl();</div><div class="line">// 当前应用配置</div><div class="line">ApplicationConfig application = new ApplicationConfig();</div><div class="line">application.setName(<span class="string">"xxx"</span>);</div><div class="line">// 连接注册中心配置</div><div class="line">RegistryConfig registry = new RegistryConfig();</div><div class="line">registry.setAddress(<span class="string">"10.20.130.230:9090"</span>);</div><div class="line">registry.setUsername(<span class="string">"aaa"</span>);</div><div class="line">registry.setPassword(<span class="string">"bbb"</span>);</div><div class="line">// 服务提供者协议配置</div><div class="line">ProviderConfig provider = new ProviderConfig();</div><div class="line">provider.setProtocol(<span class="string">"dubbo"</span>);</div><div class="line">provider.setPort(12345);</div><div class="line">provider.setThreads(200);</div><div class="line">// 服务提供者暴露服务配置</div><div class="line">ServiceConfig service = new ServiceConfig();</div><div class="line">service.setApplication(application);</div><div class="line">service.setRegistry(registry); // 多个注册中心可以用<span class="built_in">set</span>Registries()</div><div class="line">service.setProvider(provider); // 多个提供者可以用<span class="built_in">set</span>Providers()</div><div class="line">service.setInterfaceClass(XxxService.class);</div><div class="line">service.setRef(xxxService);</div><div class="line">service.setVersion(<span class="string">"1.0.0"</span>);</div><div class="line">service.export(); // 触发服务注册</div></pre></td></tr></table></figure>
-</li>
-<li><p>schema配置</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version=<span class="string">"1.0"</span> encoding=<span class="string">"UTF-8"</span>?&gt;</div><div class="line">&lt;beans xmlns=<span class="string">"http://www.springframework.org/schema/beans"</span></div><div class="line">xmlns:xsi=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></div><div class="line">xmlns:dubbo=<span class="string">"http://repo.alibaba-inc.com/schema/dubbo"</span></div><div class="line">xsi:schemaLocation=<span class="string">"http://www.springframework.org/schema/beans</span></div><div class="line">http://www.springframework.org/schema/beans/spring-beans.xsd</div><div class="line">http://repo.alibaba-inc.com/schema/dubbo</div><div class="line">http://repo.alibaba-inc.com/schema/dubbo/dubbo-component-2.0.xsd"&gt;</div><div class="line">&lt;!--服务实现 --&gt;</div><div class="line">&lt;bean id=<span class="string">"xxxService"</span> class=<span class="string">"com.alibaba.xxx.XxxServiceImpl"</span> /&gt;</div><div class="line">&lt;!--当前应用配置 --&gt;</div><div class="line">&lt;dubbo:application name=<span class="string">"morgan"</span> /&gt;</div><div class="line">&lt;!-- 连接注册中心配置 --&gt;</div><div class="line">&lt;dubbo:registry address=<span class="string">"10.20.130.230:9090"</span> username=<span class="string">"admin"</span></div><div class="line">password=<span class="string">"hello1234"</span> /&gt;</div><div class="line">&lt;!-- 服务提供者协议配置 --&gt;</div><div class="line">&lt;dubbo:provider protocol=<span class="string">"dubbo"</span> port=<span class="string">"12345"</span> threads=<span class="string">"200"</span> /&gt;</div><div class="line">&lt;!-- 服务提供者暴露服务配置 --&gt;</div><div class="line">&lt;dubbo:service interface=<span class="string">"com.alibaba.xxx.XxxService"</span></div><div class="line">version=<span class="string">"1.0.0"</span> ref=<span class="string">"xxxService"</span> /&gt;</div><div class="line">&lt;/beans&gt;</div></pre></td></tr></table></figure>
-</li>
-</ol>
-<h4 id="引用服务"><a href="#引用服务" class="headerlink" title="引用服务"></a>引用服务</h4><ol>
-<li><p>编程配置</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">// 当前应用配置</div><div class="line">ApplicationConfig application = new ApplicationConfig();</div><div class="line">application.setName(<span class="string">"yyy"</span>);</div><div class="line">// 连接注册中心配置</div><div class="line">RegistryConfig registry = new RegistryConfig();</div><div class="line">registry.setAddress(<span class="string">"10.20.130.230:9090"</span>);</div><div class="line">registry.setUsername(<span class="string">"aaa"</span>);</div><div class="line">registry.setPassword(<span class="string">"bbb"</span>);</div><div class="line">// 服务消费者缺省值配置</div><div class="line">ConsumerConfig consumer = new ConsumerConfig();</div><div class="line">consumer.setTimeout(5000);</div><div class="line">consumer.setRetries(2);</div><div class="line">// 引用远程服务</div><div class="line">ReferenceConfig reference = new ReferenceConfig();</div><div class="line">reference.setApplication(application);</div><div class="line">reference.setRegistry(registry); // 多个注册中心可以用<span class="built_in">set</span>Registries()</div><div class="line">reference.setConsumer(consumer);</div><div class="line">reference.setInterfaceClass(XxxService.class);</div><div class="line">reference.setVersion(<span class="string">"1.0.0"</span>);</div><div class="line">XxxService xxxService = reference.get(); // 获取远程xxxService代理</div></pre></td></tr></table></figure>
-</li>
-<li><p>schema配置</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version=<span class="string">"1.0"</span> encoding=<span class="string">"UTF-8"</span>?&gt;</div><div class="line">&lt;beans xmlns=<span class="string">"http://www.springframework.org/schema/beans"</span></div><div class="line">xmlns:xsi=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></div><div class="line">xmlns:dubbo=<span class="string">"http://repo.alibaba-inc.com/schema/dubbo"</span></div><div class="line">xsi:schemaLocation=<span class="string">"http://www.springframework.org/schema/beans</span></div><div class="line">http://www.springframework.org/schema/beans/spring-beans.xsd</div><div class="line">http://repo.alibaba-inc.com/schema/dubbo</div><div class="line">http://repo.alibaba-inc.com/schema/dubbo/dubbo-component-2.0.xsd"&gt;</div><div class="line">&lt;!-- 当前应用信息配置 --&gt;</div><div class="line">&lt;dubbo:application name=<span class="string">"kylin"</span> /&gt;</div><div class="line">&lt;!-- 连接注册中心配置 --&gt;</div><div class="line">&lt;dubbo:registry address=<span class="string">"10.20.130.230:9090"</span> username=<span class="string">"admin"</span></div><div class="line">password=<span class="string">"hello1234"</span> /&gt;</div><div class="line">&lt;!-- 服务消费者缺省值配置 --&gt;</div><div class="line">&lt;dubbo:consumer timeout=<span class="string">"5000"</span> retries=<span class="string">"2"</span> /&gt;</div><div class="line">&lt;!-- 引用远程服务 --&gt;</div><div class="line">&lt;dubbo:reference id=<span class="string">"xxxService"</span></div><div class="line">interface=<span class="string">"com.alibaba.xxx.XxxService"</span> version=<span class="string">"1.0.0 /&gt;</span></div><div class="line">&lt;/beans&gt;</div></pre></td></tr></table></figure>
-</li>
-</ol>
-<h3 id="服务分组"><a href="#服务分组" class="headerlink" title="服务分组"></a>服务分组</h3><p>当一个接口有不同实现，可以用group区分<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">//服务提供者</div><div class="line">&lt;dubbo:service group=<span class="string">"feeback"</span> interface=<span class="string">"com.xxx.IndexService"</span>/&gt;</div><div class="line">&lt;dubbo:service group=<span class="string">"member"</span> interface=<span class="string">"com.xxx.IndexService"</span>/&gt;</div><div class="line">//服务消费者</div><div class="line">&lt;dubbo:reference id=<span class="string">"fsService"</span> group=<span class="string">"feeback"</span> interface=<span class="string">"com.xxx.IndexService"</span>/&gt;</div><div class="line">&lt;dubbo:reference id=<span class="string">"mservice"</span> group=<span class="string">"member"</span> interface=<span class="string">"com.xxx.IndexService"</span>/&gt;</div></pre></td></tr></table></figure></p>
-<p>当一个接口实现，出现不兼容升级时，可以用版本号过渡，版本号不同的服务相互间不引用<br>一般处理步骤<br>1）在低压力时间段，先升级一半提供者为新版本<br>2）再将所有消费者升级为新版本<br>3）然后将剩下的一半提供者升级为新版本<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">服务提供者</div><div class="line">&lt;dubbo:service interface=<span class="string">"com.foo.BarService"</span> version=<span class="string">"1.0.0"</span> /&gt;</div><div class="line">&lt;dubbo:service interface=<span class="string">"com.foo.BarService"</span> version=<span class="string">"2.0.0"</span> /&gt;</div><div class="line">服务消费者</div><div class="line">&lt;dubbo:reference id=<span class="string">"barService"</span> interface=<span class="string">"com.foo.BarService"</span> version=<span class="string">"1.0.0"</span> /&gt;</div><div class="line">&lt;dubbo:reference id=<span class="string">"barService"</span> interface=<span class="string">"com.foo.BarService"</span> version=<span class="string">"2.0.0"</span> /&gt;</div></pre></td></tr></table></figure></p>
-<h3 id="指定调用"><a href="#指定调用" class="headerlink" title="指定调用"></a>指定调用</h3><p>点对点直连/指定调用需求（开发/测试环境）。在开发及测试环境下，经常需要绕过注册中心，只测试指定服务提供者，这时候可能需要点对点直连，点对点直联方式，将以服务接口为单位，忽略注册中心的提供者列表。</p>
-<ol>
-<li><p>spring配置</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;dubbo:reference interface=<span class="string">"com.alibaba.xxx.XxxService"</span> url=<span class="string">"dubbo://localhost:20890"</span>/&gt;</div></pre></td></tr></table></figure>
-</li>
-<li><p>java -D参数</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">java -Dcom.alibaba.xxx.XxxService=dubbo://localhost:20890</div></pre></td></tr></table></figure>
-</li>
-<li><p>映射文件方式</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">– java -Ddubbo.resolve.file=xxx.properties</div><div class="line">– com.alibaba.xxx.XxxService=dubbo://localhost:20890</div></pre></td></tr></table></figure>
-</li>
-<li><p>路由方式<br>– 参数匹配 host、clssifier</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">//对于所有调用com.foo.BarService接口的消费者，如果消费者的ip是<span class="string">"10.20.153.10"</span>，那么这个消费者将调用ip为<span class="string">"10.20.153.11"</span>的提供者，这样，通过动态配置注册中心的路由规则，就实现了动态指定某个提供者的需求。</div><div class="line">RegistryFactory registryFactory = ExtensionLoader.getExtensionLoader(RegistryFactory.class).getAdaptiveExtension();</div><div class="line">Registry registry = registryFactory.getRegistry(URL.valueOf(<span class="string">"zookeeper://10.20.153.10:2181"</span>));</div><div class="line">registry.register(URL.valueOf(<span class="string">"condition://0.0.0.0/com.foo.BarService?category=routers&amp;dynamic=false&amp;rule="</span>+ URL.encode(<span class="string">"http://10.20.160.198/wiki/display/dubbo/host = 10.20.153.10 =&gt; host = 10.20.153.11"</span>)));</div></pre></td></tr></table></figure>
-</li>
-<li><p>修改version<br>不推荐</p>
-</li>
-</ol>
-<h3 id="只订阅"><a href="#只订阅" class="headerlink" title="只订阅"></a>只订阅</h3><p>共用注册中心，开发人员机器上的服务提供者被误调，影响其他开发人员（开发、测试环境）<br>场景：为方便开发测试，经常会在线下共用一个所有服务可用的注册中心，这时，如果一个正在开发中的服务提供者注册，可能会影响消费者不能正常运行。可以让服务提供者开发方，只订阅服务(开发的服务可能依赖其它服务)，而不注册正在开发的服务，通过直连测试正在开发的服务。</p>
-<p><dubbo:registry register="false"><br><img src="/2017/11/24/dubbo功能介绍/只订阅结构.png" alt="只订阅"></dubbo:registry></p>
-<h3 id="集群和容错"><a href="#集群和容错" class="headerlink" title="集群和容错"></a>集群和容错</h3><p><img src="/2017/11/24/dubbo功能介绍/集群容错.png" alt="集群容错"><br>将Directory中的多个Invoker伪装成一个Invoker, 对上层透明，包含集群的容错机制<br>Cluster接口定义<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">@SPI(FailoverCluster.NAME)</div><div class="line">public interface Cluster &#123;</div><div class="line">    @Adaptive</div><div class="line">    &lt;T&gt; Invoker&lt;T&gt;join(Directory&lt;T&gt; directory) throws RpcException;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>Cluster可以看做是工厂类， 将目录directory下的invoker合并成一个统一的Invoker，根据不同集群策略的Cluster创建不同的Invoker我们来看下默认的失败转移，当出现失败重试其他服务的策略, 这个Cluster实现很简单就是创建FailoverCluseterInvoker对象<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">public class FailoverCluster implements Cluster &#123;</div><div class="line">    public final static String NAME =<span class="string">"failover"</span>;</div><div class="line">    public&lt;T&gt; Invoker&lt;T&gt; join(Directory&lt;T&gt; directory)throws RpcException&#123;</div><div class="line">        <span class="built_in">return</span> new FailoverClusterInvoker&lt;T&gt;(directory);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p><img src="/2017/11/24/dubbo功能介绍/集群方案.png" alt="集群方案"><br>1）AvailableCluster: 获取可用的调用。遍历所有Invokers判断Invoker.isAvalible,只要一个有为true直接调用返回，不管成不成功<br>2）BroadcastCluster: 广播调用。遍历所有Invokers, 逐个调用每个调用catch住异常不影响其他invoker调用<br>3）FailbackCluster: 失败自动恢复， 对于invoker调用失败， 后台记录失败请求，任务定时重发, 通常用于通知<br>4）FailfastCluster: 快速失败，只发起一次调用，失败立即保错，通常用于非幂等性操作<br>5）FailoverCluster: 失败转移，当出现失败，重试其它服务器，通常用于读操作，但重试会带来更长延迟<br>（1）   目录服务directory.list(invocation) 列出方法的所有可调用服务<br>获取重试次数，默认重试两次<br>（2）   根据LoadBalance负载策略选择一个Invoker<br>（3）   执行invoker.invoke(invocation)调用<br>（4）   调用成功返回<br>调用失败小于重试次数，重新执行从3）步骤开始执行<br>       调用次数大于等于重试次数抛出调用失败异常<br>6）FailsafeCluster: 失败安全，出现异常时，直接忽略，通常用于写入审计日志等操作。<br>7）ForkingCluster: 并行调用，只要一个成功即返回，通常用于实时性要求较高的操作，但需要浪费更多服务资源。<br>8）  MergeableCluster: 分组聚合， 按组合并返回结果，比如菜单服务，接口一样，但有多种实现，用group区分，现在消费方需从每种group中调用一次返回结果，合并结果返回，这样就可以实现聚合菜单项。<br>这个还蛮有意思，我们分析下是如何实现的<br>（1）   根据MERGE_KEY从url获取参数值<br>（2）   为空不需要merge， 正常调用<br>（3）   按group分组调用，将返回接口保存到集合中<br>（4）   获取MERGE_KEY如果是默认的话，获取默认merge策略，主要根据返回类型判断<br>（5）   如果不是，获取自定义的merge策略<br>（6）   Merge策略合并调用结果返回<br><img src="/2017/11/24/dubbo功能介绍/merge.png" alt="merge"><br>9）MockClusterWrapper: 具备调用mock功能是其他Cluster包装<br>获取url的MOCK_KEY属性<br>（1）   不存在直接调用其他cluster<br>（2）   存在值startsWith(“force”) 强制mock调用<br>（3）   存在值不是startsWith(“force”) 先正常调用， 出现异常在mock调用<br>集群模式的配置<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&lt;dubbo:service cluster=<span class="string">"failsafe"</span> /&gt;    服务提供方</div><div class="line">&lt;dubbo:reference cluster=<span class="string">"failsafe"</span> /&gt;  服务消费方</div></pre></td></tr></table></figure></p>
-<h3 id="多注册中心引用"><a href="#多注册中心引用" class="headerlink" title="多注册中心引用"></a>多注册中心引用</h3><p>解决CRM需同时调用中文站和国际站PC2相同接口相同版本服务的问题<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">定义多个注册中心：</div><div class="line">&lt;dubbo:registry id=<span class="string">"chinaRegistry"</span> address=<span class="string">"172.29.63.18:9090"</span> /&gt;</div><div class="line">&lt;dubbo:registry id=<span class="string">"intlRegistry"</span> address=<span class="string">"172.29.61.132:9090"</span> /&gt;</div><div class="line">不同注册中心使用不同引用：</div><div class="line">&lt;dubbo:reference id=<span class="string">"chinaXxxService"</span> interface=<span class="string">"com.alibaba.xxx.XxxService"</span></div><div class="line">version=<span class="string">"1.0.0"</span> registry=<span class="string">"chinaRegistry"</span> /&gt;</div><div class="line">&lt;dubbo:reference id=<span class="string">"intlXxxService"</span> interface=<span class="string">"com.alibaba.xxx.XxxService"</span></div><div class="line">version=<span class="string">"1.0.0"</span> registry=<span class="string">"intlRegistry"</span> /&gt;</div></pre></td></tr></table></figure></p>
-<h3 id="graceful-shutdown"><a href="#graceful-shutdown" class="headerlink" title="graceful shutdown"></a>graceful shutdown</h3><p><img src="/2017/11/24/dubbo功能介绍/shutdown.png" alt="shutdown"></p>
-<h2 id="dubbo-Rpc高级功能"><a href="#dubbo-Rpc高级功能" class="headerlink" title="dubbo-Rpc高级功能"></a>dubbo-Rpc高级功能</h2><p><img src="/2017/11/24/dubbo功能介绍/高级功能.png" alt="高级功能"></p>
-<h3 id="telnet互操作"><a href="#telnet互操作" class="headerlink" title="telnet互操作"></a>telnet互操作</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">C:\&gt; telnet localhost 20880</div><div class="line">dubbo&gt; <span class="built_in">help</span></div><div class="line">ls <span class="_">-l</span></div><div class="line">ps <span class="_">-l</span></div><div class="line">status <span class="_">-l</span></div><div class="line">trace XxxService 10</div><div class="line">count XxxService</div><div class="line">invoke XxxService.xxxMethod(args)</div><div class="line"><span class="built_in">log</span> 100</div></pre></td></tr></table></figure>
-<h3 id="泛化调用"><a href="#泛化调用" class="headerlink" title="泛化调用"></a>泛化调用</h3><p>泛接口调用方式主要用于客户端没有API接口及模型类元的情况，参数及返回值中的所有POJO均用Map表示，通常用于框架集成，比如：实现一个通用的服务测试框架，可通过GenericService调用所有服务实现。所谓泛化调用是使用通用服务接口.GenericService来invoke需要调用的服务方法，这种设计无疑是可复用、可扩展之典范。 GenericService只有一个方法Object$invoke(String method,String[] parameterTypes,Object[] args)throwsGenericException;invoke接受三个参数，分别为方法名，参数类型组以及参数值组，其中参数类型和参数值一一对应.<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;dubbo:reference id=<span class="string">"barService"</span> interface=<span class="string">"com.foo.BarService"</span> generic=<span class="string">"true"</span> /&gt;</div><div class="line">GenericService barService = (GenericService) applicationContext.getBean(<span class="string">"barService"</span>);</div><div class="line">Object result = barService.<span class="variable">$invoke</span>(<span class="string">"sayHello"</span>, new String[] &#123; <span class="string">"java.lang.String"</span> &#125;, new Object[] &#123; <span class="string">"World"</span> &#125;);</div></pre></td></tr></table></figure></p>
-<h3 id="显示回调"><a href="#显示回调" class="headerlink" title="显示回调"></a>显示回调</h3><p><img src="/2017/11/24/dubbo功能介绍/回调.png" alt="回调"><br>参数回调方式与调用本地callback或listener相同，只需要在Spring的配置文件中声明哪个参数是callback类型即可，Dubbo将基于长连接生成反向代理，这样就可以从服务器端调用客户端逻辑。</p>
-<h3 id="异步调用"><a href="#异步调用" class="headerlink" title="异步调用"></a>异步调用</h3><p>并行发起多个请求，但只使用一个线程,基于NIO非阻塞实现并行调用，不用开启多线程，开销变小<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;dubbo:method name=<span class="string">"findXxx"</span> async=<span class="string">"true"</span> /&gt;</div><div class="line">xxxService.findXxx();//返回null</div><div class="line">Future&lt;Xxx&gt; future=RpcContext。getContext().getFuture();</div></pre></td></tr></table></figure></p>
-<p><img src="/2017/11/24/dubbo功能介绍/async.png" alt="async"></p>
-<h3 id="框架事件"><a href="#框架事件" class="headerlink" title="框架事件"></a>框架事件</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&lt;Dubbo:service … ondisconnected= xxx &gt;</div><div class="line">&lt;Dubbo:reference … ondisconnected =xxx&gt;</div></pre></td></tr></table></figure>
-<h3 id="本地执行"><a href="#本地执行" class="headerlink" title="本地执行"></a>本地执行</h3><p>在客户端执行部分代码，比如：<br>– 在客户端缓存已查询过的数据<br>– 当服务器端全部不可用时，伪造容错数据<br><img src="/2017/11/24/dubbo功能介绍/本地执行.png" alt="本地执行"></p>
-<h3 id="隐式传参"><a href="#隐式传参" class="headerlink" title="隐式传参"></a>隐式传参</h3><p>隐式传参，比如：<br>– 验权扩展点需要携带一些用户凭证信息<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">• ThreadLocal Context</div><div class="line">– RpcContext.setAttachment(<span class="string">"password"</span>, <span class="string">"xxx"</span>);</div><div class="line">– RpcContext.getAttachment(<span class="string">"password"</span>);</div><div class="line"></div><div class="line">//Consumer</div><div class="line">RpcContext.getContext().setAttachment(<span class="string">"parm"</span>, <span class="string">"test"</span>+i);</div><div class="line">//server</div><div class="line">Map&lt;String, String&gt; attachments = RpcContext.getContext()</div><div class="line">               .getAttachments();</div><div class="line">String parm = attachments.get(<span class="string">"parm"</span>);</div></pre></td></tr></table></figure></p>
-<h3 id="路由"><a href="#路由" class="headerlink" title="路由"></a>路由</h3><p>注册中心路由<br>注册中心根据路由规则挑选服务提供者列表<br>RPC路由<br>根据类、方法、参数级别的路由规则<br>数据sharding<br>– 开发阶段的服务过滤(classifier)<br>– 可扩展的路由接口&amp;基于ScriptEngine的实现<br>• simpleEL<br>• Groovy ..<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">function</span> route(invokers,invocation,context)&#123;</div><div class="line">var result = new java.util.ArrayList();</div><div class="line"><span class="keyword">if</span> (invokers.size()&gt;1 &amp;&amp;</div><div class="line">invocation.getMethodName() .equals(<span class="string">"method1"</span>)) &#123;</div><div class="line">result.add(invokers.get(0)) ;</div><div class="line">&#125; <span class="keyword">else</span> &#123;</div><div class="line">result.add(invokers.get(1)) ;</div><div class="line">&#125;</div><div class="line"><span class="built_in">return</span> result;</div><div class="line">&#125;;</div><div class="line">route(invokers,invocation,context);</div></pre></td></tr></table></figure></p>
-<h3 id="流量控制"><a href="#流量控制" class="headerlink" title="流量控制"></a>流量控制</h3><p>actives:consumer并发数限制<br>executes:provider并发数限制<br>connections：consumer连接数限制<br>accept：provider连接数限制<br>短连接是连接上限，长连接则是启用的连接数<br>LeastActive LoadBalance:<br>调用并发数最少的provider，调节provider的并发<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line">并发控制</div><div class="line">限制com.foo.BarService的每个方法，服务器端并发执行（或占用线程池线程数）不能超过10个：</div><div class="line">&lt;dubbo:service interface=<span class="string">"com.foo.BarService"</span> executes=<span class="string">"10"</span> /&gt;</div><div class="line">限制com.foo.BarService的sayHello方法，服务器端并发执行（或占用线程池线程数）不能超过10个：</div><div class="line">&lt;dubbo:service interface=<span class="string">"com.foo.BarService"</span>&gt;</div><div class="line">&lt;dubbo:method name=<span class="string">"sayHello"</span> executes=<span class="string">"10"</span> /&gt;</div><div class="line">&lt;/dubbo:service&gt;</div><div class="line">限制com.foo.BarService的每个方法，每客户端并发执行（或占用连接的请求数）不能超过10个：</div><div class="line">&lt;dubbo:service interface=<span class="string">"com.foo.BarService"</span> actives=<span class="string">"10"</span> /&gt;</div><div class="line">Or:</div><div class="line">&lt;dubbo:reference interface=<span class="string">"com.foo.BarService"</span> actives=<span class="string">"10"</span> /&gt;</div><div class="line">限制com.foo.BarService的sayHello方法，每客户端并发执行（或占用连接的请求数）不能超过10个：</div><div class="line">&lt;dubbo:service interface=<span class="string">"com.foo.BarService"</span>&gt;</div><div class="line">&lt;dubbo:method name=<span class="string">"sayHello"</span> actives=<span class="string">"10"</span> /&gt;</div><div class="line">&lt;/dubbo:service&gt;</div><div class="line">Or:</div><div class="line">&lt;dubbo:reference interface=<span class="string">"com.foo.BarService"</span>&gt;</div><div class="line">&lt;dubbo:method name=<span class="string">"sayHello"</span> actives=<span class="string">"10"</span> /&gt;</div><div class="line">&lt;/dubbo:service&gt;</div><div class="line">如果&lt;dubbo:service&gt;和&lt;dubbo:reference&gt;都配了actives，&lt;dubbo:reference&gt;优先，参见：配置的覆盖策略。</div><div class="line">Load Balance均衡：</div><div class="line">配置服务的客户端的loadbalance属性为leastactive，此Loadbalance会调用并发数最小的Provider（Consumer端并发数）。</div><div class="line">&lt;dubbo:reference interface=<span class="string">"com.foo.BarService"</span> loadbalance=<span class="string">"leastactive"</span> /&gt;</div><div class="line">Or:</div><div class="line">&lt;dubbo:service interface=<span class="string">"com.foo.BarService"</span> loadbalance=<span class="string">"leastactive"</span> /&gt;</div><div class="line">连接控制</div><div class="line">限制服务器端接受的连接不能超过10个：（以连接在Server上，所以配置在Provider上）</div><div class="line">&lt;dubbo:provider protocol=<span class="string">"dubbo"</span> accepts=<span class="string">"10"</span> /&gt;</div><div class="line">&lt;dubbo:protocol name=<span class="string">"dubbo"</span> accepts=<span class="string">"10"</span> /&gt;</div><div class="line">限制客户端服务使用连接连接数：(如果是长连接，比如Dubbo协议，connections表示该服务对每个提供者建立的长连接数)</div><div class="line">&lt;dubbo:reference interface=<span class="string">"com.foo.BarService"</span> connections=<span class="string">"10"</span> /&gt;</div><div class="line">Or:</div><div class="line">&lt;dubbo:service interface=<span class="string">"com.foo.BarService"</span> connections=<span class="string">"10"</span> /&gt;</div><div class="line">如果&lt;dubbo:service&gt;和&lt;dubbo:reference&gt;都配了connections，&lt;dubbo:reference&gt;优先</div></pre></td></tr></table></figure></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/15/elasticsearch权威后续/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="李睿">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/15/elasticsearch权威后续/" itemprop="url">elasticsearch权威后续</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-15T21:44:09+08:00">
-                2017-11-15
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/elasticSearch/" itemprop="url" rel="index">
-                    <span itemprop="name">elasticSearch</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="分布式增删改查"><a href="#分布式增删改查" class="headerlink" title="分布式增删改查"></a>分布式增删改查</h1><h2 id="路由"><a href="#路由" class="headerlink" title="路由"></a>路由</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">shard=<span class="built_in">hash</span>(routing)%number_of_primary_shards</div></pre></td></tr></table></figure>
-<p>routing是一个字符串，默认是_id；这也就解释了主分片的数量只能在创建索引时定义且不能修改：如果主分片的数量在未来改变了，所有先前的路由值就失效了，文档也就永远找不到了</p>
-<h2 id="分片交互"><a href="#分片交互" class="headerlink" title="分片交互"></a>分片交互</h2><p>我们能够发送请求给集群中任意一个节点。每个节点都有能力处理任意请求。每个节点都知道任意文档所在的节点，所以也可以将请求转发到需要的节点。下面的例子中，我们将发送所有请求给 Node 1  ，这个节点我们将会称之为请求节点</p>
-<h2 id="新建、索引、删除文档"><a href="#新建、索引、删除文档" class="headerlink" title="新建、索引、删除文档"></a>新建、索引、删除文档</h2><p>新建、索引和删除请求都是写(write)操作，它们必须在主分片上成功完成才能复制到相关的复制分片上。<br>罗列在主分片和复制分片上成功新建、索引或删除一个文档必要的顺序步骤：</p>
-<ul>
-<li>客户端给Node1发送新建、索引或删除请求。</li>
-<li>节点使用文档的_id  确定文档属于分片0。它转发请求到 Node3，分片0位于这个节点上</li>
-<li>Node3在主分片上执行请求，如果成功，它转发请求到相应的位于 Node1和 Node2的复制节点上当所有的复制节点报告成功,Node 3报告成功到请求的节点，请求的节点再报告给客户端。客户端接收到成功响应的时候，文档的修改已经被应用于主分片和所有的复制分片。你的修改生效了。</li>
-</ul>
-<h3 id="replication（注意在ElasticSearch-5-0开始被废弃）"><a href="#replication（注意在ElasticSearch-5-0开始被废弃）" class="headerlink" title="replication（注意在ElasticSearch 5.0开始被废弃）"></a>replication（注意在ElasticSearch 5.0开始被废弃）</h3><p>复制默认的值是 sync。这将导致主分片得到复制分片的成功响应后才返回。<br>如果你设置 replication为 async，请求在主分片上被执行后就会返回给客户端。它依旧会转发请求给复制节点，但你将不知道复制节点成功与否。</p>
-<h3 id="consistency（注意在ElasticSearch-5-0开始被废弃）"><a href="#consistency（注意在ElasticSearch-5-0开始被废弃）" class="headerlink" title="consistency（注意在ElasticSearch 5.0开始被废弃）"></a>consistency（注意在ElasticSearch 5.0开始被废弃）</h3><p>默认主分片在尝试写入时需要<strong>规定数量(quorum)或过半的分片（可以是主节点或复制节点）可用。这是防止数据被写入到错的网络分区</strong>。规定的数量计算公式如下：<br>int( (primary + number_of_replicas) / 2 ) + 1<br>consistency允许的值为one（只有一个主分片），all（所有主分片和复制分片）或者默认的quorum或过半分片。<br>注意number_of_replicas是在索引中的的设置，用来定义复制分片的数量，而不是现在活动的复制节点的数量。如果你定义了索引有3个复制节点，那规定数量是：int( (primary + 3 replicas) / 2 ) + 1 = 3<br>但如果你只有2个节点，那你的活动分片不够规定数量，也就不能索引或删除任何文档。<br>注意: 新索引默认有1个复制分片，这意味着为了满足quorum的要求需要两个活动的分片。当然，这个默认设置将阻止我们在单一节点集群中进行操作。为了避开这个问题，规定数量只有在number_of_replicas大于一时才生效。</p>
-<h3 id="time-out"><a href="#time-out" class="headerlink" title="time out"></a>time out</h3><p>当分片副本不足时会怎样？Elasticsearch会等待更多的分片出现。默认等待一分钟。如果需要，你可以设置 timeout参数让它终止的更早： 100  表示100毫秒， 30s  表示30秒。</p>
-<blockquote>
-<p>新索引默认有 1  个复制分片，这意味着为了满足 quorum  的要求需要两个活动的分片。当然，这个默认设置将阻止我们在单一节点集群中进行操作。为了避开这个问题，规定数量只有在 number_of_replicas  大于一时才生效</p>
-</blockquote>
-<h2 id="检索文档"><a href="#检索文档" class="headerlink" title="检索文档"></a>检索文档</h2><ol>
-<li>客户端给Node1发送get请求。</li>
-<li>节点使用文档的id确定文档属于分片0。分片0对应的复制分片在三个节点上都有。此时，它转发请求到 Node2。</li>
-<li>Node2返回endangered给Node1然后返回给客户端。</li>
-</ol>
-<p>对于读请求，为了平衡负载，请求节点会为每个请求选择不同的分片——它会循环所有分片副本。可能的情况是，一个被索引的文档已经存在于主分片上却还没来得及同步到复制分片上。这时复制分片会报告文档未找到，主分片会成功返回文档。一旦索引请求成功返回给用户，文档则在主分片和复制分片都是可用的。</p>
-<h2 id="更新文档"><a href="#更新文档" class="headerlink" title="更新文档"></a>更新文档</h2><ol>
-<li>客户端给Node1发送更新请求。</li>
-<li>它转发请求到主分片所在节点Node3。</li>
-<li>Node3从主分片检索出文档，修改source字段的JSON，然后在主分片上重建索引。如果有其他进程修改了文档，它以retry_on_conflict设置的次数重复步骤3，都未成功则放弃。</li>
-<li>如果 Node3成功更新文档，它同时转发文档的新版本到Node1和Node2上的复制节点以重建索引。当所有复制节点报告成功,Node3返回成功给请求节点，然后返回给客户端.<blockquote>
-<p>当主分片转发更改给复制分片时，并不是转发更新请求，而是转发整个文档的新版本。记住这些修改转发到复制节点是异步的，它们并不能保证到达的顺序与发送相同。如果Elasticsearch转发的仅仅是修改请求，修改的顺序可能是错误的，那得到的就是个损坏的文档。</p>
-</blockquote>
-</li>
-</ol>
-<h2 id="多文档模式"><a href="#多文档模式" class="headerlink" title="多文档模式"></a>多文档模式</h2><p>mget请求检索多个文档的顺序步骤：</p>
-<ol>
-<li>客户端向Node1发送mget请求。</li>
-<li>Node1为每个分片构建一个多条数据检索请求，然后转发到这些请求所需的主分片或复制分片上。当所有回复被接收，Node1构建响应并返回给客户端</li>
-</ol>
-<p>bulk执行多个create、index、delete和update请求的顺序步骤：</p>
-<ol>
-<li>客户端向Node1发送bulk请求。</li>
-<li>Node1为每个分片构建批量请求，然后转发到这些请求所需的主分片上。</li>
-<li>主分片一个接一个的按序执行操作。当一个操作执行完，主分片转发新文档（或者删除部分）给对应的复制节点，然后执行下一个操作。复制节点为报告所有操作完成，节点报告给请求节点，请求节点整理响应并返回给客户端。</li>
-</ol>
-<p>这里我们可以解释bulk的格式，而不是包装成json格式请求：意味着我们需要解析JSON为数组（包括文档数据，可能非常大）、检查每个请求决定应该到哪个分片上、为每个分片创建一个请求的数组、序列化这些数组为内部传输格式、发送请求到每个分片。</p>
-<h1 id="搜索"><a href="#搜索" class="headerlink" title="搜索"></a>搜索</h1><table>
-<thead>
-<tr>
-<th>概念</th>
-<th style="text-align:right">解释</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>mappings(映射)</td>
-<td style="text-align:right">数据在每个字段中的解释说明</td>
-</tr>
-<tr>
-<td>analysis(分析)</td>
-<td style="text-align:right">全文是如何处理的可以被搜索的</td>
-</tr>
-<tr>
-<td>领域特定语句查询(query DSL)</td>
-<td style="text-align:right">Elasticsearch使用的灵活的、强大的查询语言</td>
-</tr>
-</tbody>
-</table>
-<h2 id="空搜索"><a href="#空搜索" class="headerlink" title="空搜索"></a>空搜索</h2><p>没有指定任何的查询条件，只返回集群索引中的所有文档<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GET /_search</div></pre></td></tr></table></figure></p>
-<h2 id="多索引和多类别"><a href="#多索引和多类别" class="headerlink" title="多索引和多类别"></a>多索引和多类别</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">/_search  //在所有索引的所有类型中搜索</div><div class="line">/gb/_search //在索引gb的所有类型中搜索</div><div class="line">/gb,us/_search //在索引gb us的所有类型中搜索</div><div class="line">/g*,u*/_search //在索引g或u开头的所有类型中搜索</div><div class="line">/gb/user/_search //在索引 gb的类型user中搜索</div><div class="line">/gb,us/user,tweet/_search //在gb、us的user和tweet类型中搜索</div><div class="line">/_all/user,tweet/_search //在user和tweet类型中搜索</div></pre></td></tr></table></figure>
-<h2 id="分页"><a href="#分页" class="headerlink" title="分页"></a>分页</h2><p>size默认为10 from默认为0<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">GET /_search?size=5</div><div class="line">GET /_search?size=5&amp;from=5</div><div class="line">GET /_search?size=5&amp;from=10</div></pre></td></tr></table></figure></p>
-<p>注意：现在假设我们请求第1000页——结果10001到10010。工作方式都相同，不同的是每个分片都必须产生顶端的10010个结果。然后请求节点排序这50050个结果并丢弃50040个！你可以看到在分布式系统中，排序结果的花费随着分页的深入而成倍增长</p>
-<h1 id="映射分析"><a href="#映射分析" class="headerlink" title="映射分析"></a>映射分析</h1><h2 id="确切值和全文文本"><a href="#确切值和全文文本" class="headerlink" title="确切值和全文文本"></a>确切值和全文文本</h2><p>确切值是确定的，正如它的名字一样。比如一个date或用户ID，也可以包含更多的字符串比如username或email地址。全文文本，从另一个角度来说是文本化的数据(常常以人类的语言书写)，比如一片推文(Twitter的文章)或邮件正文<br>确切值是很容易查询的，因为结果是二进制的 – 要么匹配，要么不匹配。</p>
-<h2 id="分析和分析器"><a href="#分析和分析器" class="headerlink" title="分析和分析器"></a>分析和分析器</h2><p>分析(analysis)是这样一个过程：<br>首先，表征化一个文本块为适用于倒排索引单独的词(term)<br>然后标准化这些词为标准形式，提高它们的“可搜索性”或“查全率”</p>
-<h2 id="映射"><a href="#映射" class="headerlink" title="映射"></a>映射</h2><table>
-<thead>
-<tr>
-<th>类型</th>
-<th>标识的数据类型</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>String</td>
-<td>String</td>
-</tr>
-<tr>
-<td>whole number</td>
-<td>byte、short、integer、long</td>
-</tr>
-<tr>
-<td>floating point</td>
-<td>float、double</td>
-</tr>
-<tr>
-<td>Boolean</td>
-<td>boolean</td>
-</tr>
-<tr>
-<td>Date</td>
-<td>date</td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr>
-<th>JSON type</th>
-<th>field type</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Boolean:true,false</td>
-<td>“boolean”</td>
-</tr>
-<tr>
-<td>whole number:123</td>
-<td>“long”</td>
-</tr>
-<tr>
-<td>floating point:123.45</td>
-<td>“double”</td>
-</tr>
-<tr>
-<td>String:”123”</td>
-<td>“string”</td>
-</tr>
-<tr>
-<td>string valid date:”2016-05-01”</td>
-<td>date”</td>
-</tr>
-</tbody>
-</table>
-<blockquote>
-<p>这意味着，如果你索引一个带引号的数字—— “123”  ，它将被映射为 “string”  类型，而不是 “long”  类型。然而，如果字段已经被映射为 “long”  类型，Elasticsearch将尝试转换字符串为long，并在转换失败时会抛出异常。</p>
-</blockquote>
-<h3 id="查看映射"><a href="#查看映射" class="headerlink" title="查看映射"></a>查看映射</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">get sjjhpt/_mapping/fwjbl</div></pre></td></tr></table></figure>
-<h3 id="index"><a href="#index" class="headerlink" title="index"></a>index</h3><table>
-<thead>
-<tr>
-<th>值</th>
-<th>解释</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>analyzed</td>
-<td>首先分析这个字符串，然后索引。换言之，以全文形式索引此字段。</td>
-</tr>
-<tr>
-<td>not_analyzed</td>
-<td>索引这个字段，使之可以被搜索，但是索引内容和指定值一样。不分析此字段</td>
-</tr>
-<tr>
-<td>no</td>
-<td>不索引这个字段。这个字段不能为搜索到</td>
-</tr>
-</tbody>
-</table>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line"> <span class="string">"userid"</span>:&#123;</div><div class="line">     <span class="string">"type"</span>:<span class="string">"string"</span>,</div><div class="line">     <span class="string">"index"</span>:<span class="string">"not_analyzed"</span></div><div class="line"></div><div class="line"> &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<blockquote>
-<p>其他简单类型——long、double、date等等——也接受index参数，但相应的值只能是 no和not_analyzed,它们的值不能被分析</p>
-</blockquote>
-<h3 id="更新映射"><a href="#更新映射" class="headerlink" title="更新映射"></a>更新映射</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">PUT /gb/_mapping/tweet</div><div class="line">&#123;</div><div class="line"><span class="string">"properties"</span> : &#123;</div><div class="line"><span class="string">"tag"</span> :&#123;</div><div class="line"><span class="string">"type"</span> : <span class="string">"string"</span>,</div><div class="line"><span class="string">"index"</span>: <span class="string">"not_analyzed"</span></div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h2 id="复合核心字段类型"><a href="#复合核心字段类型" class="headerlink" title="复合核心字段类型"></a>复合核心字段类型</h2><h3 id="多值字段"><a href="#多值字段" class="headerlink" title="多值字段"></a>多值字段</h3><p>数组：{ “tag”: [ “search”, “nosql” ]}<br>对于数组不需要特殊的映射。任何一个字段可以包含零个、一个或多个值，同样对于全文字段将被分析并产生多个词。这意味着数组中所有值必须为同一类型。你不能把日期和字符窜混合。如果你创建一个新字段，这个字段索引了一个数组，Elasticsearch将使用第一个值的类型来确定这个新字段的类型。</p>
-<h3 id="空字段"><a href="#空字段" class="headerlink" title="空字段"></a>空字段</h3><p>Lucene没法存放null值，所以一个null值的字段被认为是空字段。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="string">"empty_string"</span>: <span class="string">""</span>,</div><div class="line"><span class="string">"null_value"</span>: null,</div><div class="line"><span class="string">"empty_array"</span>: [],</div><div class="line"><span class="string">"array_with_null_value"</span>: [ null ]</div></pre></td></tr></table></figure></p>
-<h3 id="多层对象"><a href="#多层对象" class="headerlink" title="多层对象"></a>多层对象</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">      <span class="string">"gb"</span>: &#123;</div><div class="line">      <span class="string">"tweet"</span>: &#123;</div><div class="line">      <span class="string">"properties"</span>: &#123;</div><div class="line">      <span class="string">"tweet"</span>: &#123; <span class="string">"type"</span>: <span class="string">"string"</span> &#125;,</div><div class="line">      <span class="string">"user"</span>: &#123;</div><div class="line">      <span class="string">"type"</span>: <span class="string">"object"</span>,</div><div class="line">      <span class="string">"properties"</span>: &#123;</div><div class="line">      <span class="string">"id"</span>: &#123; <span class="string">"type"</span>: <span class="string">"string"</span> &#125;,</div><div class="line">      <span class="string">"gender"</span>: &#123; <span class="string">"type"</span>: <span class="string">"string"</span> &#125;,</div><div class="line">      <span class="string">"age"</span>: &#123; <span class="string">"type"</span>: <span class="string">"long"</span> &#125;,</div><div class="line">      <span class="string">"name"</span>: &#123;</div><div class="line">      <span class="string">"type"</span>: <span class="string">"object"</span>,</div><div class="line">      <span class="string">"properties"</span>: &#123;</div><div class="line">      <span class="string">"full"</span>: &#123; <span class="string">"type"</span>: <span class="string">"string"</span> &#125;,</div><div class="line">      <span class="string">"first"</span>: &#123; <span class="string">"type"</span>: <span class="string">"string"</span> &#125;,</div><div class="line">      <span class="string">"last"</span>: &#123; <span class="string">"type"</span>: <span class="string">"string"</span> &#125;</div><div class="line">       &#125;</div><div class="line">        &#125;</div><div class="line">        &#125;</div><div class="line">       &#125;</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>多层对像user的first，我们需要制定他的完整路径，像”user.name.first”或者tweet.user.name.first，而对于lucene，我们不能检索user或者user.name,我们不能检索复杂的结构体.</p>
-<h1 id="结构化查询"><a href="#结构化查询" class="headerlink" title="结构化查询"></a>结构化查询</h1><h2 id="请求体查询"><a href="#请求体查询" class="headerlink" title="请求体查询"></a>请求体查询</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">POST /_search</div><div class="line">&#123;</div><div class="line"><span class="string">"from"</span>: 30,</div><div class="line"><span class="string">"size"</span>: 10</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h2 id="结构化查询-1"><a href="#结构化查询-1" class="headerlink" title="结构化查询"></a>结构化查询</h2><p>使用结构化查询，你需要传递query参数<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">/_search POST</div><div class="line">&#123;</div><div class="line">  &quot;query&quot;: your_query_here</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h3 id="空查询"><a href="#空查询" class="headerlink" title="空查询"></a>空查询</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">/_search POST</div><div class="line">&#123;</div><div class="line">  <span class="string">"query"</span>: &#123;</div><div class="line">       <span class="string">"match_all"</span>:&#123;</div><div class="line"></div><div class="line">       &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="查询子句"><a href="#查询子句" class="headerlink" title="查询子句"></a>查询子句</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line"> QUERY_NAME: &#123;</div><div class="line"> ARGUMENT: VALUE</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line">GET /_search</div><div class="line">&#123;</div><div class="line">  <span class="string">"query"</span>: &#123;</div><div class="line">  <span class="string">"match"</span>: &#123;</div><div class="line">  <span class="string">"tweet"</span>: <span class="string">"elasticsearch"</span></div><div class="line">  &#125;</div><div class="line"> &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="合并多字句"><a href="#合并多字句" class="headerlink" title="合并多字句"></a>合并多字句</h3><p>复合子句(compound)用以合并其他的子句。bool子句允许你合并其他的合法子句，无论是must，must_not还是should<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line"><span class="string">"bool"</span>: &#123;</div><div class="line"> <span class="string">"must"</span>: &#123; <span class="string">"match"</span>: &#123; <span class="string">"email"</span>: <span class="string">"business opportunity"</span> &#125;&#125;,</div><div class="line"><span class="string">"should"</span>: [</div><div class="line">&#123; <span class="string">"match"</span>: &#123; <span class="string">"starred"</span>: <span class="literal">true</span> &#125;&#125;,</div><div class="line">&#123; <span class="string">"bool"</span>: &#123;</div><div class="line"><span class="string">"must"</span>: &#123; <span class="string">"folder"</span>: <span class="string">"inbox"</span> &#125;&#125;,</div><div class="line"><span class="string">"must_not"</span>: &#123; <span class="string">"spam"</span>: <span class="literal">true</span> &#125;&#125;</div><div class="line">&#125;&#125;</div><div class="line">],</div><div class="line"><span class="string">"minimum_should_match"</span>: 1</div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h2 id="查询与过滤"><a href="#查询与过滤" class="headerlink" title="查询与过滤"></a>查询与过滤</h2><p>一条查询语句会计算每个文档与查询语句的相关性，会给出一个相关性评分_score并且按照相关性对匹配到的文档进行排序。这种评分方式非常适用于一个没有完全配置结果的全文本搜索。</p>
-<h3 id="性能差异"><a href="#性能差异" class="headerlink" title="性能差异"></a>性能差异</h3><p>使用过滤语句得到的结果集 – 一个简单的文档列表，快速匹配运算并存入内存是十分方便的，每个文档仅需要1个字节。这些缓存的过滤结果集与后续请求的结合使用是非常高效的。<br>查询语句不仅要查找相匹配的文档，还需要计算每个文档的相关性，所以一般来说查询语句要比过滤语句更耗时，并且查询结果也不可缓存。<br>原则上来说，使用查询语句做全文本搜索或其他需要进行相关性评分的时候，剩下的全部用过滤语句</p>
-<h2 id="查询过滤语句"><a href="#查询过滤语句" class="headerlink" title="查询过滤语句"></a>查询过滤语句</h2><h3 id="term过滤"><a href="#term过滤" class="headerlink" title="term过滤"></a>term过滤</h3><p>term用于精确匹配哪些值，比如数字，日期，布尔值或not_analyzed的字符串(未经分析的文本数据类型)<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&#123; <span class="string">"term"</span>: &#123; <span class="string">"age"</span>: 26 &#125;&#125;</div><div class="line">&#123; <span class="string">"term"</span>: &#123; <span class="string">"date"</span>: <span class="string">"2014-09-01"</span> &#125;&#125;</div><div class="line">&#123; <span class="string">"term"</span>: &#123; <span class="string">"public"</span>: <span class="literal">true</span> &#125;&#125;</div><div class="line">&#123; <span class="string">"term"</span>: &#123; <span class="string">"tag"</span>: <span class="string">"full_text"</span> &#125;&#125;</div></pre></td></tr></table></figure></p>
-<h3 id="terms过滤"><a href="#terms过滤" class="headerlink" title="terms过滤"></a>terms过滤</h3><p>terms允许指定多个匹配条件.如果某个字段指定了多个值，那么文档需要一起去做匹配<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  <span class="string">"terms"</span>:&#123;</div><div class="line">      <span class="string">"jkbsf"</span>:[<span class="string">"test"</span>,<span class="string">"test1"</span>]</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h3 id="range过滤"><a href="#range过滤" class="headerlink" title="range过滤"></a>range过滤</h3><p>用于查询范围<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  <span class="string">"range"</span>:&#123;</div><div class="line">      <span class="string">"age"</span>:&#123;</div><div class="line">          <span class="string">"gte"</span>:10,</div><div class="line">          <span class="string">"lt"</span>:20</div><div class="line">      &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>gt：大于、gte:大于等于、lt:小于、lte：小于等于</p>
-<h3 id="exists和missing过滤"><a href="#exists和missing过滤" class="headerlink" title="exists和missing过滤"></a>exists和missing过滤</h3><p>exists 和 missing 过滤可以用于查找文档中是否包含指定字段或没有某个字段，类似于SQL语句中的IS_NULL条件<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">    <span class="string">"exists"</span>:   &#123;</div><div class="line">        <span class="string">"field"</span>:    <span class="string">"title"</span></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h3 id="bool过滤"><a href="#bool过滤" class="headerlink" title="bool过滤"></a>bool过滤</h3><p>bool 过滤可以用来合并多个过滤条件查询结果的布尔逻辑，它包含一下操作符：<br>must :: 多个查询条件的完全匹配,相当于 and。<br>must_not :: 多个查询条件的相反匹配，相当于 not。<br>should :: 至少有一个查询条件匹配, 相当于 or。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">    <span class="string">"bool"</span>: &#123;</div><div class="line">        <span class="string">"must"</span>:     &#123; <span class="string">"term"</span>: &#123; <span class="string">"folder"</span>: <span class="string">"inbox"</span> &#125;&#125;,</div><div class="line">        <span class="string">"must_not"</span>: &#123; <span class="string">"term"</span>: &#123; <span class="string">"tag"</span>:    <span class="string">"spam"</span>  &#125;&#125;,</div><div class="line">        <span class="string">"should"</span>: [</div><div class="line">                    &#123; <span class="string">"term"</span>: &#123; <span class="string">"starred"</span>: <span class="literal">true</span>   &#125;&#125;,</div><div class="line">                    &#123; <span class="string">"term"</span>: &#123; <span class="string">"unread"</span>:  <span class="literal">true</span>   &#125;&#125;</div><div class="line">        ]</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h3 id="match-all查询"><a href="#match-all查询" class="headerlink" title="match_all查询"></a>match_all查询</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  <span class="string">"match_all"</span>:&#123;</div><div class="line"></div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line"><span class="comment">### match查询</span></div><div class="line">match查询是一个标准查询，不管你需要全文本查询还是精确查询基本上都要用到它</div><div class="line">如果你使用  match  查询一个全文本字段，它会在真正查询之前用分析器先分析 match  一下查询字符</div><div class="line">``` bash</div><div class="line">&#123;</div><div class="line"><span class="string">"match"</span>: &#123;</div><div class="line"><span class="string">"tweet"</span>: <span class="string">"About Search"</span></div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>如果用 match下指定了一个确切值，在遇到数字，日期，布尔值或者 not_analyzed的字符串时，它将为你搜索你给定的值<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&#123; <span class="string">"match"</span>: &#123; <span class="string">"age"</span>: 26 &#125;&#125;</div><div class="line">&#123; <span class="string">"match"</span>: &#123; <span class="string">"date"</span>: <span class="string">"2014-09-01"</span> &#125;&#125;</div><div class="line">&#123; <span class="string">"match"</span>: &#123; <span class="string">"public"</span>: <span class="literal">true</span> &#125;&#125;</div><div class="line">&#123; <span class="string">"match"</span>: &#123; <span class="string">"tag"</span>: <span class="string">"full_text"</span> &#125;&#125;</div></pre></td></tr></table></figure></p>
-<blockquote>
-<p>做精确匹配搜索时，你最好用过滤语句，因为过滤语句可以缓存数据。</p>
-</blockquote>
-<h3 id="multi-match查询"><a href="#multi-match查询" class="headerlink" title="multi_match查询"></a>multi_match查询</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line"><span class="string">"multi_match"</span>: &#123;</div><div class="line"><span class="string">"query"</span>: <span class="string">"full text search"</span>,</div><div class="line"><span class="string">"fields"</span>: [ <span class="string">"title"</span>, <span class="string">"body"</span> ]</div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="bool查询"><a href="#bool查询" class="headerlink" title="bool查询"></a>bool查询</h3><p>bool查询与bool过滤相似，用于合并多个查询子句。不同的是，bool过滤可以直接给出是否匹配成功，而bool查询要计算每一个查询子句的score（相关性分值）。<br>must  :: 查询指定文档一定要被包含。<br>must_not  :: 查询指定文档一定不要被包含。<br>should  :: 查询指定文档，有则可以为文档相关性加分。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line"><span class="string">"bool"</span>: &#123;</div><div class="line"><span class="string">"must"</span>: &#123; <span class="string">"match"</span>: &#123; <span class="string">"title"</span>: <span class="string">"how to make millions"</span> &#125;&#125;,</div><div class="line"><span class="string">"must_not"</span>: &#123; <span class="string">"match"</span>: &#123; <span class="string">"tag"</span>: <span class="string">"spam"</span> &#125;&#125;,</div><div class="line"><span class="string">"should"</span>: [</div><div class="line">&#123; <span class="string">"match"</span>: &#123; <span class="string">"tag"</span>: <span class="string">"starred"</span> &#125;&#125;,</div><div class="line">&#123; <span class="string">"range"</span>: &#123; <span class="string">"date"</span>: &#123; <span class="string">"gte"</span>: <span class="string">"2014-01-01"</span> &#125;&#125;&#125;</div><div class="line">]</div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<blockquote>
-<p>提示： 如果bool查询下没有must子句，那至少应该有一个should子句。但是如果有must子句，那么没有should子句也可以进行查询。</p>
-</blockquote>
-<h2 id="过滤查询"><a href="#过滤查询" class="headerlink" title="过滤查询"></a>过滤查询</h2><p>查询语句和过滤语句可以放在各自的上下文中。在 ElasticSearch API 中我们会看到许多带有query或 filter的语句。这些语句既可以包含单条 query 语句，也可以包含一条 filter子句。换句话说，这些语句需要首先创建一个query或filter的上下文关系。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">GET /_search</div><div class="line">&#123;</div><div class="line"><span class="string">"query"</span>: &#123;</div><div class="line"><span class="string">"filtered"</span>: &#123;</div><div class="line"><span class="string">"query"</span>: &#123; <span class="string">"match"</span>: &#123; <span class="string">"email"</span>: <span class="string">"business opportunity"</span> &#125;&#125;,</div><div class="line"><span class="string">"filter"</span>: &#123; <span class="string">"term"</span>: &#123; <span class="string">"folder"</span>: <span class="string">"inbox"</span> &#125;&#125;</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h2 id="验证查询"><a href="#验证查询" class="headerlink" title="验证查询"></a>验证查询</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">GET /gb/tweet/_validate/query</div><div class="line">&#123;</div><div class="line"><span class="string">"query"</span>: &#123;</div><div class="line"><span class="string">"tweet"</span> : &#123;</div><div class="line"><span class="string">"match"</span> : <span class="string">"really powerful"</span></div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h1 id="排序"><a href="#排序" class="headerlink" title="排序"></a>排序</h1><h2 id="字段值排序"><a href="#字段值排序" class="headerlink" title="字段值排序"></a>字段值排序</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">GET /_search</div><div class="line">&#123;</div><div class="line"><span class="string">"query"</span> : &#123;</div><div class="line"><span class="string">"filtered"</span> : &#123;</div><div class="line"><span class="string">"filter"</span> : &#123; <span class="string">"term"</span> : &#123; <span class="string">"user_id"</span> : 1 &#125;&#125;</div><div class="line">&#125;</div><div class="line">&#125;,</div><div class="line"><span class="string">"sort"</span>: &#123; <span class="string">"date"</span>: &#123; <span class="string">"order"</span>: <span class="string">"desc"</span> &#125;&#125;</div></pre></td></tr></table></figure>
-<h2 id="默认排序"><a href="#默认排序" class="headerlink" title="默认排序"></a>默认排序</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">//默认以顺序排序，_score以倒序排序</div><div class="line"><span class="string">"sort"</span>: <span class="string">"number_of_children"</span></div></pre></td></tr></table></figure>
-<h2 id="多级排序"><a href="#多级排序" class="headerlink" title="多级排序"></a>多级排序</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">GET /_search</div><div class="line">&#123;</div><div class="line"><span class="string">"query"</span> : &#123;</div><div class="line"><span class="string">"filtered"</span> : &#123;</div><div class="line"><span class="string">"query"</span>: &#123; <span class="string">"match"</span>: &#123; <span class="string">"tweet"</span>: <span class="string">"manage text search"</span> &#125;&#125;,</div><div class="line"><span class="string">"filter"</span> : &#123; <span class="string">"term"</span> : &#123; <span class="string">"user_id"</span> : 2 &#125;&#125;</div><div class="line">&#125;</div><div class="line">&#125;,</div><div class="line"><span class="string">"sort"</span>: [</div><div class="line">&#123; <span class="string">"date"</span>: &#123; <span class="string">"order"</span>: <span class="string">"desc"</span> &#125;&#125;,</div><div class="line">&#123; <span class="string">"_score"</span>: &#123; <span class="string">"order"</span>: <span class="string">"desc"</span> &#125;&#125;</div><div class="line">]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h2 id="字符串排序"><a href="#字符串排序" class="headerlink" title="字符串排序"></a>字符串排序</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GET /_search?sort=date:desc&amp;sort=_score&amp;q=search</div></pre></td></tr></table></figure>
-<h3 id="多值字段字符串排序"><a href="#多值字段字符串排序" class="headerlink" title="多值字段字符串排序"></a>多值字段字符串排序</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">//改变前的mapping</div><div class="line"><span class="string">"tweet"</span>: &#123;</div><div class="line"><span class="string">"type"</span>: <span class="string">"string"</span>,</div><div class="line"><span class="string">"analyzer"</span>: <span class="string">"english"</span></div><div class="line">&#125;</div><div class="line">//改变后的mapping</div><div class="line"><span class="string">"tweet"</span>: &#123;</div><div class="line"><span class="string">"type"</span>: <span class="string">"string"</span>,</div><div class="line"><span class="string">"analyzer"</span>: <span class="string">"english"</span>,</div><div class="line"><span class="string">"fields"</span>: &#123;</div><div class="line"><span class="string">"raw"</span>: &#123;</div><div class="line"><span class="string">"type"</span>: <span class="string">"string"</span>,</div><div class="line"><span class="string">"index"</span>: <span class="string">"not_analyzed"</span></div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">//现在，在给数据重建索引后，我们既可以使用  tweet  字段进行全文本搜索，也可以用 tweet.raw  字段进行排序</div><div class="line">GET /_search</div><div class="line">&#123;</div><div class="line"><span class="string">"query"</span>: &#123;</div><div class="line"><span class="string">"match"</span>: &#123;</div><div class="line"><span class="string">"tweet"</span>: <span class="string">"elasticsearch"</span></div><div class="line">&#125;</div><div class="line">&#125;,</div><div class="line"><span class="string">"sort"</span>: <span class="string">"tweet.raw"</span></div><div class="line">&#125;</div><div class="line">对analyzed字段进行强制排序会消耗大量内存</div></pre></td></tr></table></figure>
-<h2 id="相关性"><a href="#相关性" class="headerlink" title="相关性"></a>相关性</h2><p>每个文档都有相关性评分，用一个相对的浮点数字段_score来表示,_score的评分越高，相关性越高.fuzzy查询会计算与关键词的拼写相似程度,terms查询会计算 找到的内容与关键词组成部分匹配的百分比，但是一般意义上我们说的全文本搜索是指计算内容与关键词的类似程度。<br>es的相似度算法被定义为TF/IDF,即检索词频率和反向文档频率，<br>检索词频率：检索词在该字段出现的频率；也就是出现频率越高，相关性越高。<br>反向文档频率：每个检索词在索引中出现的频率；频率越高，相关性越低。检索词出现在多数文档中会比出现在少数文档中的权重更低，即检验一个检索词在文档中的普遍重要性<br>字段长度准则：长度越长，相关度越低。<br>如果多条查询子句被合并为一条复合查询语句，比如bool查询，则每个查询子句计算得出的评分会被合并到总的相关性评分中。</p>
-<h3 id="理解评分规则"><a href="#理解评分规则" class="headerlink" title="理解评分规则"></a>理解评分规则</h3><p>explain参数可以让返回结果添加一个_score评分的得来依据<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">GET /_search?explain</div><div class="line">&#123;</div><div class="line"><span class="string">"query"</span> : &#123; <span class="string">"match"</span> : &#123; <span class="string">"tweet"</span> : <span class="string">"honeymoon"</span> &#125;&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h3 id="Explain-Api"><a href="#Explain-Api" class="headerlink" title="Explain Api"></a>Explain Api</h3><p> explain  选项加到某一文档上时，它会告诉你为何这个文档会被匹配，以及一个文档为何没有被匹配<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">GET /us/tweet/12/_explain</div><div class="line">&#123;</div><div class="line"><span class="string">"query"</span> : &#123;</div><div class="line"><span class="string">"filtered"</span> : &#123;</div><div class="line"><span class="string">"filter"</span> : &#123; <span class="string">"term"</span> : &#123; <span class="string">"user_id"</span> : 2 &#125;&#125;,</div><div class="line"><span class="string">"query"</span> : &#123; <span class="string">"match"</span> : &#123; <span class="string">"tweet"</span> : <span class="string">"honeymoon"</span> &#125;&#125;</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">//response</div><div class="line"><span class="string">"failure to match filter: cache(user_id:[2 TO 2])"</span></div></pre></td></tr></table></figure></p>
-<h2 id="数据字段"><a href="#数据字段" class="headerlink" title="数据字段"></a>数据字段</h2><p>为了提高排序效率，ElasticSearch 会将所有字段的值加载到内存中，这就叫做”数据字段”</p>
-<blockquote>
-<p>es将所有字段数据加载到内存中并不是匹配到的那部分数据,而是索引下所有文档中的值，包括所有类型</p>
-</blockquote>
-<p>将所有字段数据加载到内存中是因为从硬盘反向倒排索引是非常缓慢的。尽管你这次请求需要的是某些文档中的部分数据，但你下个请求却需要另外的数据，所以将所有字段数据一次性加载到内存中是十分必要的。<br>ElasticSearch中的字段数据常被应用到以下场景：</p>
-<ol>
-<li>对一个字段进行排序</li>
-<li>对一个字段进行聚合</li>
-<li>某些过滤，比如地理位置过滤</li>
-<li>某些与字段相关的脚本计算<br>这会消耗掉很多内存，尤其是大量的字符串数据 – string字段可能包含很多不同的值，比如邮件内容。 值得庆幸的是，内存不足是可以通过横向扩展解决的，我们可以增加更多的节点到集群。</li>
-</ol>
-<h1 id="分布式搜索"><a href="#分布式搜索" class="headerlink" title="分布式搜索"></a>分布式搜索</h1><p>一个CRUD操作只处理一个单独的文档。文档的唯一性由 _index  ,  _type  和 routing-value  （通常默认是该文档的 _id  ）的组合来确定。这意味着我们可以准确知道集群中的哪个分片持有这个文档。但如果针对复杂的搜索模型，由于不知道哪个文档会匹配查询（文档可能存放在集群中的任意分片上）。一个搜索不得不通过查询每一个我们感兴趣的索引的分片副本，来看是否含有任何匹配的文档。搜索的执行过程分两个阶段，称为查询然后取回（query then fetch）</p>
-<h2 id="查询阶段"><a href="#查询阶段" class="headerlink" title="查询阶段"></a>查询阶段</h2><p>在初始化查询阶段，查询被向索引中的每个分片或者副本广播，每个分片会在本地执行搜索并建立匹配文档的优先队列。</p>
-<blockquote>
-<p>优先队列<br>一个优先队列（priority queue is）只是一个存有前n个（top-n）匹配document的有序列表。这个优先队列的大小由分页参数from和size决定。例如，下面这个例子中的搜索请求要求优先队列要能够容纳100个document</p>
-</blockquote>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">GET /_search</div><div class="line">&#123;</div><div class="line"><span class="string">"from"</span>: 90,</div><div class="line"><span class="string">"size"</span>: 10</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>查询阶段包含以下三步：<br>1.客户端发送一个search给node3，node3创建一个from+size的空优先队列；<br>2.node3转发请求到索引中每个分片的原本或者副本，每个分片在本地执行这个查询并且将结果放到一个from+size的优先队列里；<br>3.每个分片返回documentid和它优先队列里所有document的排序值给协调节点node3.协调节点node3把这些值合并到自己的优先队列产生全局排列的结果<br>当一个搜索请求被发送到一个节点node时，这个节点就成了协调节点，这个节点工作是向所有相关的分片广播搜索请求并把他们的响应整合成全局的有序结果集。<br>第一步是向索引里的每个节点的分片副本广播请求。就像document的 GET  请求一样，搜索请求可以被每个分片的原本或任意副本处理。对于后续请求，协调节点会轮询所有的分片副本以分摊负载。<br>每一个分片在本地执行查询和建立一个长度为 from+size  的有序优先队列——这个长度意味着它自己的结果数量就足够满足全局的请求要求。分片返回一个轻量级的结果列表给协调节点。只包含documentID值和排序需要用到的值，例如 _score。</p>
-<h2 id="取回阶段"><a href="#取回阶段" class="headerlink" title="取回阶段"></a>取回阶段</h2><p>分布式搜索取回阶段如下：<br>1.协调节点需要辨别哪个document需要取回，并且向相关分片发送GET请求。<br>2.每个分片加载document并根据需要丰富他，然后再将document返回给协调节点。<br>3.一旦所有的document都被取回，协调节点会将结果返回给客户端<br>分片加载document主体—— _source  field。如果需要，还会根据元数据丰富结果和高亮搜索片断。一旦协调节点收到所有结果，会将它们汇集到单一的回答响应里，这个响应将会返回给客户端。  </p>
-<h2 id="深分页"><a href="#深分页" class="headerlink" title="深分页"></a>深分页</h2><p>是机器人或者网络爬虫的行为。它们会持续不断地一页接着一页地获取页面直到服务器到底崩溃的边缘<br>查询然后取回过程虽然支持通过使用 from  和 size  参数进行分页，但是要在有限范围内（within limited）。还记得每个分片必须构造一个长度为 from+size  的优先队列吧，所有这些都要传回协调节点。这意味着协调节点要通过对 分片数量 * (from +size)  个document进行排序来找到正确的 size  个document。</p>
-<h2 id="搜索选项"><a href="#搜索选项" class="headerlink" title="搜索选项"></a>搜索选项</h2><h3 id="preference（偏爱）"><a href="#preference（偏爱）" class="headerlink" title="preference（偏爱）"></a>preference（偏爱）</h3><p>preference  参数允许你控制使用哪个分片或节点来处理搜索请求。她接受如下一些参数<br>primary：搜索只在主分片执行搜索请求，副本不参与搜索；性能会打折扣，达不到性能的水平扩展。<br>_primary_first：优先在主分片执行，如果主分片挂掉，会在副本执行请求。<br>_local：搜索请求优先于在本地执行。<br>_only_node:xyz：只在xyz节点执行搜索。<br>_prefer_node:xyz：搜索请求优先在节点xyz执行。<br>_shards:2,3：搜索只在分片2、3执行，可以与_primary参数一起使用如：_shards:2,3;_primary<br>随机字符串：指定一个随机字符串，可以保证同样的请求，被分配到同样的副本上面，从而保证同一请求结果的稳定性。<br>结果震荡<br>想像一下，你正在按照 timestamp  字段来对你的结果排序，并且有两个document有相同的timestamp。由于搜索请求是在所有有效的分片副本间轮询的，这两个document可能在原始分片里是一种顺序，在副本分片里是另一种顺序.这就是被称为结果震荡（bouncing results）的问题：用户每次刷新页面，结果顺序会发生变化。避免这个问题方法是对于同一个用户总是使用同一个分片。方法就是使用一个随机字符串例如用户的会话ID（session ID）来设置 preference  参数</p>
-<h3 id="timeout"><a href="#timeout" class="headerlink" title="timeout"></a>timeout</h3><p>通常，协调节点会等待接收所有分片的回答。如果有一个节点遇到问题，它会拖慢整个搜索请求。<br>timeout参数告诉协调节点最多等待多久，就可以放弃等待而将已有结果返回。返回部分结果总比什么都没有好<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="string">"timed_out"</span>: <span class="literal">true</span>, (1)</div><div class="line"><span class="string">"_shards"</span>: &#123;</div><div class="line"><span class="string">"total"</span>: 5,</div><div class="line"><span class="string">"successful"</span>: 4,</div><div class="line"><span class="string">"failed"</span>: 1 (2)</div><div class="line">&#125;,</div></pre></td></tr></table></figure></p>
-<h3 id="路由选择"><a href="#路由选择" class="headerlink" title="路由选择"></a>路由选择</h3><p>在搜索时，你可以指定一个或多个 routing  值来限制只搜索那些分片而不是搜索index里的全部分片<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GET /_search?routing=user_1,user2</div></pre></td></tr></table></figure></p>
-<h3 id="搜索类型"><a href="#搜索类型" class="headerlink" title="搜索类型"></a>搜索类型</h3><p>默认的搜索类型是query_then_fetch<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GET /_search?search_type=count</div></pre></td></tr></table></figure></p>
-<h4 id="计数"><a href="#计数" class="headerlink" title="计数"></a>计数</h4><p>count（计数）搜索类型只有一个 query（查询）  的阶段。当不需要搜索结果只需要知道满足查询的document的数量时，可以使用这个查询类型。</p>
-<h4 id="query-then-fetch-查询并且取回"><a href="#query-then-fetch-查询并且取回" class="headerlink" title="query_then_fetch 查询并且取回"></a>query_then_fetch 查询并且取回</h4><p>query_and_fetch（查询并且取回）  搜索类型将查询和取回阶段合并成一个步骤。这是一个内部优化选项，当搜索请求的目标只是一个分片时可以使用，例如指定了 routing（路由选择）  值时。虽然你可以手动选择使用这个搜索类型，但是这么做基本上不会有什么效果</p>
-<h4 id="dfs-query-then-fetch-和-dfs-query-and-fetch"><a href="#dfs-query-then-fetch-和-dfs-query-and-fetch" class="headerlink" title="dfs_query_then_fetch 和 dfs_query_and_fetch"></a>dfs_query_then_fetch 和 dfs_query_and_fetch</h4><p>dfs  搜索类型有一个预查询的阶段，它会从全部相关的分片里取回项目频数来计算全局的项目频数。我们将在relevance-is-broken（相关性被破坏）里进一步讨论这个</p>
-<h4 id="scan-扫描"><a href="#scan-扫描" class="headerlink" title="scan(扫描)"></a>scan(扫描)</h4><p>scan（扫描）  搜索类型是和 scroll（滚屏）  API连在一起使用的，可以高效地取回巨大数量的结果。它是通过禁用排序来实现的</p>
-<h2 id="扫描和滚屏"><a href="#扫描和滚屏" class="headerlink" title="扫描和滚屏"></a>扫描和滚屏</h2><p>scan（扫描）  搜索类型是和 scroll（滚屏）  API一起使用来从Elasticsearch里高效地取回巨大数量的结果而不需要付出深分页的代价。<br>为了使用scan-and-scroll（扫描和滚屏），需要执行一个搜索请求，将 search_type  设置成 scan  ，并且传递一个 scroll  参数来告诉Elasticsearch滚屏应该持续多长时间。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">curl -XGET <span class="string">'localhost:9200/twitter/tweet/_search?scroll=1m'</span> <span class="_">-d</span> <span class="string">'</span></div><div class="line">&#123;</div><div class="line">    "query": &#123;</div><div class="line">        "match" : &#123;</div><div class="line">            "title" : "elasticsearch"</div><div class="line">        &#125;,</div><div class="line"></div><div class="line">    &#125;,</div><div class="line">    size:1000</div><div class="line">&#125;</div><div class="line"></div><div class="line">//这个请求的应答没有包含任何命中的结果，但是包含了一个Base-64编码的 _scroll_id（滚屏id）  字符串。现在我们可以将 _scroll_id  传递给 _search/scroll  末端来获取第一批结果</div><div class="line">curl -XGET  'localhost:9200/_search/scroll<span class="string">'  -d'</span></div><div class="line">&#123;</div><div class="line">    <span class="string">"scroll"</span> : <span class="string">"1m"</span>,</div><div class="line">    <span class="string">"scroll_id"</span> : <span class="string">"c2Nhbjs2OzM0NDg1ODpzRlBLc0FXNlNyNm5JWUc1"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>(1) 保持滚屏开启另一分钟。<br>(2)  _scroll_id  可以在body或者URL里传递，也可以被当做查询参数传递。注意，要再次指定 ?scroll=1m  。滚屏的终止时间会在我们每次执行滚屏请求时刷新，所以他只需要给我们足够的时间来处理<br>当前批次的结果而不是所有的匹配查询的document。<br>这个滚屏请求的应答包含了第一批次的结果。虽然指定了一个1000的size，但是获得了更多的document。当扫描时,size被应用到每一个分片上，所以我们在每个批次里最多或获得 size <em> number_of_primary_shards（size</em>主分片数）个document。</p>
-<blockquote>
-<p>滚屏请求也会返回一个新的_scroll_id  。每次做下一个滚屏请求时，必须传递前一次请求返回的_scroll_id  。</p>
-<h1 id="索引管理"><a href="#索引管理" class="headerlink" title="索引管理"></a>索引管理</h1><h2 id="创建删除"><a href="#创建删除" class="headerlink" title="创建删除"></a>创建删除</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">PUT /_index</div><div class="line">&#123;</div><div class="line">  <span class="string">"settings"</span>:&#123;</div><div class="line"></div><div class="line">  &#125;,</div><div class="line">  <span class="string">"mappings"</span>:&#123;</div><div class="line">    <span class="string">"type_one"</span>:&#123;</div><div class="line">       ...</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-</blockquote>
-<p>config/elasticsearch.yml,添加下面的配置来防止自动创建索引<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">action.auto_create_index: <span class="literal">false</span></div></pre></td></tr></table></figure></p>
-<h2 id="索引设置"><a href="#索引设置" class="headerlink" title="索引设置"></a>索引设置</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">number_of_shards 定义一个索引的主分片个数，默认值是 `5`。这个配置在索引创建后不能修改。</div><div class="line">number_of_replicas 每个主分片的复制分片个数，默认是 `1`。这个配置可以随时在活跃的索引上修改</div><div class="line">PUT /my_temp_index</div><div class="line">&#123;</div><div class="line"><span class="string">"settings"</span>: &#123;</div><div class="line"><span class="string">"number_of_shards"</span> : 1,</div><div class="line"><span class="string">"number_of_replicas"</span> : 0</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">//修改</div><div class="line">PUT /my_temp_index/_settings</div><div class="line">&#123;</div><div class="line"><span class="string">"number_of_replicas"</span>: 1</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h2 id="配置分词器"><a href="#配置分词器" class="headerlink" title="配置分词器"></a>配置分词器</h2><p>standard分析器是用于全文字段的默认分析器，对于大部分西方语系来说是一个不错的选择。它考虑了这几点<br>standard  分词器，在词层级上分割输入的文本。<br>standard  表征过滤器，被设计用来整理分词器触发的所有表征（但是目前什么都没做）。<br>lowercase  表征过滤器，将所有表征转换为小写。<br>stop  表征过滤器，删除所有可能会造成搜索歧义的停用词，如a、the、and、is  。</p>
-<h2 id="自定义分析器"><a href="#自定义分析器" class="headerlink" title="自定义分析器"></a>自定义分析器</h2><p>字符过滤器、分词器、表征过滤器</p>
-<h3 id="字符过滤器"><a href="#字符过滤器" class="headerlink" title="字符过滤器"></a>字符过滤器</h3><p>字符过滤器是让字符串在被分词前变得更加“整洁”。例如，如果我们的文本是 HTML 格式，它可能会包含一些我们不想被索引的 HTML 标签，诸如</p><p>或<div>。我们可以使用html_strip字符过滤器 来删除所有的HTML标签，并且将HTML实体转换成对应的 Unicode字符，比如将&Aacute;  转成Á。一个分析器可能包含零到多个字符过滤器</div></p>
-<h3 id="分词器"><a href="#分词器" class="headerlink" title="分词器"></a>分词器</h3><p>一个分析器必须包含一个分词器。分词器将字符串分割成单独的词（terms）或表征（tokens）。standard分析器使用standard分词器将字符串分割成单独的字词，删除大部分标点符号，但是现存的其他分词器会有不同的行为特征。</p>
-<h3 id="表征过滤器"><a href="#表征过滤器" class="headerlink" title="表征过滤器"></a>表征过滤器</h3><p>表征过滤器可能修改，添加或删除表征。我们已经提过lowercase和stop表征过滤器，但是 Elasticsearch 中有更多的选择。</p>
-<h3 id="创建自定义的分词器"><a href="#创建自定义的分词器" class="headerlink" title="创建自定义的分词器"></a>创建自定义的分词器</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line">PUT /my_index</div><div class="line">&#123;</div><div class="line"><span class="string">"settings"</span>: &#123;</div><div class="line"><span class="string">"analysis"</span>: &#123;</div><div class="line"><span class="string">"char_filter"</span>: &#123; ... custom character filters ... &#125;,</div><div class="line"><span class="string">"tokenizer"</span>: &#123; ... custom tokenizers ... &#125;,</div><div class="line"><span class="string">"filter"</span>: &#123; ... custom token filters ... &#125;,</div><div class="line"><span class="string">"analyzer"</span>: &#123; ... custom analyzers ... &#125;</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">//实例</div><div class="line">PUT /my_index</div><div class="line">&#123;</div><div class="line"><span class="string">"settings"</span>: &#123;</div><div class="line"><span class="string">"analysis"</span>: &#123;</div><div class="line"><span class="string">"char_filter"</span>: &#123;</div><div class="line"><span class="string">"&amp;_to_and"</span>: &#123;</div><div class="line"><span class="string">"type"</span>: <span class="string">"mapping"</span>,</div><div class="line"><span class="string">"mappings"</span>: [ <span class="string">"&amp;=&gt; and "</span>]</div><div class="line">&#125;&#125;,</div><div class="line"><span class="string">"filter"</span>: &#123;</div><div class="line"><span class="string">"my_stopwords"</span>: &#123;</div><div class="line"><span class="string">"type"</span>: <span class="string">"stop"</span>,</div><div class="line"><span class="string">"stopwords"</span>: [ <span class="string">"the"</span>, <span class="string">"a"</span> ]</div><div class="line">&#125;&#125;,</div><div class="line"><span class="string">"analyzer"</span>: &#123;</div><div class="line"><span class="string">"my_analyzer"</span>: &#123;</div><div class="line"><span class="string">"type"</span>: <span class="string">"custom"</span>,</div><div class="line"><span class="string">"char_filter"</span>: [ <span class="string">"html_strip"</span>, <span class="string">"&amp;_to_and"</span> ],</div><div class="line"><span class="string">"tokenizer"</span>: <span class="string">"standard"</span>,</div><div class="line"><span class="string">"filter"</span>: [ <span class="string">"lowercase"</span>, <span class="string">"my_stopwords"</span> ]</div><div class="line">&#125;&#125;</div><div class="line">&#125;&#125;</div></pre></td></tr></table></figure>
-<p>除非我们告诉es在哪里使用，否则分析器不会起作用。我们可以通过下面的映射将它应用在一个string类型的字段上.<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">PUT /_index/_mapping/_type</div><div class="line">&#123;</div><div class="line">  <span class="string">"properties"</span>:&#123;</div><div class="line">      <span class="string">"title"</span>:&#123;</div><div class="line">          <span class="string">"type"</span>:<span class="string">"string"</span>,</div><div class="line">          <span class="string">"analyzer"</span>:<span class="string">"my_analyzer"</span></div><div class="line">      &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line"><span class="comment">## 映射</span></div><div class="line">Lucene 中，一个文档由一组简单的键值对组成，一个字段至少需要有一个值，但是任何字段都可以有多个值。类似的，一个单独的字符串可能在分析过程中被转换成多个值。Lucene 不关心这些值是字符串，数字或日期，所有的值都被当成不透明字节</div><div class="line"><span class="comment">### 预防类型陷阱</span></div><div class="line">想象一下我们的索引中有两种类型： blog_en  表示英语版的博客， blog_es  表示西班牙语版的博客。两种类型都有  title字段，但是其中一种类型使用  english  分析器，另一种使用  spanish  分析器。</div><div class="line">``` bash</div><div class="line">GET /_search</div><div class="line">&#123;</div><div class="line"><span class="string">"query"</span>: &#123;</div><div class="line"><span class="string">"multi_match"</span>: &#123;</div><div class="line"><span class="string">"query"</span>: <span class="string">"The quick brown fox"</span>,</div><div class="line"><span class="string">"fields"</span>: [ <span class="string">"blog_en.title"</span>, <span class="string">"blog_es.title"</span> ]</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h2 id="根对象"><a href="#根对象" class="headerlink" title="根对象"></a>根对象</h2><p>一个 properties 节点，列出了文档中可能包含的每个字段的映射<br>多个元数据字段，每一个都以下划线开头，例如  _type  ,  _id  和  _source<br>设置项，控制如何动态处理新的字段，例如analyzer,dynamic_date_formats和dynamic_templates  。其他设置，可以同时应用在根对象和其他object类型的字段上，例如enabled,dynamic和 include_in_all<br>属性重要有三个type、index、analyzer</p>
-<h2 id="source"><a href="#source" class="headerlink" title="_source"></a>_source</h2><p>默认情况下，Elasticsearch 用 JSON 字符串来表示文档主体保存在  _source  字段中。像其他保存的字段一样,_source字段也会在写入硬盘前压缩<br>需要source的理由：</p>
-<ol>
-<li>搜索结果中能得到完整的文档 —— 不需要额外去别的数据源中查询文档</li>
-<li>如果缺少_source字段，部分更新请求不会起作用</li>
-<li>当你的映射有变化，而且你需要重新索引数据时，你可以直接在 Elasticsearch 中操作而不需要重新从别的数据源中取回数据</li>
-<li>你可以从  _source  中通过  get  或  search  请求取回部分字段，而不是整个文档</li>
-<li>这样容易排查错误，因为你可以准确的看到每个文档中包含的内容，而不是只能从一堆ID中猜测他们的内容<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">//禁用<span class="built_in">source</span></div><div class="line">PUT /my_index</div><div class="line">&#123;</div><div class="line"><span class="string">"mappings"</span>: &#123;</div><div class="line"><span class="string">"my_type"</span>: &#123;</div><div class="line"><span class="string">"_source"</span>: &#123;</div><div class="line"><span class="string">"enabled"</span>: <span class="literal">false</span></div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">GET /_search</div><div class="line">&#123;</div><div class="line"><span class="string">"query"</span>: &#123; <span class="string">"match_all"</span>: &#123;&#125;&#125;,</div><div class="line"><span class="string">"_source"</span>: [ <span class="string">"title"</span>, <span class="string">"created"</span> ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-</li>
-</ol>
-<h2 id="元数据-all字段"><a href="#元数据-all字段" class="headerlink" title="元数据:_all字段"></a>元数据:_all字段</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">//当你还不清楚最终文档的结构时，可以将任何查询用于这个字段</div><div class="line">GET /_search</div><div class="line">&#123;</div><div class="line"><span class="string">"match"</span>: &#123;</div><div class="line"><span class="string">"_all"</span>: <span class="string">"john smith marketing"</span></div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">// 禁用_all</div><div class="line">PUT /my_index/_mapping/my_type</div><div class="line">&#123;</div><div class="line"><span class="string">"my_type"</span>: &#123;</div><div class="line"><span class="string">"_all"</span>: &#123; <span class="string">"enabled"</span>: <span class="literal">false</span> &#125;</div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>通过  include_in_all  选项可以控制字段是否要被包含在_all字段中，默认值是true。</p>
-<h2 id="文档id"><a href="#文档id" class="headerlink" title="文档id"></a>文档id</h2><p>文档唯一标识由_index、_type、_id、_uid组成</p>
-<h2 id="动态映射"><a href="#动态映射" class="headerlink" title="动态映射"></a>动态映射</h2><p>它通过动态映射来确定字段的数据类型且自动将该字段加到类型映射中，通过dynamic设置来控制这些行为，它接受下面几个选项true：自动添加字段（默认）、false：忽略字段、strict：当遇到未知字段时抛出异常<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">PUT /my_index</div><div class="line">&#123;</div><div class="line"><span class="string">"mappings"</span>: &#123;</div><div class="line"><span class="string">"my_type"</span>: &#123;</div><div class="line"><span class="string">"dynamic"</span>: <span class="string">"strict"</span>, &lt;1&gt;</div><div class="line"><span class="string">"properties"</span>: &#123;</div><div class="line"><span class="string">"title"</span>: &#123; <span class="string">"type"</span>: <span class="string">"string"</span>&#125;,</div><div class="line"><span class="string">"stash"</span>: &#123;</div><div class="line"><span class="string">"type"</span>: <span class="string">"object"</span>,</div><div class="line"><span class="string">"dynamic"</span>: <span class="literal">true</span> &lt;2&gt;</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>判断字符串为日期的规则可以通过dynamic_date_formats配置来修改</p>
-<h2 id="动态模板"><a href="#动态模板" class="headerlink" title="动态模板"></a>动态模板</h2><p>使用dynamic_templates，你可以完全控制新字段的映射，你设置可以通过字段名或数据类型应用一个完全不同的映射<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">//es  : 字段名以  _es  结尾需要使用spanish分析器 ;en:所有其他字段使用english分析器。</div><div class="line">PUT /my_index</div><div class="line">&#123;</div><div class="line"><span class="string">"mappings"</span>: &#123;</div><div class="line"><span class="string">"my_type"</span>: &#123;</div><div class="line"><span class="string">"dynamic_templates"</span>: [</div><div class="line">自定义动态索引</div><div class="line">日期检测</div><div class="line">动态模板</div><div class="line">&#123; <span class="string">"es"</span>: &#123;</div><div class="line"><span class="string">"match"</span>: <span class="string">"*_es"</span>, &lt;1&gt;</div><div class="line"><span class="string">"match_mapping_type"</span>: <span class="string">"string"</span>,</div><div class="line"><span class="string">"mapping"</span>: &#123;</div><div class="line"><span class="string">"type"</span>: <span class="string">"string"</span>,</div><div class="line"><span class="string">"analyzer"</span>: <span class="string">"spanish"</span></div><div class="line">&#125;</div><div class="line">&#125;&#125;,</div><div class="line">&#123; <span class="string">"en"</span>: &#123;</div><div class="line"><span class="string">"match"</span>: <span class="string">"*"</span>, &lt;2&gt;</div><div class="line"><span class="string">"match_mapping_type"</span>: <span class="string">"string"</span>,</div><div class="line"><span class="string">"mapping"</span>: &#123;</div><div class="line"><span class="string">"type"</span>: <span class="string">"string"</span>,</div><div class="line"><span class="string">"analyzer"</span>: <span class="string">"english"</span></div><div class="line">&#125;</div><div class="line">&#125;&#125;</div><div class="line">]</div><div class="line">&#125;&#125;&#125;</div></pre></td></tr></table></figure></p>
-<h2 id="默认映射"><a href="#默认映射" class="headerlink" title="默认映射"></a>默认映射</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">PUT /my_index</div><div class="line">&#123;</div><div class="line"><span class="string">"mappings"</span>: &#123;</div><div class="line"><span class="string">"_default_"</span>: &#123;</div><div class="line"><span class="string">"_all"</span>: &#123; <span class="string">"enabled"</span>: <span class="literal">false</span> &#125;</div><div class="line">&#125;,</div><div class="line"><span class="string">"blog"</span>: &#123;</div><div class="line"><span class="string">"_all"</span>: &#123; <span class="string">"enabled"</span>: <span class="literal">true</span> &#125;</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h2 id="重建索引"><a href="#重建索引" class="headerlink" title="重建索引"></a>重建索引</h2><p>_source字段的一个最大的好处是你已经在 Elasticsearch 中有了完整的文档，你不再需要从数据库中重建你的索引。你可以在同一时间执行多个重新索引的任务，但是你显然不愿意它们的结果有重叠。所以，可以将重建大索引的任务通过日期或时间戳字段拆分成较小的任务。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">GET /old_index/_search?search_type=scan&amp;scroll=1m</div><div class="line">&#123;</div><div class="line"><span class="string">"query"</span>: &#123;</div><div class="line"><span class="string">"range"</span>: &#123;</div><div class="line"><span class="string">"date"</span>: &#123;</div><div class="line"><span class="string">"gte"</span>: <span class="string">"2014-01-01"</span>,</div><div class="line"><span class="string">"lt"</span>: <span class="string">"2014-02-01"</span></div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">&#125;,</div><div class="line"><span class="string">"size"</span>: 1000</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h2 id="别名"><a href="#别名" class="headerlink" title="别名"></a>别名</h2><p>索引 别名 就像一个快捷方式或软连接，可以指向一个或多个索引<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">//创建一个索引  my_index_v1  ，然后将别名  my_index  指向它</div><div class="line">PUT /my_index_v1 &lt;1&gt;</div><div class="line">PUT /my_index_v1/_alias/my_index &lt;2&gt;</div><div class="line">//你可以检测这个别名指向哪个索引</div><div class="line">GET /*/_alias/my_index</div><div class="line">//哪些别名指向这个索引</div><div class="line">GET /my_index_v1/_alias/*</div><div class="line">//别名可以指向多个索引，所以我们需要在新索引中添加别名的同时从旧索引中删除它</div><div class="line">POST /_aliases</div><div class="line">&#123;</div><div class="line"><span class="string">"actions"</span>: [</div><div class="line">&#123; <span class="string">"remove"</span>: &#123; <span class="string">"index"</span>: <span class="string">"my_index_v1"</span>, <span class="string">"alias"</span>: <span class="string">"my_index"</span> &#125;&#125;,</div><div class="line">&#123; <span class="string">"add"</span>: &#123; <span class="string">"index"</span>: <span class="string">"my_index_v2"</span>, <span class="string">"alias"</span>: <span class="string">"my_index"</span> &#125;&#125;</div><div class="line">]</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h1 id="深入分片"><a href="#深入分片" class="headerlink" title="深入分片"></a>深入分片</h1><h2 id="不变性"><a href="#不变性" class="headerlink" title="不变性"></a>不变性</h2><p>早期的全文检索会为整个文档集合建立一个很大的倒排索引并将其写入到磁盘。 一旦新的索引就绪，旧的就会被其替换，这样最近的变化便可以被检索到。<br>倒排索引被写入磁盘后是 不可改变 的:它永远不会修改。 不变性有重要的价值：<br>不需要锁。如果你从来不更新索引，你就不需要担心多进程同时修改数据的问题。一旦索引被读入内核的文件系统缓存，便会留在哪里，由于其不变性。只要文件系统缓存中还有足够的空间，那么大部分读请求会直接请求内存，而不会命中磁盘。这提供了很大的性能提升。其它缓存(像filter缓存)，在索引的生命周期内始终有效。它们不需要在每次数据改变时被重建，因为数据不会变化。<br>写入单个大的倒排索引允许数据被压缩，减少磁盘 I/O 和 需要被缓存到内存的索引的使用量。当然，一个不变的索引也有不好的地方。主要事实是它是不可变的! 你不能修改它。如果你需要让一个新的文档 可被搜索，你需要重建整个索引。这要么对一个索引所能包含的数据量造成了很大的限制，要么对索引可被更新的频率造成了很大的限制。</p>
-<h2 id="动态更新索引"><a href="#动态更新索引" class="headerlink" title="动态更新索引"></a>动态更新索引</h2><p>通过增加新的补充索引来反映新近的修改，而不是直接重写整个倒排索引。每一个倒排索引都会被轮流查询到–从最早的开始–查询完后再对结果进行合并。Elasticsearch 基于 Lucene, 这个 java 库引入了 按段搜索 的概念。 每一 段 本身都是一个倒排索引， 但 索引 在 Lucene 中除表示所有 段 的集合外， 还增加了 提交点 的概念 — 一个列出了所有已知段的文件<br>新的文档首先被添加到内存索引缓存中，然后写入到一个基于磁盘的段，在一次提交后，一个新的段被添加到提交点而且缓存被清空。<br>逐段搜索会以如下流程进行工作：</p>
-<ol>
-<li>新文档被收集到内存索引缓存，不时地, 缓存被提交</li>
-<li>不时地, 缓存被 提交 ：<br>一个新的段–一个追加的倒排索引–被写入磁盘。<br>一个新的包含新段名字的 提交点 被写入磁盘。<br>磁盘进行同步 — 所有在文件系统缓存中等待的写入都刷新到磁盘，以确保它们被写入物理文件。新的段被开启，让它包含的文档可见以被搜索。内存缓存被清空，等待接收新的文档。</li>
-<li>新的段被开启，让它包含的文档可见以被搜索。</li>
-<li>内存缓存被清空，等待接收新的文档。</li>
-</ol>
-<h2 id="删除更新"><a href="#删除更新" class="headerlink" title="删除更新"></a>删除更新</h2><p>段是不可改变的，所以既不能从把文档从旧的段中移除，也不能修改旧的段来进行反映文档的更新。 取而代之的是，每个提交点会包含一个 .del 文件，文件中会列出这些被删除文档的段信息。<br>当一个文档被 “删除” 时，它实际上只是在 .del 文件中被 标记 删除。一个被标记删除的文档仍然可以被查询匹配到， 但它会在最终结果被返回前从结果集中移除。<br>文档更新也是类似的操作方式：当一个文档被更新时，旧版本文档被标记删除，文档的新版本被索引到一个新的段中。 可能两个版本的文档都会被一个查询匹配到，但被删除的那个旧版本文档在结果集返回前就已经被移除。</p>
-<h2 id="近实时搜索"><a href="#近实时搜索" class="headerlink" title="近实时搜索"></a>近实时搜索</h2><p>随着按段（per-segment）搜索的发展， 一个新的文档从索引到可被搜索的延迟显著降低了。新文档在几分钟之内即可被检索，但这样还是不够快。<br>磁盘在这里成为了瓶颈。 提交（Commiting）一个新的段到磁盘需要一个 fsync 来确保段被物理性地写入磁盘，这样在断电的时候就不会丢失数据。 但是 fsync 操作代价很大; 如果每次索引一个文档都去执行一次的话会造成很大的性能问题。<br>但是这里新段会被先写入到文件系统缓存–这一步代价会比较低，稍后再被刷新到磁盘–这一步代价比较高。不过只要文件已经在缓存中， 就可以像其它文件一样被打开和读取了。Lucene 允许新段被写入和打开–使其包含的文档在未进行一次完整提交时便对搜索可见。 这种方式比进行一次提交代价要小得多，并且在不影响性能的前提下可以被频繁地执行。</p>
-<h3 id="refresh-api"><a href="#refresh-api" class="headerlink" title="refresh api"></a>refresh api</h3><p>在 Elasticsearch 中，写入和打开一个新段的轻量的过程叫做 refresh 。 默认情况下每个分片会每秒自动刷新一次。这就是为什么我们说 Elasticsearch 是近实时搜索: 文档的变化并不是立即对搜索可见，但会在一秒之内变为可见。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">POST /_refresh //刷新所有索引</div><div class="line">POST /blogs/_refresh //刷新blogs索引</div><div class="line">//正在使用 Elasticsearch 索引大量的日志文件， 你可能想优化索引速度而不是近实时搜索， 可以通过设置 refresh_interval ， 降低每个索引的刷新频率</div><div class="line">PUT /my_logs</div><div class="line">&#123;</div><div class="line">  <span class="string">"settings"</span>: &#123;</div><div class="line">    <span class="string">"refresh_interval"</span>: <span class="string">"30s"</span> //每30秒刷新 my_logs 索引</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line">//当你在建立一个大索引时，可以关闭自动刷新</div><div class="line">PUT /my_logs/_settings</div><div class="line">&#123; <span class="string">"refresh_interval"</span>: -1 &#125;</div></pre></td></tr></table></figure></p>
-<h2 id="持久化变更"><a href="#持久化变更" class="headerlink" title="持久化变更"></a>持久化变更</h2><p>1.新的文档被添加到内存缓冲区并且被追加到了事务日志<br>2.刷新（refresh）完成后, 缓存被清空但是事务日志不会<br>3.事务日志不断积累文档<br>4.在刷新（flush）之后，段被全量提交，并且事务日志被清空<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">POST /blogs/_flush //刷新（flush） blogs 索引</div><div class="line">POST /_flush?wait_for_ongoing //刷新（flush）所有的索引并且并且等待所有刷新在返回前完成。</div></pre></td></tr></table></figure></p>
-<h2 id="段合并"><a href="#段合并" class="headerlink" title="段合并"></a>段合并</h2><p>由于自动刷新流程每秒会创建一个新的段 ，这样会导致短时间内的段数量暴增。而段数目太多会带来较大的麻烦。 每一个段都会消耗文件句柄、内存和cpu运行周期。更重要的是，每个搜索请求都必须轮流检查每个段；所以段越多，搜索也就越慢。Elasticsearch通过在后台进行段合并来解决这个问题。小的段被合并到大的段，然后这些大的段再被合并到更大的段。段合并的时候会将那些旧的已删除文档 从文件系统中清除。 被删除的文档（或被更新文档的旧版本）不会被拷贝到新的大段中。启动段合并不需要你做任何事。进行索引和搜索时会自动进行。步骤如下：</p>
-<ol>
-<li>两个提交了的段和一个未提交的段正在被合并到一个更大的段</li>
-<li>一旦合并结束，老的段被删除<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">//optimize API大可看做是 强制合并 API 。它会将一个分片强制合并到 max_num_segments 参数指定大小的段数目。 这样做的意图是减少段的数量（通常减少到一个），来提升搜索性能。</div><div class="line">POST /logstash-2014-10/_optimize?max_num_segments=1</div></pre></td></tr></table></figure>
-</li>
-</ol>
-<h1 id="结构化搜索"><a href="#结构化搜索" class="headerlink" title="结构化搜索"></a>结构化搜索</h1><p>结构化搜索是查询包含内部结构的数据。日期、数字、时间都是结构化的，或者是结构化文本，比如蜡笔的颜色或者博客的标签。通过结构化搜索，你的查询结果始终是 是或非；是否应该属于集合。结构化搜索不关心文档的相关性或分数，它只是简单的包含或排除文档</p>
-<h2 id="查找准确的值"><a href="#查找准确的值" class="headerlink" title="查找准确的值"></a>查找准确的值</h2><p>对于准确值，你需要使用过滤器。过滤器的重要性在于它们非常的快。它们不计算相关性（避过所有计分阶段）而且很容易被缓存。<br>在5里filtered被去掉，放在bool里面<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">	<span class="string">"query"</span>:&#123;</div><div class="line">			<span class="string">"filter"</span>:&#123;</div><div class="line">				<span class="string">"terms"</span>:&#123;</div><div class="line">					<span class="string">"jkbsf"</span>:[<span class="string">"tyws-AddCaseTrial"</span>,<span class="string">"mrshjbs tyws-AddCaseTrial"</span>]</div><div class="line">				&#125;</div><div class="line">			&#125;</div><div class="line">	    &#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">//SELECT document FROM products WHERE price = 20</div><div class="line">GET /my_store/products/_search</div><div class="line">&#123;</div><div class="line"><span class="string">"query"</span> : &#123;</div><div class="line"><span class="string">"filtered"</span> : &#123;</div><div class="line"><span class="string">"filter"</span> : &#123;</div><div class="line"><span class="string">"term"</span> : &#123;</div><div class="line"><span class="string">"productID"</span> : <span class="string">"XHDK-A-1293-#fJ3"</span></div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h2 id="组合过滤"><a href="#组合过滤" class="headerlink" title="组合过滤"></a>组合过滤</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">SELECT product</div><div class="line">FROM products</div><div class="line">WHERE (price = 20 OR productID = <span class="string">"XHDK-A-1293-#fJ3"</span>)</div><div class="line">AND (price != 30)</div><div class="line"></div><div class="line">GET /my_store/products/_search</div><div class="line">&#123;</div><div class="line"><span class="string">"query"</span> : &#123;</div><div class="line"><span class="string">"filtered"</span> : &#123; &lt;1&gt;</div><div class="line"><span class="string">"filter"</span> : &#123;</div><div class="line"><span class="string">"bool"</span> : &#123;</div><div class="line"><span class="string">"should"</span> : [</div><div class="line">&#123; <span class="string">"term"</span> : &#123;<span class="string">"price"</span> : 20&#125;&#125;, &lt;2&gt;</div><div class="line">&#123; <span class="string">"term"</span> : &#123;<span class="string">"productID"</span> : <span class="string">"XHDK-A-1293-#fJ3"</span>&#125;&#125; &lt;2&gt;</div><div class="line">],</div><div class="line"><span class="string">"must_not"</span> : &#123;</div><div class="line"><span class="string">"term"</span> : &#123;<span class="string">"price"</span> : 30&#125; &lt;3&gt;</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>嵌套布尔过滤器<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line">SELECT document</div><div class="line">FROM products</div><div class="line">WHERE productID = <span class="string">"KDKE-B-9947-#kL5"</span></div><div class="line">OR ( productID = <span class="string">"JODL-X-1937-#pV7"</span></div><div class="line">AND price = 30</div><div class="line"></div><div class="line">&#123;</div><div class="line">   <span class="string">"query"</span>:&#123;</div><div class="line">     <span class="string">"filtered"</span>:&#123;</div><div class="line">        <span class="string">"filter"</span>:&#123;</div><div class="line">           <span class="string">"bool"</span>:&#123;</div><div class="line">             <span class="string">"should"</span>:[</div><div class="line">                &#123;</div><div class="line">                  <span class="string">"term"</span>:&#123;</div><div class="line">                    <span class="string">"productID"</span>:<span class="string">"KDKE-B-9947-#kL5"</span></div><div class="line">                  &#125;</div><div class="line">                &#125;,</div><div class="line">                &#123;</div><div class="line">                  <span class="string">"bool"</span>:&#123;</div><div class="line">                    <span class="string">"must"</span>:[</div><div class="line">                    &#123;</div><div class="line">                      <span class="string">"term"</span>:&#123;</div><div class="line">                        <span class="string">"productID"</span> : <span class="string">"JODL-X-1937-#pV7"</span></div><div class="line">                      &#125;</div><div class="line">                    &#125;,&#123;</div><div class="line">                      <span class="string">"term"</span>:&#123;</div><div class="line">                        <span class="string">"price"</span>: 30</div><div class="line">                      &#125;</div><div class="line">                    &#125;</div><div class="line">                    ]</div><div class="line">                  &#125;</div><div class="line">                &#125;</div><div class="line">             ]</div><div class="line">           &#125;</div><div class="line">        &#125;</div><div class="line">     &#125;</div><div class="line">   &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h2 id="查询多个准确值"><a href="#查询多个准确值" class="headerlink" title="查询多个准确值"></a>查询多个准确值</h2><p>terms过滤器是term过滤器的复数版本<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">GET /my_store/products/_search</div><div class="line">&#123;</div><div class="line"><span class="string">"query"</span> : &#123;</div><div class="line"><span class="string">"filtered"</span> : &#123;</div><div class="line"><span class="string">"filter"</span> : &#123;</div><div class="line"><span class="string">"terms"</span> : &#123; &lt;1&gt;</div><div class="line"><span class="string">"price"</span> : [20, 30]</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h2 id="包含而不是相等"><a href="#包含而不是相等" class="headerlink" title="包含而不是相等"></a>包含而不是相等</h2><p>假如你有一个 term 过滤器  { “term” : { “tags” : “search” } }  ，它将匹配下面两个文档<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&#123; <span class="string">"tags"</span> : [<span class="string">"search"</span>] &#125;</div><div class="line">&#123; <span class="string">"tags"</span> : [<span class="string">"search"</span>, <span class="string">"open_source"</span>] &#125;</div></pre></td></tr></table></figure></p>
-<p>假如你真的需要完全匹配这种行为，最好是通过添加另一个字段来实现。在这个字段中，你索引原字段包含值的个数。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">&#123; <span class="string">"tags"</span> : [<span class="string">"search"</span>], <span class="string">"tag_count"</span> : 1 &#125;</div><div class="line">&#123; <span class="string">"tags"</span> : [<span class="string">"search"</span>, <span class="string">"open_source"</span>], <span class="string">"tag_count"</span> : 2</div><div class="line">&#123;</div><div class="line">  <span class="string">"query"</span>:&#123;</div><div class="line">    <span class="string">"filtered"</span>:&#123;</div><div class="line">      <span class="string">"filter"</span>:&#123;</div><div class="line">        <span class="string">"bool"</span>:&#123;</div><div class="line">          <span class="string">"must"</span>:[</div><div class="line">            &#123;</div><div class="line">              <span class="string">"term"</span>:&#123;</div><div class="line">                <span class="string">"tags"</span>:<span class="string">"search"</span></div><div class="line">              &#125;</div><div class="line">            &#125;,</div><div class="line">            &#123;</div><div class="line">              <span class="string">"term"</span>:&#123;</div><div class="line">                <span class="string">"tag_count"</span>:1</div><div class="line">              &#125;</div><div class="line">            &#125;</div><div class="line">          ]</div><div class="line">        &#125;</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h2 id="范围过滤"><a href="#范围过滤" class="headerlink" title="范围过滤"></a>范围过滤</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">GET /my_store/products/_search</div><div class="line">&#123;</div><div class="line"><span class="string">"query"</span> : &#123;</div><div class="line"><span class="string">"filtered"</span> : &#123;</div><div class="line"><span class="string">"filter"</span> : &#123;</div><div class="line"><span class="string">"range"</span> : &#123;</div><div class="line"><span class="string">"price"</span> : &#123;</div><div class="line"><span class="string">"gte"</span> : 20,</div><div class="line"><span class="string">"lt"</span> : 40</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>当用于日期字段时,range过滤器支持日期数学操作。例如，我们想找到所有最近一个小时的文档<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="string">"range"</span> : &#123;</div><div class="line"><span class="string">"timestamp"</span> : &#123;</div><div class="line"><span class="string">"gt"</span> : <span class="string">"now-1h"</span></div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>日期计算也能用于实际的日期，而不是仅仅是一个像 now 一样的占位符。只要在日期后加上双竖线  ||  ，就能使用日期数学表达式了。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="string">"range"</span> : &#123;</div><div class="line"><span class="string">"timestamp"</span> : &#123;</div><div class="line"><span class="string">"gt"</span> : <span class="string">"2014-01-01 00:00:00"</span>,</div><div class="line"><span class="string">"lt"</span> : <span class="string">"2014-01-01 00:00:00||+1M"</span> &lt;1&gt;</div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>range  过滤器也可以用于字符串。字符串范围根据字典或字母顺序来计算<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="string">"range"</span> : &#123;</div><div class="line"><span class="string">"title"</span> : &#123;</div><div class="line"><span class="string">"gte"</span> : <span class="string">"a"</span>,</div><div class="line"><span class="string">"lt"</span> : <span class="string">"b"</span></div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>字符串范围适用于一个基数较小的字段，一个唯一短语个数较少的字段。你的唯一短语数越多，搜索就越慢</p>
-<h2 id="处理null值"><a href="#处理null值" class="headerlink" title="处理null值"></a>处理null值</h2><p>本质上来说null[]（空数组）和[null]是相等的。它们都不存在于倒排索引中<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">GET /my_index/posts/_search</div><div class="line">&#123;</div><div class="line"><span class="string">"query"</span> : &#123;</div><div class="line"><span class="string">"filtered"</span> : &#123;</div><div class="line"><span class="string">"filter"</span> : &#123;</div><div class="line"><span class="string">"exists"</span> : &#123; <span class="string">"field"</span> : <span class="string">"tags"</span> &#125;</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">GET /my_index/posts/_search</div><div class="line">&#123;</div><div class="line"><span class="string">"query"</span> : &#123;</div><div class="line"><span class="string">"filtered"</span> : &#123;</div><div class="line"><span class="string">"filter"</span>: &#123;</div><div class="line"><span class="string">"missing"</span> : &#123; <span class="string">"field"</span> : <span class="string">"tags"</span> &#125;</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h2 id="缓存"><a href="#缓存" class="headerlink" title="缓存"></a>缓存</h2><p>它们的核心是一个字节集来表示哪些文档符合这个过滤器。Elasticsearch 主动缓存了这些字节集留作以后使用。一旦缓存后，当遇到相同的过滤时，这些字节集就可以被重用，而<br>不需要重新运算整个过滤。<br>缓存的字节集很“聪明”：他们会增量更新。你索引中添加了新的文档，只有这些新文档需要被添加到已存的字节集中，而不是一遍遍重新计算整个缓存的过滤器。过滤器和整个系统的其他部分一样是实时的，你不需要关心缓存的过期时间。<br>独立的过滤缓存<br>每个过滤器都被独立计算和缓存，而不管它们在哪里使用。如果两个不同的查询使用相同的过滤器，则会使用相同的字节集。同样，如果一个查询在多处使用同样的过滤器，只有一个字节集会被计算和重用。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">//这两个过滤器相同，而且会使用同一个字节集</div><div class="line"><span class="string">"bool"</span>: &#123;</div><div class="line"><span class="string">"should"</span>: [</div><div class="line">&#123; <span class="string">"bool"</span>: &#123;</div><div class="line"><span class="string">"must"</span>: [</div><div class="line">&#123; <span class="string">"term"</span>: &#123; <span class="string">"folder"</span>: <span class="string">"inbox"</span> &#125;&#125;, &lt;1&gt;</div><div class="line">&#123; <span class="string">"term"</span>: &#123; <span class="string">"read"</span>: <span class="literal">false</span> &#125;&#125;</div><div class="line">]</div><div class="line">&#125;&#125;,</div><div class="line">&#123; <span class="string">"bool"</span>: &#123;</div><div class="line"><span class="string">"must_not"</span>: &#123;</div><div class="line"><span class="string">"term"</span>: &#123; <span class="string">"folder"</span>: <span class="string">"inbox"</span> &#125; &lt;1&gt;</div><div class="line">&#125;,</div><div class="line"><span class="string">"must"</span>: &#123;</div><div class="line"><span class="string">"term"</span>: &#123; <span class="string">"important"</span>: <span class="literal">true</span> &#125;</div><div class="line">&#125;</div><div class="line">&#125;&#125;</div><div class="line">]</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h2 id="过滤顺序"><a href="#过滤顺序" class="headerlink" title="过滤顺序"></a>过滤顺序</h2><p>在  bool  条件中过滤器的顺序对性能有很大的影响。更详细的过滤条件应该被放置在其他过滤器之前，以便在更早的排除更多的文档。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2786,7 +2476,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">48</span>
+                <span class="site-state-item-count">51</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2808,7 +2498,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">20</span>
+                <span class="site-state-item-count">22</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

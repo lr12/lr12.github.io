@@ -1,0 +1,779 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="微服务,spring cloud，ribbon," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="博客" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="例子参考：[http://blog.csdn.net/forezp/article/details/69934399] 客户端负载均衡负载均衡指的是服务端负载均衡，其中分为硬件负载均衡、软件负载均衡。硬件负载均衡是通过服务器节点之间安装专门用于负载均衡的设备，比如F5等；而软件负载均衡是通过在服务器上安装一些具有均衡负载的模块或软件来完成请求分发工作，比如Nginx。硬件负载均衡设备或是软件负载均">
+<meta name="keywords" content="微服务,spring cloud，ribbon">
+<meta property="og:type" content="article">
+<meta property="og:title" content="客户端负载均衡:ribbon">
+<meta property="og:url" content="http://yoursite.com/2018/01/21/客户端负载均衡-ribbon/index.html">
+<meta property="og:site_name" content="博客">
+<meta property="og:description" content="例子参考：[http://blog.csdn.net/forezp/article/details/69934399] 客户端负载均衡负载均衡指的是服务端负载均衡，其中分为硬件负载均衡、软件负载均衡。硬件负载均衡是通过服务器节点之间安装专门用于负载均衡的设备，比如F5等；而软件负载均衡是通过在服务器上安装一些具有均衡负载的模块或软件来完成请求分发工作，比如Nginx。硬件负载均衡设备或是软件负载均">
+<meta property="og:image" content="http://yoursite.com/2018/01/21/客户端负载均衡-ribbon/AbstractLoadBalancer.png">
+<meta property="og:image" content="http://yoursite.com/2018/01/21/客户端负载均衡-ribbon/自动化配置.png">
+<meta property="og:updated_time" content="2018-01-22T09:33:49.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="客户端负载均衡:ribbon">
+<meta name="twitter:description" content="例子参考：[http://blog.csdn.net/forezp/article/details/69934399] 客户端负载均衡负载均衡指的是服务端负载均衡，其中分为硬件负载均衡、软件负载均衡。硬件负载均衡是通过服务器节点之间安装专门用于负载均衡的设备，比如F5等；而软件负载均衡是通过在服务器上安装一些具有均衡负载的模块或软件来完成请求分发工作，比如Nginx。硬件负载均衡设备或是软件负载均">
+<meta name="twitter:image" content="http://yoursite.com/2018/01/21/客户端负载均衡-ribbon/AbstractLoadBalancer.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/01/21/客户端负载均衡-ribbon/"/>
+
+
+
+
+
+  <title>客户端负载均衡:ribbon | 博客</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/21/客户端负载均衡-ribbon/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="李睿">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">客户端负载均衡:ribbon</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-21T18:07:05+08:00">
+                2018-01-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/spring-cloud-微服务实战/" itemprop="url" rel="index">
+                    <span itemprop="name">spring cloud 微服务实战</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>例子参考：[<a href="http://blog.csdn.net/forezp/article/details/69934399" target="_blank" rel="external">http://blog.csdn.net/forezp/article/details/69934399</a>]</p>
+<h1 id="客户端负载均衡"><a href="#客户端负载均衡" class="headerlink" title="客户端负载均衡"></a>客户端负载均衡</h1><p>负载均衡指的是服务端负载均衡，其中分为硬件负载均衡、软件负载均衡。硬件负载均衡是通过服务器节点之间安装专门用于负载均衡的设备，比如F5等；而软件负载均衡是通过在服务器上安装一些具有均衡负载的模块或软件来完成请求分发工作，比如Nginx。<br>硬件负载均衡设备或是软件负载均衡的软件模块都会维护一个下挂可用的服务端清单，通过心跳检测来剔除故障的服务端节点以保证清单中都是可以正常访问的服务端节点。当客户端发送请求给负载均衡设备时，从维护可用的列表中取出一台服务器的地址，然后进行转发。<br>客户端负载均衡和服务端负载均衡最大不同是在于上面所提到的服务清单所存储的位置。在客户端负载均衡中，所有客户端节点都要维护着自己访问的服务端清单，而这些服务端清单来自于服务注册中心。<br>spring ribbon的封装，使得使用客户端负载均衡调用非常简单，只需两步：</p>
+<ul>
+<li>服务提供者只需要启动多个实例并注册在一个注册中心或多个相关联的注册中心。</li>
+<li>服务消费者直接通过调用被@LoadBalanced注解修饰过的RestTemplate来实现面向服务的接口调用。<h1 id="RestTemplate详解"><a href="#RestTemplate详解" class="headerlink" title="RestTemplate详解"></a>RestTemplate详解</h1><h1 id="Get请求"><a href="#Get请求" class="headerlink" title="Get请求"></a>Get请求</h1>getForEntity函数<br>该方法返回ResponseEntity，该对象是Spring对Http请求响应的封装，其中主要存储了HTTP的几个重要元素，比如说HTTP请求码的枚举对象HttpStatus（404，405，500等错误码），它的父类事HttpEntity中还存储着HTTP请求的头信息对象HttpHeaders以及泛型类型的请求体对象。<br>getForEntity有三种重载的方法：具体例子[<a href="https://www.jianshu.com/p/470a30f493cf" target="_blank" rel="external">https://www.jianshu.com/p/470a30f493cf</a>]<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">getForEntity(String url, Class&lt;T&gt; responseType, Object... uriVariables)</div><div class="line">getForEntity(String url, Class&lt;T&gt; responseType, Map&lt;String, ?&gt; uriVariables)</div><div class="line">getForEntity(URI url, Class&lt;T&gt; responseType)</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>也可以通过getForObject</p>
+<h1 id="POST请求"><a href="#POST请求" class="headerlink" title="POST请求"></a>POST请求</h1><p>具体也通过postForEntity和postForObject，例子如上链接</p>
+<h1 id="PUT请求"><a href="#PUT请求" class="headerlink" title="PUT请求"></a>PUT请求</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">put(String url, Object request, Object... uriVariables)</div><div class="line">put(String url, Object request, Map&lt;String, ?&gt; uriVariables)</div><div class="line">put(URI url, Object request)</div></pre></td></tr></table></figure>
+<h1 id="Delete请求"><a href="#Delete请求" class="headerlink" title="Delete请求"></a>Delete请求</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">delete(String url, Object... uriVariables)</div><div class="line">delete(String url, Map&lt;String, ?&gt; uriVariables)</div><div class="line">delete(URI url)</div></pre></td></tr></table></figure>
+<h1 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h1><p>[<a href="http://blog.csdn.net/dyc87112/article/details/73739482" target="_blank" rel="external">http://blog.csdn.net/dyc87112/article/details/73739482</a>]</p>
+<h1 id="负载均衡器"><a href="#负载均衡器" class="headerlink" title="负载均衡器"></a>负载均衡器</h1><p>当一个请求发送，通过拦截这个请求，随机或者算法到其中的一个服务上去处理<br>那么，这中间关键的一点就是：拦截<br>最精简的LB需求：</p>
+<ul>
+<li>设置添加和读取后端服务器的列表</li>
+<li>能从中选择一个服务器去执行<br>代码实现思路就是：<br>读取后端服务，标记一个服务不可用，最主要是选择一个后端服务来提供服务<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">//使用负载均衡加载服务</div><div class="line">public interface ILoadBalancer &#123;</div><div class="line">void addServers(List var1);向负载均衡器中维护的实例列表增加服务实例。</div><div class="line">Server chooseServer(Object var1);通过某种策略，从负载均衡器中挑选出一个具体的服务实例。</div><div class="line">void markServerDown(Server var1);用来通知和标识负载均衡器中某个具体实例已经停止服务，不然负载均衡器在下一次获取服务实例清单前都会认为服务实例均是正常服务的。</div><div class="line">List getServerList(boolean var1);//目的兼容2.1.3以前的。（之后本方法拆分下面两个）</div><div class="line">List getReachableServers();获取当前正常服务的实例列表。</div><div class="line">List getAllServers();获取所有已知的服务实例列表，包括正常服务和停止服务的实例。</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="AbstractLoadBalancer"><a href="#AbstractLoadBalancer" class="headerlink" title="AbstractLoadBalancer"></a>AbstractLoadBalancer</h2><p>是ILoadBalancer的实现，定义了分组枚举类，分别为ALL、STATUS_UP、STATUS_NOT_UP<br><img src="/2018/01/21/客户端负载均衡-ribbon/AbstractLoadBalancer.png" alt=""></p>
+<h2 id="BaseLoadBalancer"><a href="#BaseLoadBalancer" class="headerlink" title="BaseLoadBalancer"></a>BaseLoadBalancer</h2><h2 id="DynamicServerListLoadBalancer"><a href="#DynamicServerListLoadBalancer" class="headerlink" title="DynamicServerListLoadBalancer"></a>DynamicServerListLoadBalancer</h2><p>服务实例清单在运行期的动态更新，还能过滤</p>
+<h2 id="ZoneAwareLoadBalancer"><a href="#ZoneAwareLoadBalancer" class="headerlink" title="ZoneAwareLoadBalancer"></a>ZoneAwareLoadBalancer</h2><h1 id="负载均衡策略"><a href="#负载均衡策略" class="headerlink" title="负载均衡策略"></a>负载均衡策略</h1><ul>
+<li>RandomRule：随机选择一个server</li>
+<li>RoundRobinRule：roundRobin方式轮询选择， 轮询index，选择index对应位置的server</li>
+<li>WeightedResponseTimeRule：根据响应时间分配一个weight(权重)，响应时间越长，weight越小，被选中的可能性越低</li>
+<li>RetryRule：对选定的负载均衡策略机上重试机制，在一个配置时间段内当选择server不成功，则一直尝试使用subRule的方式选择一个可用的server</li>
+<li>BestAvailable：选择一个最小的并发请求的server，逐个考察Server，如果Server被tripped了，则忽略</li>
+<li>AvailabilityFilteringRule：过滤掉那些因为一直连接失败的被标记为circuit tripped的后端server，并过滤掉那些高并发的的后端server（active connections 超过配置的阈值） | 使用一个AvailabilityPredicate来包含过滤server的逻辑，其实就就是检查status里记录的各个server的运行状态</li>
+<li>ZoneAvoidanceRule：复合判断server所在区域的性能和server的可用性选择server ResponseTimeWeightedRule：作用同WeightedResponseTimeRule，二者作用是一样的，ResponseTimeWeightedRule后来改名为WeightedResponseTimeRule</li>
+</ul>
+<h1 id="自动化配置"><a href="#自动化配置" class="headerlink" title="自动化配置"></a>自动化配置</h1><p><img src="/2018/01/21/客户端负载均衡-ribbon/自动化配置.png" alt=""></p>
+<h1 id="重试机制"><a href="#重试机制" class="headerlink" title="重试机制"></a>重试机制</h1><p>由于Eureka实现的服务治理机制强调了CAP原理的AP，即可用性和可靠性，与zookeeper这类强调CP（一致性、可靠性）最大的区别是Eureka为了实现更高的服务可用性，牺牲了一定的一致性，在极端情况下，它宁愿接受故障实例，也不要丢掉健康实例，比如，当服务注册中心发生故障断开时，由于所有的服务实例无法维持续约心跳，在强调AP的服务治理中，将会把所有的服务实例剔除掉，而Eureka则会因为超过百分之85的实例丢失心跳而触发保护机制，注册中心将会保留此时的所有节点，以实现服务间依然可以进行相互调用的场景，即使其中有部分故障节点，但这样做仍然能够保障大多数服务能正常消费。<br>由于在可用性和一致性上的取舍，不论是由于触发了保护机制或是服务剔除的延迟，引起服务调用到失败的实例时候，我们希望还是能够增强对这类问题的容错。所以我们会在服务调用时候加入一些重试机制。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">spring.cloud.loadbalancer.retry.enabled=<span class="literal">true</span></div><div class="line">xxService.ribbon.ConnectTimeout //请求连接超时时间</div><div class="line">xxService.ribbon.ReadTimeout //请求处理超时时间</div><div class="line">xxxService.ribbon.maxAutoRetriesNextServer //切换实例重试次数</div><div class="line">xxxService.ribbon.maxAutoRetries //重试次数</div></pre></td></tr></table></figure></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/微服务/" rel="tag"># 微服务</a>
+          
+            <a href="/tags/spring-cloud，ribbon/" rel="tag"># spring cloud，ribbon</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/01/17/服务治理Eureka/" rel="next" title="服务治理Eureka">
+                <i class="fa fa-chevron-left"></i> 服务治理Eureka
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/01/22/服务容错保护-Hystrix/" rel="prev" title="服务容错保护-Hystrix">
+                服务容错保护-Hystrix <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg"
+               alt="李睿" />
+          <p class="site-author-name" itemprop="name">李睿</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">51</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">22</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#客户端负载均衡"><span class="nav-number">1.</span> <span class="nav-text">客户端负载均衡</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#RestTemplate详解"><span class="nav-number">2.</span> <span class="nav-text">RestTemplate详解</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Get请求"><span class="nav-number">3.</span> <span class="nav-text">Get请求</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#POST请求"><span class="nav-number">4.</span> <span class="nav-text">POST请求</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#PUT请求"><span class="nav-number">5.</span> <span class="nav-text">PUT请求</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Delete请求"><span class="nav-number">6.</span> <span class="nav-text">Delete请求</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#源码分析"><span class="nav-number">7.</span> <span class="nav-text">源码分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#负载均衡器"><span class="nav-number">8.</span> <span class="nav-text">负载均衡器</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#AbstractLoadBalancer"><span class="nav-number">8.1.</span> <span class="nav-text">AbstractLoadBalancer</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BaseLoadBalancer"><span class="nav-number">8.2.</span> <span class="nav-text">BaseLoadBalancer</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DynamicServerListLoadBalancer"><span class="nav-number">8.3.</span> <span class="nav-text">DynamicServerListLoadBalancer</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ZoneAwareLoadBalancer"><span class="nav-number">8.4.</span> <span class="nav-text">ZoneAwareLoadBalancer</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#负载均衡策略"><span class="nav-number">9.</span> <span class="nav-text">负载均衡策略</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#自动化配置"><span class="nav-number">10.</span> <span class="nav-text">自动化配置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#重试机制"><span class="nav-number">11.</span> <span class="nav-text">重试机制</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">李睿</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
