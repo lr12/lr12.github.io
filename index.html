@@ -273,6 +273,234 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/23/sql优化大全/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="李睿">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/23/sql优化大全/" itemprop="url">sql优化大全</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-23T21:30:26+08:00">
+                2018-01-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/sql优化/" itemprop="url" rel="index">
+                    <span itemprop="name">sql优化</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="优化SQL步骤"><a href="#优化SQL步骤" class="headerlink" title="优化SQL步骤"></a>优化SQL步骤</h1><h2 id="通过show-status和应用特点了解各种SQL的执行频率"><a href="#通过show-status和应用特点了解各种SQL的执行频率" class="headerlink" title="通过show status和应用特点了解各种SQL的执行频率"></a>通过show status和应用特点了解各种SQL的执行频率</h2><p>通过show status可以提供服务器状态信息，可以根据需要显示session级别的统计结果和global级别的统计结果。如显示session级别：show status like ‘com%’;显示global级别：show global status;<br>以下几个参数对innodb和myisam存储引擎都计数</p>
+<ol>
+<li>Com_select执行select的次数，一次查询只累加1；</li>
+<li>Com_insert执行insert的次数，对于批量插入的insert操作，只累加一次；</li>
+<li>Com_update执行update的次数；</li>
+<li>Com_delete执行delete的次数；</li>
+</ol>
+<p>以下几个参数是针对innodb引擎计数的，累计的算法也略有不同</p>
+<ol>
+<li>Innodb_rows_read: 查询返回的行数</li>
+<li>Innodb_rows_inserted:操作insert插入的行数</li>
+<li>Innodb_rows_updated:操作更新的行数</li>
+<li>Innodb_rows_deleted:操作删除的行数</li>
+</ol>
+<p>通过以上几个参数可以了解到当前数据库应用是以插入更新为主还是查询为主，以及各种类型的sql大致执行比例是多少。对于更新操作的计数，是对执行的次数，不论提交还是回滚都会累加。<br>对于事务型应用，通过Com_commit和Com_rollback可以了解事务提交和回滚情况，对于回滚频繁的数据库，可能意味着应用编写存在问题。此外，以下几个参数可以让我们了解数据库基本情况：</p>
+<ol>
+<li>Connections 试图连接mysql服务器的次数</li>
+<li>Uptime 服务器工作时间</li>
+<li>Slow_queries 慢查询的次数</li>
+</ol>
+<h2 id="定位执行效率较低的sql语句"><a href="#定位执行效率较低的sql语句" class="headerlink" title="定位执行效率较低的sql语句"></a>定位执行效率较低的sql语句</h2><h3 id="通过慢查询日志定位那些执行效率比较低的sql语句"><a href="#通过慢查询日志定位那些执行效率比较低的sql语句" class="headerlink" title="通过慢查询日志定位那些执行效率比较低的sql语句"></a>通过慢查询日志定位那些执行效率比较低的sql语句</h3><p>用-log-slow-queries[=filename]选项启动时，mysqlId写一个包含所有执行时间超过long_query_time的sql语句的日志文件。<br>启用 slow log，有两种启用方式:</p>
+<ol>
+<li>在my.cnf 里 通过 log-slow-queries[=file_name]</li>
+<li>在mysqld进程启动时,指定–log-slow-queries[=file_name]选项</li>
+</ol>
+<p>比较常用的五种分析工具，MySQLdumpslow、mysqlsla、mysqlprofi、mysql-explain-slow-log、mysqllogfilter.具体可以查看[<a href="https://wenku.baidu.com/view/2b1b230e01f69e3143329499.html" target="_blank" rel="external">https://wenku.baidu.com/view/2b1b230e01f69e3143329499.html</a>]</p>
+<h3 id="使用show-processlist查看当前mysql线程"><a href="#使用show-processlist查看当前mysql线程" class="headerlink" title="使用show processlist查看当前mysql线程"></a>使用show processlist查看当前mysql线程</h3><p>命令慢查询日志在查询结束后才记录日志，所以在应用反应执行效率出现问题时，查询慢查询日志并不能定位问题，可以使用show processlist命令查看当前mysql进行的线程，包括线程状态、是否锁表，可以实时查看sql执行情况，同时对一些缩表操作进行优化。</p>
+<h2 id="通过explain分析低效sql的执行计划"><a href="#通过explain分析低效sql的执行计划" class="headerlink" title="通过explain分析低效sql的执行计划"></a>通过explain分析低效sql的执行计划</h2><p>通过上面查询到效率低的sql后，我们可以通过explain或者desc获取mysql如何执行select语句的信息，包括select语句执行过程表如何连接和连接的次序。<br>[<a href="https://www.cnblogs.com/xiaoboluo768/p/5400990.html" target="_blank" rel="external">https://www.cnblogs.com/xiaoboluo768/p/5400990.html</a>]</p>
+<h1 id="mysql索引"><a href="#mysql索引" class="headerlink" title="mysql索引"></a>mysql索引</h1><h2 id="mysql如何使用索引"><a href="#mysql如何使用索引" class="headerlink" title="mysql如何使用索引"></a>mysql如何使用索引</h2><p>索引用于快速查找某个列具有特定值的行，对相关列使用索引是提高select操作性能的最佳途径。<br>查询要使用索引最主要的条件是查询条件中需要使用索引关键字，如果是多列索引，那么只有查询条件使用了多列关键字最左边的前缀时(前缀索引)，才会使用索引，否则将不能使用索引。<br>下面情况，将不会使用索引</p>
+<ol>
+<li><p>如果mysql估计使用索引比全表扫描更慢，则不使用索引。例如：如果key_part1均匀地分布在1和100之间，下列查询中使用索引就不是很好：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">SELECT * FROM table_name <span class="built_in">where</span> key_part1 &gt; 1 and key_part1 &lt; 90</div></pre></td></tr></table></figure>
+</li>
+<li><p>如果使用heap表并且where条件中不用=索引列，其他 &gt; 、 &lt; 、 &gt;= 、 &lt;= 均不使 用索引（MyISAM和innodb表使用索引）；</p>
+</li>
+<li>使用or分割的条件，如果or前面的条件列有索引，后面的列中没有索引，那么涉及到的索引都不会使用。</li>
+<li>如果创建复合索引，如果条件中使用的列不是索引列的第一部分（前缀索引）。</li>
+<li>如果like是以%开始。</li>
+<li>对where语句后面条件为字符串的一定要加引号，字符串如果是数字mysql会自动转为字符串，但是不使用索引。</li>
+</ol>
+<h2 id="查看索引使用情况"><a href="#查看索引使用情况" class="headerlink" title="查看索引使用情况"></a>查看索引使用情况</h2><p>如果索引正在工作，Handler_read_key的值将很高，这个值代表一个行被索引值读的次数，很低说明增加索引得到的性能改善不高，所以索引并不经常使用。<br>Handler_read_rnd_next的值高代表查询运行低效，并且应该建立索引补救，这个值含义是在数据文件中读下一行的请求数。如果你进行大量的表扫描，该值较高，通常说明索引不正确或写入查询没有利用索引。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">show global status like <span class="string">'Handler_read%'</span>;</div></pre></td></tr></table></figure></p>
+<h1 id="具体优化查询语句"><a href="#具体优化查询语句" class="headerlink" title="具体优化查询语句"></a>具体优化查询语句</h1><h2 id="避免全表查询"><a href="#避免全表查询" class="headerlink" title="避免全表查询"></a>避免全表查询</h2><p>对查询进行优化，应尽量避免全表扫描，首先应考虑在where以及order by涉及的列建立索引。尝试下面的技巧以避免优化器错选了表扫描：</p>
+<ul>
+<li>使用analyze table tbl_name为扫描的表更新关键字。<br>[<a href="http://blog.csdn.net/alongken2005/article/details/6394016" target="_blank" rel="external">http://blog.csdn.net/alongken2005/article/details/6394016</a>]</li>
+<li>对扫描的表使用FORCEINDEX告知MySQL，相对于使用给定的索引表扫描将非常耗时。SELECT * FROM t1, t2 FORCE INDEX (index_for_column) WHERE t1.col_name=t2.col_name；[<a href="http://blog.csdn.net/bruce128/article/details/46777567" target="_blank" rel="external">http://blog.csdn.net/bruce128/article/details/46777567</a>]</li>
+<li>用–max-seeks-for-key=1000选项启动mysqld或使用SET max_seeks_for_key=1000告知优化器假设关键字扫描不会超过1,000次关键字搜索。</li>
+</ul>
+<h3 id="where中避免null值判断"><a href="#where中避免null值判断" class="headerlink" title="where中避免null值判断"></a>where中避免null值判断</h3><p>null值将导致引擎放弃索引而进行全表扫描，如select id from t where num is null<br>null对大多数数据库都需要特殊处理，mysql也一样，它需要更多的代码，更多的检查和特殊的索引逻辑，有些开发人员完全没有意识到，创建表时null是默认值，但大多数时候应该使用not null，或者使用一个特殊的值，如0，-1作为默认值。<br>不能用null作为索引，任何包含null值的列都不会被包含在索引中。即使索引中有一列含有null，该列就会从索引中排除。也就是说如果某列存在空值，即使对该列建索引也不会提高性能。任何在where子句中使用is null或者is not null的语句优化器是不允许使用索引。</p>
+<h3 id="where中避免使用-或-lt-gt-操作符"><a href="#where中避免使用-或-lt-gt-操作符" class="headerlink" title="where中避免使用!=或&lt;&gt;操作符"></a>where中避免使用!=或&lt;&gt;操作符</h3><p>否则引擎放弃索引进行全表扫描<br>mysql只有对以下操作符才会使用索引:&lt; &lt;= = &gt; &gt;= between in 某些时候的like，可以在like操作中使用索引的情形是指另一个操作数以通配符(%或者_)开头的情形，如<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">SELECT id FROM  t WHERE col LIKE <span class="string">'Mich%'</span>; <span class="comment">#这个查询将使用索引</span></div><div class="line">SELECT id FROM  t WHERE col  LIKE <span class="string">'%i'</span>; <span class="comment">#这个查询不会使用索引</span></div></pre></td></tr></table></figure></p>
+<h3 id="where中避免or"><a href="#where中避免or" class="headerlink" title="where中避免or"></a>where中避免or</h3><p>否则引擎将会放弃索引进行全表扫描，如<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">SELECT id from t <span class="built_in">where</span> num=10 or num=20;</div><div class="line">//一般or语句改为union</div><div class="line">SELECT id from t <span class="built_in">where</span> num=10 union all SELECT id from t <span class="built_in">where</span> num=20;</div></pre></td></tr></table></figure></p>
+<p>在某些条件，or条件也是可以避免全表扫描</p>
+<ol>
+<li>where语句如果带有or条件，myisam表能用到索引，Innodb不能</li>
+<li>必须所有的or条件都必须是独立索引</li>
+</ol>
+<h3 id="in和not-in会导致全表扫描"><a href="#in和not-in会导致全表扫描" class="headerlink" title="in和not in会导致全表扫描"></a>in和not in会导致全表扫描</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">SELECT id from t <span class="built_in">where</span> num <span class="keyword">in</span> (1,2,3);</div></pre></td></tr></table></figure>
+<p>对用户连续的值，能用between就别用in:select id from t where num between 1 and 3;</p>
+<h3 id="下面的查询也将导致全表扫描"><a href="#下面的查询也将导致全表扫描" class="headerlink" title="下面的查询也将导致全表扫描"></a>下面的查询也将导致全表扫描</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">SELECT id from t <span class="built_in">where</span> name like <span class="string">'%abc%'</span></div><div class="line">SELECT id from t <span class="built_in">where</span> name like <span class="string">'%abc'</span></div></pre></td></tr></table></figure>
+<p>若要考虑效率可以用全文检索<br>而select id from t where name like ‘abc%’</p>
+<h3 id="where使用参数，也会导致全表扫描"><a href="#where使用参数，也会导致全表扫描" class="headerlink" title="where使用参数，也会导致全表扫描"></a>where使用参数，也会导致全表扫描</h3><p>因为sql只有在运行时才会解析局部变量，而优化程序不能将访问计划的选择推迟到运行时，它必须在编译时进行选择。然而，如果在编译时建立访问计划，变量的值还是未知的，因而无法作为索引选择的输入项。如下面语句将进行全表扫描：<br>select id from t where num=@num<br>可以改为强制查询使用索引：<br>select id from t with(index(索引名)) where num=@num</p>
+<h3 id="避免字段进行表达式操作"><a href="#避免字段进行表达式操作" class="headerlink" title="避免字段进行表达式操作"></a>避免字段进行表达式操作</h3><p>如select id from t where num/2=100应改为select id from t where num=200</p>
+<h3 id="where中避免对字段进行函数操作"><a href="#where中避免对字段进行函数操作" class="headerlink" title="where中避免对字段进行函数操作"></a>where中避免对字段进行函数操作</h3><p>select id from t where substring(name,1,3)=’abc’<br>select id from t where datediff(day,createdate,’2005-11-30’)=0<br>应改为<br>select id from t where name like ‘abc%’<br>select id from t where createdate&gt;=’2015-11-30’ and createdate &lt; ‘2015-12-01’</p>
+<h3 id="where子句避免-左边进行函数、算数运算或其他表达式运算"><a href="#where子句避免-左边进行函数、算数运算或其他表达式运算" class="headerlink" title="where子句避免=左边进行函数、算数运算或其他表达式运算"></a>where子句避免=左边进行函数、算数运算或其他表达式运算</h3><p>否则系统将可能无法正确使用索引</p>
+<h3 id="索引字段不是复合索引的前缀"><a href="#索引字段不是复合索引的前缀" class="headerlink" title="索引字段不是复合索引的前缀"></a>索引字段不是复合索引的前缀</h3><p>在使用索引作为条件时，如果该索引是复合索引，那么必须使用到该索引中的第一个字段作为条件时才能保证系统使用该索引，并且尽可能让字段顺序和索引顺序相一致</p>
+<h2 id="其他一些注意的优化"><a href="#其他一些注意的优化" class="headerlink" title="其他一些注意的优化"></a>其他一些注意的优化</h2><h3 id="不要写一些没有意义的查询"><a href="#不要写一些没有意义的查询" class="headerlink" title="不要写一些没有意义的查询"></a>不要写一些没有意义的查询</h3><p>如需要生成一张空表：select col1,col2 into #t where 1=0<br>这类代码不会返回任何结果集，但是会消耗系统资源，应改成create table #t(…)</p>
+<h3 id="很多时候下用exists代替in"><a href="#很多时候下用exists代替in" class="headerlink" title="很多时候下用exists代替in"></a>很多时候下用exists代替in</h3><p>外层查询表小于子查询表，则用exists，外层查询表大于子查询表，则用in，如果外层和子查询表差不多，则爱用哪个用哪个。<br>[<a href="https://segmentfault.com/a/1190000008709410" target="_blank" rel="external">https://segmentfault.com/a/1190000008709410</a>]<br>select num from a where num in(select num from b)<br>用下面的语句替换：<br>select num from a where exists(select 1 from b where num=a.num)</p>
+<h3 id="并不是所有索引对查询都有效"><a href="#并不是所有索引对查询都有效" class="headerlink" title="并不是所有索引对查询都有效"></a>并不是所有索引对查询都有效</h3><p>sql是根据表中的数据进行查询优化，当索引列有大量数据重复时，sql查询可能不会去利用索引，如一张表中有字段，sex，male和female几乎各占一半，那么即使在sex上建立索引也对查询起不了什么作用。</p>
+<h3 id="索引不是越多越好"><a href="#索引不是越多越好" class="headerlink" title="索引不是越多越好"></a>索引不是越多越好</h3><p>索引固然可以提高相应的select的效率，但同时也降低了insert和delete的效率，因为insert或update会导致索引的重建，所以怎么建索引需要慎重考虑，视情况而定。一个表的索引数最好不要超过6个，若太多则应考虑一些不常使用到的列上建立索引是否有必要。</p>
+<h3 id="避免更新聚簇索引数据列"><a href="#避免更新聚簇索引数据列" class="headerlink" title="避免更新聚簇索引数据列"></a>避免更新聚簇索引数据列</h3><p>因为聚簇索引的索引列的顺序就是表记录的物理存储位置，一旦该列值改变，将导致整个表记录的顺序调整，会耗费相当大的资源。若应用程序需要频繁更新聚簇索引的索引数据列，那么应该考虑是否将该索引建为聚簇索引。</p>
+<h3 id="尽量使用数字型字段"><a href="#尽量使用数字型字段" class="headerlink" title="尽量使用数字型字段"></a>尽量使用数字型字段</h3><p>若只含数值信息的字段尽量不要设置为字符型，这会降低查询和连接的空间，并会增加开销。这是因为引擎在处理查询和连接时会逐个比较字符串的每一个字符，而对于数字型而言只需要比较一次就够了。</p>
+<h3 id="使用varchar或nvarchar代替char和nchar"><a href="#使用varchar或nvarchar代替char和nchar" class="headerlink" title="使用varchar或nvarchar代替char和nchar"></a>使用varchar或nvarchar代替char和nchar</h3><p>首先变长字段存储空间小，可以节省存储空间，其次对于查询来说，在一个相对较小的字段内搜索效率显然要更高些。</p>
+<h3 id="避免-返回所有"><a href="#避免-返回所有" class="headerlink" title="避免*返回所有"></a>避免*返回所有</h3><p>用具体的字段代替*，不要返回用不到的字段</p>
+<h2 id="临时表问题"><a href="#临时表问题" class="headerlink" title="临时表问题"></a>临时表问题</h2><h3 id="尽量表变量来代替临时表"><a href="#尽量表变量来代替临时表" class="headerlink" title="尽量表变量来代替临时表"></a>尽量表变量来代替临时表</h3><p>如果表变量包含大量数据，请注意索引有限</p>
+<h3 id="避免频繁创建和删除临时表，以减少系统表的资源损耗"><a href="#避免频繁创建和删除临时表，以减少系统表的资源损耗" class="headerlink" title="避免频繁创建和删除临时表，以减少系统表的资源损耗"></a>避免频繁创建和删除临时表，以减少系统表的资源损耗</h3><h3 id="临时表并不是不可使用"><a href="#临时表并不是不可使用" class="headerlink" title="临时表并不是不可使用"></a>临时表并不是不可使用</h3><p>适当地使用它们可以使某些例程更有效，例如，当需要重复引用大型表或常用表中的某个数据集时。但是，对于一次性事件，最好使用导出表</p>
+<h3 id="避免造成大量log"><a href="#避免造成大量log" class="headerlink" title="避免造成大量log"></a>避免造成大量log</h3><p>如：在新建临时表时，如果一次性插入数据量很大，那么可以使用 select into 代替 create table，避免造成大量 log ，以提高速度<br>如果数据量不大，为了缓和系统表的资源，应先create table，然后insert</p>
+<h3 id="及时删除临时表"><a href="#及时删除临时表" class="headerlink" title="及时删除临时表"></a>及时删除临时表</h3><p>如果使用到了临时表，在存储过程的最后务必将所有的临时表显式删除，先 truncate table ，然后 drop table ，这样可以避免系统表的较长时间锁定。</p>
+<h2 id="游标的问题"><a href="#游标的问题" class="headerlink" title="游标的问题"></a>游标的问题</h2><h3 id="尽量避免游标"><a href="#尽量避免游标" class="headerlink" title="尽量避免游标"></a>尽量避免游标</h3><p>因为游标效率太差，游标操作数据超过一万行，就应该考虑改写</p>
+<h3 id="使用基于游标的方法或临时表之前"><a href="#使用基于游标的方法或临时表之前" class="headerlink" title="使用基于游标的方法或临时表之前"></a>使用基于游标的方法或临时表之前</h3><p>应先寻找基于集的解决方案来解决问题，基于集的方法通常更有效。</p>
+<h3 id="游标并不是不可用"><a href="#游标并不是不可用" class="headerlink" title="游标并不是不可用"></a>游标并不是不可用</h3><p>对小型数据集使用 FAST_FORWARD 游标通常要优于其他逐行处理方法，尤其是在必须引用几个表才能获得所需的数据时。在结果集中包括“合计”的例程通常要比使用游标执行的速度快。如果开发时间允许，基于游标的方法和基于集的方法都可以尝试一下，看哪一种方法的效果更好。</p>
+<h3 id="存储过程和触发器"><a href="#存储过程和触发器" class="headerlink" title="存储过程和触发器"></a>存储过程和触发器</h3><p>在所有的存储过程和触发器开始处设置set nocount on，在结束时设置set nocount off。无需在执行存储过程和触发器的每个语句后向客户端发送 DONE_IN_PROC 消息。</p>
+<h2 id="事务的问题"><a href="#事务的问题" class="headerlink" title="事务的问题"></a>事务的问题</h2><p>尽量避免大事务操作，提高系统并发能力</p>
+<h2 id="数据量的问题"><a href="#数据量的问题" class="headerlink" title="数据量的问题"></a>数据量的问题</h2><p>尽量避免向客户端返回大数据量。若数据量过大，应该考虑相应需求是否合理</p>
+<h2 id="count优化"><a href="#count优化" class="headerlink" title="count优化"></a>count优化</h2><h3 id="count-优于cout-1-和count-primary"><a href="#count-优于cout-1-和count-primary" class="headerlink" title="count(*)优于cout(1)和count(primary)"></a>count(*)优于cout(1)和count(primary)</h3><p>很多人为了统计记录条数，就使用count(1)和count(primary)，而不是使用count(*),这是一个误区。对于有些场景下，可能性能会更差。应为数据库对count(*)计数操作做了一些特别的优化</p>
+<h3 id="count-column-和count-是不一样的"><a href="#count-column-和count-是不一样的" class="headerlink" title="count(column)和count(*)是不一样的"></a>count(column)和count(*)是不一样的</h3><p>count(column)是表示结果集中有多少个Column字段不为空的记录<br>count(*)是代表结果集有多少条记录</p>
+<h3 id="优化order-by记录"><a href="#优化order-by记录" class="headerlink" title="优化order by记录"></a>优化order by记录</h3><p>mysql的弱点是它的排序，虽然mysql可以在1秒内查询大约15000条数据，但mysql在查询时最多只能使用一个索引。因此如果where条件已经占据了一个索引，那么排序将不使用索引，这将大大降低查询速度。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">SELECT * FROM SALES WHERE NAME = <span class="string">'name'</span> ORDER BY SALE_DATE DESC;</div></pre></td></tr></table></figure></p>
+<p>在以上的SQL的WHERE子句中已经使用了NAME字段上的索引，因此，在对SALE_DATE进行排序时将不再使用索引。为了解决这个问题，我们可以对SALES表建立复合索引:<br>ALTER TABLE SALES DROP INDEX NAME, ADD INDEX (NAME,SALE_DATE)<br>这样再使用上述的SELECT语句进行查询时速度就会大副提升。但要注意，在使用这个方法时，要确保WHERE子句中没有排序字段，在上例中就是不能用SALE_DATE进行查询，否则虽然排序快了，但是SALE_DATE字段上没有单独的索引，因此查询又会慢下来。<br>在某些情况中，mysql需要使用一个索引来满足order by子句，而不需要额外的排序。where语句和order by使用相同的索引，并且order by的顺序和索引顺序相同，并且order by的字段都是升序或者降序。例如下面语句可以使用索引<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">SELECT from t order by key_part1,key_part2;</div><div class="line">SELECT from t key_part1=1 order by key_part1 desc,key_part2 desc;</div><div class="line">SELECT from t order by key_part1 desc,key_part2 desc;</div></pre></td></tr></table></figure></p>
+<p>但是以下情况不使用索引：<br>SELECT FROM t1 ORDER BY key_part1 DESC, key_part2 ASC –order by 的字段混合 ASC 和 DESC<br>SELECT FROM t1 WHERE key2=constant ORDER BY key1– 用于查询行的关键字与 ORDER BY 中所使用的不相同<br>SELECT FROM t1 ORDER BY key1, key2 – 对不同的关键字使用 ORDER BY</p>
+<h2 id="优化group-by"><a href="#优化group-by" class="headerlink" title="优化group by"></a>优化group by</h2><p>默认情况下，mysql排序所有group by col1,col2。查询方法如同查询指定order by col1,col2，如果显式包括一个包含相同列的order by，mysql可以毫不减速地对它进行优化，尽管仍然进行排序。如果查询包括group by，但你想要避免排序结果的消耗，你可以指定order by null禁止排序。例如<br>INSERT INTO foo SELECT a, COUNT(*) FROM bar GROUP BY a ORDER BY NULL;</p>
+<h1 id="sql核心语句"><a href="#sql核心语句" class="headerlink" title="sql核心语句"></a>sql核心语句</h1><h2 id="批量插入数据"><a href="#批量插入数据" class="headerlink" title="批量插入数据"></a>批量插入数据</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">INSERT mytable (first_column,second_column,third_column)  </div><div class="line">VALUES (<span class="string">'some data'</span>,<span class="string">'some more data'</span>,<span class="string">'yet more data'</span>) ,  </div><div class="line">VALUES (<span class="string">'some data'</span>,<span class="string">'some more data'</span>,<span class="string">'yet more data'</span>) ,  </div><div class="line">VALUES (<span class="string">'some data'</span>,<span class="string">'some more data'</span>,<span class="string">'yet more data'</span>);</div></pre></td></tr></table></figure>
+<h2 id="清空数据库表"><a href="#清空数据库表" class="headerlink" title="清空数据库表"></a>清空数据库表</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">truncate table <span class="string">'mytable'</span></div></pre></td></tr></table></figure>
+<p>删除表中的所有记录，应使用TRUNCATE TABLE语句。注意这里为什么要用TRUNCATE TABLE语句代替DELETE语句:当你使用TRUNCATE TABLE语句时，记录的删除是不作记录的。也就是说，这意味着TRUNCATE TABLE要比DELETE快得多。</p>
+<h2 id="使用select创建记录和表"><a href="#使用select创建记录和表" class="headerlink" title="使用select创建记录和表"></a>使用select创建记录和表</h2><p>insert语句和delete语句和update语句有一点不同的是，它一次只操作一个记录，然而有一个方法可以使insert语句一次添加多个记录，要做到这需要insert和select语句结合在一起。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">insert mytable(first_column,second_column)  SELECT another_first,another_second from anothertable <span class="built_in">where</span> another_first=<span class="string">'me'</span>;</div></pre></td></tr></table></figure></p>
+<p>这个语句从anothertable拷贝记录到mytable.只有表anothertable中字段another_first的值为’me’的记录才被拷贝。<br>当为一个表中的记录建立备份时，这种形式的INSERT语句是非常有用的。在删除一个表中的记录之前，你可以先用这种方法把它们拷贝到另一个表中。<br>如果你需要拷贝整个表，你可以使用SELECT INTO语句。例如，下面的语句创建了一个名为newtable的新表，该表包含表mytable的所有数据:<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">SELECT * into newTable from mytable;</div></pre></td></tr></table></figure></p>
+<p>你也可以指定只有特定的字段被用来创建这个新表。要做到这一点，只需在字段列表中指定你想要拷贝的字段。另外，你可以使用WHERE子句来限制拷贝到新表中的记录。下面的例子只拷贝字段second_columnd的值等于’me’的记录的first_column字段。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">SELECT first_column into newTable from mytable <span class="built_in">where</span> second_column=<span class="string">'me'</span>;</div></pre></td></tr></table></figure></p>
+<p>使用SQL修改已经建立的表是很困难的。例如，如果你向一个表中添加了一个字段，没有容易的办法来去除它。另外，如果你不小心把一个字段的数据类型给错了，你将没有办法改变它。但是，使用本节中讲述的SQL语句，你可以绕过这两个问题。<br>例如，假设你想从一个表中删除一个字段。使用SELECT INTO语句，你可以创建该表的一个拷贝，但不包含要删除的字段。这使你既删除了该字段，又保留了不想删除的数据。<br>如果你想改变一个字段的数据类型，你可以创建一个包含正确数据类型字段的新表。创建好该表后，你就可以结合使用UPDATE语句和SELECT语句，把原来表中的所有数据拷贝到新表中。通过这种方法，你既可以修改表的结构，又能保存原有的数据。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/22/feign和zuul/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -314,6 +542,28 @@
             
           </span>
 
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/spring-cloud-微服务实战/" itemprop="url" rel="index">
+                    <span itemprop="name">spring cloud 微服务实战</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
           
 
           
@@ -382,7 +632,7 @@
 <p>filterType：返回一个字符串代表过滤器的类型，在zuul中定义了四种不同生命周期的过滤器类型，具体如下：<br>pre：路由之前<br>routing：路由之时<br>post： 路由之后<br>error：发送错误调用<br>filterOrder：过滤的顺序，数值越小优先级越高<br>shouldFilter：这里可以写逻辑判断，是否要过滤，true,永远过滤。<br>run：过滤器的具体逻辑。可用很复杂，包括查sql，nosql去判断该请求到底有没有权限访问。</p>
 <h3 id="请求生命周期"><a href="#请求生命周期" class="headerlink" title="请求生命周期"></a>请求生命周期</h3><p>第一阶段是pre，会被pre过滤器进行处理，该过滤器主要是在请求路由之前做一些前置工作，比如请求校验。<br>第二阶段是routing，路由请求转发阶段，请求会被routing过滤器处理，当服务实例请求结果都返回之后，routing阶段结束。<br>第三阶段是post，此时请求会被post类型的过滤器处理，我们可以对处理结果进行加工或者转换。<br>还有个特殊的阶段error阶段，前面三个阶段发生异常时才会触发。</p>
 <h2 id="核心过滤器"><a href="#核心过滤器" class="headerlink" title="核心过滤器"></a>核心过滤器</h2><h2 id="动态路由"><a href="#动态路由" class="headerlink" title="动态路由"></a>动态路由</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">// pom</div><div class="line">&lt;dependencies&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-cloud-starter-zuul&lt;/artifactId&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-cloud-starter-config&lt;/artifactId&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-cloud-starter-eureka&lt;/artifactId&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">&lt;/dependencies&gt;</div><div class="line"></div><div class="line">@EnableZuulProxy</div><div class="line">@SpringCloudApplication</div><div class="line">public class Application &#123;</div><div class="line">    public static void main(String[] args) &#123;</div><div class="line">        new SpringApplicationBuilder(Application.class).web(<span class="literal">true</span>).run(args);</div><div class="line">    &#125;</div><div class="line">    @RefreshScope</div><div class="line">    @ConfigurationProperties(<span class="string">"zuul"</span>)</div><div class="line">    public ZuulProperties <span class="function"><span class="title">zuulProperties</span></span>()&#123;</div><div class="line">      <span class="built_in">return</span> new ZuulProperties();</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">spring.application.name=api-gateway</div><div class="line">server.port=5555</div><div class="line">spring.cloud.config.uri=http://localhost:7001/</div><div class="line">eureka.client.serviceUrl.defaultZone=http://localhost:1111/eureka/</div></pre></td></tr></table></figure>
-<p>在git仓库上增加网关配置文件<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">zuul.routes.a.path=/a/**</div><div class="line">zuul.routes.a.url=ribbon-consumer</div><div class="line"></div><div class="line">zuul.routes.b.path=/b/**</div><div class="line">zuul.routes.b.url=feign-consumer</div></pre></td></tr></table></figure></p>
+<p>在git仓库上增加网关配置文件,api-gateway.properties<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">zuul.routes.a.path=/a/**</div><div class="line">zuul.routes.a.url=ribbon-consumer</div><div class="line">zuul.routes.b.path=/b/**</div><div class="line">zuul.routes.b.url=feign-consumer</div></pre></td></tr></table></figure></p>
 
           
         
@@ -1988,286 +2238,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/26/java并发编程前三章/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="李睿">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/26/java并发编程前三章/" itemprop="url">java并发编程前三章</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-26T17:08:19+08:00">
-                2017-12-26
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java并发编程艺术读书笔记/" itemprop="url" rel="index">
-                    <span itemprop="name">java并发编程艺术读书笔记</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="并发编程的挑战"><a href="#并发编程的挑战" class="headerlink" title="并发编程的挑战"></a>并发编程的挑战</h1><h2 id="上下文切换"><a href="#上下文切换" class="headerlink" title="上下文切换"></a>上下文切换</h2><p>即使是单核也支持多线程执行代码，cpu通过给每个线程分配cpu时间片来实现这个机制。时间片是cpu分配给每个线程的时间，因为时间片非常短，所以cpu通过不停地切换线程执行，让我们感觉多个线程是同时执行，时间片一般是几十毫秒。<br>CPU通过时间片分配算法来循环执行任务，当前任务执行一个时间片后会切换到下一个任务。但是，在切换前会保存上一个任务的状态，以便下次切换回这个任务时，可以再加载这个任务的状态。所以任务从保存到再加载的过程就是一次上下文切换。</p>
-<h3 id="多线程一定快吗"><a href="#多线程一定快吗" class="headerlink" title="多线程一定快吗"></a>多线程一定快吗</h3><p>当并发执行累加操作不超过百万次时，速度会比串行执行累加操作要慢。那么，为什么并发执行的速度会比串行慢呢？这是因为线程有创建和上下文切换的开销。</p>
-<h3 id="测试上下文切换的次数"><a href="#测试上下文切换的次数" class="headerlink" title="测试上下文切换的次数"></a>测试上下文切换的次数</h3><p>使用Lmbench3可以测量上下文切换的时长，使用vmstat可以测量上下文切换的次数。</p>
-<h3 id="如何减少上下文切换"><a href="#如何减少上下文切换" class="headerlink" title="如何减少上下文切换"></a>如何减少上下文切换</h3><p>减少上下文切换的方法有无锁并发编程、CAS算法、使用最少线程和使用协程。<br>·无锁并发编程。多线程竞争锁时，会引起上下文切换，所以多线程处理数据时，可以用一些办法来避免使用锁，如将数据的ID按照Hash算法取模分段，不同的线程处理不同段的数据。<br>·CAS算法。Java的Atomic包使用CAS算法来更新数据，而不需要加锁。<br>·使用最少线程。避免创建不需要的线程，比如任务很少，但是创建了很多线程来处理，这样会造成大量线程都处于等待状态。<br>·协程：在单线程里实现多任务的调度，并在单线程里维持多个任务间的切换。</p>
-<h3 id="减少上下文切换实战"><a href="#减少上下文切换实战" class="headerlink" title="减少上下文切换实战"></a>减少上下文切换实战</h3><p>第一步用jstack命令dump线程信息<br>第二步统计所有线程分别处于什么状态<br>第三步打开dump文件查看处于waiting的线程在做什么<br>第四步根据查看发现很多线程都在waiting，调整线程池配置<br>第五步重启服务器再统计</p>
-<h2 id="死锁"><a href="#死锁" class="headerlink" title="死锁"></a>死锁</h2><p>避免死锁的方法：<br>避免一个线程同时获得多个锁；<br>避免一个锁内同时占用多个资源，尽量保证一个锁只占用一个资源<br>尝试使用定时锁来代替内部锁机制,lock.tryLock(timeout)<br>对于数据库操作，加锁和解锁必须在一个数据库的连接里，否则会出现解锁失败的现象</p>
-<h2 id="资源限制的挑战"><a href="#资源限制的挑战" class="headerlink" title="资源限制的挑战"></a>资源限制的挑战</h2><h3 id="什么是资源限制"><a href="#什么是资源限制" class="headerlink" title="什么是资源限制"></a>什么是资源限制</h3><p>资源限制是指在进行并发编程时，程序的执行速度受限于计算机硬件资源或者软件资源。例如带宽的上传下载速度、硬盘读写速度和cpu的处理速度。软件资源限制有数据库连接数和socket的连接数</p>
-<h3 id="资源限制带来的问题"><a href="#资源限制带来的问题" class="headerlink" title="资源限制带来的问题"></a>资源限制带来的问题</h3><p>资源限制引发的问题导致并发可能不会加快，反而变慢，原因在于增加了上下文的切换和资源调度的时间</p>
-<h3 id="如何解决资源限制问题"><a href="#如何解决资源限制问题" class="headerlink" title="如何解决资源限制问题"></a>如何解决资源限制问题</h3><p>对于硬件资源限制，可以考虑使用集群并行执行程序。对于软件资源限制可以使用线程池将socket和数据库连接复用，或者在调用对方webservice接口获取数据时</p>
-<h3 id="在资源限制情况下进行并发编程"><a href="#在资源限制情况下进行并发编程" class="headerlink" title="在资源限制情况下进行并发编程"></a>在资源限制情况下进行并发编程</h3><p>根据不同的资源限制调整程序的并发度，比如下载文件程序依赖于两个资源——带宽和硬盘读写速度。有数据库操作时，涉及数据库连接数，如果SQL语句执行非常快，而线程的数量比数据库连接数大很多，则某些线程会被阻塞，等待数据库连接</p>
-<h1 id="java并发机制的底层实现原理"><a href="#java并发机制的底层实现原理" class="headerlink" title="java并发机制的底层实现原理"></a>java并发机制的底层实现原理</h1><h2 id="volatile的应用"><a href="#volatile的应用" class="headerlink" title="volatile的应用"></a>volatile的应用</h2><p>volatile是轻量级的synchronized，它在多处理器开发中保证了共享变量的“可见性”。可见性的意思是当一个线程修改一个共享变量时，另外一个线程能读到这个修改的值。如果volatile变量修饰符使用恰当的话，它比synchronized的使用和执行成本更低，因为它不会引起线程上下文的切换和调度。</p>
-<h3 id="定义及其实现原理"><a href="#定义及其实现原理" class="headerlink" title="定义及其实现原理"></a>定义及其实现原理</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">instance = new Singleton();//instance是volatile变量</div><div class="line">//汇编</div><div class="line">0x01a3de1d: movb \<span class="variable">$0</span>×0,0×1104800(%esi);0x01a3de24: lock addl \<span class="variable">$0</span>×0,(%esp);</div></pre></td></tr></table></figure>
-<p>lock指令会在多核处理器引发两件事情：</p>
-<ol>
-<li>将当前的缓存处理器缓存行的数据写回到系统内存</li>
-<li>这个写回内存的操作会使其他cpu缓存该地内存址的数据无效</li>
-</ol>
-<p><em>缓存一致性协议：在多处理器中，为了保证各个处理器的缓存是一致的，就会实现缓存一致性，每个处理器会通过嗅探在总线传播过来的数据来检查自己缓存的数据是否过期，当处理器发现自己缓存行对应的内存地址被修改时，就会将自己的缓存状态设为失效状态，当处理器对这个数据进行访问时，就会重新从系统内存中把数据读到处理器缓存中。</em></p>
-<h3 id="volatile的使用优化"><a href="#volatile的使用优化" class="headerlink" title="volatile的使用优化"></a>volatile的使用优化</h3><p>Linked-TransferQueue，它在使用volatile变量时，用一种追加字节的方式来优化队列出队和入队的性能<br>一个对象的引用占4个字节，它追加了15个变量（共占60个字节），再加上父类的value变量，一共64个字节。<br>为什么追加64字节能够提高并发编程的效率呢？因为对于英特尔酷睿i7、酷睿、Atom和NetBurst，以及Core Solo和Pentium M处理器的L1、L2或L3缓存的高速缓存行是64个字节宽，不支持部分填充缓存行，这意味着，如果队列的头节点和尾节点都不足64字节的话，处理器会将它们都读到同一个高速缓存行中，在多处理器下每个处理器都会缓存同样的头、尾节点，当一个处理器试图修改头节点时，会将整个缓存行锁定，那么在缓存一致性机制的作用下，会导致其他处理器不能访问自己高速缓存中的尾节点，而队列的入队和出队操作则需要不停修改头节点和尾节点，所以在多处理器的情况下将会严重影响到队列的入队和出队效率。Doug lea使用追加到64字节的方式来填满高速缓冲区的缓存行，避免头节点和尾节点加载到同一个缓存行，使头、尾节点在修改时不会互相锁定。那么是不是在使用volatile变量时都应该追加到64字节呢？不是的。在两种场景下不应该使用这种方式。<br>·缓存行非64字节宽的处理器。如P6系列和奔腾处理器，它们的L1和L2高速缓存行是32个字节宽。<br>·共享变量不会被频繁地写。因为使用追加字节的方式需要处理器读取更多的字节到高速缓冲区，这本身就会带来一定的性能消耗，如果共享变量不被频繁写的话，锁的几率也非常小，就没必要通过追加字节的方式来避免相互锁定。</p>
-<h2 id="synchronized的实现原理与应用"><a href="#synchronized的实现原理与应用" class="headerlink" title="synchronized的实现原理与应用"></a>synchronized的实现原理与应用</h2><p>java中每一个对象都可以成为锁，具体表现形式如下：<br>对于普通的同步方法，锁是当前实例对象<br>对于静态的同步方法，锁是当前类的class对象<br>对于同步方法快，锁是Sychronized括号里配置的对象。<br>JVM基于进入和退出monitor对象实现方法同步和代码块同步，但两个实现细节不一样，代码块同步是通过monitorenter和monitorexit指令实现，方法同步使用另一种方式。<br>monitorenter指令是在编译后插入到同步代码块的开始位置，而monitorexit是插入到方法结束处和异常处，JVM要保证每个monitorenter必须有对应的monitorexit与之配对。任何对象都有一个monitor与之关联，当且一个monitor被持有后，它将处于锁定状态。线程执行到monitorenter指令时，将会尝试获取对象所对应的monitor的所有权，即尝试获得对象的锁。</p>
-<h3 id="java对象头"><a href="#java对象头" class="headerlink" title="java对象头"></a>java对象头</h3><p>synchronized用的锁是存在java对象头里。如果对象是数组类型，则虚拟机用3个字宽存储对象头，如果非数组，用2字宽存储对象头。<br><img src="/2017/12/26/java并发编程前三章/java对象头.png" alt=""></p>
-<p><img src="/2017/12/26/java并发编程前三章/锁状态.png" alt=""></p>
-<h3 id="锁升级与对比"><a href="#锁升级与对比" class="headerlink" title="锁升级与对比"></a>锁升级与对比</h3><p>java SE1.6中锁一共有四种状态，从低到高依次是：无锁状态、偏向锁状态、轻量锁状态、重量级锁状态。锁可以升级但不能降级，意味着偏向锁升级成轻量级锁后不能降级成偏向锁。这种锁升级却不能降级的策略，目的是为了提高获得锁和释放锁的效率。</p>
-<h4 id="偏向锁"><a href="#偏向锁" class="headerlink" title="偏向锁"></a>偏向锁</h4><p>大多数情况下，锁不仅不存在多线程竞争，而且总是由同一线程多次获得，为了让线程获得锁的代价更低而引入了偏向锁。当一个线程访问同步块并获取锁时，会在对象头和栈帧中的锁记录里存储锁偏向的线程ID，以后该线程在进入和退出同步块时不需要进行CAS操作来加锁和解锁，只需简单地测试一下对象头的Mark Word里是否存储着指向当前线程的偏向锁。如果测试成功，表示线程已经获得了锁。如果测试失败，则需要再测试一下Mark Word中偏向锁的标识是否设置成1（表示当前是偏向锁）：如果没有设置，则使用CAS竞争锁；如果设置了，则尝试使用CAS将对象头的偏向锁指向当前线程。</p>
-<h5 id="偏向锁的撤销"><a href="#偏向锁的撤销" class="headerlink" title="偏向锁的撤销"></a>偏向锁的撤销</h5><p>偏向锁使用了一种等到竞争出现才释放锁的机制，所以当其他线程尝试竞争偏向锁时，持有偏向锁的线程才会释放锁。偏向锁的撤销，需要等待全局安全点（在这个时间点上没有正在执行的字节码）。它会首先暂停拥有偏向锁的线程，然后检查持有偏向锁的线程是否活着，如果线程不处于活动状态，则将对象头设置成无锁状态；如果线程仍然活着，拥有偏向锁的栈会被执行，遍历偏向对象的锁记录，栈中的锁记录和对象头的Mark Word要么重新偏向于其他线程，要么恢复到无锁或者标记对象不适合作为偏向锁，最后唤醒暂停的线程。</p>
-<h5 id="关闭锁"><a href="#关闭锁" class="headerlink" title="关闭锁"></a>关闭锁</h5><p>偏向锁在Java 6和Java 7里是默认启用的，但是它在应用程序启动几秒钟之后才激活，如有必要可以使用JVM参数来关闭延迟：-XX:BiasedLockingStartupDelay=0。如果你确定应用程序里所有的锁通常情况下处于竞争状态，可以通过JVM参数关闭偏向锁：-XX:-UseBiasedLocking=false，那么程序默认会进入轻量级锁状态。</p>
-<h4 id="轻量级锁"><a href="#轻量级锁" class="headerlink" title="轻量级锁"></a>轻量级锁</h4><h5 id="加锁"><a href="#加锁" class="headerlink" title="加锁"></a>加锁</h5><p>线程在执行同步块之前，JVM会先在当前线程的栈桢中创建用于存储锁记录的空间，并将对象头中的Mark Word复制到锁记录中，官方称为Displaced Mark Word。然后线程尝试使用CAS将对象头中的Mark Word替换为指向锁记录的指针。如果成功，当前线程获得锁，如果失败，表示其他线程竞争锁，当前线程便尝试使用自旋来获取锁。</p>
-<h5 id="解锁"><a href="#解锁" class="headerlink" title="解锁"></a>解锁</h5><p>轻量级解锁时，会使用原子的CAS操作将Displaced Mark Word替换回到对象头，如果成功，则表示没有竞争发生。如果失败，表示当前锁存在竞争，锁就会膨胀成重量级锁。<br>因为自旋会消耗CPU，为了避免无用的自旋（比如获得锁的线程被阻塞住了），一旦锁升级成重量级锁，就不会再恢复到轻量级锁状态。当锁处于这个状态下，其他线程试图获取锁时，都会被阻塞住，当持有锁的线程释放锁之后会唤醒这些线程，被唤醒的线程就会进行新一轮的夺锁之争。</p>
-<h3 id="锁的优缺点对比"><a href="#锁的优缺点对比" class="headerlink" title="锁的优缺点对比"></a>锁的优缺点对比</h3><table>
-<thead>
-<tr>
-<th>锁</th>
-<th>优点</th>
-<th>缺点</th>
-<th>场景</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>偏向锁</td>
-<td>加锁和解锁不需要额外的消耗，和执行非同步方法相比仅存在纳秒级的差距</td>
-<td>如果进程间存在着锁竞争会带来额外的锁撤销的消耗</td>
-<td>适用于只有一个线程访问同步块场景</td>
-</tr>
-<tr>
-<td>轻量级锁</td>
-<td>竞争的线程不会阻塞，提高了程序的响应速度</td>
-<td>如果始终得不到锁竞争的线程，使用自旋消耗cpu</td>
-<td>追求响应时间，同步块执行速度非常快</td>
-</tr>
-<tr>
-<td>重量级锁</td>
-<td>线程使用不使用自旋，不用消耗cpu</td>
-<td>线程阻塞，响应速度非常慢</td>
-<td>追求吞吐量。同步块执行时间较长</td>
-</tr>
-</tbody>
-</table>
-<h2 id="原子操作实现原理"><a href="#原子操作实现原理" class="headerlink" title="原子操作实现原理"></a>原子操作实现原理</h2><p>原子操作意为不可被中断的一个或一系列操作</p>
-<h3 id="术语定义"><a href="#术语定义" class="headerlink" title="术语定义"></a>术语定义</h3><p>缓存行、比较并交换、cpu流水线、内存顺序冲突</p>
-<h3 id="处理器实现原子操作"><a href="#处理器实现原子操作" class="headerlink" title="处理器实现原子操作"></a>处理器实现原子操作</h3><p>处理器通过总线锁定和缓存锁定两个机制来保证复杂内存操作的原子性</p>
-<h4 id="使用总线锁保证原子性"><a href="#使用总线锁保证原子性" class="headerlink" title="使用总线锁保证原子性"></a>使用总线锁保证原子性</h4><p>总线锁就是使用处理器提供的一个lock信号，当一个总线输出此信号时，其他处理器的请求将会被阻塞住，那么该处理器就可以独占共享内存。</p>
-<h4 id="使用缓存锁保证原子性"><a href="#使用缓存锁保证原子性" class="headerlink" title="使用缓存锁保证原子性"></a>使用缓存锁保证原子性</h4><p>缓存锁定是内存区域如果被缓存在处理器的缓存行中，并且在lock操作期间被锁定，那么当它执行锁操作回写到内存时，处理器不在总线上声言lock信号，而是修改内部的内存地址，并允许它的缓存一致性机制来保证操作的原子性，因为缓存一致性会阻止同时修改由两个以上的处理器缓存的内存区域数据，当其他处理器回写已被锁定的缓存行的数据时，会使缓存行无效。<br>但是有两种情况下处理器不会使用缓存锁定。<br>第一种情况是：当操作的数据不能被缓存在处理器内部，或操作的数据跨多个缓存行（cache line）时，则处理器会调用总线锁定。<br>第二种情况是：有些处理器不支持缓存锁定。对于Intel 486和Pentium处理器，就算锁定的内存区域在处理器的缓存行中也会调用总线锁定。</p>
-<h4 id="java如何实现原子操作"><a href="#java如何实现原子操作" class="headerlink" title="java如何实现原子操作"></a>java如何实现原子操作</h4><p>java中可以通过使用锁和cas实现原子操作<br>1.使用循环cas操作<br>2.cas实现原子操作的三大问题</p>
-<ul>
-<li>A-&gt;B-&gt;A问题<br>解决思路是使用版本号，在变量前面追加版本号，每次变量改变版本号加一。这个<br>类的compareAndSet方法的作用是首先检查当前引用是否等于预期引用，并且检查当前标志是否等于预期标志，如果全部相等，则以原子方式将该引用和该标志的值设置为给定的更新值。</li>
-<li>循环时间长开销大<br>自旋CAS如果长时间不成功，会给CPU带来非常大的执行开销。如果JVM能支持处理器提供的pause指令，那么效率会有一定的提升。pause指令有两个作用：第一，它可以延迟流水线执行指令（de-pipeline），使CPU不会消耗过多的执行资源，延迟的时间取决于具体实现的版本，在一些处理器上延迟时间是零；第二，它可以避免在退出循环的时候因内存顺序冲突（Memory Order Violation）而引起CPU流水线被清空（CPU Pipeline Flush），从而提高CPU的执行效率。</li>
-<li>只能保证一个共享变量的原子操作<br>当对一个共享变量执行操作时，我们可以使用循环CAS的方式来保证原子操作，但是对多个共享变量操作时，循环CAS就无法保证操作的原子性，这个时候就可以用锁。</li>
-</ul>
-<p>3.使用锁机制实现原子操作<br>锁机制保证了只有获得锁的线程才能够操作锁定的内存区域。JVM内部实现了很多种锁机制，有偏向锁、轻量级锁和互斥锁。</p>
-<h1 id="java内存模型"><a href="#java内存模型" class="headerlink" title="java内存模型"></a>java内存模型</h1><h2 id="java内存查询的基础"><a href="#java内存查询的基础" class="headerlink" title="java内存查询的基础"></a>java内存查询的基础</h2><h3 id="并发编程模型的两个关键问题"><a href="#并发编程模型的两个关键问题" class="headerlink" title="并发编程模型的两个关键问题"></a>并发编程模型的两个关键问题</h3><p>两个关键问题：线程之间如何通信以及线程之间如何同步。线程之间的通信机制有两种：共享内存和消息传递。<br>在共享内存的并发模型中，线程之间共享程序的公共状态，通过写-读内存中的公共状态进行隐性通信。在消息传递的并发模型中，线程没有公共状态，线程必须通过发送信息来显性通信。<br>同步是指程序中用于控制不同线程间操作发生相对顺序的机制。在共享内存并发模型里，同步是显式进行的。程序员必须显式指定某个方法或某段代码需要在线程之间互斥执行。在消息传递的并发模型里，由于消息的发送必须在消息的接收之前，因此同步是隐式进行的。<br>Java的并发采用的是共享内存模型，Java线程之间的通信总是隐式进行，整个通信过程对程序员完全透明。</p>
-<h3 id="java内存模型的抽象结构"><a href="#java内存模型的抽象结构" class="headerlink" title="java内存模型的抽象结构"></a>java内存模型的抽象结构</h3><p>在java中，所有实例域、静态域和数组元素都存储在堆内存中，堆内存在线程间共享。局部变量、方法定义参数和异常处理器参数不会在线程之间共享，它们不会有内存可见性问题。也不受内存模型的影响。<br>java线程的通信由java内存模型(JMM)控制，JMM决定了一个线程对共享变量的写入何时对另一个线程可见。从抽象的角度看，JMM定义了线程和主内存之间的抽象关系：线程之间的共享变量存储在主内存中，每个线程都有一个私有的本地内存，本地内存中存储了该线程以读/写的共享变量的副本。本地内存是JMM的一个抽象概念，并不真实存在。它涵盖了缓存、写缓冲区、寄存器以及其他的硬件和编译器优化。<br><img src="/2017/12/26/java并发编程前三章/java内存模型.png" alt=""><br>如果线程A与线程B之间要通信的话，必须要经历下面2个步骤。<br>1）线程A把本地内存A中更新过的共享变量刷新到主内存中去。<br>2）线程B到主内存中去读取线程A之前已更新过的共享变量。<br><img src="/2017/12/26/java并发编程前三章/线程通信.png" alt=""><br>本地内存A和本地内存B由主内存中共享变量x的副本。假设初始时，这3个内存中的x值都为0。线程A在执行时，把更新后的x值（假设值为1）临时存放在自己的本地内存A中。当线程A和线程B需要通信时，线程A首先会把自己本地内存中修改后的x值刷新到主内存中，此时主内存中的x值变为了1。随后，线程B到主内存中去读取线程A更新后的x值，此时线程B的本地内存的x值也变为了1。<br>从整体来看，这两个步骤实质上是线程A在向线程B发送消息，而且这个通信过程必须要经过主内存。JMM通过控制主内存与每个线程的本地内存之间的交互，来为Java程序员提供内存可见性保证。</p>
-<h3 id="从源代码到指令序列的重排序"><a href="#从源代码到指令序列的重排序" class="headerlink" title="从源代码到指令序列的重排序"></a>从源代码到指令序列的重排序</h3><p>重排序分为三类：<br>1）编译器优化的重排序。编译器在不改变单线程程序语义的前提下，可以重新安排语句的执行顺序。<br>2）指令级并行的重排序。现代处理器采用了指令级并行技术（Instruction-Level Parallelism，ILP）来将多条指令重叠执行。如果不存在数据依赖性，处理器可以改变语句对应机器指令的执行顺序。<br>3）内存系统的重排序。由于处理器使用缓存和读/写缓冲区，这使得加载和存储操作看上去可能是在乱序执行。<br><img src="/2017/12/26/java并发编程前三章/重排序.png" alt=""><br>1属于编译器重排序，2和3属于处理器重排序。这些重排序可能会导致多线程程序出现内存可见性问题。对于编译器，JMM的编译器重排序规则会禁止特定类型的编译器重排序（不是所有的编译器重排序都要禁止）。对于处理器重排序，JMM的处理器重排序规则会要求Java编译器在生成指令序列时，插入特定类型的内存屏障（Memory Barriers，Intel称之为Memory Fence）指令，通过内存屏障指令来禁止特定类型的处理器重排序。</p>
-<h3 id="并发编程模型的分类"><a href="#并发编程模型的分类" class="headerlink" title="并发编程模型的分类"></a>并发编程模型的分类</h3><p>现代处理器使用写缓冲区临时保存向内存写入的数据。写缓冲区可以保证指令流水线持续运行，它可以避免由于处理器停顿下来等待向内存写入数据而产生延迟。同时，通过以批处理的方式刷新写缓冲区，以及合并写缓冲区中对同一内存地址的多次写，减少对内存总线的占用。虽然写缓冲区有这么多好处，但每个处理器上的写缓冲区，仅仅对它所在的处理器可见。</p>
-<h3 id="happens-before简介"><a href="#happens-before简介" class="headerlink" title="happens-before简介"></a>happens-before简介</h3><p>在JMM中，如果一个操作执行结果需要对另一个操作可见，那么这两个操作必须存在happens-before关系。这里提到的两个操作可以是一个线程内，也可以是不同线程间。<br>·程序顺序规则：一个线程中的每个操作，happens-before于该线程中的任意后续操作。<br>·监视器锁规则：对一个锁的解锁，happens-before于随后对这个锁的加锁。<br>·volatile变量规则：对一个volatile域的写，happens-before于任意后续对这个volatile域的读。<br>·传递性：如果A happens-before B，且B happens-before C，那么A happens-before C。</p>
-<h2 id="重排序"><a href="#重排序" class="headerlink" title="重排序"></a>重排序</h2><p>重排序是指编译器和处理器为了优化程序性能而对指令序列进行重新排序的一种手段。</p>
-<h3 id="数据依赖性"><a href="#数据依赖性" class="headerlink" title="数据依赖性"></a>数据依赖性</h3><p>如果两个操作访问一个变量，且这两个操作有一个是写操作，那么这两个操作就存在数据依赖性。<br>编译器和处理器可能会对操作做重排序。编译器和处理器在重排序时，会遵守数据依赖性，编译器和处理器不会改变存在数据依赖关系的两个操作的执行顺序。<br>这里所说的数据依赖性仅针对单个处理器中执行的指令序列和单个线程中执行的操作，不同处理器之间和不同线程之间的数据依赖性不被编译器和处理器考虑。</p>
-<h3 id="as-if-serial语义"><a href="#as-if-serial语义" class="headerlink" title="as if serial语义"></a>as if serial语义</h3><p>不管怎么重排序，程序的执行结果不能被改变。</p>
-<h3 id="程序顺序规则"><a href="#程序顺序规则" class="headerlink" title="程序顺序规则"></a>程序顺序规则</h3><h3 id="重排序对多线程的影响"><a href="#重排序对多线程的影响" class="headerlink" title="重排序对多线程的影响"></a>重排序对多线程的影响</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">int a=0;</div><div class="line">boolean flag=<span class="literal">false</span>;</div><div class="line">public void <span class="function"><span class="title">writer</span></span>()&#123;</div><div class="line">  a=1;</div><div class="line">  flag=<span class="literal">true</span>;</div><div class="line">&#125;</div><div class="line">public void <span class="function"><span class="title">reader</span></span>()&#123;</div><div class="line">  <span class="keyword">if</span>(flag)&#123;</div><div class="line">    int i=a*a;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>这里假设有两个线程A和B，A首先执行writer()方法，随后B线程接着执行reader()方法.这时B不一定能观察到线程A的写入。因为两个线程之间没有数据依赖性。</p>
-<h2 id="顺序一致性"><a href="#顺序一致性" class="headerlink" title="顺序一致性"></a>顺序一致性</h2><h3 id="数据竞争与顺序一致性"><a href="#数据竞争与顺序一致性" class="headerlink" title="数据竞争与顺序一致性"></a>数据竞争与顺序一致性</h3><p>数据竞争：在一个线程中写一个变量、在另一个线程中读一个变量、而且写和读之间没有通过同步来排序。<br>如果程序是正确同步的，程序的执行将具有顺序一致性——即程序的执行结果与该程序在顺序一致性内存模型中的执行结果相同。</p>
-<h3 id="顺序一致性内存模型"><a href="#顺序一致性内存模型" class="headerlink" title="顺序一致性内存模型"></a>顺序一致性内存模型</h3><p>两大特性：1.一个线程内的所有操作必须按照程序的顺序来执行。2.所有线程只能看到单一的操作执行顺序。在顺序一致性模型中，每个操作都必须原子执行且立刻对所有线程可见。<br>顺序一致性模型有一个单一的全局内存，这个内存通过一个左右摇摆的开关可以连接到任意一个线程，同时每个线程都按照程序的顺序执行内存的读写操作。<br>未同步程序在顺序一致性模型中虽然整体执行顺序是无序的，但所有线程都只能看到一个一致的整体执行顺序。但是，在JMM中就没有这个保证。未同步程序在JMM中不但整体的执行顺序是无序的，而且所有线程看到的操作执行顺序也可能不一致。比如，在当前线程把写过的数据缓存在本地内存中，在没有刷新到主内存之前，这个写操作仅对当前线程可见；从其他线程的角度来观察，会认为这个写操作根本没有被当前线程执行。只有当前线程把本地内存中写过的数据刷新到主内存之后，这个写操作才能对其他线程可见。在这种情况下，当前线程和其他线程看到的操作执行顺序将不一致。</p>
-<h3 id="同步程序的顺序一致性模型"><a href="#同步程序的顺序一致性模型" class="headerlink" title="同步程序的顺序一致性模型"></a>同步程序的顺序一致性模型</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">int a=0;</div><div class="line">boolean flag=<span class="literal">false</span>;</div><div class="line">public synchronized void <span class="function"><span class="title">writer</span></span>()&#123;</div><div class="line">  a=1;</div><div class="line">  flag=<span class="literal">true</span>;</div><div class="line">&#125;</div><div class="line">public synchronized void <span class="function"><span class="title">reader</span></span>()&#123;</div><div class="line">  <span class="keyword">if</span>(flag)&#123;</div><div class="line">    int i=a*a;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>顺序一致性模型中，所有操作完全按程序的顺序串行执行。而在JMM中，临界区内的代码可以重排序（但JMM不允许临界区内的代码“逸出”到临界区之外，那样会破坏监视器的语义）。JMM会在退出临界区和进入临界区这两个关键时间点做一些特别处理，使得线程在这两个时间点具有与顺序一致性模型相同的内存视图（具体细节后文会说明）。虽然线程A在临界区内做了重排序，但由于监视器互斥执行的特性，这里的线程B根本无法“观察”到线程A在临界区内的重排序。这种重排序既提高了执行效率，又没有改变程序的执行结果。<br>JMM在具体实现上的基本方针为：在不改变（正确同步的）程序执行结果的前提下，尽可能地为编译器和处理器的优化打开方便之门。</p>
-<h3 id="未同步程序的执行特性"><a href="#未同步程序的执行特性" class="headerlink" title="未同步程序的执行特性"></a>未同步程序的执行特性</h3><p>对于未同步或未正确同步的多线程程序，JMM只提供最小安全性：线程执行时读取到的值，要么是之前某个线程写入的值，要么是默认值（0，null，false）。为了实现最小安全性，JVM在堆上分配对象，域会默认初始化。<br>JMM不保证未同步程序的执行结果与该程序在顺序一致性模型中的执行结果一致。<br>未同步程序在JMM中的执行时，整体上是无序的，其执行结果无法预知。未同步程序在两个模型中的执行特性有如下几个差异。<br>1）顺序一致性模型保证单线程内的操作会按程序的顺序执行，而JMM不保证单线程内的<br>操作会按程序的顺序执行<br>2）顺序一致性模型保证所有线程只能看到一致的操作执行顺序，而JMM不保证所有线程<br>能看到一致的操作执行顺序。<br>3）JMM不保证对64位的long型和double型变量的写操作具有原子性，而顺序一致性模型保证对所有的内存读/写操作都具有原子性。</p>
-<h2 id="volatile的内存语义"><a href="#volatile的内存语义" class="headerlink" title="volatile的内存语义"></a>volatile的内存语义</h2><h3 id="volatile的特性"><a href="#volatile的特性" class="headerlink" title="volatile的特性"></a>volatile的特性</h3><p>理解volatile特性的一个好方法是把对volatile变量的单个读/写，看成是使用同一个锁对这些单个读/写操作做了同步。<br>锁的语义决定了临界区代码的执行具有原子性。这意味着，即使是64位的long型和double型变量，只要它是volatile变量，对该变量的读/写就具有原子性。如果是多个volatile操作或类似于volatile++这种复合操作，这些操作整体上不具有原子性。<br>volatile变量自身具有下列特性：<br>可见性。对一个volatile变量的读，总能看到任意线程对这个volatile变量的写入。<br>原子性。对任意单个volatile变量的读/写具有原子性。但类似volatile++这种复合操作不具有原子性。</p>
-<h3 id="volatile写-读建立的happens-before"><a href="#volatile写-读建立的happens-before" class="headerlink" title="volatile写-读建立的happens-before"></a>volatile写-读建立的happens-before</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">class VolatileExample &#123;</div><div class="line"> int a = 0;</div><div class="line"> volatile boolean flag = <span class="literal">false</span>;</div><div class="line"> public void <span class="function"><span class="title">writer</span></span>() &#123;</div><div class="line">    a = 1;　　　　　// 1</div><div class="line">    flag = <span class="literal">true</span>;　　　// 2</div><div class="line"> &#125;</div><div class="line"> public void <span class="function"><span class="title">reader</span></span>() &#123;</div><div class="line">    <span class="keyword">if</span>(flag)&#123;  //3</div><div class="line">      int i=a; //4</div><div class="line">    &#125;</div><div class="line"> &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>根据程序次序规则，1 happens-before 2;3 happens-before 4<br>根据volatile规则，2 happens-before 3<br>根据happens-before的传递性规则，1 happens-before 4</p>
-<h3 id="volatile写-读的内存语义"><a href="#volatile写-读的内存语义" class="headerlink" title="volatile写-读的内存语义"></a>volatile写-读的内存语义</h3><p>当写一个volatile变量时，JMM会把该线程对应的本地内存中的共享变量值刷新到主内存。<br>volatile的内存语义如下：当读一个volatile变量时，JMM会把该线程对应的本地内存置<br>为无效，线程接下来从主内存中读取共享变量。</p>
-<h3 id="volatile内存语义的实现"><a href="#volatile内存语义的实现" class="headerlink" title="volatile内存语义的实现"></a>volatile内存语义的实现</h3><p><img src="/2017/12/26/java并发编程前三章/重排序规则.png" alt=""><br>·当第二个操作是volatile写时，不管第一个操作是什么，都不能重排序。这个规则确保volatile写之前的操作不会被编译器重排序到volatile写之后。<br>·当第一个操作是volatile读时，不管第二个操作是什么，都不能重排序。这个规则确保volatile读之后的操作不会被编译器重排序到volatile读之前。<br>·当第一个操作是volatile写，第二个操作是volatile读时，不能重排序。<br>·在每个volatile写操作的前面插入一个StoreStore屏障。<br>·在每个volatile写操作的后面插入一个StoreLoad屏障。<br>·在每个volatile读操作的后面插入一个LoadLoad屏障。<br>·在每个volatile读操作的后面插入一个LoadStore屏障。<br><img src="/2017/12/26/java并发编程前三章/volatile写指令.png" alt=""></p>
-<p><img src="/2017/12/26/java并发编程前三章/volatile读指令.png" alt=""></p>
-<h3 id="jsr-133为什么要增强volatile语句"><a href="#jsr-133为什么要增强volatile语句" class="headerlink" title="jsr-133为什么要增强volatile语句"></a>jsr-133为什么要增强volatile语句</h3><p>严格限制编译器和处理器对volatile变量与普通变量的重排序，确保volatile的写-读和锁的释放-获取具有相同的内存语义。从编译器重排序规则和处理器内存屏障插入策略来看，只要volatile变量与普通变量之间的重排序可能会破坏volatile的内存语义，这种重排序就会被编译器重排序规则和处理器内存屏障插入策略禁止。</p>
-<h2 id="锁的内存语义"><a href="#锁的内存语义" class="headerlink" title="锁的内存语义"></a>锁的内存语义</h2><h3 id="锁的释放获取"><a href="#锁的释放获取" class="headerlink" title="锁的释放获取"></a>锁的释放获取</h3><p>锁除了让临界区互斥执行外，还可以让释放锁的线程向获取同一个锁的线程发送消息<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">class MonitorExample &#123;</div><div class="line">int a = 0;</div><div class="line">public synchronized void <span class="function"><span class="title">writer</span></span>() &#123;　　　　// 1</div><div class="line">a++;　　　　　　　　　　// 2</div><div class="line">&#125;　　　　　　　　　　　　// 3</div><div class="line">public synchronized void <span class="function"><span class="title">reader</span></span>() &#123;　　　// 4</div><div class="line">int i = a;　　　　　　　　// 5</div><div class="line">……</div><div class="line">&#125;　　　　　　　　　　　　// 6</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>假设线程A执行writer()方法，随后线程B执行reader()方法。根据happens-before规则，这个过程包含的happens-before关系可以分为3类。<br>1）根据程序次序规则，1 happens-before 2,2 happens-before 3;4 happens-before 5,5 happens-before 6。<br>2）根据监视器锁规则，3 happens-before 4。<br>3）根据happens-before的传递性，2 happens-before 5。</p>
-<h3 id="锁的释放和获取的内存语义"><a href="#锁的释放和获取的内存语义" class="headerlink" title="锁的释放和获取的内存语义"></a>锁的释放和获取的内存语义</h3><p>当线程释放锁时，JMM会把该线程对应的本地内存中的共享变量刷新到主内存中。<br>当线程获取到锁时，JMM会把该线程对应的本地内存置为无效，从而使得被监视器保护的临界区代码必须从主内存中读取共享变量。<br>总结：线程A释放一个锁，实质是线程A向接下来将要获取这个锁的某个线程发出了对共享变量所做修改的消息。线程B获取一个锁，实质是线程B接收了之前某个线程发出的（在释放这个锁之前对共享变量所做修改的）消息。<br>线程A释放锁，随后线程B获取这个锁，这个过程实质是线程A通过主内存向线程B发送消息。</p>
-<h3 id="锁内存语义的实现"><a href="#锁内存语义的实现" class="headerlink" title="锁内存语义的实现"></a>锁内存语义的实现</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">int a=0;</div><div class="line">ReentrantLock lock=new ReentrantLock();</div><div class="line">public void <span class="function"><span class="title">writer</span></span>()&#123;</div><div class="line">    lock.lock();</div><div class="line">    try&#123;</div><div class="line">       a++;</div><div class="line">    &#125;catch(Exception e)&#123;</div><div class="line"></div><div class="line">    &#125;finally&#123;</div><div class="line">      lock.unlock();</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">public void <span class="function"><span class="title">reader</span></span>()&#123;</div><div class="line">  lock.lock();</div><div class="line">  try&#123;</div><div class="line">    int i=a;</div><div class="line">  &#125;catch(Exception e)&#123;</div><div class="line"></div><div class="line">  &#125;finally&#123;</div><div class="line">    lock.unlock();</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>ReentrantLock的实现依赖于java同步器框架AbstractQueuedSynchronizer(AQS)，AQS使用一个整形的volatile(state)变量来维护同步状态。<br><img src="/2017/12/26/java并发编程前三章/ReentrantLock类图.png" alt=""><br>ReentrantLock分为公平锁和非公平锁，使用公平锁<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">ReentrantLock:lock();</div><div class="line">FairSync:lock();</div><div class="line">AbstractQueuedSynchronizer:acquire(int arg);</div><div class="line">ReentrantLock:tryAcquire(int acquire);</div><div class="line">FairSync:</div><div class="line">protected final boolean tryAcquire(int acquires) &#123;</div><div class="line">    final Thread current = Thread.currentThread();</div><div class="line">    int c = getState();</div><div class="line">    <span class="keyword">if</span>(c == 0)&#123;</div><div class="line">        <span class="keyword">if</span>(!hasQueuedPredecessors() &amp;&amp;compareAndSetState(0, acquires))&#123;</div><div class="line">            <span class="built_in">set</span>ExclusiveOwnerThread(current);</div><div class="line">            <span class="built_in">return</span> <span class="literal">true</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;<span class="keyword">else</span> <span class="keyword">if</span>(current==getExclusiveOwnerThread())&#123;</div><div class="line">      int nextc = c + acquires;</div><div class="line">      <span class="keyword">if</span>(nextc &lt; 0)</div><div class="line">          throw new Error(<span class="string">"Maximum lock count exceeded"</span>);</div><div class="line">      <span class="built_in">set</span>State(nextc);</div><div class="line">      <span class="built_in">return</span> <span class="literal">true</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="built_in">return</span> <span class="literal">false</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>加锁方法首先读volatile变量state<br>在使用公平锁时，解锁方法unlock()调用轨迹如下。<br>1）ReentrantLock:unlock()。<br>2）AbstractQueuedSynchronizer:release(int arg)。<br>3）Sync:tryRelease(int releases)。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">protected final boolean tryRelease(int releases) &#123;</div><div class="line">    int c =getState()- releases;</div><div class="line">    <span class="keyword">if</span>(Thread.currentThread()!=getExclusiveOwnerThread())</div><div class="line">        throw new IllegalMonitorStateException();</div><div class="line">    boolean free = <span class="literal">false</span>;</div><div class="line">    <span class="keyword">if</span>(c == 0) &#123;</div><div class="line">        free = <span class="literal">true</span>;</div><div class="line">        <span class="built_in">set</span>ExclusiveOwnerThread(null);</div><div class="line">    &#125;</div><div class="line">    <span class="built_in">set</span>State(c);</div><div class="line">    <span class="built_in">return</span> free;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>在释放锁的最后写volatile变量state。<br>公平锁在释放锁的最后写volatile变量state，在获取锁时首先读这个volatile变量。根据volatile的happens-before规则，释放锁的线程在写volatile变量之前可见的共享变量，在获取锁的线程读取同一个volatile变量后将立即变得对获取锁的线程可见。<br>这里仅仅分析非公平锁的获取。使用非公平锁时，加锁方法lock()调用轨迹如下。<br>1）ReentrantLock:lock()。<br>2）NonfairSync:lock()。<br>3）AbstractQueuedSynchronizer:compareAndSetState(int expect,int update)。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">protected final boolean compareAndSetState(int expect, int update) &#123;</div><div class="line"><span class="built_in">return</span> unsafe.compareAndSwapInt(this, stateOffset, expect, update);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>该方法以原子操作的方式更新state变量，本文把Java的compareAndSet()方法调用简称为CAS。JDK文档对该方法的说明如下：如果当前状态值等于预期值，则以原子方式将同步状态设置为给定的更新值。此操作具有volatile读和写的内存语义。<br>编译器不会对volatile读与volatile读后面的任意内存操作重排序；编译器不会对volatile写与volatile写前面的任意内存操作重排序。组合这两个条件，意味着为了同时实现volatile读和volatile写的内存语义，编译器不能对CAS与CAS前面和后面的任意内存操作重排序。<br>现在对公平锁和非公平锁的内存语义做个总结。<br>·公平锁和非公平锁释放时，最后都要写一个volatile变量state。<br>·公平锁获取时，首先会去读volatile变量。<br>·非公平锁获取时，首先会用CAS更新volatile变量，这个操作同时具有volatile读和volatile写的内存语义。</p>
-<h3 id="concurrent包的实现"><a href="#concurrent包的实现" class="headerlink" title="concurrent包的实现"></a>concurrent包的实现</h3><p>java的CAS同时具有volatile读和volatile写的内存语义，因此java线程之间的通信有了下面四种方式：<br>1）A线程写volatile变量，随后B线程读这个volatile变量。<br>2）A线程写volatile变量，随后B线程用CAS更新这个volatile变量。<br>3）A线程用CAS更新一个volatile变量，随后B线程用CAS更新这个volatile变量。<br>4）A线程用CAS更新一个volatile变量，随后B线程读这个volatile变量。<br>Java的CAS会使用现代处理器上提供的高效机器级别的原子指令，这些原子指令以原子方式对内存执行读-改-写操作，这是在多处理器中实现同步的关键。同时，volatile变量的读/写和CAS可以实现线程之间的通信。把这些特性整合在一起，就形成了整个concurrent包得以实现的基石。<br>首先，声明共享变量为volatile。<br>然后，使用CAS的原子条件更新来实现线程之间的同步。同时，配合以volatile的读/写和CAS所具有的volatile读和写的内存语义来实现线程之间的通信。<br>AQS，非阻塞数据结构和原子变量类（java.util.concurrent.atomic包中的类），这些concurrent包中的基础类都是使用这种模式来实现的，而concurrent包中的高层类又是依赖于这些基础类来实现的。</p>
-<h2 id="final域的内存语义"><a href="#final域的内存语义" class="headerlink" title="final域的内存语义"></a>final域的内存语义</h2><p>对final域的读和写更像是普通的变量访问。</p>
-<h3 id="重排序规则"><a href="#重排序规则" class="headerlink" title="重排序规则"></a>重排序规则</h3><p>1）在构造函数内对一个final域的写入，与随后把这个被构造对象的引用赋值给一个引用<br>变量，这两个操作之间不能重排序。<br>2）初次读一个包含final域的对象的引用，与随后初次读这个final域，这两个操作之间不能<br>重排序。</p>
-<h3 id="写final域的重排序规则"><a href="#写final域的重排序规则" class="headerlink" title="写final域的重排序规则"></a>写final域的重排序规则</h3><p>1）JMM禁止编译器把final域的写重排序到构造函数之外；<br>2）编译器会在final域写之后，构造函数return之前，插入一个storestore。这个屏障会禁止处理器把final域的写重排序到构造函数之外。<br>写final域的重排序规则可以确保：在对象引用为任意线程可见之前，对象的final域已经被正确初始化过了，而普通域不具有这个保障。</p>
-<h3 id="读final域的重排序规则"><a href="#读final域的重排序规则" class="headerlink" title="读final域的重排序规则"></a>读final域的重排序规则</h3><p>读final域的重排序规则是，在一个线程中，初次读对象引用与初次读该对象包含的final域，JMM禁止处理器重排序这两个操作（注意，这个规则仅仅针对处理器）。编译器会在读final域操作的前面插入一个LoadLoad屏障。<br>读final域的重排序规则可以确保：在读一个对象的final域之前，一定会先读包含这个final域的对象的引用。在这个示例程序中，如果该引用不为null，那么引用对象的final域一定已经被A线程初始化过了。</p>
-<h3 id="final为引用类型"><a href="#final为引用类型" class="headerlink" title="final为引用类型"></a>final为引用类型</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">public class FinalReferenceExample &#123;</div><div class="line">final int[] intArray; // final是引用类型</div><div class="line">static FinalReferenceExample obj;</div><div class="line">public <span class="function"><span class="title">FinalReferenceExample</span></span> () &#123; // 构造函数</div><div class="line">intArray = new int[1]; // 1</div><div class="line">intArray[0] = 1; // 2</div><div class="line">&#125;</div><div class="line">public static void <span class="function"><span class="title">writerOne</span></span> () &#123; // 写线程A执行</div><div class="line">obj = new FinalReferenceExample (); // 3</div><div class="line">&#125;</div><div class="line">public static void <span class="function"><span class="title">writerTwo</span></span> () &#123; // 写线程B执行</div><div class="line">obj.intArray[0] = 2; // 4</div><div class="line">&#125;</div><div class="line">public static void <span class="function"><span class="title">reader</span></span> () &#123; // 读线程C执行</div><div class="line"><span class="keyword">if</span>(obj != null) &#123; // 5</div><div class="line">int temp1 = obj.intArray[0]; // 6</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>假设首先线程A执行writerOne()方法，执行完后线程B执行writerTwo()方法，执行完后线程C执行reader()方法.JMM可以确保读线程C至少能看到写线程A在构造函数中对final引用对象的成员域的写入。即C至少能看到数组下标0的值为1。而写线程B对数组元素的写入，读线程C可能看得到，也可能看不到。JMM不保证线程B的写入对读线程C可见，因为写线程B和读线程C之间存在数据竞争，此时的执行结果不可预知。</p>
-<h3 id="为什么final引用不能从构造函数内“溢出”"><a href="#为什么final引用不能从构造函数内“溢出”" class="headerlink" title="为什么final引用不能从构造函数内“溢出”"></a>为什么final引用不能从构造函数内“溢出”</h3><p>写final域的重排序规则会要求编译器在final域的写之后，构造函数return之前插入一个StoreStore障屏。读final域的重排序规则要求编译器在读final域的操作前面插入一个LoadLoad屏障。</p>
-<h3 id="JSR-133为什么要增强final的语义"><a href="#JSR-133为什么要增强final的语义" class="headerlink" title="JSR-133为什么要增强final的语义"></a>JSR-133为什么要增强final的语义</h3><p>为了修补这个漏洞，JSR-133专家组增强了final的语义。通过为final域增加写和读重排序规则，可以为Java程序员提供初始化安全保证：只要对象是正确构造的（被构造对象的引用在构造函数中没有“逸出”），那么不需要使用同步（指lock和volatile的使用）就可以保证任意线程#都能看到这个final域在构造函数中被初始化之后的值。</p>
-<h2 id="happens-before"><a href="#happens-before" class="headerlink" title="happens-before"></a>happens-before</h2><h3 id="JMM的设计"><a href="#JMM的设计" class="headerlink" title="JMM的设计"></a>JMM的设计</h3><p>JMM目标：一方面，要为程序员提供足够强的内存可见性保证；另一方面，对编译器和处理器的限制要尽可能地放松。<br>JMM保证两点：</p>
-<ol>
-<li>JMM向程序员提供的happens-before能够保证程序员的需求。JMM的happens-before规则不但简单且易懂，而且向程序员提供了足够强的内存可见性保证。</li>
-<li>JMM对编译器和处理器的束缚已经尽可能少。从上面的分析可以看出，JMM其实在遵循一个基本原则：只要不改变程序的执行结果，编译器和处理器怎么优化都可以。例如，如果编译器经过细致的分析后，认定一个锁只会被单个线程访问，那么这个锁可以被消除。再如，如果编译器经过细致的分析后，认定一个volatile变量只会被单个线程访问，那么编译器可以把这个volatile变量当作一个普通变量来对待。这些优化既不会改变程序的执行结果，又能提高程序的执行效率。</li>
-</ol>
-<h3 id="happens-before的定义"><a href="#happens-before的定义" class="headerlink" title="happens-before的定义"></a>happens-before的定义</h3><p>1）如果一个操作happens-before另一个操作，那么第一个操作的执行结果将对第二个操作可见，而且第一个操作执行顺序排在第二个操作之前。<br>2）两个操作之间存在着happens-before关系，并不意味着java平台具体实现按照happens-before关系指定的顺序来执行。如果重排序的执行结果与按照happens-before关系执行的结果一致，那么这种重排序并不非法。<br>上面的1）是JMM对程序员的承诺。从程序员的角度来说，可以这样理解happens-before关系：如果A happens-before B，那么Java内存模型将向程序员保证——A操作的结果将对B可见，且A的执行顺序排在B之前。<br>上面的2）是JMM对编译器和处理器重排序的约束原则。正如前面所言，JMM其实是在遵循一个基本原则：只要不改变程序的执行结果（指的是单线程程序和正确同步的多线程程序），编译器和处理器怎么优化都行。JMM这么做的原因是：程序员对于这两个操作是否真的被重排序并不关心，程序员关心的是程序执行时的语义不能被改变（即执行结果不能被改变）。因此，happens-before关系本质上和as-if-serial语义是一回事。<br>·as-if-serial语义保证单线程内程序的执行结果不被改变，happens-before关系保证正确同步的多线程程序的执行结果不被改变。<br>·as-if-serial语义给编写单线程程序的程序员创造了一个幻境：单线程程序是按程序的顺序来执行的。happens-before关系给编写正确同步的多线程程序的程序员创造了一个幻境：正确同步的多线程程序是按happens-before指定的顺序来执行的。</p>
-<h3 id="happens-before规则"><a href="#happens-before规则" class="headerlink" title="happens-before规则"></a>happens-before规则</h3><ol>
-<li>程序顺序规则：一个程序的每个操作，happens-before与该线程的任意后续操作。</li>
-<li>监视器锁规则：对一个锁的解锁，happens-before于随后对这个锁的加锁。</li>
-<li>volatile变量规则：对一个volatile域的写，happens-before与后续对这个volatile的读</li>
-<li>传递性：如果A happens-before B，且B happens-before C，那么A happens-before C。</li>
-<li>start规则：如果线程A执行操作ThreadB.start,那么A线程的start操作happens-before线程B的任何操作。</li>
-<li>join规则：如果线程A执行操作ThreadB.join()并成功返回，那么线程B中的任意操作happens-before于线程A从ThreadB.join()操作成功返回。</li>
-</ol>
-<h2 id="双重检查锁和延迟初始化"><a href="#双重检查锁和延迟初始化" class="headerlink" title="双重检查锁和延迟初始化"></a>双重检查锁和延迟初始化</h2><p>在Java多线程程序中，有时候需要采用延迟初始化来降低初始化类和创建对象的开销。双重检查锁定是常见的延迟初始化技术，但它是一个错误的用法。</p>
-<h3 id="双重锁检查锁定的由来"><a href="#双重锁检查锁定的由来" class="headerlink" title="双重锁检查锁定的由来"></a>双重锁检查锁定的由来</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">public class Singleton&#123;</div><div class="line">    private static Singleton single;</div><div class="line">    public synchronized static Singleton <span class="function"><span class="title">getSingleton</span></span>()&#123;</div><div class="line">      <span class="keyword">if</span>(single==null)&#123;</div><div class="line">        single=new Singleton();</div><div class="line">      &#125;</div><div class="line">      <span class="built_in">return</span> single;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>Synchronized将导致性能开销。如果getInstance()方法被多个线程频繁的调用，将会导致程序执行性能的下降。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">public class Singleton&#123;</div><div class="line">    private static Singleton single;</div><div class="line">    public  static Singleton <span class="function"><span class="title">getSingleton</span></span>()&#123;</div><div class="line">      <span class="keyword">if</span>(single==null)&#123;   //4</div><div class="line">        synchronized(Singleton.class)&#123;</div><div class="line">          <span class="keyword">if</span>(single==null)&#123;</div><div class="line">            single=new Singleton();</div><div class="line">          &#125;</div><div class="line">        &#125;</div><div class="line">      &#125;</div><div class="line">      <span class="built_in">return</span> single;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>如果第一次检查instance不为null，那么就不需要执行下面的加锁和初始化操作。因此，可以大幅降低synchronized带来的性能开销。上面代码表面上看起来，似乎两全其美。<br>·多个线程试图在同一时间创建对象时，会通过加锁来保证只有一个线程能创建对象。<br>·在对象创建好之后，执行getInstance()方法将不需要获取锁，直接返回已创建好的对象。双重检查锁定看起来似乎很完美，但这是一个错误的优化！在线程执行到第4行，代码读取到instance不为null时，instance引用的对象有可能还没有完成初始化。</p>
-<h3 id="问题的根源"><a href="#问题的根源" class="headerlink" title="问题的根源"></a>问题的根源</h3><p>single=new Singleton();创建了一个对象。这一行代码可以分解为如下的3行伪代码。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">memory = allocate();　　// 1：分配对象的内存空间</div><div class="line">ctorInstance(memory);　// 2：初始化对象</div><div class="line">single = memory;　　// 3：设置instance指向刚分配的内存地址</div></pre></td></tr></table></figure></p>
-<p>上面3行伪代码中的2和3之间，可能会被重排序<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">memory = allocate();　　// 1：分配对象的内存空间</div><div class="line">instance = memory;　　// 3：设置instance指向刚分配的内存地址</div><div class="line">// 注意，此时对象还没有被初始化！</div><div class="line">ctorInstance(memory);　// 2：初始化对象</div></pre></td></tr></table></figure></p>
-<p><img src="/2017/12/26/java并发编程前三章/多线程执行时序.png" alt=""></p>
-<h3 id="基于volatile解决"><a href="#基于volatile解决" class="headerlink" title="基于volatile解决"></a>基于volatile解决</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">public class Singleton&#123;</div><div class="line">    private static Singleton single;</div><div class="line">    public  static Singleton <span class="function"><span class="title">getSingleton</span></span>()&#123;</div><div class="line">      <span class="keyword">if</span>(single==null)&#123;   //4</div><div class="line">        synchronized(Singleton.class)&#123;</div><div class="line">          <span class="keyword">if</span>(single==null)&#123;</div><div class="line">            single=new Singleton();</div><div class="line">          &#125;</div><div class="line">        &#125;</div><div class="line">      &#125;</div><div class="line">      <span class="built_in">return</span> single;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>当声明对象的引用为volatile后,伪代码中的2和3之间的重排序，在多线程环境中将会被禁止。</p>
-<h3 id="基于类初始化的解决方案"><a href="#基于类初始化的解决方案" class="headerlink" title="基于类初始化的解决方案"></a>基于类初始化的解决方案</h3><p>VM在类的初始化阶段（即在Class被加载后，且被线程使用之前），会执行类的初始化。在执行类的初始化期间，JVM会去获取一个锁。这个锁可以同步多个线程对同一个类的初始化。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">public class InstanceFactory&#123;</div><div class="line"></div><div class="line">  private static class InstanceHolder&#123;</div><div class="line">    public static Instance instance=new Instance();</div><div class="line">  &#125;</div><div class="line"></div><div class="line"> public static Instance <span class="function"><span class="title">getInstance</span></span>()&#123;</div><div class="line">         <span class="built_in">return</span> InstanceHoleder.instance;</div><div class="line"> &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>Java语言规范规定，对于每一个类或接口C，都有一个唯一的初始化锁LC与之对应。从C到LC的映射，由JVM的具体实现去自由实现。JVM在类初始化期间会获取这个初始化锁，并且每个线程至少获取一次锁来确保这个类已经被初始化过了<br>第1阶段：通过在Class对象上同步（即获取Class对象的初始化锁），来控制类或接口的初始化。这个获取锁的线程会一直等待，直到当前线程能够获取到这个初始化锁。<br>第2阶段：线程A执行类的初始化，同时线程B在初始化锁对应的condition上等待。<br>第3阶段：线程A设置state=initialized，然后唤醒在condition中等待的所有线程。<br>第4阶段：线程B结束类的初始化处理。<br>第5阶段：线程C执行类的初始化的处理。<br>字段延迟初始化降低了初始化类或创建实例的开销，但增加了访问被延迟初始化的字段的开销。在大多数时候，正常的初始化要优于延迟初始化。如果确实需要对实例字段使用线程安全的延迟初始化，请使用上面介绍的基于volatile的延迟初始化的方案；如果确实需要对静态字段使用线程安全的延迟初始化，请使用上面介绍的基于类初始化的方案。</p>
-<h2 id="java内存模型综述"><a href="#java内存模型综述" class="headerlink" title="java内存模型综述"></a>java内存模型综述</h2><h3 id="处理器的内存模型"><a href="#处理器的内存模型" class="headerlink" title="处理器的内存模型"></a>处理器的内存模型</h3><p>顺序一致性内存模型是一个理论参考模型，JMM和处理器内存模型在设计时通常会以顺序一致性内存模型为参照。<br>·放松程序中写-读操作的顺序，由此产生了Total Store Ordering内存模型（简称为TSO）。<br>·在上面的基础上，继续放松程序中写-写操作的顺序，由此产生了Partial Store Order内存模型（简称为PSO）。<br>·在前面两条的基础上，继续放松程序中读-写和读-读操作的顺序，由此产生了RelaxedMemory Order内存模型（简称为RMO）和PowerPC内存模型。<br>这里处理器对读/写操作的放松，是以两个操作之间不存在数据依赖性为前提的<br>JMM屏蔽了不同处理器内存模型的差异，它在不同的处理器平台之上为Java程序员呈现了一个一致的内存模型。</p>
-<h3 id="各种内存模型之间的关系"><a href="#各种内存模型之间的关系" class="headerlink" title="各种内存模型之间的关系"></a>各种内存模型之间的关系</h3><p>JMM是一种语言参考模型，处理器内存模型是硬件级的内存模型，顺序一致性模型是一个理论参考模型。<br>常见的4种处理器内存模型比常用的3中语言内存模型要弱，处理器内存模型和语言内存模型都比顺序一致性内存模型要弱。同处理器内存模型一样，越是追求执行性能的语言，内存模型设计得会越弱。</p>
-<h3 id="JMM的内存可见性保证"><a href="#JMM的内存可见性保证" class="headerlink" title="JMM的内存可见性保证"></a>JMM的内存可见性保证</h3><p>按照程序类型，java程序的内存可见性保证可以分为3类：</p>
-<ul>
-<li>单线程程序<br>单线程程序不会出现内存可见性问题。编译器、runtime和处理器会共同确保单线程程序的执行结果跟该程序在顺序一致性模型中执行的结果一样。</li>
-<li>正确同步的多线程程序<br>正确同步的多线程程序的执行将具有顺序一致性。这是JMM关注的重点。JMM通过限制编译器和处理器和处理器的重排序来为程序员提供内存可见性保证。</li>
-<li>对于未同步或未正确同步的多线程程序<br>JMM提供了最小安全保障：线程执行时读取到的值，要么是之前某个线程写入的值，要么是默认值（0，false，null）</li>
-</ul>
-<p>最小安全性保障与64位数据的非原子性写并不矛盾。它们是两个不同的概念，它们“发生”的时间点也不同。最小安全性保证对象默认初始化之后（设置成员域为0、null或false），才会被任意线程使用。最小安全性“发生”在对象被任意线程使用之前。64位数据的非原子性写“发生”在对象被多个线程使用的过程中（写共享变量）。当发生问题时（处理器B看到仅仅被处理器A“写了一半”的无效值），这里虽然处理器B读取到一个被写了一半的无效值，但这个值仍然是处理器A写入的，只不过是处理器A还没有写完而已。最小安全性保证线程读取到的值，要么是之前某个线程写入的值，要么是默认值（0、null、false）。但最小安全性并不保证线程读取到的值，一定是某个线程写完后的值。最小安全性保证线程读取到的值不会无中生<br>只要多线程程序是正确同步的，JMM保证该程序在任意的处理器平台上的执行结果，与该程序在顺序一致性内存模型中的执行结果一致。</p>
-<h3 id="JSR-133对旧内存模型的修补"><a href="#JSR-133对旧内存模型的修补" class="headerlink" title="JSR-133对旧内存模型的修补"></a>JSR-133对旧内存模型的修补</h3><ul>
-<li>增强volatile变量的内存语义。旧内存模型允许volatile变量和普通变量进行重排序。JSR-133严格限制volatile变量与普通变量的重排序，使得volatile的写和读和和锁的释放-获取有相同的语义</li>
-<li>增强final的内存语义。在旧内存模型中，多次读取同一个final变量可能有所不同。为此jsr-133增加两个重排规则，在保证final引用不会从构造函数内溢出的情况，final具有了初始化的安全。</li>
-</ul>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2317,7 +2287,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">51</span>
+                <span class="site-state-item-count">52</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2328,7 +2298,7 @@
             
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
-                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-count">15</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -2339,7 +2309,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">22</span>
+                <span class="site-state-item-count">25</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

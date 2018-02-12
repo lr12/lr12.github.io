@@ -1,0 +1,834 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="sql," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="博客" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="优化SQL步骤通过show status和应用特点了解各种SQL的执行频率通过show status可以提供服务器状态信息，可以根据需要显示session级别的统计结果和global级别的统计结果。如显示session级别：show status like ‘com%’;显示global级别：show global status;以下几个参数对innodb和myisam存储引擎都计数  Com_s">
+<meta name="keywords" content="sql">
+<meta property="og:type" content="article">
+<meta property="og:title" content="sql优化大全">
+<meta property="og:url" content="http://yoursite.com/2018/01/23/sql优化大全/index.html">
+<meta property="og:site_name" content="博客">
+<meta property="og:description" content="优化SQL步骤通过show status和应用特点了解各种SQL的执行频率通过show status可以提供服务器状态信息，可以根据需要显示session级别的统计结果和global级别的统计结果。如显示session级别：show status like ‘com%’;显示global级别：show global status;以下几个参数对innodb和myisam存储引擎都计数  Com_s">
+<meta property="og:updated_time" content="2018-01-25T09:48:33.104Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="sql优化大全">
+<meta name="twitter:description" content="优化SQL步骤通过show status和应用特点了解各种SQL的执行频率通过show status可以提供服务器状态信息，可以根据需要显示session级别的统计结果和global级别的统计结果。如显示session级别：show status like ‘com%’;显示global级别：show global status;以下几个参数对innodb和myisam存储引擎都计数  Com_s">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/01/23/sql优化大全/"/>
+
+
+
+
+
+  <title>sql优化大全 | 博客</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/23/sql优化大全/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="李睿">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">sql优化大全</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-23T21:30:26+08:00">
+                2018-01-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/sql优化/" itemprop="url" rel="index">
+                    <span itemprop="name">sql优化</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="优化SQL步骤"><a href="#优化SQL步骤" class="headerlink" title="优化SQL步骤"></a>优化SQL步骤</h1><h2 id="通过show-status和应用特点了解各种SQL的执行频率"><a href="#通过show-status和应用特点了解各种SQL的执行频率" class="headerlink" title="通过show status和应用特点了解各种SQL的执行频率"></a>通过show status和应用特点了解各种SQL的执行频率</h2><p>通过show status可以提供服务器状态信息，可以根据需要显示session级别的统计结果和global级别的统计结果。如显示session级别：show status like ‘com%’;显示global级别：show global status;<br>以下几个参数对innodb和myisam存储引擎都计数</p>
+<ol>
+<li>Com_select执行select的次数，一次查询只累加1；</li>
+<li>Com_insert执行insert的次数，对于批量插入的insert操作，只累加一次；</li>
+<li>Com_update执行update的次数；</li>
+<li>Com_delete执行delete的次数；</li>
+</ol>
+<p>以下几个参数是针对innodb引擎计数的，累计的算法也略有不同</p>
+<ol>
+<li>Innodb_rows_read: 查询返回的行数</li>
+<li>Innodb_rows_inserted:操作insert插入的行数</li>
+<li>Innodb_rows_updated:操作更新的行数</li>
+<li>Innodb_rows_deleted:操作删除的行数</li>
+</ol>
+<p>通过以上几个参数可以了解到当前数据库应用是以插入更新为主还是查询为主，以及各种类型的sql大致执行比例是多少。对于更新操作的计数，是对执行的次数，不论提交还是回滚都会累加。<br>对于事务型应用，通过Com_commit和Com_rollback可以了解事务提交和回滚情况，对于回滚频繁的数据库，可能意味着应用编写存在问题。此外，以下几个参数可以让我们了解数据库基本情况：</p>
+<ol>
+<li>Connections 试图连接mysql服务器的次数</li>
+<li>Uptime 服务器工作时间</li>
+<li>Slow_queries 慢查询的次数</li>
+</ol>
+<h2 id="定位执行效率较低的sql语句"><a href="#定位执行效率较低的sql语句" class="headerlink" title="定位执行效率较低的sql语句"></a>定位执行效率较低的sql语句</h2><h3 id="通过慢查询日志定位那些执行效率比较低的sql语句"><a href="#通过慢查询日志定位那些执行效率比较低的sql语句" class="headerlink" title="通过慢查询日志定位那些执行效率比较低的sql语句"></a>通过慢查询日志定位那些执行效率比较低的sql语句</h3><p>用-log-slow-queries[=filename]选项启动时，mysqlId写一个包含所有执行时间超过long_query_time的sql语句的日志文件。<br>启用 slow log，有两种启用方式:</p>
+<ol>
+<li>在my.cnf 里 通过 log-slow-queries[=file_name]</li>
+<li>在mysqld进程启动时,指定–log-slow-queries[=file_name]选项</li>
+</ol>
+<p>比较常用的五种分析工具，MySQLdumpslow、mysqlsla、mysqlprofi、mysql-explain-slow-log、mysqllogfilter.具体可以查看[<a href="https://wenku.baidu.com/view/2b1b230e01f69e3143329499.html" target="_blank" rel="external">https://wenku.baidu.com/view/2b1b230e01f69e3143329499.html</a>]</p>
+<h3 id="使用show-processlist查看当前mysql线程"><a href="#使用show-processlist查看当前mysql线程" class="headerlink" title="使用show processlist查看当前mysql线程"></a>使用show processlist查看当前mysql线程</h3><p>命令慢查询日志在查询结束后才记录日志，所以在应用反应执行效率出现问题时，查询慢查询日志并不能定位问题，可以使用show processlist命令查看当前mysql进行的线程，包括线程状态、是否锁表，可以实时查看sql执行情况，同时对一些缩表操作进行优化。</p>
+<h2 id="通过explain分析低效sql的执行计划"><a href="#通过explain分析低效sql的执行计划" class="headerlink" title="通过explain分析低效sql的执行计划"></a>通过explain分析低效sql的执行计划</h2><p>通过上面查询到效率低的sql后，我们可以通过explain或者desc获取mysql如何执行select语句的信息，包括select语句执行过程表如何连接和连接的次序。<br>[<a href="https://www.cnblogs.com/xiaoboluo768/p/5400990.html" target="_blank" rel="external">https://www.cnblogs.com/xiaoboluo768/p/5400990.html</a>]</p>
+<h1 id="mysql索引"><a href="#mysql索引" class="headerlink" title="mysql索引"></a>mysql索引</h1><h2 id="mysql如何使用索引"><a href="#mysql如何使用索引" class="headerlink" title="mysql如何使用索引"></a>mysql如何使用索引</h2><p>索引用于快速查找某个列具有特定值的行，对相关列使用索引是提高select操作性能的最佳途径。<br>查询要使用索引最主要的条件是查询条件中需要使用索引关键字，如果是多列索引，那么只有查询条件使用了多列关键字最左边的前缀时(前缀索引)，才会使用索引，否则将不能使用索引。<br>下面情况，将不会使用索引</p>
+<ol>
+<li><p>如果mysql估计使用索引比全表扫描更慢，则不使用索引。例如：如果key_part1均匀地分布在1和100之间，下列查询中使用索引就不是很好：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">SELECT * FROM table_name <span class="built_in">where</span> key_part1 &gt; 1 and key_part1 &lt; 90</div></pre></td></tr></table></figure>
+</li>
+<li><p>如果使用heap表并且where条件中不用=索引列，其他 &gt; 、 &lt; 、 &gt;= 、 &lt;= 均不使 用索引（MyISAM和innodb表使用索引）；</p>
+</li>
+<li>使用or分割的条件，如果or前面的条件列有索引，后面的列中没有索引，那么涉及到的索引都不会使用。</li>
+<li>如果创建复合索引，如果条件中使用的列不是索引列的第一部分（前缀索引）。</li>
+<li>如果like是以%开始。</li>
+<li>对where语句后面条件为字符串的一定要加引号，字符串如果是数字mysql会自动转为字符串，但是不使用索引。</li>
+</ol>
+<h2 id="查看索引使用情况"><a href="#查看索引使用情况" class="headerlink" title="查看索引使用情况"></a>查看索引使用情况</h2><p>如果索引正在工作，Handler_read_key的值将很高，这个值代表一个行被索引值读的次数，很低说明增加索引得到的性能改善不高，所以索引并不经常使用。<br>Handler_read_rnd_next的值高代表查询运行低效，并且应该建立索引补救，这个值含义是在数据文件中读下一行的请求数。如果你进行大量的表扫描，该值较高，通常说明索引不正确或写入查询没有利用索引。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">show global status like <span class="string">'Handler_read%'</span>;</div></pre></td></tr></table></figure></p>
+<h1 id="具体优化查询语句"><a href="#具体优化查询语句" class="headerlink" title="具体优化查询语句"></a>具体优化查询语句</h1><h2 id="避免全表查询"><a href="#避免全表查询" class="headerlink" title="避免全表查询"></a>避免全表查询</h2><p>对查询进行优化，应尽量避免全表扫描，首先应考虑在where以及order by涉及的列建立索引。尝试下面的技巧以避免优化器错选了表扫描：</p>
+<ul>
+<li>使用analyze table tbl_name为扫描的表更新关键字。<br>[<a href="http://blog.csdn.net/alongken2005/article/details/6394016" target="_blank" rel="external">http://blog.csdn.net/alongken2005/article/details/6394016</a>]</li>
+<li>对扫描的表使用FORCEINDEX告知MySQL，相对于使用给定的索引表扫描将非常耗时。SELECT * FROM t1, t2 FORCE INDEX (index_for_column) WHERE t1.col_name=t2.col_name；[<a href="http://blog.csdn.net/bruce128/article/details/46777567" target="_blank" rel="external">http://blog.csdn.net/bruce128/article/details/46777567</a>]</li>
+<li>用–max-seeks-for-key=1000选项启动mysqld或使用SET max_seeks_for_key=1000告知优化器假设关键字扫描不会超过1,000次关键字搜索。</li>
+</ul>
+<h3 id="where中避免null值判断"><a href="#where中避免null值判断" class="headerlink" title="where中避免null值判断"></a>where中避免null值判断</h3><p>null值将导致引擎放弃索引而进行全表扫描，如select id from t where num is null<br>null对大多数数据库都需要特殊处理，mysql也一样，它需要更多的代码，更多的检查和特殊的索引逻辑，有些开发人员完全没有意识到，创建表时null是默认值，但大多数时候应该使用not null，或者使用一个特殊的值，如0，-1作为默认值。<br>不能用null作为索引，任何包含null值的列都不会被包含在索引中。即使索引中有一列含有null，该列就会从索引中排除。也就是说如果某列存在空值，即使对该列建索引也不会提高性能。任何在where子句中使用is null或者is not null的语句优化器是不允许使用索引。</p>
+<h3 id="where中避免使用-或-lt-gt-操作符"><a href="#where中避免使用-或-lt-gt-操作符" class="headerlink" title="where中避免使用!=或&lt;&gt;操作符"></a>where中避免使用!=或&lt;&gt;操作符</h3><p>否则引擎放弃索引进行全表扫描<br>mysql只有对以下操作符才会使用索引:&lt; &lt;= = &gt; &gt;= between in 某些时候的like，可以在like操作中使用索引的情形是指另一个操作数以通配符(%或者_)开头的情形，如<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">SELECT id FROM  t WHERE col LIKE <span class="string">'Mich%'</span>; <span class="comment">#这个查询将使用索引</span></div><div class="line">SELECT id FROM  t WHERE col  LIKE <span class="string">'%i'</span>; <span class="comment">#这个查询不会使用索引</span></div></pre></td></tr></table></figure></p>
+<h3 id="where中避免or"><a href="#where中避免or" class="headerlink" title="where中避免or"></a>where中避免or</h3><p>否则引擎将会放弃索引进行全表扫描，如<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">SELECT id from t <span class="built_in">where</span> num=10 or num=20;</div><div class="line">//一般or语句改为union</div><div class="line">SELECT id from t <span class="built_in">where</span> num=10 union all SELECT id from t <span class="built_in">where</span> num=20;</div></pre></td></tr></table></figure></p>
+<p>在某些条件，or条件也是可以避免全表扫描</p>
+<ol>
+<li>where语句如果带有or条件，myisam表能用到索引，Innodb不能</li>
+<li>必须所有的or条件都必须是独立索引</li>
+</ol>
+<h3 id="in和not-in会导致全表扫描"><a href="#in和not-in会导致全表扫描" class="headerlink" title="in和not in会导致全表扫描"></a>in和not in会导致全表扫描</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">SELECT id from t <span class="built_in">where</span> num <span class="keyword">in</span> (1,2,3);</div></pre></td></tr></table></figure>
+<p>对用户连续的值，能用between就别用in:select id from t where num between 1 and 3;</p>
+<h3 id="下面的查询也将导致全表扫描"><a href="#下面的查询也将导致全表扫描" class="headerlink" title="下面的查询也将导致全表扫描"></a>下面的查询也将导致全表扫描</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">SELECT id from t <span class="built_in">where</span> name like <span class="string">'%abc%'</span></div><div class="line">SELECT id from t <span class="built_in">where</span> name like <span class="string">'%abc'</span></div></pre></td></tr></table></figure>
+<p>若要考虑效率可以用全文检索<br>而select id from t where name like ‘abc%’</p>
+<h3 id="where使用参数，也会导致全表扫描"><a href="#where使用参数，也会导致全表扫描" class="headerlink" title="where使用参数，也会导致全表扫描"></a>where使用参数，也会导致全表扫描</h3><p>因为sql只有在运行时才会解析局部变量，而优化程序不能将访问计划的选择推迟到运行时，它必须在编译时进行选择。然而，如果在编译时建立访问计划，变量的值还是未知的，因而无法作为索引选择的输入项。如下面语句将进行全表扫描：<br>select id from t where num=@num<br>可以改为强制查询使用索引：<br>select id from t with(index(索引名)) where num=@num</p>
+<h3 id="避免字段进行表达式操作"><a href="#避免字段进行表达式操作" class="headerlink" title="避免字段进行表达式操作"></a>避免字段进行表达式操作</h3><p>如select id from t where num/2=100应改为select id from t where num=200</p>
+<h3 id="where中避免对字段进行函数操作"><a href="#where中避免对字段进行函数操作" class="headerlink" title="where中避免对字段进行函数操作"></a>where中避免对字段进行函数操作</h3><p>select id from t where substring(name,1,3)=’abc’<br>select id from t where datediff(day,createdate,’2005-11-30’)=0<br>应改为<br>select id from t where name like ‘abc%’<br>select id from t where createdate&gt;=’2015-11-30’ and createdate &lt; ‘2015-12-01’</p>
+<h3 id="where子句避免-左边进行函数、算数运算或其他表达式运算"><a href="#where子句避免-左边进行函数、算数运算或其他表达式运算" class="headerlink" title="where子句避免=左边进行函数、算数运算或其他表达式运算"></a>where子句避免=左边进行函数、算数运算或其他表达式运算</h3><p>否则系统将可能无法正确使用索引</p>
+<h3 id="索引字段不是复合索引的前缀"><a href="#索引字段不是复合索引的前缀" class="headerlink" title="索引字段不是复合索引的前缀"></a>索引字段不是复合索引的前缀</h3><p>在使用索引作为条件时，如果该索引是复合索引，那么必须使用到该索引中的第一个字段作为条件时才能保证系统使用该索引，并且尽可能让字段顺序和索引顺序相一致</p>
+<h2 id="其他一些注意的优化"><a href="#其他一些注意的优化" class="headerlink" title="其他一些注意的优化"></a>其他一些注意的优化</h2><h3 id="不要写一些没有意义的查询"><a href="#不要写一些没有意义的查询" class="headerlink" title="不要写一些没有意义的查询"></a>不要写一些没有意义的查询</h3><p>如需要生成一张空表：select col1,col2 into #t where 1=0<br>这类代码不会返回任何结果集，但是会消耗系统资源，应改成create table #t(…)</p>
+<h3 id="很多时候下用exists代替in"><a href="#很多时候下用exists代替in" class="headerlink" title="很多时候下用exists代替in"></a>很多时候下用exists代替in</h3><p>外层查询表小于子查询表，则用exists，外层查询表大于子查询表，则用in，如果外层和子查询表差不多，则爱用哪个用哪个。<br>[<a href="https://segmentfault.com/a/1190000008709410" target="_blank" rel="external">https://segmentfault.com/a/1190000008709410</a>]<br>select num from a where num in(select num from b)<br>用下面的语句替换：<br>select num from a where exists(select 1 from b where num=a.num)</p>
+<h3 id="并不是所有索引对查询都有效"><a href="#并不是所有索引对查询都有效" class="headerlink" title="并不是所有索引对查询都有效"></a>并不是所有索引对查询都有效</h3><p>sql是根据表中的数据进行查询优化，当索引列有大量数据重复时，sql查询可能不会去利用索引，如一张表中有字段，sex，male和female几乎各占一半，那么即使在sex上建立索引也对查询起不了什么作用。</p>
+<h3 id="索引不是越多越好"><a href="#索引不是越多越好" class="headerlink" title="索引不是越多越好"></a>索引不是越多越好</h3><p>索引固然可以提高相应的select的效率，但同时也降低了insert和delete的效率，因为insert或update会导致索引的重建，所以怎么建索引需要慎重考虑，视情况而定。一个表的索引数最好不要超过6个，若太多则应考虑一些不常使用到的列上建立索引是否有必要。</p>
+<h3 id="避免更新聚簇索引数据列"><a href="#避免更新聚簇索引数据列" class="headerlink" title="避免更新聚簇索引数据列"></a>避免更新聚簇索引数据列</h3><p>因为聚簇索引的索引列的顺序就是表记录的物理存储位置，一旦该列值改变，将导致整个表记录的顺序调整，会耗费相当大的资源。若应用程序需要频繁更新聚簇索引的索引数据列，那么应该考虑是否将该索引建为聚簇索引。</p>
+<h3 id="尽量使用数字型字段"><a href="#尽量使用数字型字段" class="headerlink" title="尽量使用数字型字段"></a>尽量使用数字型字段</h3><p>若只含数值信息的字段尽量不要设置为字符型，这会降低查询和连接的空间，并会增加开销。这是因为引擎在处理查询和连接时会逐个比较字符串的每一个字符，而对于数字型而言只需要比较一次就够了。</p>
+<h3 id="使用varchar或nvarchar代替char和nchar"><a href="#使用varchar或nvarchar代替char和nchar" class="headerlink" title="使用varchar或nvarchar代替char和nchar"></a>使用varchar或nvarchar代替char和nchar</h3><p>首先变长字段存储空间小，可以节省存储空间，其次对于查询来说，在一个相对较小的字段内搜索效率显然要更高些。</p>
+<h3 id="避免-返回所有"><a href="#避免-返回所有" class="headerlink" title="避免*返回所有"></a>避免*返回所有</h3><p>用具体的字段代替*，不要返回用不到的字段</p>
+<h2 id="临时表问题"><a href="#临时表问题" class="headerlink" title="临时表问题"></a>临时表问题</h2><h3 id="尽量表变量来代替临时表"><a href="#尽量表变量来代替临时表" class="headerlink" title="尽量表变量来代替临时表"></a>尽量表变量来代替临时表</h3><p>如果表变量包含大量数据，请注意索引有限</p>
+<h3 id="避免频繁创建和删除临时表，以减少系统表的资源损耗"><a href="#避免频繁创建和删除临时表，以减少系统表的资源损耗" class="headerlink" title="避免频繁创建和删除临时表，以减少系统表的资源损耗"></a>避免频繁创建和删除临时表，以减少系统表的资源损耗</h3><h3 id="临时表并不是不可使用"><a href="#临时表并不是不可使用" class="headerlink" title="临时表并不是不可使用"></a>临时表并不是不可使用</h3><p>适当地使用它们可以使某些例程更有效，例如，当需要重复引用大型表或常用表中的某个数据集时。但是，对于一次性事件，最好使用导出表</p>
+<h3 id="避免造成大量log"><a href="#避免造成大量log" class="headerlink" title="避免造成大量log"></a>避免造成大量log</h3><p>如：在新建临时表时，如果一次性插入数据量很大，那么可以使用 select into 代替 create table，避免造成大量 log ，以提高速度<br>如果数据量不大，为了缓和系统表的资源，应先create table，然后insert</p>
+<h3 id="及时删除临时表"><a href="#及时删除临时表" class="headerlink" title="及时删除临时表"></a>及时删除临时表</h3><p>如果使用到了临时表，在存储过程的最后务必将所有的临时表显式删除，先 truncate table ，然后 drop table ，这样可以避免系统表的较长时间锁定。</p>
+<h2 id="游标的问题"><a href="#游标的问题" class="headerlink" title="游标的问题"></a>游标的问题</h2><h3 id="尽量避免游标"><a href="#尽量避免游标" class="headerlink" title="尽量避免游标"></a>尽量避免游标</h3><p>因为游标效率太差，游标操作数据超过一万行，就应该考虑改写</p>
+<h3 id="使用基于游标的方法或临时表之前"><a href="#使用基于游标的方法或临时表之前" class="headerlink" title="使用基于游标的方法或临时表之前"></a>使用基于游标的方法或临时表之前</h3><p>应先寻找基于集的解决方案来解决问题，基于集的方法通常更有效。</p>
+<h3 id="游标并不是不可用"><a href="#游标并不是不可用" class="headerlink" title="游标并不是不可用"></a>游标并不是不可用</h3><p>对小型数据集使用 FAST_FORWARD 游标通常要优于其他逐行处理方法，尤其是在必须引用几个表才能获得所需的数据时。在结果集中包括“合计”的例程通常要比使用游标执行的速度快。如果开发时间允许，基于游标的方法和基于集的方法都可以尝试一下，看哪一种方法的效果更好。</p>
+<h3 id="存储过程和触发器"><a href="#存储过程和触发器" class="headerlink" title="存储过程和触发器"></a>存储过程和触发器</h3><p>在所有的存储过程和触发器开始处设置set nocount on，在结束时设置set nocount off。无需在执行存储过程和触发器的每个语句后向客户端发送 DONE_IN_PROC 消息。</p>
+<h2 id="事务的问题"><a href="#事务的问题" class="headerlink" title="事务的问题"></a>事务的问题</h2><p>尽量避免大事务操作，提高系统并发能力</p>
+<h2 id="数据量的问题"><a href="#数据量的问题" class="headerlink" title="数据量的问题"></a>数据量的问题</h2><p>尽量避免向客户端返回大数据量。若数据量过大，应该考虑相应需求是否合理</p>
+<h2 id="count优化"><a href="#count优化" class="headerlink" title="count优化"></a>count优化</h2><h3 id="count-优于cout-1-和count-primary"><a href="#count-优于cout-1-和count-primary" class="headerlink" title="count(*)优于cout(1)和count(primary)"></a>count(*)优于cout(1)和count(primary)</h3><p>很多人为了统计记录条数，就使用count(1)和count(primary)，而不是使用count(*),这是一个误区。对于有些场景下，可能性能会更差。应为数据库对count(*)计数操作做了一些特别的优化</p>
+<h3 id="count-column-和count-是不一样的"><a href="#count-column-和count-是不一样的" class="headerlink" title="count(column)和count(*)是不一样的"></a>count(column)和count(*)是不一样的</h3><p>count(column)是表示结果集中有多少个Column字段不为空的记录<br>count(*)是代表结果集有多少条记录</p>
+<h3 id="优化order-by记录"><a href="#优化order-by记录" class="headerlink" title="优化order by记录"></a>优化order by记录</h3><p>mysql的弱点是它的排序，虽然mysql可以在1秒内查询大约15000条数据，但mysql在查询时最多只能使用一个索引。因此如果where条件已经占据了一个索引，那么排序将不使用索引，这将大大降低查询速度。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">SELECT * FROM SALES WHERE NAME = <span class="string">'name'</span> ORDER BY SALE_DATE DESC;</div></pre></td></tr></table></figure></p>
+<p>在以上的SQL的WHERE子句中已经使用了NAME字段上的索引，因此，在对SALE_DATE进行排序时将不再使用索引。为了解决这个问题，我们可以对SALES表建立复合索引:<br>ALTER TABLE SALES DROP INDEX NAME, ADD INDEX (NAME,SALE_DATE)<br>这样再使用上述的SELECT语句进行查询时速度就会大副提升。但要注意，在使用这个方法时，要确保WHERE子句中没有排序字段，在上例中就是不能用SALE_DATE进行查询，否则虽然排序快了，但是SALE_DATE字段上没有单独的索引，因此查询又会慢下来。<br>在某些情况中，mysql需要使用一个索引来满足order by子句，而不需要额外的排序。where语句和order by使用相同的索引，并且order by的顺序和索引顺序相同，并且order by的字段都是升序或者降序。例如下面语句可以使用索引<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">SELECT from t order by key_part1,key_part2;</div><div class="line">SELECT from t key_part1=1 order by key_part1 desc,key_part2 desc;</div><div class="line">SELECT from t order by key_part1 desc,key_part2 desc;</div></pre></td></tr></table></figure></p>
+<p>但是以下情况不使用索引：<br>SELECT FROM t1 ORDER BY key_part1 DESC, key_part2 ASC –order by 的字段混合 ASC 和 DESC<br>SELECT FROM t1 WHERE key2=constant ORDER BY key1– 用于查询行的关键字与 ORDER BY 中所使用的不相同<br>SELECT FROM t1 ORDER BY key1, key2 – 对不同的关键字使用 ORDER BY</p>
+<h2 id="优化group-by"><a href="#优化group-by" class="headerlink" title="优化group by"></a>优化group by</h2><p>默认情况下，mysql排序所有group by col1,col2。查询方法如同查询指定order by col1,col2，如果显式包括一个包含相同列的order by，mysql可以毫不减速地对它进行优化，尽管仍然进行排序。如果查询包括group by，但你想要避免排序结果的消耗，你可以指定order by null禁止排序。例如<br>INSERT INTO foo SELECT a, COUNT(*) FROM bar GROUP BY a ORDER BY NULL;</p>
+<h1 id="sql核心语句"><a href="#sql核心语句" class="headerlink" title="sql核心语句"></a>sql核心语句</h1><h2 id="批量插入数据"><a href="#批量插入数据" class="headerlink" title="批量插入数据"></a>批量插入数据</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">INSERT mytable (first_column,second_column,third_column)  </div><div class="line">VALUES (<span class="string">'some data'</span>,<span class="string">'some more data'</span>,<span class="string">'yet more data'</span>) ,  </div><div class="line">VALUES (<span class="string">'some data'</span>,<span class="string">'some more data'</span>,<span class="string">'yet more data'</span>) ,  </div><div class="line">VALUES (<span class="string">'some data'</span>,<span class="string">'some more data'</span>,<span class="string">'yet more data'</span>);</div></pre></td></tr></table></figure>
+<h2 id="清空数据库表"><a href="#清空数据库表" class="headerlink" title="清空数据库表"></a>清空数据库表</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">truncate table <span class="string">'mytable'</span></div></pre></td></tr></table></figure>
+<p>删除表中的所有记录，应使用TRUNCATE TABLE语句。注意这里为什么要用TRUNCATE TABLE语句代替DELETE语句:当你使用TRUNCATE TABLE语句时，记录的删除是不作记录的。也就是说，这意味着TRUNCATE TABLE要比DELETE快得多。</p>
+<h2 id="使用select创建记录和表"><a href="#使用select创建记录和表" class="headerlink" title="使用select创建记录和表"></a>使用select创建记录和表</h2><p>insert语句和delete语句和update语句有一点不同的是，它一次只操作一个记录，然而有一个方法可以使insert语句一次添加多个记录，要做到这需要insert和select语句结合在一起。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">insert mytable(first_column,second_column)  SELECT another_first,another_second from anothertable <span class="built_in">where</span> another_first=<span class="string">'me'</span>;</div></pre></td></tr></table></figure></p>
+<p>这个语句从anothertable拷贝记录到mytable.只有表anothertable中字段another_first的值为’me’的记录才被拷贝。<br>当为一个表中的记录建立备份时，这种形式的INSERT语句是非常有用的。在删除一个表中的记录之前，你可以先用这种方法把它们拷贝到另一个表中。<br>如果你需要拷贝整个表，你可以使用SELECT INTO语句。例如，下面的语句创建了一个名为newtable的新表，该表包含表mytable的所有数据:<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">SELECT * into newTable from mytable;</div></pre></td></tr></table></figure></p>
+<p>你也可以指定只有特定的字段被用来创建这个新表。要做到这一点，只需在字段列表中指定你想要拷贝的字段。另外，你可以使用WHERE子句来限制拷贝到新表中的记录。下面的例子只拷贝字段second_columnd的值等于’me’的记录的first_column字段。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">SELECT first_column into newTable from mytable <span class="built_in">where</span> second_column=<span class="string">'me'</span>;</div></pre></td></tr></table></figure></p>
+<p>使用SQL修改已经建立的表是很困难的。例如，如果你向一个表中添加了一个字段，没有容易的办法来去除它。另外，如果你不小心把一个字段的数据类型给错了，你将没有办法改变它。但是，使用本节中讲述的SQL语句，你可以绕过这两个问题。<br>例如，假设你想从一个表中删除一个字段。使用SELECT INTO语句，你可以创建该表的一个拷贝，但不包含要删除的字段。这使你既删除了该字段，又保留了不想删除的数据。<br>如果你想改变一个字段的数据类型，你可以创建一个包含正确数据类型字段的新表。创建好该表后，你就可以结合使用UPDATE语句和SELECT语句，把原来表中的所有数据拷贝到新表中。通过这种方法，你既可以修改表的结构，又能保存原有的数据。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/sql/" rel="tag"># sql</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/01/22/feign和zuul/" rel="next" title="feign和zuul">
+                <i class="fa fa-chevron-left"></i> feign和zuul
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg"
+               alt="李睿" />
+          <p class="site-author-name" itemprop="name">李睿</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">52</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">25</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#优化SQL步骤"><span class="nav-number">1.</span> <span class="nav-text">优化SQL步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#通过show-status和应用特点了解各种SQL的执行频率"><span class="nav-number">1.1.</span> <span class="nav-text">通过show status和应用特点了解各种SQL的执行频率</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#定位执行效率较低的sql语句"><span class="nav-number">1.2.</span> <span class="nav-text">定位执行效率较低的sql语句</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#通过慢查询日志定位那些执行效率比较低的sql语句"><span class="nav-number">1.2.1.</span> <span class="nav-text">通过慢查询日志定位那些执行效率比较低的sql语句</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用show-processlist查看当前mysql线程"><span class="nav-number">1.2.2.</span> <span class="nav-text">使用show processlist查看当前mysql线程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#通过explain分析低效sql的执行计划"><span class="nav-number">1.3.</span> <span class="nav-text">通过explain分析低效sql的执行计划</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#mysql索引"><span class="nav-number">2.</span> <span class="nav-text">mysql索引</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#mysql如何使用索引"><span class="nav-number">2.1.</span> <span class="nav-text">mysql如何使用索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看索引使用情况"><span class="nav-number">2.2.</span> <span class="nav-text">查看索引使用情况</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#具体优化查询语句"><span class="nav-number">3.</span> <span class="nav-text">具体优化查询语句</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#避免全表查询"><span class="nav-number">3.1.</span> <span class="nav-text">避免全表查询</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#where中避免null值判断"><span class="nav-number">3.1.1.</span> <span class="nav-text">where中避免null值判断</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#where中避免使用-或-lt-gt-操作符"><span class="nav-number">3.1.2.</span> <span class="nav-text">where中避免使用!=或<>操作符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#where中避免or"><span class="nav-number">3.1.3.</span> <span class="nav-text">where中避免or</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#in和not-in会导致全表扫描"><span class="nav-number">3.1.4.</span> <span class="nav-text">in和not in会导致全表扫描</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#下面的查询也将导致全表扫描"><span class="nav-number">3.1.5.</span> <span class="nav-text">下面的查询也将导致全表扫描</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#where使用参数，也会导致全表扫描"><span class="nav-number">3.1.6.</span> <span class="nav-text">where使用参数，也会导致全表扫描</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#避免字段进行表达式操作"><span class="nav-number">3.1.7.</span> <span class="nav-text">避免字段进行表达式操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#where中避免对字段进行函数操作"><span class="nav-number">3.1.8.</span> <span class="nav-text">where中避免对字段进行函数操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#where子句避免-左边进行函数、算数运算或其他表达式运算"><span class="nav-number">3.1.9.</span> <span class="nav-text">where子句避免=左边进行函数、算数运算或其他表达式运算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#索引字段不是复合索引的前缀"><span class="nav-number">3.1.10.</span> <span class="nav-text">索引字段不是复合索引的前缀</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他一些注意的优化"><span class="nav-number">3.2.</span> <span class="nav-text">其他一些注意的优化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#不要写一些没有意义的查询"><span class="nav-number">3.2.1.</span> <span class="nav-text">不要写一些没有意义的查询</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#很多时候下用exists代替in"><span class="nav-number">3.2.2.</span> <span class="nav-text">很多时候下用exists代替in</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#并不是所有索引对查询都有效"><span class="nav-number">3.2.3.</span> <span class="nav-text">并不是所有索引对查询都有效</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#索引不是越多越好"><span class="nav-number">3.2.4.</span> <span class="nav-text">索引不是越多越好</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#避免更新聚簇索引数据列"><span class="nav-number">3.2.5.</span> <span class="nav-text">避免更新聚簇索引数据列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#尽量使用数字型字段"><span class="nav-number">3.2.6.</span> <span class="nav-text">尽量使用数字型字段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用varchar或nvarchar代替char和nchar"><span class="nav-number">3.2.7.</span> <span class="nav-text">使用varchar或nvarchar代替char和nchar</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#避免-返回所有"><span class="nav-number">3.2.8.</span> <span class="nav-text">避免*返回所有</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#临时表问题"><span class="nav-number">3.3.</span> <span class="nav-text">临时表问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#尽量表变量来代替临时表"><span class="nav-number">3.3.1.</span> <span class="nav-text">尽量表变量来代替临时表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#避免频繁创建和删除临时表，以减少系统表的资源损耗"><span class="nav-number">3.3.2.</span> <span class="nav-text">避免频繁创建和删除临时表，以减少系统表的资源损耗</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#临时表并不是不可使用"><span class="nav-number">3.3.3.</span> <span class="nav-text">临时表并不是不可使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#避免造成大量log"><span class="nav-number">3.3.4.</span> <span class="nav-text">避免造成大量log</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#及时删除临时表"><span class="nav-number">3.3.5.</span> <span class="nav-text">及时删除临时表</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#游标的问题"><span class="nav-number">3.4.</span> <span class="nav-text">游标的问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#尽量避免游标"><span class="nav-number">3.4.1.</span> <span class="nav-text">尽量避免游标</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用基于游标的方法或临时表之前"><span class="nav-number">3.4.2.</span> <span class="nav-text">使用基于游标的方法或临时表之前</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#游标并不是不可用"><span class="nav-number">3.4.3.</span> <span class="nav-text">游标并不是不可用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#存储过程和触发器"><span class="nav-number">3.4.4.</span> <span class="nav-text">存储过程和触发器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#事务的问题"><span class="nav-number">3.5.</span> <span class="nav-text">事务的问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据量的问题"><span class="nav-number">3.6.</span> <span class="nav-text">数据量的问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#count优化"><span class="nav-number">3.7.</span> <span class="nav-text">count优化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#count-优于cout-1-和count-primary"><span class="nav-number">3.7.1.</span> <span class="nav-text">count(*)优于cout(1)和count(primary)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#count-column-和count-是不一样的"><span class="nav-number">3.7.2.</span> <span class="nav-text">count(column)和count(*)是不一样的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#优化order-by记录"><span class="nav-number">3.7.3.</span> <span class="nav-text">优化order by记录</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#优化group-by"><span class="nav-number">3.8.</span> <span class="nav-text">优化group by</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#sql核心语句"><span class="nav-number">4.</span> <span class="nav-text">sql核心语句</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#批量插入数据"><span class="nav-number">4.1.</span> <span class="nav-text">批量插入数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#清空数据库表"><span class="nav-number">4.2.</span> <span class="nav-text">清空数据库表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用select创建记录和表"><span class="nav-number">4.3.</span> <span class="nav-text">使用select创建记录和表</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">李睿</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -74,7 +74,7 @@
 <link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="zuul,feign," />
 
 
 
@@ -93,12 +93,13 @@
 
 
 <meta name="description" content="Feign我们在使用Ribbon时，通常会利用它来对RestTemplate的请求拦截来实现对依赖服务的接口调用。RestTemplate已经实现了对http请求的封装处理，形成一套模板化的调用方法。在实际开发中，对服务依赖的调用可能不止一处，往往一个接口会被多处调用，我们需要封装一些客户端类来包装这些依赖服务的调用。在Feign实现下，我们只需要创建一个接口并用注解配置它，即可完成对服务提供方的">
+<meta name="keywords" content="zuul,feign">
 <meta property="og:type" content="article">
 <meta property="og:title" content="feign和zuul">
 <meta property="og:url" content="http://yoursite.com/2018/01/22/feign和zuul/index.html">
 <meta property="og:site_name" content="博客">
 <meta property="og:description" content="Feign我们在使用Ribbon时，通常会利用它来对RestTemplate的请求拦截来实现对依赖服务的接口调用。RestTemplate已经实现了对http请求的封装处理，形成一套模板化的调用方法。在实际开发中，对服务依赖的调用可能不止一处，往往一个接口会被多处调用，我们需要封装一些客户端类来包装这些依赖服务的调用。在Feign实现下，我们只需要创建一个接口并用注解配置它，即可完成对服务提供方的">
-<meta property="og:updated_time" content="2018-01-23T09:20:48.426Z">
+<meta property="og:updated_time" content="2018-02-12T01:53:16.362Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="feign和zuul">
 <meta name="twitter:description" content="Feign我们在使用Ribbon时，通常会利用它来对RestTemplate的请求拦截来实现对依赖服务的接口调用。RestTemplate已经实现了对http请求的封装处理，形成一套模板化的调用方法。在实际开发中，对服务依赖的调用可能不止一处，往往一个接口会被多处调用，我们需要封装一些客户端类来包装这些依赖服务的调用。在Feign实现下，我们只需要创建一个接口并用注解配置它，即可完成对服务提供方的">
@@ -315,6 +316,28 @@
           </span>
 
           
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/spring-cloud-微服务实战/" itemprop="url" rel="index">
+                    <span itemprop="name">spring cloud 微服务实战</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
 
           
             
@@ -380,7 +403,7 @@
 <p>filterType：返回一个字符串代表过滤器的类型，在zuul中定义了四种不同生命周期的过滤器类型，具体如下：<br>pre：路由之前<br>routing：路由之时<br>post： 路由之后<br>error：发送错误调用<br>filterOrder：过滤的顺序，数值越小优先级越高<br>shouldFilter：这里可以写逻辑判断，是否要过滤，true,永远过滤。<br>run：过滤器的具体逻辑。可用很复杂，包括查sql，nosql去判断该请求到底有没有权限访问。</p>
 <h3 id="请求生命周期"><a href="#请求生命周期" class="headerlink" title="请求生命周期"></a>请求生命周期</h3><p>第一阶段是pre，会被pre过滤器进行处理，该过滤器主要是在请求路由之前做一些前置工作，比如请求校验。<br>第二阶段是routing，路由请求转发阶段，请求会被routing过滤器处理，当服务实例请求结果都返回之后，routing阶段结束。<br>第三阶段是post，此时请求会被post类型的过滤器处理，我们可以对处理结果进行加工或者转换。<br>还有个特殊的阶段error阶段，前面三个阶段发生异常时才会触发。</p>
 <h2 id="核心过滤器"><a href="#核心过滤器" class="headerlink" title="核心过滤器"></a>核心过滤器</h2><h2 id="动态路由"><a href="#动态路由" class="headerlink" title="动态路由"></a>动态路由</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">// pom</div><div class="line">&lt;dependencies&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-cloud-starter-zuul&lt;/artifactId&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-cloud-starter-config&lt;/artifactId&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-cloud-starter-eureka&lt;/artifactId&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">&lt;/dependencies&gt;</div><div class="line"></div><div class="line">@EnableZuulProxy</div><div class="line">@SpringCloudApplication</div><div class="line">public class Application &#123;</div><div class="line">    public static void main(String[] args) &#123;</div><div class="line">        new SpringApplicationBuilder(Application.class).web(<span class="literal">true</span>).run(args);</div><div class="line">    &#125;</div><div class="line">    @RefreshScope</div><div class="line">    @ConfigurationProperties(<span class="string">"zuul"</span>)</div><div class="line">    public ZuulProperties <span class="function"><span class="title">zuulProperties</span></span>()&#123;</div><div class="line">      <span class="built_in">return</span> new ZuulProperties();</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">spring.application.name=api-gateway</div><div class="line">server.port=5555</div><div class="line">spring.cloud.config.uri=http://localhost:7001/</div><div class="line">eureka.client.serviceUrl.defaultZone=http://localhost:1111/eureka/</div></pre></td></tr></table></figure>
-<p>在git仓库上增加网关配置文件<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">zuul.routes.a.path=/a/**</div><div class="line">zuul.routes.a.url=ribbon-consumer</div><div class="line"></div><div class="line">zuul.routes.b.path=/b/**</div><div class="line">zuul.routes.b.url=feign-consumer</div></pre></td></tr></table></figure></p>
+<p>在git仓库上增加网关配置文件,api-gateway.properties<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">zuul.routes.a.path=/a/**</div><div class="line">zuul.routes.a.url=ribbon-consumer</div><div class="line">zuul.routes.b.path=/b/**</div><div class="line">zuul.routes.b.url=feign-consumer</div></pre></td></tr></table></figure></p>
 
       
     </div>
@@ -408,6 +431,14 @@
 
     <footer class="post-footer">
       
+        <div class="post-tags">
+          
+            <a href="/tags/zuul/" rel="tag"># zuul</a>
+          
+            <a href="/tags/feign/" rel="tag"># feign</a>
+          
+        </div>
+      
 
       
         
@@ -426,6 +457,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/01/23/sql优化大全/" rel="prev" title="sql优化大全">
+                sql优化大全 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -497,7 +532,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">51</span>
+                <span class="site-state-item-count">52</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -508,7 +543,7 @@
             
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
-                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-count">15</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -519,7 +554,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">22</span>
+                <span class="site-state-item-count">25</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

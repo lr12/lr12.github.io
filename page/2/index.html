@@ -273,6 +273,286 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/26/java并发编程前三章/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="李睿">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/26/java并发编程前三章/" itemprop="url">java并发编程前三章</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-26T17:08:19+08:00">
+                2017-12-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java并发编程艺术读书笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">java并发编程艺术读书笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="并发编程的挑战"><a href="#并发编程的挑战" class="headerlink" title="并发编程的挑战"></a>并发编程的挑战</h1><h2 id="上下文切换"><a href="#上下文切换" class="headerlink" title="上下文切换"></a>上下文切换</h2><p>即使是单核也支持多线程执行代码，cpu通过给每个线程分配cpu时间片来实现这个机制。时间片是cpu分配给每个线程的时间，因为时间片非常短，所以cpu通过不停地切换线程执行，让我们感觉多个线程是同时执行，时间片一般是几十毫秒。<br>CPU通过时间片分配算法来循环执行任务，当前任务执行一个时间片后会切换到下一个任务。但是，在切换前会保存上一个任务的状态，以便下次切换回这个任务时，可以再加载这个任务的状态。所以任务从保存到再加载的过程就是一次上下文切换。</p>
+<h3 id="多线程一定快吗"><a href="#多线程一定快吗" class="headerlink" title="多线程一定快吗"></a>多线程一定快吗</h3><p>当并发执行累加操作不超过百万次时，速度会比串行执行累加操作要慢。那么，为什么并发执行的速度会比串行慢呢？这是因为线程有创建和上下文切换的开销。</p>
+<h3 id="测试上下文切换的次数"><a href="#测试上下文切换的次数" class="headerlink" title="测试上下文切换的次数"></a>测试上下文切换的次数</h3><p>使用Lmbench3可以测量上下文切换的时长，使用vmstat可以测量上下文切换的次数。</p>
+<h3 id="如何减少上下文切换"><a href="#如何减少上下文切换" class="headerlink" title="如何减少上下文切换"></a>如何减少上下文切换</h3><p>减少上下文切换的方法有无锁并发编程、CAS算法、使用最少线程和使用协程。<br>·无锁并发编程。多线程竞争锁时，会引起上下文切换，所以多线程处理数据时，可以用一些办法来避免使用锁，如将数据的ID按照Hash算法取模分段，不同的线程处理不同段的数据。<br>·CAS算法。Java的Atomic包使用CAS算法来更新数据，而不需要加锁。<br>·使用最少线程。避免创建不需要的线程，比如任务很少，但是创建了很多线程来处理，这样会造成大量线程都处于等待状态。<br>·协程：在单线程里实现多任务的调度，并在单线程里维持多个任务间的切换。</p>
+<h3 id="减少上下文切换实战"><a href="#减少上下文切换实战" class="headerlink" title="减少上下文切换实战"></a>减少上下文切换实战</h3><p>第一步用jstack命令dump线程信息<br>第二步统计所有线程分别处于什么状态<br>第三步打开dump文件查看处于waiting的线程在做什么<br>第四步根据查看发现很多线程都在waiting，调整线程池配置<br>第五步重启服务器再统计</p>
+<h2 id="死锁"><a href="#死锁" class="headerlink" title="死锁"></a>死锁</h2><p>避免死锁的方法：<br>避免一个线程同时获得多个锁；<br>避免一个锁内同时占用多个资源，尽量保证一个锁只占用一个资源<br>尝试使用定时锁来代替内部锁机制,lock.tryLock(timeout)<br>对于数据库操作，加锁和解锁必须在一个数据库的连接里，否则会出现解锁失败的现象</p>
+<h2 id="资源限制的挑战"><a href="#资源限制的挑战" class="headerlink" title="资源限制的挑战"></a>资源限制的挑战</h2><h3 id="什么是资源限制"><a href="#什么是资源限制" class="headerlink" title="什么是资源限制"></a>什么是资源限制</h3><p>资源限制是指在进行并发编程时，程序的执行速度受限于计算机硬件资源或者软件资源。例如带宽的上传下载速度、硬盘读写速度和cpu的处理速度。软件资源限制有数据库连接数和socket的连接数</p>
+<h3 id="资源限制带来的问题"><a href="#资源限制带来的问题" class="headerlink" title="资源限制带来的问题"></a>资源限制带来的问题</h3><p>资源限制引发的问题导致并发可能不会加快，反而变慢，原因在于增加了上下文的切换和资源调度的时间</p>
+<h3 id="如何解决资源限制问题"><a href="#如何解决资源限制问题" class="headerlink" title="如何解决资源限制问题"></a>如何解决资源限制问题</h3><p>对于硬件资源限制，可以考虑使用集群并行执行程序。对于软件资源限制可以使用线程池将socket和数据库连接复用，或者在调用对方webservice接口获取数据时</p>
+<h3 id="在资源限制情况下进行并发编程"><a href="#在资源限制情况下进行并发编程" class="headerlink" title="在资源限制情况下进行并发编程"></a>在资源限制情况下进行并发编程</h3><p>根据不同的资源限制调整程序的并发度，比如下载文件程序依赖于两个资源——带宽和硬盘读写速度。有数据库操作时，涉及数据库连接数，如果SQL语句执行非常快，而线程的数量比数据库连接数大很多，则某些线程会被阻塞，等待数据库连接</p>
+<h1 id="java并发机制的底层实现原理"><a href="#java并发机制的底层实现原理" class="headerlink" title="java并发机制的底层实现原理"></a>java并发机制的底层实现原理</h1><h2 id="volatile的应用"><a href="#volatile的应用" class="headerlink" title="volatile的应用"></a>volatile的应用</h2><p>volatile是轻量级的synchronized，它在多处理器开发中保证了共享变量的“可见性”。可见性的意思是当一个线程修改一个共享变量时，另外一个线程能读到这个修改的值。如果volatile变量修饰符使用恰当的话，它比synchronized的使用和执行成本更低，因为它不会引起线程上下文的切换和调度。</p>
+<h3 id="定义及其实现原理"><a href="#定义及其实现原理" class="headerlink" title="定义及其实现原理"></a>定义及其实现原理</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">instance = new Singleton();//instance是volatile变量</div><div class="line">//汇编</div><div class="line">0x01a3de1d: movb \<span class="variable">$0</span>×0,0×1104800(%esi);0x01a3de24: lock addl \<span class="variable">$0</span>×0,(%esp);</div></pre></td></tr></table></figure>
+<p>lock指令会在多核处理器引发两件事情：</p>
+<ol>
+<li>将当前的缓存处理器缓存行的数据写回到系统内存</li>
+<li>这个写回内存的操作会使其他cpu缓存该地内存址的数据无效</li>
+</ol>
+<p><em>缓存一致性协议：在多处理器中，为了保证各个处理器的缓存是一致的，就会实现缓存一致性，每个处理器会通过嗅探在总线传播过来的数据来检查自己缓存的数据是否过期，当处理器发现自己缓存行对应的内存地址被修改时，就会将自己的缓存状态设为失效状态，当处理器对这个数据进行访问时，就会重新从系统内存中把数据读到处理器缓存中。</em></p>
+<h3 id="volatile的使用优化"><a href="#volatile的使用优化" class="headerlink" title="volatile的使用优化"></a>volatile的使用优化</h3><p>Linked-TransferQueue，它在使用volatile变量时，用一种追加字节的方式来优化队列出队和入队的性能<br>一个对象的引用占4个字节，它追加了15个变量（共占60个字节），再加上父类的value变量，一共64个字节。<br>为什么追加64字节能够提高并发编程的效率呢？因为对于英特尔酷睿i7、酷睿、Atom和NetBurst，以及Core Solo和Pentium M处理器的L1、L2或L3缓存的高速缓存行是64个字节宽，不支持部分填充缓存行，这意味着，如果队列的头节点和尾节点都不足64字节的话，处理器会将它们都读到同一个高速缓存行中，在多处理器下每个处理器都会缓存同样的头、尾节点，当一个处理器试图修改头节点时，会将整个缓存行锁定，那么在缓存一致性机制的作用下，会导致其他处理器不能访问自己高速缓存中的尾节点，而队列的入队和出队操作则需要不停修改头节点和尾节点，所以在多处理器的情况下将会严重影响到队列的入队和出队效率。Doug lea使用追加到64字节的方式来填满高速缓冲区的缓存行，避免头节点和尾节点加载到同一个缓存行，使头、尾节点在修改时不会互相锁定。那么是不是在使用volatile变量时都应该追加到64字节呢？不是的。在两种场景下不应该使用这种方式。<br>·缓存行非64字节宽的处理器。如P6系列和奔腾处理器，它们的L1和L2高速缓存行是32个字节宽。<br>·共享变量不会被频繁地写。因为使用追加字节的方式需要处理器读取更多的字节到高速缓冲区，这本身就会带来一定的性能消耗，如果共享变量不被频繁写的话，锁的几率也非常小，就没必要通过追加字节的方式来避免相互锁定。</p>
+<h2 id="synchronized的实现原理与应用"><a href="#synchronized的实现原理与应用" class="headerlink" title="synchronized的实现原理与应用"></a>synchronized的实现原理与应用</h2><p>java中每一个对象都可以成为锁，具体表现形式如下：<br>对于普通的同步方法，锁是当前实例对象<br>对于静态的同步方法，锁是当前类的class对象<br>对于同步方法快，锁是Sychronized括号里配置的对象。<br>JVM基于进入和退出monitor对象实现方法同步和代码块同步，但两个实现细节不一样，代码块同步是通过monitorenter和monitorexit指令实现，方法同步使用另一种方式。<br>monitorenter指令是在编译后插入到同步代码块的开始位置，而monitorexit是插入到方法结束处和异常处，JVM要保证每个monitorenter必须有对应的monitorexit与之配对。任何对象都有一个monitor与之关联，当且一个monitor被持有后，它将处于锁定状态。线程执行到monitorenter指令时，将会尝试获取对象所对应的monitor的所有权，即尝试获得对象的锁。</p>
+<h3 id="java对象头"><a href="#java对象头" class="headerlink" title="java对象头"></a>java对象头</h3><p>synchronized用的锁是存在java对象头里。如果对象是数组类型，则虚拟机用3个字宽存储对象头，如果非数组，用2字宽存储对象头。<br><img src="/2017/12/26/java并发编程前三章/java对象头.png" alt=""></p>
+<p><img src="/2017/12/26/java并发编程前三章/锁状态.png" alt=""></p>
+<h3 id="锁升级与对比"><a href="#锁升级与对比" class="headerlink" title="锁升级与对比"></a>锁升级与对比</h3><p>java SE1.6中锁一共有四种状态，从低到高依次是：无锁状态、偏向锁状态、轻量锁状态、重量级锁状态。锁可以升级但不能降级，意味着偏向锁升级成轻量级锁后不能降级成偏向锁。这种锁升级却不能降级的策略，目的是为了提高获得锁和释放锁的效率。</p>
+<h4 id="偏向锁"><a href="#偏向锁" class="headerlink" title="偏向锁"></a>偏向锁</h4><p>大多数情况下，锁不仅不存在多线程竞争，而且总是由同一线程多次获得，为了让线程获得锁的代价更低而引入了偏向锁。当一个线程访问同步块并获取锁时，会在对象头和栈帧中的锁记录里存储锁偏向的线程ID，以后该线程在进入和退出同步块时不需要进行CAS操作来加锁和解锁，只需简单地测试一下对象头的Mark Word里是否存储着指向当前线程的偏向锁。如果测试成功，表示线程已经获得了锁。如果测试失败，则需要再测试一下Mark Word中偏向锁的标识是否设置成1（表示当前是偏向锁）：如果没有设置，则使用CAS竞争锁；如果设置了，则尝试使用CAS将对象头的偏向锁指向当前线程。</p>
+<h5 id="偏向锁的撤销"><a href="#偏向锁的撤销" class="headerlink" title="偏向锁的撤销"></a>偏向锁的撤销</h5><p>偏向锁使用了一种等到竞争出现才释放锁的机制，所以当其他线程尝试竞争偏向锁时，持有偏向锁的线程才会释放锁。偏向锁的撤销，需要等待全局安全点（在这个时间点上没有正在执行的字节码）。它会首先暂停拥有偏向锁的线程，然后检查持有偏向锁的线程是否活着，如果线程不处于活动状态，则将对象头设置成无锁状态；如果线程仍然活着，拥有偏向锁的栈会被执行，遍历偏向对象的锁记录，栈中的锁记录和对象头的Mark Word要么重新偏向于其他线程，要么恢复到无锁或者标记对象不适合作为偏向锁，最后唤醒暂停的线程。</p>
+<h5 id="关闭锁"><a href="#关闭锁" class="headerlink" title="关闭锁"></a>关闭锁</h5><p>偏向锁在Java 6和Java 7里是默认启用的，但是它在应用程序启动几秒钟之后才激活，如有必要可以使用JVM参数来关闭延迟：-XX:BiasedLockingStartupDelay=0。如果你确定应用程序里所有的锁通常情况下处于竞争状态，可以通过JVM参数关闭偏向锁：-XX:-UseBiasedLocking=false，那么程序默认会进入轻量级锁状态。</p>
+<h4 id="轻量级锁"><a href="#轻量级锁" class="headerlink" title="轻量级锁"></a>轻量级锁</h4><h5 id="加锁"><a href="#加锁" class="headerlink" title="加锁"></a>加锁</h5><p>线程在执行同步块之前，JVM会先在当前线程的栈桢中创建用于存储锁记录的空间，并将对象头中的Mark Word复制到锁记录中，官方称为Displaced Mark Word。然后线程尝试使用CAS将对象头中的Mark Word替换为指向锁记录的指针。如果成功，当前线程获得锁，如果失败，表示其他线程竞争锁，当前线程便尝试使用自旋来获取锁。</p>
+<h5 id="解锁"><a href="#解锁" class="headerlink" title="解锁"></a>解锁</h5><p>轻量级解锁时，会使用原子的CAS操作将Displaced Mark Word替换回到对象头，如果成功，则表示没有竞争发生。如果失败，表示当前锁存在竞争，锁就会膨胀成重量级锁。<br>因为自旋会消耗CPU，为了避免无用的自旋（比如获得锁的线程被阻塞住了），一旦锁升级成重量级锁，就不会再恢复到轻量级锁状态。当锁处于这个状态下，其他线程试图获取锁时，都会被阻塞住，当持有锁的线程释放锁之后会唤醒这些线程，被唤醒的线程就会进行新一轮的夺锁之争。</p>
+<h3 id="锁的优缺点对比"><a href="#锁的优缺点对比" class="headerlink" title="锁的优缺点对比"></a>锁的优缺点对比</h3><table>
+<thead>
+<tr>
+<th>锁</th>
+<th>优点</th>
+<th>缺点</th>
+<th>场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>偏向锁</td>
+<td>加锁和解锁不需要额外的消耗，和执行非同步方法相比仅存在纳秒级的差距</td>
+<td>如果进程间存在着锁竞争会带来额外的锁撤销的消耗</td>
+<td>适用于只有一个线程访问同步块场景</td>
+</tr>
+<tr>
+<td>轻量级锁</td>
+<td>竞争的线程不会阻塞，提高了程序的响应速度</td>
+<td>如果始终得不到锁竞争的线程，使用自旋消耗cpu</td>
+<td>追求响应时间，同步块执行速度非常快</td>
+</tr>
+<tr>
+<td>重量级锁</td>
+<td>线程使用不使用自旋，不用消耗cpu</td>
+<td>线程阻塞，响应速度非常慢</td>
+<td>追求吞吐量。同步块执行时间较长</td>
+</tr>
+</tbody>
+</table>
+<h2 id="原子操作实现原理"><a href="#原子操作实现原理" class="headerlink" title="原子操作实现原理"></a>原子操作实现原理</h2><p>原子操作意为不可被中断的一个或一系列操作</p>
+<h3 id="术语定义"><a href="#术语定义" class="headerlink" title="术语定义"></a>术语定义</h3><p>缓存行、比较并交换、cpu流水线、内存顺序冲突</p>
+<h3 id="处理器实现原子操作"><a href="#处理器实现原子操作" class="headerlink" title="处理器实现原子操作"></a>处理器实现原子操作</h3><p>处理器通过总线锁定和缓存锁定两个机制来保证复杂内存操作的原子性</p>
+<h4 id="使用总线锁保证原子性"><a href="#使用总线锁保证原子性" class="headerlink" title="使用总线锁保证原子性"></a>使用总线锁保证原子性</h4><p>总线锁就是使用处理器提供的一个lock信号，当一个总线输出此信号时，其他处理器的请求将会被阻塞住，那么该处理器就可以独占共享内存。</p>
+<h4 id="使用缓存锁保证原子性"><a href="#使用缓存锁保证原子性" class="headerlink" title="使用缓存锁保证原子性"></a>使用缓存锁保证原子性</h4><p>缓存锁定是内存区域如果被缓存在处理器的缓存行中，并且在lock操作期间被锁定，那么当它执行锁操作回写到内存时，处理器不在总线上声言lock信号，而是修改内部的内存地址，并允许它的缓存一致性机制来保证操作的原子性，因为缓存一致性会阻止同时修改由两个以上的处理器缓存的内存区域数据，当其他处理器回写已被锁定的缓存行的数据时，会使缓存行无效。<br>但是有两种情况下处理器不会使用缓存锁定。<br>第一种情况是：当操作的数据不能被缓存在处理器内部，或操作的数据跨多个缓存行（cache line）时，则处理器会调用总线锁定。<br>第二种情况是：有些处理器不支持缓存锁定。对于Intel 486和Pentium处理器，就算锁定的内存区域在处理器的缓存行中也会调用总线锁定。</p>
+<h4 id="java如何实现原子操作"><a href="#java如何实现原子操作" class="headerlink" title="java如何实现原子操作"></a>java如何实现原子操作</h4><p>java中可以通过使用锁和cas实现原子操作<br>1.使用循环cas操作<br>2.cas实现原子操作的三大问题</p>
+<ul>
+<li>A-&gt;B-&gt;A问题<br>解决思路是使用版本号，在变量前面追加版本号，每次变量改变版本号加一。这个<br>类的compareAndSet方法的作用是首先检查当前引用是否等于预期引用，并且检查当前标志是否等于预期标志，如果全部相等，则以原子方式将该引用和该标志的值设置为给定的更新值。</li>
+<li>循环时间长开销大<br>自旋CAS如果长时间不成功，会给CPU带来非常大的执行开销。如果JVM能支持处理器提供的pause指令，那么效率会有一定的提升。pause指令有两个作用：第一，它可以延迟流水线执行指令（de-pipeline），使CPU不会消耗过多的执行资源，延迟的时间取决于具体实现的版本，在一些处理器上延迟时间是零；第二，它可以避免在退出循环的时候因内存顺序冲突（Memory Order Violation）而引起CPU流水线被清空（CPU Pipeline Flush），从而提高CPU的执行效率。</li>
+<li>只能保证一个共享变量的原子操作<br>当对一个共享变量执行操作时，我们可以使用循环CAS的方式来保证原子操作，但是对多个共享变量操作时，循环CAS就无法保证操作的原子性，这个时候就可以用锁。</li>
+</ul>
+<p>3.使用锁机制实现原子操作<br>锁机制保证了只有获得锁的线程才能够操作锁定的内存区域。JVM内部实现了很多种锁机制，有偏向锁、轻量级锁和互斥锁。</p>
+<h1 id="java内存模型"><a href="#java内存模型" class="headerlink" title="java内存模型"></a>java内存模型</h1><h2 id="java内存查询的基础"><a href="#java内存查询的基础" class="headerlink" title="java内存查询的基础"></a>java内存查询的基础</h2><h3 id="并发编程模型的两个关键问题"><a href="#并发编程模型的两个关键问题" class="headerlink" title="并发编程模型的两个关键问题"></a>并发编程模型的两个关键问题</h3><p>两个关键问题：线程之间如何通信以及线程之间如何同步。线程之间的通信机制有两种：共享内存和消息传递。<br>在共享内存的并发模型中，线程之间共享程序的公共状态，通过写-读内存中的公共状态进行隐性通信。在消息传递的并发模型中，线程没有公共状态，线程必须通过发送信息来显性通信。<br>同步是指程序中用于控制不同线程间操作发生相对顺序的机制。在共享内存并发模型里，同步是显式进行的。程序员必须显式指定某个方法或某段代码需要在线程之间互斥执行。在消息传递的并发模型里，由于消息的发送必须在消息的接收之前，因此同步是隐式进行的。<br>Java的并发采用的是共享内存模型，Java线程之间的通信总是隐式进行，整个通信过程对程序员完全透明。</p>
+<h3 id="java内存模型的抽象结构"><a href="#java内存模型的抽象结构" class="headerlink" title="java内存模型的抽象结构"></a>java内存模型的抽象结构</h3><p>在java中，所有实例域、静态域和数组元素都存储在堆内存中，堆内存在线程间共享。局部变量、方法定义参数和异常处理器参数不会在线程之间共享，它们不会有内存可见性问题。也不受内存模型的影响。<br>java线程的通信由java内存模型(JMM)控制，JMM决定了一个线程对共享变量的写入何时对另一个线程可见。从抽象的角度看，JMM定义了线程和主内存之间的抽象关系：线程之间的共享变量存储在主内存中，每个线程都有一个私有的本地内存，本地内存中存储了该线程以读/写的共享变量的副本。本地内存是JMM的一个抽象概念，并不真实存在。它涵盖了缓存、写缓冲区、寄存器以及其他的硬件和编译器优化。<br><img src="/2017/12/26/java并发编程前三章/java内存模型.png" alt=""><br>如果线程A与线程B之间要通信的话，必须要经历下面2个步骤。<br>1）线程A把本地内存A中更新过的共享变量刷新到主内存中去。<br>2）线程B到主内存中去读取线程A之前已更新过的共享变量。<br><img src="/2017/12/26/java并发编程前三章/线程通信.png" alt=""><br>本地内存A和本地内存B由主内存中共享变量x的副本。假设初始时，这3个内存中的x值都为0。线程A在执行时，把更新后的x值（假设值为1）临时存放在自己的本地内存A中。当线程A和线程B需要通信时，线程A首先会把自己本地内存中修改后的x值刷新到主内存中，此时主内存中的x值变为了1。随后，线程B到主内存中去读取线程A更新后的x值，此时线程B的本地内存的x值也变为了1。<br>从整体来看，这两个步骤实质上是线程A在向线程B发送消息，而且这个通信过程必须要经过主内存。JMM通过控制主内存与每个线程的本地内存之间的交互，来为Java程序员提供内存可见性保证。</p>
+<h3 id="从源代码到指令序列的重排序"><a href="#从源代码到指令序列的重排序" class="headerlink" title="从源代码到指令序列的重排序"></a>从源代码到指令序列的重排序</h3><p>重排序分为三类：<br>1）编译器优化的重排序。编译器在不改变单线程程序语义的前提下，可以重新安排语句的执行顺序。<br>2）指令级并行的重排序。现代处理器采用了指令级并行技术（Instruction-Level Parallelism，ILP）来将多条指令重叠执行。如果不存在数据依赖性，处理器可以改变语句对应机器指令的执行顺序。<br>3）内存系统的重排序。由于处理器使用缓存和读/写缓冲区，这使得加载和存储操作看上去可能是在乱序执行。<br><img src="/2017/12/26/java并发编程前三章/重排序.png" alt=""><br>1属于编译器重排序，2和3属于处理器重排序。这些重排序可能会导致多线程程序出现内存可见性问题。对于编译器，JMM的编译器重排序规则会禁止特定类型的编译器重排序（不是所有的编译器重排序都要禁止）。对于处理器重排序，JMM的处理器重排序规则会要求Java编译器在生成指令序列时，插入特定类型的内存屏障（Memory Barriers，Intel称之为Memory Fence）指令，通过内存屏障指令来禁止特定类型的处理器重排序。</p>
+<h3 id="并发编程模型的分类"><a href="#并发编程模型的分类" class="headerlink" title="并发编程模型的分类"></a>并发编程模型的分类</h3><p>现代处理器使用写缓冲区临时保存向内存写入的数据。写缓冲区可以保证指令流水线持续运行，它可以避免由于处理器停顿下来等待向内存写入数据而产生延迟。同时，通过以批处理的方式刷新写缓冲区，以及合并写缓冲区中对同一内存地址的多次写，减少对内存总线的占用。虽然写缓冲区有这么多好处，但每个处理器上的写缓冲区，仅仅对它所在的处理器可见。</p>
+<h3 id="happens-before简介"><a href="#happens-before简介" class="headerlink" title="happens-before简介"></a>happens-before简介</h3><p>在JMM中，如果一个操作执行结果需要对另一个操作可见，那么这两个操作必须存在happens-before关系。这里提到的两个操作可以是一个线程内，也可以是不同线程间。<br>·程序顺序规则：一个线程中的每个操作，happens-before于该线程中的任意后续操作。<br>·监视器锁规则：对一个锁的解锁，happens-before于随后对这个锁的加锁。<br>·volatile变量规则：对一个volatile域的写，happens-before于任意后续对这个volatile域的读。<br>·传递性：如果A happens-before B，且B happens-before C，那么A happens-before C。</p>
+<h2 id="重排序"><a href="#重排序" class="headerlink" title="重排序"></a>重排序</h2><p>重排序是指编译器和处理器为了优化程序性能而对指令序列进行重新排序的一种手段。</p>
+<h3 id="数据依赖性"><a href="#数据依赖性" class="headerlink" title="数据依赖性"></a>数据依赖性</h3><p>如果两个操作访问一个变量，且这两个操作有一个是写操作，那么这两个操作就存在数据依赖性。<br>编译器和处理器可能会对操作做重排序。编译器和处理器在重排序时，会遵守数据依赖性，编译器和处理器不会改变存在数据依赖关系的两个操作的执行顺序。<br>这里所说的数据依赖性仅针对单个处理器中执行的指令序列和单个线程中执行的操作，不同处理器之间和不同线程之间的数据依赖性不被编译器和处理器考虑。</p>
+<h3 id="as-if-serial语义"><a href="#as-if-serial语义" class="headerlink" title="as if serial语义"></a>as if serial语义</h3><p>不管怎么重排序，程序的执行结果不能被改变。</p>
+<h3 id="程序顺序规则"><a href="#程序顺序规则" class="headerlink" title="程序顺序规则"></a>程序顺序规则</h3><h3 id="重排序对多线程的影响"><a href="#重排序对多线程的影响" class="headerlink" title="重排序对多线程的影响"></a>重排序对多线程的影响</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">int a=0;</div><div class="line">boolean flag=<span class="literal">false</span>;</div><div class="line">public void <span class="function"><span class="title">writer</span></span>()&#123;</div><div class="line">  a=1;</div><div class="line">  flag=<span class="literal">true</span>;</div><div class="line">&#125;</div><div class="line">public void <span class="function"><span class="title">reader</span></span>()&#123;</div><div class="line">  <span class="keyword">if</span>(flag)&#123;</div><div class="line">    int i=a*a;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这里假设有两个线程A和B，A首先执行writer()方法，随后B线程接着执行reader()方法.这时B不一定能观察到线程A的写入。因为两个线程之间没有数据依赖性。</p>
+<h2 id="顺序一致性"><a href="#顺序一致性" class="headerlink" title="顺序一致性"></a>顺序一致性</h2><h3 id="数据竞争与顺序一致性"><a href="#数据竞争与顺序一致性" class="headerlink" title="数据竞争与顺序一致性"></a>数据竞争与顺序一致性</h3><p>数据竞争：在一个线程中写一个变量、在另一个线程中读一个变量、而且写和读之间没有通过同步来排序。<br>如果程序是正确同步的，程序的执行将具有顺序一致性——即程序的执行结果与该程序在顺序一致性内存模型中的执行结果相同。</p>
+<h3 id="顺序一致性内存模型"><a href="#顺序一致性内存模型" class="headerlink" title="顺序一致性内存模型"></a>顺序一致性内存模型</h3><p>两大特性：1.一个线程内的所有操作必须按照程序的顺序来执行。2.所有线程只能看到单一的操作执行顺序。在顺序一致性模型中，每个操作都必须原子执行且立刻对所有线程可见。<br>顺序一致性模型有一个单一的全局内存，这个内存通过一个左右摇摆的开关可以连接到任意一个线程，同时每个线程都按照程序的顺序执行内存的读写操作。<br>未同步程序在顺序一致性模型中虽然整体执行顺序是无序的，但所有线程都只能看到一个一致的整体执行顺序。但是，在JMM中就没有这个保证。未同步程序在JMM中不但整体的执行顺序是无序的，而且所有线程看到的操作执行顺序也可能不一致。比如，在当前线程把写过的数据缓存在本地内存中，在没有刷新到主内存之前，这个写操作仅对当前线程可见；从其他线程的角度来观察，会认为这个写操作根本没有被当前线程执行。只有当前线程把本地内存中写过的数据刷新到主内存之后，这个写操作才能对其他线程可见。在这种情况下，当前线程和其他线程看到的操作执行顺序将不一致。</p>
+<h3 id="同步程序的顺序一致性模型"><a href="#同步程序的顺序一致性模型" class="headerlink" title="同步程序的顺序一致性模型"></a>同步程序的顺序一致性模型</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">int a=0;</div><div class="line">boolean flag=<span class="literal">false</span>;</div><div class="line">public synchronized void <span class="function"><span class="title">writer</span></span>()&#123;</div><div class="line">  a=1;</div><div class="line">  flag=<span class="literal">true</span>;</div><div class="line">&#125;</div><div class="line">public synchronized void <span class="function"><span class="title">reader</span></span>()&#123;</div><div class="line">  <span class="keyword">if</span>(flag)&#123;</div><div class="line">    int i=a*a;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>顺序一致性模型中，所有操作完全按程序的顺序串行执行。而在JMM中，临界区内的代码可以重排序（但JMM不允许临界区内的代码“逸出”到临界区之外，那样会破坏监视器的语义）。JMM会在退出临界区和进入临界区这两个关键时间点做一些特别处理，使得线程在这两个时间点具有与顺序一致性模型相同的内存视图（具体细节后文会说明）。虽然线程A在临界区内做了重排序，但由于监视器互斥执行的特性，这里的线程B根本无法“观察”到线程A在临界区内的重排序。这种重排序既提高了执行效率，又没有改变程序的执行结果。<br>JMM在具体实现上的基本方针为：在不改变（正确同步的）程序执行结果的前提下，尽可能地为编译器和处理器的优化打开方便之门。</p>
+<h3 id="未同步程序的执行特性"><a href="#未同步程序的执行特性" class="headerlink" title="未同步程序的执行特性"></a>未同步程序的执行特性</h3><p>对于未同步或未正确同步的多线程程序，JMM只提供最小安全性：线程执行时读取到的值，要么是之前某个线程写入的值，要么是默认值（0，null，false）。为了实现最小安全性，JVM在堆上分配对象，域会默认初始化。<br>JMM不保证未同步程序的执行结果与该程序在顺序一致性模型中的执行结果一致。<br>未同步程序在JMM中的执行时，整体上是无序的，其执行结果无法预知。未同步程序在两个模型中的执行特性有如下几个差异。<br>1）顺序一致性模型保证单线程内的操作会按程序的顺序执行，而JMM不保证单线程内的<br>操作会按程序的顺序执行<br>2）顺序一致性模型保证所有线程只能看到一致的操作执行顺序，而JMM不保证所有线程<br>能看到一致的操作执行顺序。<br>3）JMM不保证对64位的long型和double型变量的写操作具有原子性，而顺序一致性模型保证对所有的内存读/写操作都具有原子性。</p>
+<h2 id="volatile的内存语义"><a href="#volatile的内存语义" class="headerlink" title="volatile的内存语义"></a>volatile的内存语义</h2><h3 id="volatile的特性"><a href="#volatile的特性" class="headerlink" title="volatile的特性"></a>volatile的特性</h3><p>理解volatile特性的一个好方法是把对volatile变量的单个读/写，看成是使用同一个锁对这些单个读/写操作做了同步。<br>锁的语义决定了临界区代码的执行具有原子性。这意味着，即使是64位的long型和double型变量，只要它是volatile变量，对该变量的读/写就具有原子性。如果是多个volatile操作或类似于volatile++这种复合操作，这些操作整体上不具有原子性。<br>volatile变量自身具有下列特性：<br>可见性。对一个volatile变量的读，总能看到任意线程对这个volatile变量的写入。<br>原子性。对任意单个volatile变量的读/写具有原子性。但类似volatile++这种复合操作不具有原子性。</p>
+<h3 id="volatile写-读建立的happens-before"><a href="#volatile写-读建立的happens-before" class="headerlink" title="volatile写-读建立的happens-before"></a>volatile写-读建立的happens-before</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">class VolatileExample &#123;</div><div class="line"> int a = 0;</div><div class="line"> volatile boolean flag = <span class="literal">false</span>;</div><div class="line"> public void <span class="function"><span class="title">writer</span></span>() &#123;</div><div class="line">    a = 1;　　　　　// 1</div><div class="line">    flag = <span class="literal">true</span>;　　　// 2</div><div class="line"> &#125;</div><div class="line"> public void <span class="function"><span class="title">reader</span></span>() &#123;</div><div class="line">    <span class="keyword">if</span>(flag)&#123;  //3</div><div class="line">      int i=a; //4</div><div class="line">    &#125;</div><div class="line"> &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>根据程序次序规则，1 happens-before 2;3 happens-before 4<br>根据volatile规则，2 happens-before 3<br>根据happens-before的传递性规则，1 happens-before 4</p>
+<h3 id="volatile写-读的内存语义"><a href="#volatile写-读的内存语义" class="headerlink" title="volatile写-读的内存语义"></a>volatile写-读的内存语义</h3><p>当写一个volatile变量时，JMM会把该线程对应的本地内存中的共享变量值刷新到主内存。<br>volatile的内存语义如下：当读一个volatile变量时，JMM会把该线程对应的本地内存置<br>为无效，线程接下来从主内存中读取共享变量。</p>
+<h3 id="volatile内存语义的实现"><a href="#volatile内存语义的实现" class="headerlink" title="volatile内存语义的实现"></a>volatile内存语义的实现</h3><p><img src="/2017/12/26/java并发编程前三章/重排序规则.png" alt=""><br>·当第二个操作是volatile写时，不管第一个操作是什么，都不能重排序。这个规则确保volatile写之前的操作不会被编译器重排序到volatile写之后。<br>·当第一个操作是volatile读时，不管第二个操作是什么，都不能重排序。这个规则确保volatile读之后的操作不会被编译器重排序到volatile读之前。<br>·当第一个操作是volatile写，第二个操作是volatile读时，不能重排序。<br>·在每个volatile写操作的前面插入一个StoreStore屏障。<br>·在每个volatile写操作的后面插入一个StoreLoad屏障。<br>·在每个volatile读操作的后面插入一个LoadLoad屏障。<br>·在每个volatile读操作的后面插入一个LoadStore屏障。<br><img src="/2017/12/26/java并发编程前三章/volatile写指令.png" alt=""></p>
+<p><img src="/2017/12/26/java并发编程前三章/volatile读指令.png" alt=""></p>
+<h3 id="jsr-133为什么要增强volatile语句"><a href="#jsr-133为什么要增强volatile语句" class="headerlink" title="jsr-133为什么要增强volatile语句"></a>jsr-133为什么要增强volatile语句</h3><p>严格限制编译器和处理器对volatile变量与普通变量的重排序，确保volatile的写-读和锁的释放-获取具有相同的内存语义。从编译器重排序规则和处理器内存屏障插入策略来看，只要volatile变量与普通变量之间的重排序可能会破坏volatile的内存语义，这种重排序就会被编译器重排序规则和处理器内存屏障插入策略禁止。</p>
+<h2 id="锁的内存语义"><a href="#锁的内存语义" class="headerlink" title="锁的内存语义"></a>锁的内存语义</h2><h3 id="锁的释放获取"><a href="#锁的释放获取" class="headerlink" title="锁的释放获取"></a>锁的释放获取</h3><p>锁除了让临界区互斥执行外，还可以让释放锁的线程向获取同一个锁的线程发送消息<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">class MonitorExample &#123;</div><div class="line">int a = 0;</div><div class="line">public synchronized void <span class="function"><span class="title">writer</span></span>() &#123;　　　　// 1</div><div class="line">a++;　　　　　　　　　　// 2</div><div class="line">&#125;　　　　　　　　　　　　// 3</div><div class="line">public synchronized void <span class="function"><span class="title">reader</span></span>() &#123;　　　// 4</div><div class="line">int i = a;　　　　　　　　// 5</div><div class="line">……</div><div class="line">&#125;　　　　　　　　　　　　// 6</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>假设线程A执行writer()方法，随后线程B执行reader()方法。根据happens-before规则，这个过程包含的happens-before关系可以分为3类。<br>1）根据程序次序规则，1 happens-before 2,2 happens-before 3;4 happens-before 5,5 happens-before 6。<br>2）根据监视器锁规则，3 happens-before 4。<br>3）根据happens-before的传递性，2 happens-before 5。</p>
+<h3 id="锁的释放和获取的内存语义"><a href="#锁的释放和获取的内存语义" class="headerlink" title="锁的释放和获取的内存语义"></a>锁的释放和获取的内存语义</h3><p>当线程释放锁时，JMM会把该线程对应的本地内存中的共享变量刷新到主内存中。<br>当线程获取到锁时，JMM会把该线程对应的本地内存置为无效，从而使得被监视器保护的临界区代码必须从主内存中读取共享变量。<br>总结：线程A释放一个锁，实质是线程A向接下来将要获取这个锁的某个线程发出了对共享变量所做修改的消息。线程B获取一个锁，实质是线程B接收了之前某个线程发出的（在释放这个锁之前对共享变量所做修改的）消息。<br>线程A释放锁，随后线程B获取这个锁，这个过程实质是线程A通过主内存向线程B发送消息。</p>
+<h3 id="锁内存语义的实现"><a href="#锁内存语义的实现" class="headerlink" title="锁内存语义的实现"></a>锁内存语义的实现</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">int a=0;</div><div class="line">ReentrantLock lock=new ReentrantLock();</div><div class="line">public void <span class="function"><span class="title">writer</span></span>()&#123;</div><div class="line">    lock.lock();</div><div class="line">    try&#123;</div><div class="line">       a++;</div><div class="line">    &#125;catch(Exception e)&#123;</div><div class="line"></div><div class="line">    &#125;finally&#123;</div><div class="line">      lock.unlock();</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">public void <span class="function"><span class="title">reader</span></span>()&#123;</div><div class="line">  lock.lock();</div><div class="line">  try&#123;</div><div class="line">    int i=a;</div><div class="line">  &#125;catch(Exception e)&#123;</div><div class="line"></div><div class="line">  &#125;finally&#123;</div><div class="line">    lock.unlock();</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>ReentrantLock的实现依赖于java同步器框架AbstractQueuedSynchronizer(AQS)，AQS使用一个整形的volatile(state)变量来维护同步状态。<br><img src="/2017/12/26/java并发编程前三章/ReentrantLock类图.png" alt=""><br>ReentrantLock分为公平锁和非公平锁，使用公平锁<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">ReentrantLock:lock();</div><div class="line">FairSync:lock();</div><div class="line">AbstractQueuedSynchronizer:acquire(int arg);</div><div class="line">ReentrantLock:tryAcquire(int acquire);</div><div class="line">FairSync:</div><div class="line">protected final boolean tryAcquire(int acquires) &#123;</div><div class="line">    final Thread current = Thread.currentThread();</div><div class="line">    int c = getState();</div><div class="line">    <span class="keyword">if</span>(c == 0)&#123;</div><div class="line">        <span class="keyword">if</span>(!hasQueuedPredecessors() &amp;&amp;compareAndSetState(0, acquires))&#123;</div><div class="line">            <span class="built_in">set</span>ExclusiveOwnerThread(current);</div><div class="line">            <span class="built_in">return</span> <span class="literal">true</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;<span class="keyword">else</span> <span class="keyword">if</span>(current==getExclusiveOwnerThread())&#123;</div><div class="line">      int nextc = c + acquires;</div><div class="line">      <span class="keyword">if</span>(nextc &lt; 0)</div><div class="line">          throw new Error(<span class="string">"Maximum lock count exceeded"</span>);</div><div class="line">      <span class="built_in">set</span>State(nextc);</div><div class="line">      <span class="built_in">return</span> <span class="literal">true</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="built_in">return</span> <span class="literal">false</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>加锁方法首先读volatile变量state<br>在使用公平锁时，解锁方法unlock()调用轨迹如下。<br>1）ReentrantLock:unlock()。<br>2）AbstractQueuedSynchronizer:release(int arg)。<br>3）Sync:tryRelease(int releases)。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">protected final boolean tryRelease(int releases) &#123;</div><div class="line">    int c =getState()- releases;</div><div class="line">    <span class="keyword">if</span>(Thread.currentThread()!=getExclusiveOwnerThread())</div><div class="line">        throw new IllegalMonitorStateException();</div><div class="line">    boolean free = <span class="literal">false</span>;</div><div class="line">    <span class="keyword">if</span>(c == 0) &#123;</div><div class="line">        free = <span class="literal">true</span>;</div><div class="line">        <span class="built_in">set</span>ExclusiveOwnerThread(null);</div><div class="line">    &#125;</div><div class="line">    <span class="built_in">set</span>State(c);</div><div class="line">    <span class="built_in">return</span> free;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>在释放锁的最后写volatile变量state。<br>公平锁在释放锁的最后写volatile变量state，在获取锁时首先读这个volatile变量。根据volatile的happens-before规则，释放锁的线程在写volatile变量之前可见的共享变量，在获取锁的线程读取同一个volatile变量后将立即变得对获取锁的线程可见。<br>这里仅仅分析非公平锁的获取。使用非公平锁时，加锁方法lock()调用轨迹如下。<br>1）ReentrantLock:lock()。<br>2）NonfairSync:lock()。<br>3）AbstractQueuedSynchronizer:compareAndSetState(int expect,int update)。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">protected final boolean compareAndSetState(int expect, int update) &#123;</div><div class="line"><span class="built_in">return</span> unsafe.compareAndSwapInt(this, stateOffset, expect, update);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>该方法以原子操作的方式更新state变量，本文把Java的compareAndSet()方法调用简称为CAS。JDK文档对该方法的说明如下：如果当前状态值等于预期值，则以原子方式将同步状态设置为给定的更新值。此操作具有volatile读和写的内存语义。<br>编译器不会对volatile读与volatile读后面的任意内存操作重排序；编译器不会对volatile写与volatile写前面的任意内存操作重排序。组合这两个条件，意味着为了同时实现volatile读和volatile写的内存语义，编译器不能对CAS与CAS前面和后面的任意内存操作重排序。<br>现在对公平锁和非公平锁的内存语义做个总结。<br>·公平锁和非公平锁释放时，最后都要写一个volatile变量state。<br>·公平锁获取时，首先会去读volatile变量。<br>·非公平锁获取时，首先会用CAS更新volatile变量，这个操作同时具有volatile读和volatile写的内存语义。</p>
+<h3 id="concurrent包的实现"><a href="#concurrent包的实现" class="headerlink" title="concurrent包的实现"></a>concurrent包的实现</h3><p>java的CAS同时具有volatile读和volatile写的内存语义，因此java线程之间的通信有了下面四种方式：<br>1）A线程写volatile变量，随后B线程读这个volatile变量。<br>2）A线程写volatile变量，随后B线程用CAS更新这个volatile变量。<br>3）A线程用CAS更新一个volatile变量，随后B线程用CAS更新这个volatile变量。<br>4）A线程用CAS更新一个volatile变量，随后B线程读这个volatile变量。<br>Java的CAS会使用现代处理器上提供的高效机器级别的原子指令，这些原子指令以原子方式对内存执行读-改-写操作，这是在多处理器中实现同步的关键。同时，volatile变量的读/写和CAS可以实现线程之间的通信。把这些特性整合在一起，就形成了整个concurrent包得以实现的基石。<br>首先，声明共享变量为volatile。<br>然后，使用CAS的原子条件更新来实现线程之间的同步。同时，配合以volatile的读/写和CAS所具有的volatile读和写的内存语义来实现线程之间的通信。<br>AQS，非阻塞数据结构和原子变量类（java.util.concurrent.atomic包中的类），这些concurrent包中的基础类都是使用这种模式来实现的，而concurrent包中的高层类又是依赖于这些基础类来实现的。</p>
+<h2 id="final域的内存语义"><a href="#final域的内存语义" class="headerlink" title="final域的内存语义"></a>final域的内存语义</h2><p>对final域的读和写更像是普通的变量访问。</p>
+<h3 id="重排序规则"><a href="#重排序规则" class="headerlink" title="重排序规则"></a>重排序规则</h3><p>1）在构造函数内对一个final域的写入，与随后把这个被构造对象的引用赋值给一个引用<br>变量，这两个操作之间不能重排序。<br>2）初次读一个包含final域的对象的引用，与随后初次读这个final域，这两个操作之间不能<br>重排序。</p>
+<h3 id="写final域的重排序规则"><a href="#写final域的重排序规则" class="headerlink" title="写final域的重排序规则"></a>写final域的重排序规则</h3><p>1）JMM禁止编译器把final域的写重排序到构造函数之外；<br>2）编译器会在final域写之后，构造函数return之前，插入一个storestore。这个屏障会禁止处理器把final域的写重排序到构造函数之外。<br>写final域的重排序规则可以确保：在对象引用为任意线程可见之前，对象的final域已经被正确初始化过了，而普通域不具有这个保障。</p>
+<h3 id="读final域的重排序规则"><a href="#读final域的重排序规则" class="headerlink" title="读final域的重排序规则"></a>读final域的重排序规则</h3><p>读final域的重排序规则是，在一个线程中，初次读对象引用与初次读该对象包含的final域，JMM禁止处理器重排序这两个操作（注意，这个规则仅仅针对处理器）。编译器会在读final域操作的前面插入一个LoadLoad屏障。<br>读final域的重排序规则可以确保：在读一个对象的final域之前，一定会先读包含这个final域的对象的引用。在这个示例程序中，如果该引用不为null，那么引用对象的final域一定已经被A线程初始化过了。</p>
+<h3 id="final为引用类型"><a href="#final为引用类型" class="headerlink" title="final为引用类型"></a>final为引用类型</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">public class FinalReferenceExample &#123;</div><div class="line">final int[] intArray; // final是引用类型</div><div class="line">static FinalReferenceExample obj;</div><div class="line">public <span class="function"><span class="title">FinalReferenceExample</span></span> () &#123; // 构造函数</div><div class="line">intArray = new int[1]; // 1</div><div class="line">intArray[0] = 1; // 2</div><div class="line">&#125;</div><div class="line">public static void <span class="function"><span class="title">writerOne</span></span> () &#123; // 写线程A执行</div><div class="line">obj = new FinalReferenceExample (); // 3</div><div class="line">&#125;</div><div class="line">public static void <span class="function"><span class="title">writerTwo</span></span> () &#123; // 写线程B执行</div><div class="line">obj.intArray[0] = 2; // 4</div><div class="line">&#125;</div><div class="line">public static void <span class="function"><span class="title">reader</span></span> () &#123; // 读线程C执行</div><div class="line"><span class="keyword">if</span>(obj != null) &#123; // 5</div><div class="line">int temp1 = obj.intArray[0]; // 6</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>假设首先线程A执行writerOne()方法，执行完后线程B执行writerTwo()方法，执行完后线程C执行reader()方法.JMM可以确保读线程C至少能看到写线程A在构造函数中对final引用对象的成员域的写入。即C至少能看到数组下标0的值为1。而写线程B对数组元素的写入，读线程C可能看得到，也可能看不到。JMM不保证线程B的写入对读线程C可见，因为写线程B和读线程C之间存在数据竞争，此时的执行结果不可预知。</p>
+<h3 id="为什么final引用不能从构造函数内“溢出”"><a href="#为什么final引用不能从构造函数内“溢出”" class="headerlink" title="为什么final引用不能从构造函数内“溢出”"></a>为什么final引用不能从构造函数内“溢出”</h3><p>写final域的重排序规则会要求编译器在final域的写之后，构造函数return之前插入一个StoreStore障屏。读final域的重排序规则要求编译器在读final域的操作前面插入一个LoadLoad屏障。</p>
+<h3 id="JSR-133为什么要增强final的语义"><a href="#JSR-133为什么要增强final的语义" class="headerlink" title="JSR-133为什么要增强final的语义"></a>JSR-133为什么要增强final的语义</h3><p>为了修补这个漏洞，JSR-133专家组增强了final的语义。通过为final域增加写和读重排序规则，可以为Java程序员提供初始化安全保证：只要对象是正确构造的（被构造对象的引用在构造函数中没有“逸出”），那么不需要使用同步（指lock和volatile的使用）就可以保证任意线程#都能看到这个final域在构造函数中被初始化之后的值。</p>
+<h2 id="happens-before"><a href="#happens-before" class="headerlink" title="happens-before"></a>happens-before</h2><h3 id="JMM的设计"><a href="#JMM的设计" class="headerlink" title="JMM的设计"></a>JMM的设计</h3><p>JMM目标：一方面，要为程序员提供足够强的内存可见性保证；另一方面，对编译器和处理器的限制要尽可能地放松。<br>JMM保证两点：</p>
+<ol>
+<li>JMM向程序员提供的happens-before能够保证程序员的需求。JMM的happens-before规则不但简单且易懂，而且向程序员提供了足够强的内存可见性保证。</li>
+<li>JMM对编译器和处理器的束缚已经尽可能少。从上面的分析可以看出，JMM其实在遵循一个基本原则：只要不改变程序的执行结果，编译器和处理器怎么优化都可以。例如，如果编译器经过细致的分析后，认定一个锁只会被单个线程访问，那么这个锁可以被消除。再如，如果编译器经过细致的分析后，认定一个volatile变量只会被单个线程访问，那么编译器可以把这个volatile变量当作一个普通变量来对待。这些优化既不会改变程序的执行结果，又能提高程序的执行效率。</li>
+</ol>
+<h3 id="happens-before的定义"><a href="#happens-before的定义" class="headerlink" title="happens-before的定义"></a>happens-before的定义</h3><p>1）如果一个操作happens-before另一个操作，那么第一个操作的执行结果将对第二个操作可见，而且第一个操作执行顺序排在第二个操作之前。<br>2）两个操作之间存在着happens-before关系，并不意味着java平台具体实现按照happens-before关系指定的顺序来执行。如果重排序的执行结果与按照happens-before关系执行的结果一致，那么这种重排序并不非法。<br>上面的1）是JMM对程序员的承诺。从程序员的角度来说，可以这样理解happens-before关系：如果A happens-before B，那么Java内存模型将向程序员保证——A操作的结果将对B可见，且A的执行顺序排在B之前。<br>上面的2）是JMM对编译器和处理器重排序的约束原则。正如前面所言，JMM其实是在遵循一个基本原则：只要不改变程序的执行结果（指的是单线程程序和正确同步的多线程程序），编译器和处理器怎么优化都行。JMM这么做的原因是：程序员对于这两个操作是否真的被重排序并不关心，程序员关心的是程序执行时的语义不能被改变（即执行结果不能被改变）。因此，happens-before关系本质上和as-if-serial语义是一回事。<br>·as-if-serial语义保证单线程内程序的执行结果不被改变，happens-before关系保证正确同步的多线程程序的执行结果不被改变。<br>·as-if-serial语义给编写单线程程序的程序员创造了一个幻境：单线程程序是按程序的顺序来执行的。happens-before关系给编写正确同步的多线程程序的程序员创造了一个幻境：正确同步的多线程程序是按happens-before指定的顺序来执行的。</p>
+<h3 id="happens-before规则"><a href="#happens-before规则" class="headerlink" title="happens-before规则"></a>happens-before规则</h3><ol>
+<li>程序顺序规则：一个程序的每个操作，happens-before与该线程的任意后续操作。</li>
+<li>监视器锁规则：对一个锁的解锁，happens-before于随后对这个锁的加锁。</li>
+<li>volatile变量规则：对一个volatile域的写，happens-before与后续对这个volatile的读</li>
+<li>传递性：如果A happens-before B，且B happens-before C，那么A happens-before C。</li>
+<li>start规则：如果线程A执行操作ThreadB.start,那么A线程的start操作happens-before线程B的任何操作。</li>
+<li>join规则：如果线程A执行操作ThreadB.join()并成功返回，那么线程B中的任意操作happens-before于线程A从ThreadB.join()操作成功返回。</li>
+</ol>
+<h2 id="双重检查锁和延迟初始化"><a href="#双重检查锁和延迟初始化" class="headerlink" title="双重检查锁和延迟初始化"></a>双重检查锁和延迟初始化</h2><p>在Java多线程程序中，有时候需要采用延迟初始化来降低初始化类和创建对象的开销。双重检查锁定是常见的延迟初始化技术，但它是一个错误的用法。</p>
+<h3 id="双重锁检查锁定的由来"><a href="#双重锁检查锁定的由来" class="headerlink" title="双重锁检查锁定的由来"></a>双重锁检查锁定的由来</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">public class Singleton&#123;</div><div class="line">    private static Singleton single;</div><div class="line">    public synchronized static Singleton <span class="function"><span class="title">getSingleton</span></span>()&#123;</div><div class="line">      <span class="keyword">if</span>(single==null)&#123;</div><div class="line">        single=new Singleton();</div><div class="line">      &#125;</div><div class="line">      <span class="built_in">return</span> single;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>Synchronized将导致性能开销。如果getInstance()方法被多个线程频繁的调用，将会导致程序执行性能的下降。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">public class Singleton&#123;</div><div class="line">    private static Singleton single;</div><div class="line">    public  static Singleton <span class="function"><span class="title">getSingleton</span></span>()&#123;</div><div class="line">      <span class="keyword">if</span>(single==null)&#123;   //4</div><div class="line">        synchronized(Singleton.class)&#123;</div><div class="line">          <span class="keyword">if</span>(single==null)&#123;</div><div class="line">            single=new Singleton();</div><div class="line">          &#125;</div><div class="line">        &#125;</div><div class="line">      &#125;</div><div class="line">      <span class="built_in">return</span> single;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>如果第一次检查instance不为null，那么就不需要执行下面的加锁和初始化操作。因此，可以大幅降低synchronized带来的性能开销。上面代码表面上看起来，似乎两全其美。<br>·多个线程试图在同一时间创建对象时，会通过加锁来保证只有一个线程能创建对象。<br>·在对象创建好之后，执行getInstance()方法将不需要获取锁，直接返回已创建好的对象。双重检查锁定看起来似乎很完美，但这是一个错误的优化！在线程执行到第4行，代码读取到instance不为null时，instance引用的对象有可能还没有完成初始化。</p>
+<h3 id="问题的根源"><a href="#问题的根源" class="headerlink" title="问题的根源"></a>问题的根源</h3><p>single=new Singleton();创建了一个对象。这一行代码可以分解为如下的3行伪代码。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">memory = allocate();　　// 1：分配对象的内存空间</div><div class="line">ctorInstance(memory);　// 2：初始化对象</div><div class="line">single = memory;　　// 3：设置instance指向刚分配的内存地址</div></pre></td></tr></table></figure></p>
+<p>上面3行伪代码中的2和3之间，可能会被重排序<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">memory = allocate();　　// 1：分配对象的内存空间</div><div class="line">instance = memory;　　// 3：设置instance指向刚分配的内存地址</div><div class="line">// 注意，此时对象还没有被初始化！</div><div class="line">ctorInstance(memory);　// 2：初始化对象</div></pre></td></tr></table></figure></p>
+<p><img src="/2017/12/26/java并发编程前三章/多线程执行时序.png" alt=""></p>
+<h3 id="基于volatile解决"><a href="#基于volatile解决" class="headerlink" title="基于volatile解决"></a>基于volatile解决</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">public class Singleton&#123;</div><div class="line">    private static Singleton single;</div><div class="line">    public  static Singleton <span class="function"><span class="title">getSingleton</span></span>()&#123;</div><div class="line">      <span class="keyword">if</span>(single==null)&#123;   //4</div><div class="line">        synchronized(Singleton.class)&#123;</div><div class="line">          <span class="keyword">if</span>(single==null)&#123;</div><div class="line">            single=new Singleton();</div><div class="line">          &#125;</div><div class="line">        &#125;</div><div class="line">      &#125;</div><div class="line">      <span class="built_in">return</span> single;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>当声明对象的引用为volatile后,伪代码中的2和3之间的重排序，在多线程环境中将会被禁止。</p>
+<h3 id="基于类初始化的解决方案"><a href="#基于类初始化的解决方案" class="headerlink" title="基于类初始化的解决方案"></a>基于类初始化的解决方案</h3><p>VM在类的初始化阶段（即在Class被加载后，且被线程使用之前），会执行类的初始化。在执行类的初始化期间，JVM会去获取一个锁。这个锁可以同步多个线程对同一个类的初始化。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">public class InstanceFactory&#123;</div><div class="line"></div><div class="line">  private static class InstanceHolder&#123;</div><div class="line">    public static Instance instance=new Instance();</div><div class="line">  &#125;</div><div class="line"></div><div class="line"> public static Instance <span class="function"><span class="title">getInstance</span></span>()&#123;</div><div class="line">         <span class="built_in">return</span> InstanceHoleder.instance;</div><div class="line"> &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>Java语言规范规定，对于每一个类或接口C，都有一个唯一的初始化锁LC与之对应。从C到LC的映射，由JVM的具体实现去自由实现。JVM在类初始化期间会获取这个初始化锁，并且每个线程至少获取一次锁来确保这个类已经被初始化过了<br>第1阶段：通过在Class对象上同步（即获取Class对象的初始化锁），来控制类或接口的初始化。这个获取锁的线程会一直等待，直到当前线程能够获取到这个初始化锁。<br>第2阶段：线程A执行类的初始化，同时线程B在初始化锁对应的condition上等待。<br>第3阶段：线程A设置state=initialized，然后唤醒在condition中等待的所有线程。<br>第4阶段：线程B结束类的初始化处理。<br>第5阶段：线程C执行类的初始化的处理。<br>字段延迟初始化降低了初始化类或创建实例的开销，但增加了访问被延迟初始化的字段的开销。在大多数时候，正常的初始化要优于延迟初始化。如果确实需要对实例字段使用线程安全的延迟初始化，请使用上面介绍的基于volatile的延迟初始化的方案；如果确实需要对静态字段使用线程安全的延迟初始化，请使用上面介绍的基于类初始化的方案。</p>
+<h2 id="java内存模型综述"><a href="#java内存模型综述" class="headerlink" title="java内存模型综述"></a>java内存模型综述</h2><h3 id="处理器的内存模型"><a href="#处理器的内存模型" class="headerlink" title="处理器的内存模型"></a>处理器的内存模型</h3><p>顺序一致性内存模型是一个理论参考模型，JMM和处理器内存模型在设计时通常会以顺序一致性内存模型为参照。<br>·放松程序中写-读操作的顺序，由此产生了Total Store Ordering内存模型（简称为TSO）。<br>·在上面的基础上，继续放松程序中写-写操作的顺序，由此产生了Partial Store Order内存模型（简称为PSO）。<br>·在前面两条的基础上，继续放松程序中读-写和读-读操作的顺序，由此产生了RelaxedMemory Order内存模型（简称为RMO）和PowerPC内存模型。<br>这里处理器对读/写操作的放松，是以两个操作之间不存在数据依赖性为前提的<br>JMM屏蔽了不同处理器内存模型的差异，它在不同的处理器平台之上为Java程序员呈现了一个一致的内存模型。</p>
+<h3 id="各种内存模型之间的关系"><a href="#各种内存模型之间的关系" class="headerlink" title="各种内存模型之间的关系"></a>各种内存模型之间的关系</h3><p>JMM是一种语言参考模型，处理器内存模型是硬件级的内存模型，顺序一致性模型是一个理论参考模型。<br>常见的4种处理器内存模型比常用的3中语言内存模型要弱，处理器内存模型和语言内存模型都比顺序一致性内存模型要弱。同处理器内存模型一样，越是追求执行性能的语言，内存模型设计得会越弱。</p>
+<h3 id="JMM的内存可见性保证"><a href="#JMM的内存可见性保证" class="headerlink" title="JMM的内存可见性保证"></a>JMM的内存可见性保证</h3><p>按照程序类型，java程序的内存可见性保证可以分为3类：</p>
+<ul>
+<li>单线程程序<br>单线程程序不会出现内存可见性问题。编译器、runtime和处理器会共同确保单线程程序的执行结果跟该程序在顺序一致性模型中执行的结果一样。</li>
+<li>正确同步的多线程程序<br>正确同步的多线程程序的执行将具有顺序一致性。这是JMM关注的重点。JMM通过限制编译器和处理器和处理器的重排序来为程序员提供内存可见性保证。</li>
+<li>对于未同步或未正确同步的多线程程序<br>JMM提供了最小安全保障：线程执行时读取到的值，要么是之前某个线程写入的值，要么是默认值（0，false，null）</li>
+</ul>
+<p>最小安全性保障与64位数据的非原子性写并不矛盾。它们是两个不同的概念，它们“发生”的时间点也不同。最小安全性保证对象默认初始化之后（设置成员域为0、null或false），才会被任意线程使用。最小安全性“发生”在对象被任意线程使用之前。64位数据的非原子性写“发生”在对象被多个线程使用的过程中（写共享变量）。当发生问题时（处理器B看到仅仅被处理器A“写了一半”的无效值），这里虽然处理器B读取到一个被写了一半的无效值，但这个值仍然是处理器A写入的，只不过是处理器A还没有写完而已。最小安全性保证线程读取到的值，要么是之前某个线程写入的值，要么是默认值（0、null、false）。但最小安全性并不保证线程读取到的值，一定是某个线程写完后的值。最小安全性保证线程读取到的值不会无中生<br>只要多线程程序是正确同步的，JMM保证该程序在任意的处理器平台上的执行结果，与该程序在顺序一致性内存模型中的执行结果一致。</p>
+<h3 id="JSR-133对旧内存模型的修补"><a href="#JSR-133对旧内存模型的修补" class="headerlink" title="JSR-133对旧内存模型的修补"></a>JSR-133对旧内存模型的修补</h3><ul>
+<li>增强volatile变量的内存语义。旧内存模型允许volatile变量和普通变量进行重排序。JSR-133严格限制volatile变量与普通变量的重排序，使得volatile的写和读和和锁的释放-获取有相同的语义</li>
+<li>增强final的内存语义。在旧内存模型中，多次读取同一个final变量可能有所不同。为此jsr-133增加两个重排规则，在保证final引用不会从构造函数内溢出的情况，final具有了初始化的安全。</li>
+</ul>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/21/分布式系统基础设施/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2267,166 +2547,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/27/es全文搜索/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="李睿">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/27/es全文搜索/" itemprop="url">elasticsearch深入搜索</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-27T10:55:25+08:00">
-                2017-11-27
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/elasticSearch/" itemprop="url" rel="index">
-                    <span itemprop="name">elasticSearch</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="全文搜索"><a href="#全文搜索" class="headerlink" title="全文搜索"></a>全文搜索</h1><h2 id="基于词项与基于全文"><a href="#基于词项与基于全文" class="headerlink" title="基于词项与基于全文"></a>基于词项与基于全文</h2><h3 id="基于词项查询"><a href="#基于词项查询" class="headerlink" title="基于词项查询"></a>基于词项查询</h3><p>如 term 或 fuzzy 这样的底层查询不需要分析阶段，它们对单个词项进行操作。用 term 查询词项 Foo 只要在倒排索引中查找 准确词项 ，并且用 TF/IDF 算法为每个包含该词项的文档计算相关度评分score 。<br>记住 term 查询只对倒排索引的词项精确匹配，这点很重要，它不会对词的多样性进行处理（如， foo 或 FOO ）。这里，无须考虑词项是如何存入索引的。如果是将 [“Foo”,”Bar”] 索引存入一个不分析的（ not_analyzed ）包含精确值的字段，或者将 Foo Bar 索引到一个带有 whitespace 空格分析器的字段，两者的结果都会是在倒排索引中有 Foo 和 Bar 这两个词。</p>
-<h3 id="基于全文查询"><a href="#基于全文查询" class="headerlink" title="基于全文查询"></a>基于全文查询</h3><p>像 match 或 query_string 这样的查询是高层查询，它们了解字段映射的信息：<br>如果查询 日期（date） 或 整数（integer） 字段，它们会将查询字符串分别作为日期或整数对待。<br>如果查询一个（ not_analyzed ）未分析的精确值字符串字段， 它们会将整个查询字符串作为单个词项对待。<br>但如果要查询一个（ analyzed ）已分析的全文字段， 它们会先将查询字符串传递到一个合适的分析器，然后生成一个供查询的词项列表。一旦组成了词项列表，这个查询会对每个词项逐一执行底层的查询，再将结果合并，然后为每个文档生成一个最终的相关度评分。<br>当我们想要查询一个具有精确值的 not_analyzed 未分析字段之前， 需要考虑，是否真的采用评分查询，或者非评分查询会更好。<br>单词项查询通常可以用是、非这种二元问题表示，所以更适合用过滤， 而且这样做可以有效利用缓存：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  <span class="string">"query"</span>:&#123;</div><div class="line">    <span class="string">"constant_score"</span>:&#123;</div><div class="line">        <span class="string">"filter"</span>:&#123;</div><div class="line">          <span class="string">"term"</span>:&#123;</div><div class="line">            <span class="string">"sex"</span>:<span class="string">"男"</span></div><div class="line">          &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h2 id="匹配查询"><a href="#匹配查询" class="headerlink" title="匹配查询"></a>匹配查询</h2><p>匹配查询match是核心查询，它是一个高级全文查询 ，这表示它既能处理全文字段，又能处理精确字段。</p>
-<h3 id="单个词查询"><a href="#单个词查询" class="headerlink" title="单个词查询"></a>单个词查询</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">POST /index/<span class="built_in">type</span>/_search</div><div class="line">&#123;</div><div class="line">  <span class="string">"query"</span>:&#123;</div><div class="line">    <span class="string">"match"</span>:&#123;</div><div class="line">       <span class="string">"title"</span>:<span class="string">"quick"</span></div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>查询步骤如下：</p>
-<ol>
-<li>检查字段类型；标题 title 字段是一个 string 类型（ analyzed ）已分析的全文字段，这意味着查询字符串本身也应该被分析。</li>
-<li>分析查询字符串；将查询的字符串quick传入标准分析器中，输出的结果是单个项 quick 。因为只有一个单词项，所以 match 查询执行的是单个底层 term 查询。</li>
-<li>查找匹配文档；用 term 查询在倒排索引中查找 quick 然后获取一组包含该项的文档，本例的结果是文档：1、2 和 3 。</li>
-<li>为每个文档评分；用 term 查询计算每个文档相关度评分score ，这是种将 词频（term frequency，即词 quick 在相关文档的 title 字段中出现的频率）和反向文档频率（inverse document frequency，即词 quick 在所有文档的 title 字段中出现的频率），以及字段的长度（即字段越短相关度越高）相结合的计算方式。<h3 id="多词查询"><a href="#多词查询" class="headerlink" title="多词查询"></a>多词查询</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">POST index/<span class="built_in">type</span>/_search</div><div class="line">&#123;</div><div class="line">  <span class="string">"query"</span>:&#123;</div><div class="line">     <span class="string">"match"</span>:&#123;</div><div class="line">        <span class="string">"title"</span>:<span class="string">"BROWN DOG"</span></div><div class="line">     &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line">//返回结果解释</div><div class="line">文档 4 最相关，因为它包含词 <span class="string">"brown"</span> 两次以及 <span class="string">"dog"</span> 一次。</div><div class="line">文档 2、3 同时包含 brown 和 dog 各一次，而且它们 title 字段的长度相同，所以具有相同的评分。</div><div class="line">文档 1 也能匹配，尽管它只有 brown 没有 dog 。</div></pre></td></tr></table></figure>
-</li>
-</ol>
-<p>因为 match 查询必须查找两个词（ [“brown”,”dog”] ），它在内部实际上先执行两次 term 查询，然后将两次查询的结果合并作为最终结果输出。为了做到这点，它将两个 term 查询包入一个 bool 查询中。<br>以上示例告诉我们一个重要信息：即任何文档只要 title 字段里包含 指定词项中的至少一个词 就能匹配，被匹配的词项越多，文档就越相关。</p>
-<h3 id="提高精度"><a href="#提高精度" class="headerlink" title="提高精度"></a>提高精度</h3><p>用 任意 查询词项匹配文档可能会导致结果中出现不相关的长尾。 这是种散弹式搜索。可能我们只想搜索包含 所有 词项的文档，也就是说，不去匹配 brown OR dog ，而通过匹配 brown AND dog 找到所有文档。<br>match 查询还可以接受 operator 操作符作为输入参数，默认情况下该操作符是 or 。我们可以将它修改成 and 让所有指定词项都必须匹配<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">POST /index/<span class="built_in">type</span>/_search</div><div class="line">&#123;</div><div class="line">  <span class="string">"query"</span>:&#123;</div><div class="line">     <span class="string">"match"</span>:&#123;</div><div class="line">       <span class="string">"title"</span>:&#123;</div><div class="line">           <span class="string">"query"</span>: <span class="string">"brown dog"</span>,</div><div class="line">           <span class="string">"operator"</span>:<span class="string">"and"</span></div><div class="line">       &#125;</div><div class="line">     &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h3 id="控制精度"><a href="#控制精度" class="headerlink" title="控制精度"></a>控制精度</h3><p>在 所有 与 任意 间二选一有点过于非黑即白。 如果用户给定 5 个查询词项，想查找只包含其中 4 个的文档，该如何处理？将 operator 操作符参数设置成 and 只会将此文档排除。<br>有时候这正是我们期望的，但在全文搜索的大多数应用场景下，我们既想包含那些可能相关的文档，同时又排除那些不太相关的。换句话说，我们想要处于中间某种结果。<br>match 查询支持 minimum_should_match 最小匹配参数， 这让我们可以指定必须匹配的词项数用来表示一个文档是否相关。我们可以将其设置为某个具体数字，更常用的做法是将其设置为一个百分数，因为我们无法控制用户搜索时输入的单词数量<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  <span class="string">"query"</span>:&#123;</div><div class="line">    <span class="string">"match"</span>:&#123;</div><div class="line">      <span class="string">"title"</span>:&#123;</div><div class="line">        <span class="string">"query"</span>:<span class="string">"a brown dog"</span>,</div><div class="line">        <span class="string">"minimun_should_match"</span>:<span class="string">"75%"</span></div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>当给定百分比的时候， minimum_should_match 会做合适的事情：在之前三词项的示例中， 75% 会自动被截断成 66.6% ，即三个里面两个词。无论这个值设置成什么，至少包含一个词项的文档才会被认为是匹配的。</p>
-<h2 id="组合查询"><a href="#组合查询" class="headerlink" title="组合查询"></a>组合查询</h2><p>在 组合过滤器 中，我们讨论过如何使用 bool 过滤器通过 and 、 or 和 not 逻辑组合将多个过滤器进行组合。在查询中， bool 查询有类似的功能，只有一个重要的区别。<br>过滤器做二元判断：文档是否应该出现在结果中？但查询更精妙，它除了决定一个文档是否应该被包括在结果中，还会计算文档的 相关程度 。<br>与过滤器一样， bool 查询也可以接受 must 、 must_not 和 should 参数下的多个查询语句<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">GET /index/<span class="built_in">type</span>/_search</div><div class="line">&#123;</div><div class="line">  <span class="string">"query"</span>: &#123;</div><div class="line">    <span class="string">"bool"</span>: &#123;</div><div class="line">      <span class="string">"must"</span>:     &#123; <span class="string">"match"</span>: &#123; <span class="string">"title"</span>: <span class="string">"quick"</span> &#125;&#125;,</div><div class="line">      <span class="string">"must_not"</span>: &#123; <span class="string">"match"</span>: &#123; <span class="string">"title"</span>: <span class="string">"lazy"</span>  &#125;&#125;,</div><div class="line">      <span class="string">"should"</span>: [</div><div class="line">                  &#123; <span class="string">"match"</span>: &#123; <span class="string">"title"</span>: <span class="string">"brown"</span> &#125;&#125;,</div><div class="line">                  &#123; <span class="string">"match"</span>: &#123; <span class="string">"title"</span>: <span class="string">"dog"</span>   &#125;&#125;</div><div class="line">      ]</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h3 id="评分计算"><a href="#评分计算" class="headerlink" title="评分计算"></a>评分计算</h3><p>以上的查询结果返回 title 字段包含词项 quick 但不包含 lazy 的任意文档。目前为止，这与 bool 过滤器的工作方式非常相似。<br>区别就在于两个 should 语句，也就是说：一个文档不必包含 brown 或 dog 这两个词项，但如果一旦包含，我们就认为它们更相关。<br>bool查询会为每个文档计算相关度评分，再将所有匹配must和should语句的分数score求和，最后除以must和should语句总数，must_not不会影响评分，只会将不想关的文档排除。</p>
-<h3 id="控制精度-1"><a href="#控制精度-1" class="headerlink" title="控制精度"></a>控制精度</h3><p>所有 must 语句必须匹配，所有 must_not 语句都必须不匹配，但有多少 should 语句应该匹配呢？ 默认情况下，没有 should 语句是必须匹配的，只有一个例外：那就是当没有 must 语句的时候，至少有一个 should 语句必须匹配。<br>就像我们能控制 match 查询的精度 一样，我们可以通过 minimum_should_match 参数控制需要匹配的 should 语句的数量， 它既可以是一个绝对的数字，又可以是个百分比<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">GET /my_index/my_type/_search</div><div class="line">&#123;</div><div class="line">  <span class="string">"query"</span>: &#123;</div><div class="line">    <span class="string">"bool"</span>: &#123;</div><div class="line">      <span class="string">"should"</span>: [</div><div class="line">        &#123; <span class="string">"match"</span>: &#123; <span class="string">"title"</span>: <span class="string">"brown"</span> &#125;&#125;,</div><div class="line">        &#123; <span class="string">"match"</span>: &#123; <span class="string">"title"</span>: <span class="string">"fox"</span>   &#125;&#125;,</div><div class="line">        &#123; <span class="string">"match"</span>: &#123; <span class="string">"title"</span>: <span class="string">"dog"</span>   &#125;&#125;</div><div class="line">      ],</div><div class="line">      <span class="string">"minimum_should_match"</span>: 2</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>这个查询结果会将所有满足以下条件的文档返回： title 字段包含 “brown” AND “fox” 、 “brown” AND “dog” 或 “fox” AND “dog” 。如果有文档包含所有三个条件，它会比只包含两个的文档更相关。</p>
-<h2 id="bool匹配"><a href="#bool匹配" class="headerlink" title="bool匹配"></a>bool匹配</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div></pre></td><td class="code"><pre><div class="line">//以下两两是等价的</div><div class="line">&#123;</div><div class="line">    <span class="string">"match"</span>: &#123; <span class="string">"title"</span>: <span class="string">"brown fox"</span>&#125;</div><div class="line">&#125;</div><div class="line">&#123;</div><div class="line">  <span class="string">"bool"</span>: &#123;</div><div class="line">    <span class="string">"should"</span>: [</div><div class="line">      &#123; <span class="string">"term"</span>: &#123; <span class="string">"title"</span>: <span class="string">"brown"</span> &#125;&#125;,</div><div class="line">      &#123; <span class="string">"term"</span>: &#123; <span class="string">"title"</span>: <span class="string">"fox"</span>   &#125;&#125;</div><div class="line">    ]</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line">//must</div><div class="line">&#123;</div><div class="line">    <span class="string">"match"</span>: &#123;</div><div class="line">        <span class="string">"title"</span>: &#123;</div><div class="line">            <span class="string">"query"</span>:    <span class="string">"brown fox"</span>,</div><div class="line">            <span class="string">"operator"</span>: <span class="string">"and"</span></div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">&#123;</div><div class="line">  <span class="string">"bool"</span>: &#123;</div><div class="line">    <span class="string">"must"</span>: [</div><div class="line">      &#123; <span class="string">"term"</span>: &#123; <span class="string">"title"</span>: <span class="string">"brown"</span> &#125;&#125;,</div><div class="line">      &#123; <span class="string">"term"</span>: &#123; <span class="string">"title"</span>: <span class="string">"fox"</span>   &#125;&#125;</div><div class="line">    ]</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line">//</div><div class="line">&#123;</div><div class="line">    <span class="string">"match"</span>: &#123;</div><div class="line">        <span class="string">"title"</span>: &#123;</div><div class="line">            <span class="string">"query"</span>: <span class="string">"quick brown fox"</span>,</div><div class="line">            <span class="string">"minimum_should_match"</span>: <span class="string">"75%"</span></div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">&#123;</div><div class="line">  <span class="string">"bool"</span>: &#123;</div><div class="line">    <span class="string">"should"</span>: [</div><div class="line">      &#123; <span class="string">"term"</span>: &#123; <span class="string">"title"</span>: <span class="string">"brown"</span> &#125;&#125;,</div><div class="line">      &#123; <span class="string">"term"</span>: &#123; <span class="string">"title"</span>: <span class="string">"fox"</span>   &#125;&#125;,</div><div class="line">      &#123; <span class="string">"term"</span>: &#123; <span class="string">"title"</span>: <span class="string">"quick"</span> &#125;&#125;</div><div class="line">    ],</div><div class="line">    <span class="string">"minimum_should_match"</span>: 2</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h2 id="查询语句提升比重"><a href="#查询语句提升比重" class="headerlink" title="查询语句提升比重"></a>查询语句提升比重</h2><p>我们可以通过指定 boost 来控制任何查询语句的相对的权重， boost 的默认值为 1 ，大于 1 会提升一个语句的相对权重。<br>boost 参数被用来提升一个语句的相对权重（ boost 值大于 1 ）或降低相对权重（ boost 值处于 0 到 1 之间），但是这种提升或降低并不是线性的，换句话说，如果一个 boost 值为 2 ，并不能获得两倍的评分score 。<br>相反，新的评分score 会在应用权重提升之后被 归一化 ，每种类型的查询都有自己的归一算法，细节超出了本书的范围，所以不作介绍。简单的说，更高的 boost 值为我们带来更高的评分 score 。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">GET /_search</div><div class="line">&#123;</div><div class="line">    <span class="string">"query"</span>: &#123;</div><div class="line">        <span class="string">"bool"</span>: &#123;</div><div class="line">            <span class="string">"must"</span>: &#123;</div><div class="line">                <span class="string">"match"</span>: &#123;  </div><div class="line">                    <span class="string">"content"</span>: &#123;</div><div class="line">                        <span class="string">"query"</span>:    <span class="string">"full text search"</span>,</div><div class="line">                        <span class="string">"operator"</span>: <span class="string">"and"</span></div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line">            &#125;,</div><div class="line">            <span class="string">"should"</span>: [</div><div class="line">                &#123; <span class="string">"match"</span>: &#123;</div><div class="line">                    <span class="string">"content"</span>: &#123;</div><div class="line">                        <span class="string">"query"</span>: <span class="string">"Elasticsearch"</span>,</div><div class="line">                        <span class="string">"boost"</span>: 3</div><div class="line">                    &#125;</div><div class="line">                &#125;&#125;,</div><div class="line">                &#123; <span class="string">"match"</span>: &#123;</div><div class="line">                    <span class="string">"content"</span>: &#123;</div><div class="line">                        <span class="string">"query"</span>: <span class="string">"Lucene"</span>,</div><div class="line">                        <span class="string">"boost"</span>: 2</div><div class="line">                    &#125;</div><div class="line">                &#125;&#125;</div><div class="line">            ]</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h2 id="控制分析"><a href="#控制分析" class="headerlink" title="控制分析"></a>控制分析</h2><p>分析器可以从三个层面进行定义：按字段（per-field）、按索引（per-index）或全局缺省（global default）。Elasticsearch 会按照以下顺序依次处理，直到它找到能够使用的分析器。索引时的顺序如下：<br>字段映射里定义的 analyzer ，否则<br>索引设置中名为 default 的分析器，默认为standard 标准分析器<br>在搜索时，顺序有些许不同：<br>查询自己定义的 analyzer ，否则<br>字段映射里定义的 analyzer ，否则<br>索引设置中名为 default 的分析器，默认为standard 标准分析器<br>有时，在索引时和搜索时使用不同的分析器是合理的。 我们可能要想为同义词建索引（例如，所有 quick 出现的地方，同时也为 fast 、 rapid 和 speedy 创建索引）。但在搜索时，我们不需要搜索所有的同义词，取而代之的是寻找用户输入的单词是否是 quick 、 fast 、 rapid 或 speedy 。<br>为了区分，Elasticsearch 也支持一个可选的 search_analyzer 映射，它仅会应用于搜索时（ analyzer 还用于索引时）。还有一个等价的 default_search 映射，用以指定索引层的默认配置。<br>如果考虑到这些额外参数，一个搜索时的 完整 顺序会是下面这样：<br>查询自己定义的 analyzer ，否则<br>字段映射里定义的 search_analyzer ，否则<br>字段映射里定义的 analyzer ，否则<br>索引设置中名为 default_search 的分析器，默认为索引设置中名为 default 的分析器，默认为standard 标准分析器</p>
-<h2 id="被破坏的相关度！"><a href="#被破坏的相关度！" class="headerlink" title="被破坏的相关度！"></a>被破坏的相关度！</h2><p>在讨论更复杂的 多字段搜索 之前，让我们先快速解释一下为什么只在主分片上 创建测试索引 。<br>用户会时不时的抱怨无法按相关度排序并提供简短的重现步骤： 用户索引了一些文档，运行一个简单的查询，然后发现明显低相关度的结果出现在高相关度结果之上。<br>为了理解为什么会这样，可以设想，我们在两个主分片上创建了索引和总共 10 个文档，其中 6 个文档有单词 foo 。可能是分片 1 有其中 3 个 foo 文档，而分片 2 有其中另外 3 个文档，换句话说，所有文档是均匀分布存储的。<br>在 什么是相关度？中，我们描述了 Elasticsearch 默认使用的相似度算法，这个算法叫做 词频/逆向文档频率 或 TF/IDF 。词频是计算某个词在当前被查询文档里某个字段中出现的频率，出现的频率越高，文档越相关。 逆向文档频率 将 某个词在索引内所有文档出现的百分数 考虑在内，出现的频率越高，它的权重就越低。<br>但是由于性能原因， Elasticsearch 不会计算索引内所有文档的 IDF 。 相反，每个分片会根据 该分片 内的所有文档计算一个本地 IDF 。<br>因为文档是均匀分布存储的，两个分片的 IDF 是相同的。相反，设想如果有 5 个 foo 文档存于分片 1 ，而第 6 个文档存于分片 2 ，在这种场景下， foo 在一个分片里非常普通（所以不那么重要），但是在另一个分片里非常出现很少（所以会显得更重要）。这些 IDF 之间的差异会导致不正确的结果。<br>在实际应用中，这并不是一个问题，本地和全局的 IDF 的差异会随着索引里文档数的增多渐渐消失，在真实世界的数据量下，局部的 IDF 会被迅速均化，所以上述问题并不是相关度被破坏所导致的，而是由于数据太少。<br>为了测试，我们可以通过两种方式解决这个问题。第一种是只在主分片上创建索引，正如 match 查询 里介绍的那样，如果只有一个分片，那么本地的 IDF 就是 全局的 IDF。<br>第二个方式就是在搜索请求后添加 ?search_type=dfs_query_then_fetch ， dfs 是指 分布式频率搜索（Distributed Frequency Search） ， 它告诉 Elasticsearch ，先分别获得每个分片本地的 IDF ，然后根据结果再计算整个索引的全局 IDF。不要在生产环境上使用 dfs_query_then_fetch 。完全没有必要。只要有足够的数据就能保证词频是均匀分布的。没有理由给每个查询额外加上 DFS 这步。</p>
-<h1 id="多字段搜索"><a href="#多字段搜索" class="headerlink" title="多字段搜索"></a>多字段搜索</h1><p><a href="https://www.elastic.co/guide/cn/elasticsearch/guide/current/multi-field-search.html" target="_blank" rel="external">https://www.elastic.co/guide/cn/elasticsearch/guide/current/multi-field-search.html</a></p>
-<h1 id="近似匹配"><a href="#近似匹配" class="headerlink" title="近似匹配"></a>近似匹配</h1><p><a href="https://www.elastic.co/guide/cn/elasticsearch/guide/current/proximity-matching.html" target="_blank" rel="external">https://www.elastic.co/guide/cn/elasticsearch/guide/current/proximity-matching.html</a></p>
-<h1 id="控制相关度"><a href="#控制相关度" class="headerlink" title="控制相关度"></a>控制相关度</h1><p><a href="https://www.elastic.co/guide/cn/elasticsearch/guide/current/scoring-theory.html" target="_blank" rel="external">https://www.elastic.co/guide/cn/elasticsearch/guide/current/scoring-theory.html</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2476,7 +2596,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">51</span>
+                <span class="site-state-item-count">52</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2487,7 +2607,7 @@
             
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
-                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-count">15</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -2498,7 +2618,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">22</span>
+                <span class="site-state-item-count">25</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
