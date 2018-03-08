@@ -1,0 +1,769 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="mysql," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="博客" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="b-tree索引b-tree索引是通过B+树结构存储数据，Innodb叶子节点是指向主键，而myisam指向的是物理地址。特点：能够加快数据的查询速度，更适合进行范围查找。 使用b-tree索引 全值匹配的查询 where orderno=3 匹配最左前缀的查询 where no=… and one=… 匹配列前缀 like ‘123%’ 范围值查询 &amp;gt; … and &amp;lt;… 精确 匹配左">
+<meta name="keywords" content="mysql">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mysql索引">
+<meta property="og:url" content="http://yoursite.com/2018/02/22/mysql索引/index.html">
+<meta property="og:site_name" content="博客">
+<meta property="og:description" content="b-tree索引b-tree索引是通过B+树结构存储数据，Innodb叶子节点是指向主键，而myisam指向的是物理地址。特点：能够加快数据的查询速度，更适合进行范围查找。 使用b-tree索引 全值匹配的查询 where orderno=3 匹配最左前缀的查询 where no=… and one=… 匹配列前缀 like ‘123%’ 范围值查询 &amp;gt; … and &amp;lt;… 精确 匹配左">
+<meta property="og:updated_time" content="2018-02-22T16:22:43.085Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="mysql索引">
+<meta name="twitter:description" content="b-tree索引b-tree索引是通过B+树结构存储数据，Innodb叶子节点是指向主键，而myisam指向的是物理地址。特点：能够加快数据的查询速度，更适合进行范围查找。 使用b-tree索引 全值匹配的查询 where orderno=3 匹配最左前缀的查询 where no=… and one=… 匹配列前缀 like ‘123%’ 范围值查询 &amp;gt; … and &amp;lt;… 精确 匹配左">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/02/22/mysql索引/"/>
+
+
+
+
+
+  <title>mysql索引 | 博客</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/22/mysql索引/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="李睿">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">mysql索引</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-22T20:23:22+08:00">
+                2018-02-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mysql/" itemprop="url" rel="index">
+                    <span itemprop="name">mysql</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="b-tree索引"><a href="#b-tree索引" class="headerlink" title="b-tree索引"></a>b-tree索引</h1><p>b-tree索引是通过B+树结构存储数据，Innodb叶子节点是指向主键，而myisam指向的是物理地址。<br>特点：能够加快数据的查询速度，更适合进行范围查找。</p>
+<h2 id="使用b-tree索引"><a href="#使用b-tree索引" class="headerlink" title="使用b-tree索引"></a>使用b-tree索引</h2><ol>
+<li>全值匹配的查询 where orderno=3</li>
+<li>匹配最左前缀的查询 where no=… and one=…</li>
+<li>匹配列前缀 like ‘123%’</li>
+<li>范围值查询 &gt; … and &lt;…</li>
+<li>精确 匹配左前列并范围匹配另外一列</li>
+<li>至访问索引的查询</li>
+</ol>
+<h2 id="限制"><a href="#限制" class="headerlink" title="限制"></a>限制</h2><ol>
+<li>如果不是按照索引最左列开始查找，则无法使用索引</li>
+<li>使用索引时不能跳过索引中的列，例如A,B，C索引，查询A，C，C这列无法使用索引</li>
+<li>not in 和&lt;&gt;无法使用索引</li>
+<li>查询有某个列的范围查询，则其右边所有列都无法使用索引</li>
+</ol>
+<h1 id="hash索引"><a href="#hash索引" class="headerlink" title="hash索引"></a>hash索引</h1><p>哈希索引基于哈希表，只有查询条件精确匹配hash索引中的所有列时，才能够使用到hash索引。对于hash索引中的所有列，存储引擎都会为每一行计算一个hash码，hash索引存储的就是hash码。</p>
+<h2 id="hash索引的限制"><a href="#hash索引的限制" class="headerlink" title="hash索引的限制"></a>hash索引的限制</h2><p>hash索引必须进行二次查找，无法用于排序，哈希索引不支持部分索引查找也不支持范围查找，哈希索引中的hash码的计算可能存在hash冲突。</p>
+<h1 id="索引的好处"><a href="#索引的好处" class="headerlink" title="索引的好处"></a>索引的好处</h1><p>索引大大减少存储引擎需要扫描的数据量、索引可以帮助我们排序避免使用临时表、把随机IO转化为顺序IO</p>
+<h1 id="索引优化策略"><a href="#索引优化策略" class="headerlink" title="索引优化策略"></a>索引优化策略</h1><ol>
+<li>索引列不能使用表达式或者函数</li>
+<li>前缀索引和索引列的选择性(create index index_name on table(col_name(n)))</li>
+<li>联合索引<br>如何选取索引的顺序：经常会被使用到的列优先，选择性高的列优先，宽度比较小的列优先</li>
+<li>覆盖索引（哈希索引不适合，查询太多列，双百分号like查询）<br>包含查询的全部值的索引，包括where、group by、order by，可以优化缓存，变少磁盘IO，可以减少随时IO，变为顺序IO，可以避免对Innodb主键索引的二次查询、可以避免myisam表进行系统调用</li>
+</ol>
+<h1 id="使用索引优化查询"><a href="#使用索引优化查询" class="headerlink" title="使用索引优化查询"></a>使用索引优化查询</h1><p>索引的列顺序和order by子句的顺序完全一致<br>索引中所有列的方向（升序、降序）和order by子句完全一致<br>order by中的字段全部在关联表中的第一张表中</p>
+<h2 id="模拟哈希索引"><a href="#模拟哈希索引" class="headerlink" title="模拟哈希索引"></a>模拟哈希索引</h2><p>新增一列，使用触发器进行更新，使用哈希函数<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">analyze table table_name;//分析表</div><div class="line">optimize table table_name;//优化表</div></pre></td></tr></table></figure></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/mysql/" rel="tag"># mysql</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/01/23/sql优化大全/" rel="next" title="sql优化大全">
+                <i class="fa fa-chevron-left"></i> sql优化大全
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/02/23/sql查询优化/" rel="prev" title="sql查询优化">
+                sql查询优化 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg"
+               alt="李睿" />
+          <p class="site-author-name" itemprop="name">李睿</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">54</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">25</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#b-tree索引"><span class="nav-number">1.</span> <span class="nav-text">b-tree索引</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用b-tree索引"><span class="nav-number">1.1.</span> <span class="nav-text">使用b-tree索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#限制"><span class="nav-number">1.2.</span> <span class="nav-text">限制</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#hash索引"><span class="nav-number">2.</span> <span class="nav-text">hash索引</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#hash索引的限制"><span class="nav-number">2.1.</span> <span class="nav-text">hash索引的限制</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#索引的好处"><span class="nav-number">3.</span> <span class="nav-text">索引的好处</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#索引优化策略"><span class="nav-number">4.</span> <span class="nav-text">索引优化策略</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用索引优化查询"><span class="nav-number">5.</span> <span class="nav-text">使用索引优化查询</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#模拟哈希索引"><span class="nav-number">5.1.</span> <span class="nav-text">模拟哈希索引</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">李睿</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -99,7 +99,7 @@
 <meta property="og:url" content="http://yoursite.com/2018/01/01/MySQL性能管理及架构设计/index.html">
 <meta property="og:site_name" content="博客">
 <meta property="og:description" content="什么影响了mysql的性能影响性能的几个方面 服务器的硬件 操作系统或参数配置 数据库的存储引擎选择MyIsam：不支持事务，表级锁；Innodb：事务存储引擎，完美支持行级锁，支持事务ACID特性 数据库参数配置 数据库结构设计和sql语句  CPU资源和内存大小CPU资源和内存大小网络，memcache失效时会产生大量网络传输 考虑cpucpu密集型选择更好的Cpu，mysql暂不支持多cpu">
-<meta property="og:updated_time" content="2018-01-01T14:53:02.234Z">
+<meta property="og:updated_time" content="2018-02-20T14:12:18.779Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="MySQL性能管理及架构设计">
 <meta name="twitter:description" content="什么影响了mysql的性能影响性能的几个方面 服务器的硬件 操作系统或参数配置 数据库的存储引擎选择MyIsam：不支持事务，表级锁；Innodb：事务存储引擎，完美支持行级锁，支持事务ACID特性 数据库参数配置 数据库结构设计和sql语句  CPU资源和内存大小CPU资源和内存大小网络，memcache失效时会产生大量网络传输 考虑cpucpu密集型选择更好的Cpu，mysql暂不支持多cpu">
@@ -374,6 +374,29 @@
 <h3 id="系统的并发量"><a href="#系统的并发量" class="headerlink" title="系统的并发量"></a>系统的并发量</h3><p>QPS：同时处理sql的数量</p>
 <h3 id="Mysql的版本"><a href="#Mysql的版本" class="headerlink" title="Mysql的版本"></a>Mysql的版本</h3><p>最新的版本对多核支持，尤其是5.5以后的版本</p>
 <h3 id="内存"><a href="#内存" class="headerlink" title="内存"></a>内存</h3><p>内存比SSD和Fusion-IO比也要快很多<br>myisam将索引缓存到内存，数据放在通过操作系统缓存<br>innodb同时缓存数据和索引到内存<br>选择内存的主频，频率越高速度越快</p>
+<h2 id="磁盘的配置和选择"><a href="#磁盘的配置和选择" class="headerlink" title="磁盘的配置和选择"></a>磁盘的配置和选择</h2><ol>
+<li>使用传统机器硬盘；<br>使用最多、存储空间大、价格低、读写速度较慢、最常见。读取数据的时间分为访问时间和传输时间。考虑的因素是存储容量、传输速度、访问时间、主轴转速（7000多转或一万）、物理尺寸</li>
+<li>使用raid增强传统机器硬盘的性能<br>raid是磁盘冗余队列的简称，把多个小的磁盘组成一组容量更大的磁盘。主要有raid0、raid1、raid5、raid10</li>
+<li>使用固态硬盘ssd和pcied卡<br>比机械磁盘固态磁盘有更好的随机读写功能、更好的支持并发、更容易损坏</li>
+<li>使用网络存储NAS和SAN</li>
+</ol>
+<h2 id="服务器硬件对性能的影响"><a href="#服务器硬件对性能的影响" class="headerlink" title="服务器硬件对性能的影响"></a>服务器硬件对性能的影响</h2><h3 id="cpu"><a href="#cpu" class="headerlink" title="cpu"></a>cpu</h3><ul>
+<li>64位的cpu一定要工作在64位的系统上</li>
+<li>对于并发比较高的场景cpu的数量比频率重要</li>
+<li>对于cpu密集性场景和复杂sql来说则频率越高越好</li>
+</ul>
+<h3 id="内存-1"><a href="#内存-1" class="headerlink" title="内存"></a>内存</h3><ul>
+<li>选择主板所使用最高频率的内存</li>
+<li>尽可能大</li>
+</ul>
+<h3 id="IO子系统"><a href="#IO子系统" class="headerlink" title="IO子系统"></a>IO子系统</h3><p>PCIE&gt;SSD&gt;RAID&gt;磁盘&gt;SAN</p>
+<h2 id="mysql常用存储引擎MyISAM"><a href="#mysql常用存储引擎MyISAM" class="headerlink" title="mysql常用存储引擎MyISAM"></a>mysql常用存储引擎MyISAM</h2><p>mysql5.5之前版本默认存储引擎<br>系统表和临时表，这里的临时表和create 临时表不一样。临时表是在排序、分组等操作中，当数量超过一定的大小后，由查询优化器建立的临时表<br>.frm–文件存储表定义。<br>.myd–数据文件的扩展名。<br>.myi–索引文件的扩展名。</p>
+<h3 id="特性"><a href="#特性" class="headerlink" title="特性"></a>特性</h3><p>锁的级别是表锁，读取和插入是互斥。读写混合的并发性不太好。<br>表损坏修复<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">check table table_name</div><div class="line">repair table table_name</div></pre></td></tr></table></figure></p>
+<p>myisam支持全文索引、支持数据压缩（myisampack命令，在进行压缩数据后不能进行插入操作）、版本小于5.0时默认表大小为4G，版本大时默认使用256TB<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">myisampack -b <span class="_">-f</span> mysiam.MYI(myisam文件)</div></pre></td></tr></table></figure></p>
+<h3 id="适用场景"><a href="#适用场景" class="headerlink" title="适用场景"></a>适用场景</h3><p>非事务型应用、只读类应用、空间类应用</p>
+<h2 id="innodb"><a href="#innodb" class="headerlink" title="innodb"></a>innodb</h2><p>mysql5.5以后版本默认存储引擎，Innodb使用表空间进行存储。Innodb_file_per_table为on时独立表空间：ibd文件，off时系统表空间ibdataX文件</p>
+<h3 id="特性-1"><a href="#特性-1" class="headerlink" title="特性"></a>特性</h3><p>是事务性存储引擎，完全支持事务的acid特性<br>支持行级锁<br>锁的类型是读锁和写锁，粒度是表级锁、行级锁<br>后面版本已经支持全文索引和空间函数<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">lock table table_name write;//表级锁</div><div class="line">unlock tables;</div><div class="line">show engine innodb status;//innodb</div></pre></td></tr></table></figure></p>
+<h2 id="mysql服务器参数设置"><a href="#mysql服务器参数设置" class="headerlink" title="mysql服务器参数设置"></a>mysql服务器参数设置</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">set</span> global 参数名=参数值</div><div class="line"><span class="built_in">set</span> @@global.参数名 :=参数值</div><div class="line"><span class="built_in">set</span> session 参数名=参数值</div><div class="line"><span class="built_in">set</span> @@session.参数名 :=参数值</div></pre></td></tr></table></figure>
 
       
     </div>
@@ -500,7 +523,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">52</span>
+                <span class="site-state-item-count">54</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -564,7 +587,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#什么影响了mysql的性能"><span class="nav-number">1.</span> <span class="nav-text">什么影响了mysql的性能</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#影响性能的几个方面"><span class="nav-number">1.1.</span> <span class="nav-text">影响性能的几个方面</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CPU资源和内存大小"><span class="nav-number">1.2.</span> <span class="nav-text">CPU资源和内存大小</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#考虑cpu"><span class="nav-number">1.2.1.</span> <span class="nav-text">考虑cpu</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#系统的并发量"><span class="nav-number">1.2.2.</span> <span class="nav-text">系统的并发量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Mysql的版本"><span class="nav-number">1.2.3.</span> <span class="nav-text">Mysql的版本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#内存"><span class="nav-number">1.2.4.</span> <span class="nav-text">内存</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#什么影响了mysql的性能"><span class="nav-number">1.</span> <span class="nav-text">什么影响了mysql的性能</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#影响性能的几个方面"><span class="nav-number">1.1.</span> <span class="nav-text">影响性能的几个方面</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CPU资源和内存大小"><span class="nav-number">1.2.</span> <span class="nav-text">CPU资源和内存大小</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#考虑cpu"><span class="nav-number">1.2.1.</span> <span class="nav-text">考虑cpu</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#系统的并发量"><span class="nav-number">1.2.2.</span> <span class="nav-text">系统的并发量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Mysql的版本"><span class="nav-number">1.2.3.</span> <span class="nav-text">Mysql的版本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#内存"><span class="nav-number">1.2.4.</span> <span class="nav-text">内存</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#磁盘的配置和选择"><span class="nav-number">1.3.</span> <span class="nav-text">磁盘的配置和选择</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服务器硬件对性能的影响"><span class="nav-number">1.4.</span> <span class="nav-text">服务器硬件对性能的影响</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#cpu"><span class="nav-number">1.4.1.</span> <span class="nav-text">cpu</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#内存-1"><span class="nav-number">1.4.2.</span> <span class="nav-text">内存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IO子系统"><span class="nav-number">1.4.3.</span> <span class="nav-text">IO子系统</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mysql常用存储引擎MyISAM"><span class="nav-number">1.5.</span> <span class="nav-text">mysql常用存储引擎MyISAM</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#特性"><span class="nav-number">1.5.1.</span> <span class="nav-text">特性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#适用场景"><span class="nav-number">1.5.2.</span> <span class="nav-text">适用场景</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#innodb"><span class="nav-number">1.6.</span> <span class="nav-text">innodb</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#特性-1"><span class="nav-number">1.6.1.</span> <span class="nav-text">特性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mysql服务器参数设置"><span class="nav-number">1.7.</span> <span class="nav-text">mysql服务器参数设置</span></a></li></ol></li></ol></div>
             
 
           </div>

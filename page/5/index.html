@@ -273,6 +273,341 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/21/服务框架/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="李睿">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/10/21/服务框架/" itemprop="url">服务框架（第四章）</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-21T19:56:11+08:00">
+                2017-10-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/大型网站中间件/" itemprop="url" rel="index">
+                    <span itemprop="name">大型网站中间件</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="网站功能持续丰富后的困境与应对"><a href="#网站功能持续丰富后的困境与应对" class="headerlink" title="网站功能持续丰富后的困境与应对"></a>网站功能持续丰富后的困境与应对</h2><p>网站的功能主要集中在几个大应用上，而且这些应用都直接访问底层的服务，例如数据库、缓存、搜索引擎、分布式存储。随着网站规模扩大，开发人的增多，每个应用变得复杂、臃肿。</p>
+<h3 id="把应用拆小"><a href="#把应用拆小" class="headerlink" title="把应用拆小"></a>把应用拆小</h3><p>把庞大的应用拆成多个。这样的好处是相对较快的完成，但是仍然存在一些问题。一方面是数据库的连接数的压力还在，其次是代码的重复问题。</p>
+<h3 id="服务化方案"><a href="#服务化方案" class="headerlink" title="服务化方案"></a>服务化方案</h3><p>我们在原来的应用和底层的数据库、缓存系统、文件系统等系统之间增加了服务层。</p>
+<h2 id="服务框架的设计和实现"><a href="#服务框架的设计和实现" class="headerlink" title="服务框架的设计和实现"></a>服务框架的设计和实现</h2><h3 id="应用从集中式走向分布式所遇到的问题"><a href="#应用从集中式走向分布式所遇到的问题" class="headerlink" title="应用从集中式走向分布式所遇到的问题"></a>应用从集中式走向分布式所遇到的问题</h3><p>要把单层Web应用的结构改为多层的、有服务层的结构的时，很多人不会直接做一个通用的服务框架，而是为当前要用的服务做一个RPC的功能，为服务使用者提供相关的客户端。而当提供的服务的集群多于一个小时，通用的服务框架就非常重要。服务化会使得把本地调用变为远程调用。研发人员关注的是提高易用性和降低性能损失这两方面。<br>在单机单进程中，程序只需要将寄存器地址改为相应的入口地址就好，而在多机之间，我们需要对调用的请求信息进行编码，然后传给远程的节点，解码后再进行真正的调用。寻址路由是为了让调用方确定哪个实例被调用的，实际定位是指被调用的机器找到对应的实例来进行方法调用，从而实现功能。</p>
+<h3 id="通过示例看服务框架原型"><a href="#通过示例看服务框架原型" class="headerlink" title="通过示例看服务框架原型"></a>通过示例看服务框架原型</h3><p>服务框架即包含调用方的逻辑，又包含服务端的逻辑的一个实现。</p>
+<h4 id="单机方式"><a href="#单机方式" class="headerlink" title="单机方式"></a>单机方式</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">public class Calculator&#123;</div><div class="line">     public int add(int a,int b)&#123;</div><div class="line">       <span class="built_in">return</span> a+b;</div><div class="line">     &#125;</div><div class="line"></div><div class="line">&#125;</div><div class="line">Calculator calculator =new Calculator();</div><div class="line">calculator.add(2,3);</div></pre></td></tr></table></figure>
+<h4 id="实现远程服务的调用客户端"><a href="#实现远程服务的调用客户端" class="headerlink" title="实现远程服务的调用客户端"></a>实现远程服务的调用客户端</h4><p>以单机为例，我们希望实现这个服务的方式和当前的做法一样<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">public int add(int a,int b)&#123;</div><div class="line"></div><div class="line">  //获取可用服务列表</div><div class="line">  List&lt;String&gt; l=getAvailableServiceAddresses(<span class="string">"Calculator.add"</span>);</div><div class="line">  //获取调用服务的目标机器</div><div class="line">  String address=chooseTarget();</div><div class="line">  //建立连接</div><div class="line">  Socket socket=new Socket(address);</div><div class="line">  //请求序列化</div><div class="line">  byte[] request=getRequest(a,b);</div><div class="line">  //发送请求</div><div class="line">  socket.getOuputStream().write(request);</div><div class="line">  //接受结果</div><div class="line">  byte[] response=new byte[1024];</div><div class="line">  socket.getInputStream().read(response);</div><div class="line">  int result=getResult(response);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>接下来我们解析这段代码，首先是获取服务机器的地址列表，并且从可用的服务地址列表中选取一个要调用的目标机器。<br>如果我们采取的LVS或者硬件负载均衡方案，那么getAvailableServiceAddresses获取的就是获取LVS或者硬件负载均衡器的地址和端口，并且choosTarget会直接返回地址和端口。<br>如果我们采取名称服务，那么getAvailableServiceAddresses返回的是当前的服务的地址列表，参数值用来定位服务，这个一般用做key的服务名字一般采用接口的全名，也就是全限类名，也可以用类名加版本号。<br>如果我们采用规则解析，这种方式更多应用在有状态的场景上。像数据这种状态要求很高的场景，或者缓存这种尽量要有状态的场景，都会用到规则服务器的方式来解决寻址问题。在无状态的场景，则不太用规则服务器的方式处理。<br>构造请求数据包其实就是把对象变为二进制数据，也就是java的序列化。请求后，我们需要等待远程服务的执行和结果的返回，收到结果后，我们会对数据进行java1反序列化，等到结果。</p>
+<h4 id="实现服务端"><a href="#实现服务端" class="headerlink" title="实现服务端"></a>实现服务端</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">public void <span class="function"><span class="title">eventHandler</span></span>()&#123;</div><div class="line">  <span class="keyword">while</span>(<span class="literal">true</span>)&#123;</div><div class="line">    byte[] requestData=receiveRequest();</div><div class="line">    Request request=getRequest(requestData);</div><div class="line">    Object service=getServiceByNameAndVersion(request.getServiceName(),request.getServiceVersion());</div><div class="line">    Object result=callService(service,request.getMethodName(),request.getArgs());</div><div class="line">    byte[] data=getResult(result);</div><div class="line">    request.socket.getOuputStream.write(data);</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>在这段伪代码中，我们需要持续接受请求并进行响应，收到的数据也需要反序列化。在这里，我们关注服务的名称、服务的版本号、调用的方法名称和参数以及调用的连接。当我们拿到请求对象后，我们需要本地定位具体的服务，我们会有个服务注册表，我们可以动态发布服务。得到服务实例后，我们会服务调用，一般通过反射来调用，然后序列化结果，传输给客户端。</p>
+<h3 id="服务调用端的设计和实现"><a href="#服务调用端的设计和实现" class="headerlink" title="服务调用端的设计和实现"></a>服务调用端的设计和实现</h3><p>调用过程是调用发起、寻址路由、协议适配/序列化、网络传输、反序列化/协议解析、得到结果返回调用方。</p>
+<h4 id="从代码的角度看如何使用服务框架"><a href="#从代码的角度看如何使用服务框架" class="headerlink" title="从代码的角度看如何使用服务框架"></a>从代码的角度看如何使用服务框架</h4><p>客户端的引入是我们首先需要解决的问题，大多数的java开发都会使用spring作为容器。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&lt;bean id=<span class="string">"calculator"</span> class=<span class="string">"ConsumerBean"</span>&gt;</div><div class="line">&lt;property name=<span class="string">"interfaceName"</span>&gt;</div><div class="line">&lt;/property&gt;</div><div class="line">&lt;property name=<span class="string">"version"</span>&gt;</div><div class="line">&lt;/property&gt;</div><div class="line">&lt;property name=<span class="string">"group"</span>&gt;</div><div class="line">&lt;/property&gt;</div><div class="line">&lt;/bean&gt;</div></pre></td></tr></table></figure></p>
+<p>以上是简单的版本的服务框架，我们先看三个基础的属性</p>
+<h5 id="interfaceName"><a href="#interfaceName" class="headerlink" title="interfaceName"></a>interfaceName</h5><p>接口名称，在进程远程通信时ConsumerBean必须要知道调用的接口是哪一个，然后才能生成这个接口的代理，以供本地调用。</p>
+<h5 id="version"><a href="#version" class="headerlink" title="version"></a>version</h5><p>版本号，在实际场景中，接口的变化是可能的。如果直接变化，那么要求所有使用的地方一起修改，一起升级。解决问题的方式有两种，一种是需要修改方法的参数或者返回值，也就是新增一个方法，保持原来方法不变，不过在过渡阶段导致代码臃肿，并且方法名不好取名。第二种是通过版本号进行隔离。</p>
+<h5 id="group"><a href="#group" class="headerlink" title="group"></a>group</h5><p>分组。分组属性的好处是如果对同一个接口的远程调用有很多机器，那么我们可以把远程机器分组，然后调用者可以选择不同分组调用，这样就可以把不同调用者对同一服务进行隔离。</p>
+<h4 id="运行期服务框架与应用和容器的关系"><a href="#运行期服务框架与应用和容器的关系" class="headerlink" title="运行期服务框架与应用和容器的关系"></a>运行期服务框架与应用和容器的关系</h4><p>有两个比较重要的问题需要解决：1.服务框架本身的部署方式问题；2.实现服务框架所依赖的一些外部包和应用自身依赖的jar包冲突。<br>首先是部署方式；一种方案是把服务框架作为应用的一个依赖包并与应用进行打包。通过这个方式，服务框架就变为应用的一个库，并随应用启动。存在的问题是，如果要升级服务框架，就需要更新应用本身；并且服务框架也没办法接管classloader，也没办法做到隔离和包的实现替换工作。<br>另一种方案是把服务框架作为容器的一部分，那么服务框架就变为一个容器提供远程调用和远程服务的功能。<br>Jar包冲突问题，应用和服务框架的jar包版本冲突；将服务框架的自身用的类和应用用的类都控制在User-defined class loader级别上，这样就实现了相互间的隔离。web容器对多个web应用的处理以及OSGI对bundle处理采用了类似的方法。我们可以看下类加载器的层级关系，最上到下依次是bootstrap class loader($JAVA_HOME/jre/lib/rt.jar)、Extension class Loader($JAVA_HOME/jre/lib/ext/rt.jar)、System class loader($CLASSPATH)、user defined class loader</p>
+<h3 id="服务调用者和服务提供者之间通信方式的选择"><a href="#服务调用者和服务提供者之间通信方式的选择" class="headerlink" title="服务调用者和服务提供者之间通信方式的选择"></a>服务调用者和服务提供者之间通信方式的选择</h3><p>服务框架是为了把本地对象之间的方法调用变为远程过程调用，，这就涉及到远程通信问题。</p>
+<h4 id="远程通信遇到的问题"><a href="#远程通信遇到的问题" class="headerlink" title="远程通信遇到的问题"></a>远程通信遇到的问题</h4><p>最初的路由寻址过程是把远程的IP和端口号写死在代码中，但是如果是一个集群这种方式就满足不了</p>
+<h4 id="采用透明代理与调用者、服务提供者直连的解决方案"><a href="#采用透明代理与调用者、服务提供者直连的解决方案" class="headerlink" title="采用透明代理与调用者、服务提供者直连的解决方案"></a>采用透明代理与调用者、服务提供者直连的解决方案</h4><p>这里面我们通过两种方式，一种是中间代理，另一种是服务注册查找中心；服务注册查找中心只是提供可用的服务提供者列表，调用者会缓存下来地址，然后当地址列表发生改变时在去向中心获取。当客户端拿到地址后，如何对当次进行调用就是路由要做的事情，我们首先要考虑的是集群的负载均衡的实现，比如轮询、随机、权重等方式，可以参考硬件负载均衡机器或者LVS或者HAProxy策略。</p>
+<h4 id="引入基于接口、方法、参数的的路由"><a href="#引入基于接口、方法、参数的的路由" class="headerlink" title="引入基于接口、方法、参数的的路由"></a>引入基于接口、方法、参数的的路由</h4><p>一般用接口作为服务的粒度，一个服务也就是一个接口的远程实现。假设服务提供两个接口，分别是接口A，接口B，每个服务又提供了两个方法。一般来说一个请求对应一个线程，而总线程数量有一个限制，一旦并发请求过多，其余的就必须要等待。假设某个方法执行的时间很慢，那么很快如果很多线程请求该方法，那么在进入这个方法时，一旦达到瓶颈值，那么其他线程就在等待。我们可以有两种解决方案，增加机器数，可以减少分到单台机器的请求数。也就是增加资源保证系统的能力超出需要；第二种方案是隔离这些资源，从而使得快慢不同重量级别不同的方法互不影响。而分流策略可以让请求服务A的请求全部在右上方机器，请求服务B的请求全部在右下方机器。我们负载均衡的策略的具体实现是先获取服务框架的规则后进行路由处理，也就是根据服务定位提供服务集群的地址，然后在与接口路由规则中的地址做个交集，得到的地址在进行负载均衡算法，最后得到一个可用的地址进行调用。但是基于接口并未解决这个问题，因为A服务的方法一的瓶颈会影响A服务的方法而，这时我们路由规则可以基于接口名加方法，什么可以基于方法名加方法加参数</p>
+<h3 id="多机房场景"><a href="#多机房场景" class="headerlink" title="多机房场景"></a>多机房场景</h3><h3 id="服务调用端的流控处理"><a href="#服务调用端的流控处理" class="headerlink" title="服务调用端的流控处理"></a>服务调用端的流控处理</h3><p>流量控制是为了保证系统的稳定性。我们有两种控制方式，一种是01开关，完全打开和完全不打开；另外一种设定一个固定值，表示每秒可以进行请求的次数。超过这个请求数的就拒接对远程的请求。我们可以从两个维度进行控制：1.根据服务端的接口、方法进行控制；也就是根据不同接口设置不同阈值，这是为了使服务端的不同接口、方法之间的负载不互相影响；根据来源做控制，也就是对同样的接口对不同来源设置不同的限制。</p>
+<h3 id="序列化和反序列处理"><a href="#序列化和反序列处理" class="headerlink" title="序列化和反序列处理"></a>序列化和反序列处理</h3><p>对于Java的序列化，需要考虑三个问题：1.跨语言问题；2.序列化和反序列化的性能开销；3.序列化后的长度；我们可以考虑xml或者json作为序列化方式。</p>
+<h3 id="网络通信实现选择"><a href="#网络通信实现选择" class="headerlink" title="网络通信实现选择"></a>网络通信实现选择</h3><p>通信方式有BIO、NIO和AIO，BIO是阻塞IO，是一个连接消耗一个线程，但是消耗大。如果是NIO，那么客户端和服务器端之间的连接是可以复用的，而不是一个连接消耗一个线程。我们希望通过一个连接来进行多个并发请求操作。类比公路的职能，每条公路允许多辆汽车行驶而不是只有一辆汽车行驶。NIO提供的是非阻塞方式的IO，需要对外提供的是类似阻塞的同步远程请求方式。我们增加了IO线程，数据队列，通信对象队列，和定时任务。</p>
+<h3 id="支持异步服务的调用方式"><a href="#支持异步服务的调用方式" class="headerlink" title="支持异步服务的调用方式"></a>支持异步服务的调用方式</h3><h4 id="oneWay"><a href="#oneWay" class="headerlink" title="oneWay"></a>oneWay</h4><p>oneWay是只管发送不管结果，只需要把要发送的数据放入数据队列，然后继续下面的操作。oneway不关心对方是否收到数据，也不关心返回值。</p>
+<h4 id="callback"><a href="#callback" class="headerlink" title="callback"></a>callback</h4><p>这种方式下，请求方发送后会继续执行下面操作，等对方响应会进行一个回调</p>
+<h4 id="Future"><a href="#Future" class="headerlink" title="Future"></a>Future</h4><p>把数据写入队列，把future写入队列，通过future获取结果</p>
+<h4 id="可靠的异步"><a href="#可靠的异步" class="headerlink" title="可靠的异步"></a>可靠的异步</h4><p>通过消息中间件</p>
+<h3 id="使用Future对远程服务调用的优化"><a href="#使用Future对远程服务调用的优化" class="headerlink" title="使用Future对远程服务调用的优化"></a>使用Future对远程服务调用的优化</h3><p>如果我们在一个请求处理中调用多个远程服务，如果采用同步的方式，那么总时间是全部请求时间求和，如果我们仍然按照顺序把服务的请求依次发给各个服务，但是请求过去后并不等待结果，而是在最后服务发出去后在等待，这样总时间变为单个远程服务时间的最大值。但是这有个前提，所有的服务并没有依赖关系，所以他们可以一起等。</p>
+<h2 id="服务端的设计和实现"><a href="#服务端的设计和实现" class="headerlink" title="服务端的设计和实现"></a>服务端的设计和实现</h2><h3 id="如何暴露远程服务"><a href="#如何暴露远程服务" class="headerlink" title="如何暴露远程服务"></a>如何暴露远程服务</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">&lt;bean id=<span class="string">"calculator"</span> class=<span class="string">"ProviderBean"</span>&gt;</div><div class="line">&lt;property name=<span class="string">"interfaceName"</span>&gt;</div><div class="line">&lt;/property&gt;</div><div class="line">&lt;property name=<span class="string">"target"</span>&gt;</div><div class="line">&lt;/property&gt;</div><div class="line">&lt;property name=<span class="string">"version"</span>&gt;</div><div class="line">&lt;/property&gt;</div><div class="line">&lt;property name=<span class="string">"group"</span>&gt;</div><div class="line">&lt;/property&gt;</div><div class="line">&lt;/bean&gt;</div></pre></td></tr></table></figure>
+<p>服务端提供的是providerBean，而客户端提供的是ConsumerBean。providerBean的职能是服务需要注册到服务查找中心后才能被服务调用者发现，所以providerBean需要将自己所代表的服务注册到服务注册查找中心。也需要在本机注册服务和对应服务的实例。</p>
+<h3 id="服务端对请求处理的流程"><a href="#服务端对请求处理的流程" class="headerlink" title="服务端对请求处理的流程"></a>服务端对请求处理的流程</h3><p>服务框架启动时需要监听端口号，并且等待调用的请求。当服务注册好，监听端口号也准备好，就只需等待服务调用的请求进来。请求处理流程是：网络通信层、协议解析/反序列化、定位服务、调用服务。</p>
+<h3 id="执行不同服务的线程池隔离"><a href="#执行不同服务的线程池隔离" class="headerlink" title="执行不同服务的线程池隔离"></a>执行不同服务的线程池隔离</h3><h3 id="服务提供者的流控处理"><a href="#服务提供者的流控处理" class="headerlink" title="服务提供者的流控处理"></a>服务提供者的流控处理</h3><p>在服务提供者看来，不同来源的服务调用者、0-1开关、限制具体数值的QPS方式都需要实现。对不同调用者进行升级，确保优先级高的服务调用者被优先调用</p>
+<h3 id="服务升级"><a href="#服务升级" class="headerlink" title="服务升级"></a>服务升级</h3><h4 id="增加方法"><a href="#增加方法" class="headerlink" title="增加方法"></a>增加方法</h4><h4 id="修改调用参数列表"><a href="#修改调用参数列表" class="headerlink" title="修改调用参数列表"></a>修改调用参数列表</h4><p>1.对原来的方法的代码进行修改<br>2.通过版本号来解决<br>3.在设计的方法上考虑参数的扩展。但是不可行，通过map不直观</p>
+<h2 id="实战的优化"><a href="#实战的优化" class="headerlink" title="实战的优化"></a>实战的优化</h2><h3 id="服务的拆分"><a href="#服务的拆分" class="headerlink" title="服务的拆分"></a>服务的拆分</h3><h3 id="服务的粒度"><a href="#服务的粒度" class="headerlink" title="服务的粒度"></a>服务的粒度</h3><h3 id="优雅和实用的平衡"><a href="#优雅和实用的平衡" class="headerlink" title="优雅和实用的平衡"></a>优雅和实用的平衡</h3><p>最上层是服务调用者，如果服务调用者调用服务十分频繁，可以写入缓存。没有在调用服务提供者，服务提供者先访问本地缓存，没有在访问数据库</p>
+<h3 id="分布式环境下的请求合并"><a href="#分布式环境下的请求合并" class="headerlink" title="分布式环境下的请求合并"></a>分布式环境下的请求合并</h3><p>对于热点数据的处理，如果可以进行一些任务的合并问题，就会明显降低整个系统的负载。首先可以通过缓存，减少数据的读取和计算的工作量。还可以解析完参数，检查是否有线程在在计算相同的数据，如果有，等待结果；没有，进行计算。分布式环境下会涉及到多节点，如果使用分布式锁，则会有额外的开销。但是我们可以使用路由策略，相同参数的服务发送到同一台服务提供者。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/19/构建java中间件/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="李睿">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/10/19/构建java中间件/" itemprop="url">构建java中间件（第三章）</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-19T10:59:08+08:00">
+                2017-10-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/大型网站中间件/" itemprop="url" rel="index">
+                    <span itemprop="name">大型网站中间件</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="java中间件的定义"><a href="#java中间件的定义" class="headerlink" title="java中间件的定义"></a>java中间件的定义</h2><p>基于java基础构建的中间件。中间件为软件应用提供操作系统所提供的服务之外的服务，中间件不是操作系统的一部分，不是数据库管理的一部分，不是软件应用的一部分，而是能够让软件开发者更方便的处理通信、输入、输出，能够专注在他们自己应用的部分。总体来说，中间件不是最上层应用，也不是最底层的操作系统，是处于中间的组件，起到桥梁的作用，是应用和应用之间，应用和服务之间的桥梁。<br>主要有三个领域的中间件：</p>
+<h3 id="远程对象调用和对象访问中间件"><a href="#远程对象调用和对象访问中间件" class="headerlink" title="远程对象调用和对象访问中间件"></a>远程对象调用和对象访问中间件</h3><p>解决分布式的应用互相访问的问题</p>
+<h3 id="消息中间件"><a href="#消息中间件" class="headerlink" title="消息中间件"></a>消息中间件</h3><p>解决应用之间的消息传递、解耦、异步的问题</p>
+<h3 id="数据访问中间件"><a href="#数据访问中间件" class="headerlink" title="数据访问中间件"></a>数据访问中间件</h3><p>主要解决应用访问数据库的共性问题的组件</p>
+<h2 id="构建java中间件的基础知识"><a href="#构建java中间件的基础知识" class="headerlink" title="构建java中间件的基础知识"></a>构建java中间件的基础知识</h2><h3 id="跨平台的运行环境–jvm"><a href="#跨平台的运行环境–jvm" class="headerlink" title="跨平台的运行环境–jvm"></a>跨平台的运行环境–jvm</h3><p>java虚拟机所识别的是统一格式的中间代码也就是java字节码。</p>
+<h3 id="垃圾回收与内存堆布局"><a href="#垃圾回收与内存堆布局" class="headerlink" title="垃圾回收与内存堆布局"></a>垃圾回收与内存堆布局</h3><p>java虚拟机是通过垃圾回收方式来回收内存的，而不像C/C++语言那样通过代码显示释放。JVM内存堆布局有新生代、年老代、持久代。对象创建一般在新生代的eden区，也有可能直接分配在年老区。</p>
+<h2 id="java并发编程的类、接口和方法"><a href="#java并发编程的类、接口和方法" class="headerlink" title="java并发编程的类、接口和方法"></a>java并发编程的类、接口和方法</h2><h3 id="线程池"><a href="#线程池" class="headerlink" title="线程池"></a>线程池</h3><p>线程池可以降低创建线程的开销，这是因为线程池在线程结束后进行的是回收操作，而不是销毁线程。在java中，我们主要使用的线程池是ThreadPoolExecutor,此外，我们还有定时线程池scheduledThreadPoolExecutor。需要注意的是ThredPool.newCachedThreadPool()返回的线程池的使用，该方法返回的线程池的线程使用没有上限。因而没办法控制总体线程的数量，因为每个内存都要占用内存，这会造成过多内存的占用。建议不要用这个线程池。而使用有固定线程上限的线程池。</p>
+<h3 id="sychronized"><a href="#sychronized" class="headerlink" title="sychronized"></a>sychronized</h3><p>sychronized可以用于声明方法，也可以用于声明代码块。看一下三个使用场景。<br>场景一：<br>在这个类的两个静态方法中，不同线程中，两个方法的调用是互斥的，不仅这样任何两个线程都是互斥的。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">public class Demo1&#123;</div><div class="line"></div><div class="line">    public sychronized static void <span class="function"><span class="title">foo1</span></span>()&#123;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public sychronized static void <span class="function"><span class="title">foo2</span></span>()&#123;</div><div class="line"></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>场景二：<br>foo3和foo4是类的两个成员函数，在多线程中，调用同一个对象的foo3和foo4才会互斥，这是同一对象的多线程调用互斥<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">public class Demo2&#123;</div><div class="line"></div><div class="line">    public sychronized void <span class="function"><span class="title">foo3</span></span>()&#123;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public sychronized void <span class="function"><span class="title">foo4</span></span>()&#123;</div><div class="line"></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>场景三：<br>sychronized用来修饰代码块，后面的参数就是同步锁的对象。sychronized(this) 与Demo3中加sychronized成员方法是互斥，sychronized(Demo3.class)与Demo3中加sychronized静态方法是互斥的<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">public class Demo3&#123;</div><div class="line"></div><div class="line">    public void <span class="function"><span class="title">foo5</span></span>()&#123;</div><div class="line">           sychronized(this)&#123;</div><div class="line"></div><div class="line">           &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public void <span class="function"><span class="title">foo6</span></span>()&#123;</div><div class="line">          sychronized(Demo3.class)&#123;</div><div class="line"></div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="ReentrantLock"><a href="#ReentrantLock" class="headerlink" title="ReentrantLock"></a>ReentrantLock</h3><p>ReentrantLock是java.util.concurrent.locks中的一个类，他的用法类似sychronized类似，但是需要显示unlock。</p>
+<h4 id="ReentrantLock提供tryLock"><a href="#ReentrantLock提供tryLock" class="headerlink" title="ReentrantLock提供tryLock"></a>ReentrantLock提供tryLock</h4><p>调用的时候，如果锁被其他线程持有，那么tryLock就会立刻返回，返回结果为false，如果锁没有被其他线程持有，当前线程会持有锁，返回true。</p>
+<h4 id="ReentrantLock提供公平锁和抢占锁"><a href="#ReentrantLock提供公平锁和抢占锁" class="headerlink" title="ReentrantLock提供公平锁和抢占锁"></a>ReentrantLock提供公平锁和抢占锁</h4><p>默认是抢占锁，通过参数boolean fair；公平锁的好处是等待锁的线程不会饿死，但是整体效率会降低；非公平锁的好处是整体效率会相对高点，但是有些线程会饿死或者等待很长时间才能获取。公平锁是按照锁的排队顺序需要获取锁，而非公平锁是抢占式的。此外ReentrantLock还提供了ReentrantReadWriteLock，读写锁，主要用于读多写少并且读不需要互斥的场景，这样的锁比全部互斥锁性能会高。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">lock.lock();</div><div class="line">try&#123;</div><div class="line"></div><div class="line">&#125;</div><div class="line">catch(Exception e)&#123;</div><div class="line"></div><div class="line">&#125;</div><div class="line">finally&#123;</div><div class="line">  lock.unlock();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>unlock写在finally表示一定可以释放锁，ReentrantReadWriteLock与ReentrantLock用法相似，但是通过readLock()和writeLock()两个方法来获取读锁和写锁，这两个锁按照前面的方式进行加锁和解锁。</p>
+<h3 id="volatile"><a href="#volatile" class="headerlink" title="volatile"></a>volatile</h3><p>sychronized除了有互斥性，还有可见性。可见性是指一个线程修改了变量后，其他线程能够马上看到这个修改值。volatile能够保证变量的可见性，它更多是修饰开关的可见性，它不能保证操作的原子性。</p>
+<h3 id="Atomics"><a href="#Atomics" class="headerlink" title="Atomics"></a>Atomics</h3><p>JDK 1.5增加了java.util.concurrent.atomic包，这些包是以Atomic开头的类，这些类提供了一些原子操作，以AtomicInteger为例，通过jni使用硬件支持的CAS指令：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">public class Sample &#123;</div><div class="line"></div><div class="line">    private static AtomicInteger count = new AtomicInteger(0);</div><div class="line"></div><div class="line">    public static void <span class="function"><span class="title">increment</span></span>() &#123;</div><div class="line">        count.incrementAndGet();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public static void <span class="function"><span class="title">decrease</span></span>() &#123;</div><div class="line">        count.decrementAndGet();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="wait、notify和notifyAll"><a href="#wait、notify和notifyAll" class="headerlink" title="wait、notify和notifyAll"></a>wait、notify和notifyAll</h3><p>wait、notify和notifyAll是java的object对象的三个方法，wait是用来等待的，notify和notifyAll是用来通知的。在多线程中，可以把某个对象做为事件对象，通过这个对象的wait、notify、notifyAll完成线程的通知。notify和notifyAll都是唤醒调用同一个对象的wait，但不同的是notify会唤醒一个等待线程，notifyAll会唤醒全部等待线程。对wait、notify、notifyAll的调用必须在对象的sychronized中。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">public void <span class="function"><span class="title">testWait</span></span>()&#123;</div><div class="line">  sychronized(this)&#123;</div><div class="line">    this.wait();</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line">public void <span class="function"><span class="title">testNotify</span></span>()&#123;</div><div class="line">  sychronized(this)&#123;</div><div class="line">    this.notify();</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>在实践中，对wait的使用一般在循环里，并且会判断相关的数据状态是否达到预期，如果没有，继续等待，这样做主要是为了防止虚假唤醒。虚假唤醒就是一些obj.wait()会在除了obj.notify()和obj.notifyAll()的其他情况被唤醒，而此时是不应该唤醒的。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">sychronized(obj)&#123;</div><div class="line"></div><div class="line">       <span class="keyword">while</span>(&lt;condition does not hold&gt;)</div><div class="line">            obj.wait();</div><div class="line">           //<span class="keyword">do</span>Sometihing()</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="CountDownLatch"><a href="#CountDownLatch" class="headerlink" title="CountDownLatch"></a>CountDownLatch</h3><p>CountDownLatch是java.util.concurrent包中的一个类。CountDownLatch提供的机是当多个（具体数量是等于初始化CountDownLatch初始化的值）线程都到达了预期状态或完成预期工作时触发事件，其他线程可以等待这个事件触发自己后续的工作。等待的线程可以是多个，即CountDownLatch可以唤醒多个等待的线程，到达自己预期的状态会调用CountDownLatch的countDown方法，而等待的线程可以调用countDownLatch的await方法。<br>如果CountDownLatch的初始化count值为1就退化成为了单个事件，即由一个线程通知其他线程，效果等同于await和notifyAll。count值大于1是常用的方式，目的是让多个线程到达各自的预期状态，变为一个事件来通知，线程继续自己的行为。<br>例如我们使用一台多核机器对一组数据进行排序，我们可以把一组数据分到不同的线程去排序，然后在进行合并；可以将CountDownLatch作为各个线程排好序的通知。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">int count=10;</div><div class="line">final CountDownLatch latch=new CountDownLatch(count);</div><div class="line">int[] datas=new int[10204];</div><div class="line">int step=datas.length/count;</div><div class="line"><span class="keyword">for</span>(int i=0;i&lt;count;i++)&#123;</div><div class="line">    int begin=i*step;</div><div class="line">    int end=(i+1)*step;</div><div class="line">    <span class="keyword">if</span>(i==count-1)&#123;</div><div class="line">      end=datas.length;</div><div class="line">    &#125;</div><div class="line">    threadPool.execute(new MyRunnable(latch,datas,begin,end));</div><div class="line">&#125;</div><div class="line">latch.await();</div><div class="line">合并数据</div><div class="line">MyRunnable的run实现</div><div class="line">public void <span class="function"><span class="title">run</span></span>()&#123;</div><div class="line">  //数据排序</div><div class="line">  latch.countDown();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="CyclicBarrier"><a href="#CyclicBarrier" class="headerlink" title="CyclicBarrier"></a>CyclicBarrier</h3><p>CyclicBarrier字面意思循环屏障，CyclicBarrier可以协调多个线程，让多个线程在这个屏障等待，直到所有线程都到达了这个屏障，再一起继续执行后面的动作。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">public static class WorkerThread implements Runnable&#123;</div><div class="line"></div><div class="line">          CyclicBarrier barrier;</div><div class="line"></div><div class="line">          public WorkerThread(CyclicBarrier b)&#123;</div><div class="line">             this.barrier = b;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">         @Override</div><div class="line">         public void <span class="function"><span class="title">run</span></span>() &#123;</div><div class="line">             // TODO Auto-generated method stub</div><div class="line">             try&#123;</div><div class="line">                 System.out.println(<span class="string">"Worker's waiting"</span>);</div><div class="line">                 //线程在这里等待，直到所有线程都到达barrier。</div><div class="line">                 barrier.await();</div><div class="line">                 System.out.println(<span class="string">"ID:"</span>+Thread.currentThread().getId()+<span class="string">" Working"</span>);</div><div class="line">            &#125;catch(Exception e)&#123;</div><div class="line">                 e.printStackTrace();</div><div class="line">             &#125;</div><div class="line">        &#125;</div></pre></td></tr></table></figure></p>
+<p>CountDownLatch的count等于调用countDown的个数，CyclicBarrier的数量是await的数量。CyclicBarrier、CountDownLatch都是用于多线程协调，但不同是，CountDownLatch是在多线程中进行latch.countDown后才会触发事件，唤醒await的线程。而CyclicBarrier是用于同步所有调用await方法的线程。并且等到所有线程到了await后才会一起返回继续自己的工作。CountDownLatch不能循环调用,CyclicBarrier可以循环调用。</p>
+<h3 id="Semaphore"><a href="#Semaphore" class="headerlink" title="Semaphore"></a>Semaphore</h3><p>Semaphore是用来管理信号量的，构造的时候传入可供管理信号量的数值。简单来说，信号量对象管理的信号就像令牌，构造时传入个数，总数就是控制并发的数量。执行前先获取信号（通过acquire），执行后归还信号（通过release），每次acquire成功后，信号量减少一，如果没有可用的信号，acquire就会阻塞，等待release调用释放信号，才能获取信号返回。<br>如果Semaphore管理的信号量只有一个，就退化成互斥锁。如果大于1的信号量，主要用于控制并发数。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">try&#123;</div><div class="line">semaphore.acquire();</div><div class="line">&#125;</div><div class="line">catch(Exception e)&#123;</div><div class="line"></div><div class="line">&#125;</div><div class="line">finally&#123;</div><div class="line">semaphore.release();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="Exchanger"><a href="#Exchanger" class="headerlink" title="Exchanger"></a>Exchanger</h3><p>Exchanger用于两个线程的数据进行交换，线程会阻塞Exchanger的exchange方法，知道另外一个线程也到exchange方法，然后交换数据，往下执行。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">final Exchanger&lt;List&lt;String&gt;&gt; exchanger = new Exchanger&lt;List&lt;String&gt;&gt;();</div><div class="line">		new Thread(new <span class="function"><span class="title">Runnable</span></span>() &#123;</div><div class="line"></div><div class="line">			@Override</div><div class="line">			public void <span class="function"><span class="title">run</span></span>() &#123;</div><div class="line">				List&lt;String&gt; list = new ArrayList&lt;String&gt;();</div><div class="line">				list.add(<span class="string">"1"</span>);</div><div class="line">				try &#123;</div><div class="line">					list=exchanger.exchange(list);</div><div class="line">				&#125; catch (InterruptedException e) &#123;</div><div class="line">					// TODO Auto-generated catch block</div><div class="line">					e.printStackTrace();</div><div class="line">				&#125;</div><div class="line">				System.out.println(list+<span class="string">":thread1"</span>);</div><div class="line">			&#125;</div><div class="line">		&#125;).start();</div><div class="line">		new Thread(new <span class="function"><span class="title">Runnable</span></span>() &#123;</div><div class="line"></div><div class="line">			@Override</div><div class="line">			public void <span class="function"><span class="title">run</span></span>() &#123;</div><div class="line">				List&lt;String&gt; list = new ArrayList&lt;String&gt;();</div><div class="line">				list.add(<span class="string">"3"</span>);</div><div class="line">				try &#123;</div><div class="line">					list=exchanger.exchange(list);</div><div class="line">				&#125; catch (InterruptedException e) &#123;</div><div class="line">					// TODO Auto-generated catch block</div><div class="line">					e.printStackTrace();</div><div class="line">				&#125;</div><div class="line">				System.out.println(list+<span class="string">":thread2"</span>);</div><div class="line">			&#125;</div><div class="line">		&#125;).start();</div></pre></td></tr></table></figure></p>
+<h3 id="Future和FuturTask"><a href="#Future和FuturTask" class="headerlink" title="Future和FuturTask"></a>Future和FuturTask</h3><p>Future 是一个接口，FutureTask是接口的实现类，我们看下这么样的场景<br>通过调用一个方法从远程获取一些计算结果，假设有HashMap getDataFromRemote();<br>假设是同步的方式，我们会一直等待这个方法的返回，然后才能继续下面的工作，如果这个方法执行的时间比较长，并且后面的代码跟这个方法没关系的话，那么阻塞在这里就没有意义。<br>第二种方式是异步的方式，调用函数后马上返回，然后继续执行，等需要用时再来取数据。具体实现方式是用Future，或者回调。</p>
+<h3 id="并发容器"><a href="#并发容器" class="headerlink" title="并发容器"></a>并发容器</h3><p>并发容器是线程安全容器的一种，但是并发容器强调容器的并发性，也就是不仅强调安全，也强调并发。比较有代表的是CopyAndWrite和Concurrent开头的容器。如ConcurrentHashMap，ConcurrentLinkedQueue，ConcurrentLinkedDequeue、CopyOnWriteArrayList、CopyOnWriteArraySet。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">public interface Subject &#123;</div><div class="line"></div><div class="line">	 public void <span class="keyword">do</span>Something();  </div><div class="line"></div><div class="line">&#125;</div><div class="line">public class RealSubject implements Subject &#123;</div><div class="line"></div><div class="line">	@Override</div><div class="line">	  public void <span class="function"><span class="title">doSomething</span></span>()   </div><div class="line">	  &#123;   </div><div class="line">	    System.out.println( <span class="string">"call doSomething()"</span> );   </div><div class="line">	  &#125;   </div><div class="line">&#125;</div><div class="line">public class ProxyObject implements Subject &#123;</div><div class="line"></div><div class="line">	private RealSubject realSubject;</div><div class="line"></div><div class="line">	public ProxyObject(RealSubject realSubject) &#123;</div><div class="line">		super();</div><div class="line">		this.realSubject = realSubject;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	@Override</div><div class="line">	public void <span class="function"><span class="title">doSomething</span></span>() &#123;</div><div class="line">		realSubject.doSomething();  </div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="动态代理"><a href="#动态代理" class="headerlink" title="动态代理"></a>动态代理</h2><p>代理有静态代理和动态代理之分。<br>静态代理方式是为每一个被代理的对象构造对应的代理类。这种方式比较直接，实现也比较方便，不过也存在问题，即如对多个类进行代理，并且在代理类的功能实现是一致的，就必须为每一个具体类都完成一个代理类。<br>动态代理是动态地生成具体委托类的代理类实现对象。与静态代理不同，它只需要为一类代理行为写一个具体的实现类。用过Proxy.newProxyInstance来创建代理的方式可以为不同的委托类创建代理类。在具体的代理实现上，所给出的是通用实现，被代理的方法会进入invoke方法，我们可以在invoke方法中做很多事情，例如调用前和调用后可以操作。并且对于一类的增强事情，我们不用写多个ProxyHandler，就可以给多个委托类使用<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">public class ProxyHandler implements InvocationHandler &#123;</div><div class="line"></div><div class="line">	  private Object proxied;   </div><div class="line"></div><div class="line">	  public ProxyHandler( Object proxied )   </div><div class="line">	  &#123;   </div><div class="line">	    this.proxied = proxied;   </div><div class="line">	  &#125;   </div><div class="line"></div><div class="line">	@Override</div><div class="line">	public Object invoke(Object proxy, Method method, Object[] args)</div><div class="line">			throws Throwable &#123;</div><div class="line">		System.out.println(<span class="string">"before invoke"</span>);</div><div class="line">		Object object=method.invoke(proxied, args);</div><div class="line">		System.out.println(<span class="string">"after invoke"</span>);</div><div class="line">		<span class="built_in">return</span> object;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div><div class="line">RealSubject realSubject = new RealSubject();</div><div class="line">		Subject subject = (Subject) Proxy.newProxyInstance(</div><div class="line">				Subject.class.getClassLoader(), new Class[]&#123;Subject.class&#125;,</div><div class="line">				new ProxyHandler(realSubject));</div><div class="line">		subject.doSomething();</div></pre></td></tr></table></figure></p>
+<h2 id="反射"><a href="#反射" class="headerlink" title="反射"></a>反射</h2><p>java反射机制是指在运行状态中，对于任意的一个类，都能知道这个类的所有方法和所有属性。对于任意一个对象，都能调用他的任意一个他的方法或者他的属性。反射主要提供的功能有：1.在运行时判断任意一个对象所属的类；2.在运行时构造任意一个对象所属的类；3.在运行时判断任意一个类的所具有的成员变量和方法；4.在运行时调用任意一个对象的方法；5.生成动态代理。用法示例</p>
+<h3 id="获取对象属于哪个类"><a href="#获取对象属于哪个类" class="headerlink" title="获取对象属于哪个类"></a>获取对象属于哪个类</h3><p>Subject subject=new Subject(“lr12”, “topic”);<br>Class class=subject.getClass();</p>
+<h3 id="获取类的信息"><a href="#获取类的信息" class="headerlink" title="获取类的信息"></a>获取类的信息</h3><p>//获取类名<br>String className=clazz.getName();<br>//获取方法<br>Method[] methods=clazz.getDeclaredMethods();<br>//获取成员变量<br>Field[] fields=clazz.getDeclaredFields();</p>
+<h3 id="构建对象"><a href="#构建对象" class="headerlink" title="构建对象"></a>构建对象</h3><p>Class.forName(“reflect.Subject”).newInstance();<br>在这里的通过传入一个字符创来构造对象，体现了动态性，同时要求这个类的构造函数必须有一个无参的，否则将抛出异常。</p>
+<h3 id="动态执行方法"><a href="#动态执行方法" class="headerlink" title="动态执行方法"></a>动态执行方法</h3><p>Method method=clazz.getDeclaredMethod(“doSomething”);<br>method.invoke(subject);</p>
+<h3 id="动态操作属性"><a href="#动态操作属性" class="headerlink" title="动态操作属性"></a>动态操作属性</h3><p>Field field=clazz.getDeclaredField(“name”);<br>field.set(subject, “lr”)<br>这里要强调如果方法和属性是静态的，这时候可以不用传对象，可以传null。</p>
+<h3 id="网络通信实现选择"><a href="#网络通信实现选择" class="headerlink" title="网络通信实现选择"></a>网络通信实现选择</h3><p>网络通信三个模型：BIO、NIO、AIO。在1.4的版本中增加了NIO，在1.7的版本中增加了AIO。</p>
+<h2 id="分布式系统中的中间件"><a href="#分布式系统中的中间件" class="headerlink" title="分布式系统中的中间件"></a>分布式系统中的中间件</h2>
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/17/大型软件架构及其结构演进过程/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1412,285 +1747,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/05/01/云取证第二周周报/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="李睿">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/05/01/云取证第二周周报/" itemprop="url">云取证第二周周报</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-01T18:56:11+08:00">
-                2017-05-01
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/云取证/" itemprop="url" rel="index">
-                    <span itemprop="name">云取证</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>本周我主要做的工作有，看了几篇论文，主要还是了解现在云取证的一些情况和了解了一下docker这个新兴的技术在云计算中的应用和使用问题，印象比较深的有几篇云取证综述的论文。Cloud forensics State-of-the-art and future directions、cloud computing and digital forensics这两篇。</p>
-<p>首先是Cloud forensics State-of-the-art and future directions。本论文主要讲的是在现有阶段下云取证的研究进展所面临的的挑战以及移动云取证的一些研究。首先文章开篇讲了在，美国国家标准与技术研究在“NIST云计算取证科学挑战”草案中，这致力于报告这一新兴调查领域的最新进展和最新进展。而在这里，接受率仅为15.4%。这侧面反应了这个评审的难度，也说明现在的挑战还是很大。其次是在新工具的使用上，文章只是提到了促进多节点Hadoop集群中的取证调查，但并没有进行展开讨论。以此为例引出了如果没有开发根本的新工具和能力，取证专家将面临越来越多的困难和成本。因此，今天的数字侦探不仅与罪犯进行军备竞赛，而且还与未来计算机系统的开发者进行了斗争。文章最后提到移动（云）取证是一个未被研究的主题，特别是从提供高级安全性的设备中获取数据，不仅可以用于静态数据（现在已经在所有智能移动设备中变得司空见惯），而且还通过高级加密的数据。NIST IR 8006将挑战分为九组，涉及架构，数据收集，分析，反取证，事件首次响应者，角色管理，法律话题，标准和培训等问题。我的体会是，首先这篇论文也算是我的看的入门第一篇论文，首先在现在云取证面临的挑战是非常大的，不仅在于理论研究还在于新技术的取证工具。文章最后提到的移动云取证现在还是一个比较新的主题，可以算是一个小小备选方案（但我上周和学长们简单交流了下，他们说现在移动云取证几乎该挖的坑都挖完了，所以在这边还是有分歧，有可能跟时间有问题或者跟看的问题角度有关）。</p>
-<p>其次是cloud computing and digital forensics（云取证和数字取证）。这篇论文令我印象深的有这么几点：1.日志这一取证的手段。在网络入侵的情况下，受害者组织普遍存在于准备阶段，为了保护数字犯罪现场，关闭整个网络极少可行。因此，有用的证据可能不再可用，可能难以收集，也许完全不可接触，或者可能没有以法定的方式保存。例如，各种类型的日志在网络入侵调查中可能是非常有价值的，但是许多组织不会收集这些日志或不保留日志超过几天，或者不以确保其完整性的方式存储日志。这给我的体会是可以结合一个场景，将日志这个功能进行完善分析。2. 取证方法的分析，涉及哦取证技术；网络取证工具，内存取证方法和数据库取证方法。里面提到了计算机和智能手机云存储服务留下的痕迹的取证分析，是智能手机中碎片闪存页面的取证分析技术。Fasan和Olivier提出了一种重建存储在数据库中的数字证据的可靠方法（参见“数据库重建算法的正确性证明”）。这是一个重要的话题，因为更多的证据存储在数据库中，包括在云环境中，使得可以将很多证据得以保存，便于以后排查原因入侵者等因素。</p>
-<p>关于Docker的研究。Docker 是一个开源的应用容器引擎，让开发者可以打包他们的应用以及依赖包到一个可移植的容器中，然后发布到任何流行的 Linux 机器上，也可以实现虚拟化。容器是完全使用沙箱机制，相互之间不会有任何接口。docker的出现极大了加快了PAAS的发展，企业私有PAAS构建蓬勃发展起来。可以看到PAAS核心是解决软件代码完成后部署运行运维到监控的所有事情。基于Docker的PaaS平台现在逐渐成为主流。关于docker的安全问题有：</p>
-<h5 id="1-权限及资源限制。"><a href="#1-权限及资源限制。" class="headerlink" title="1.    权限及资源限制。"></a>1.    权限及资源限制。</h5><p>限制用户运行特权及访问资源。对于多租户应用，不同的容器共享同一主机的资源和环境，普通用户权限的恶意提升将会使宿主主机完全处于被非法操控的险境，而对于用户的合法操作，大量的资源申请也会将主机推向崩溃的编译。因此，有必要对用户权限进行限定，避免根权限的赋予，进而减少主机暴露的攻击面和潜力。同时，在CPU、内存及进程数等资源方面，限定用户在单一容器中的可用配额，来防止恶意的无限资源申请给整体系统带来的破坏。<br>镜像及制作管理</p>
-<h5 id="2-对容器的镜像来源进行审核。"><a href="#2-对容器的镜像来源进行审核。" class="headerlink" title="2.对容器的镜像来源进行审核。"></a>2.对容器的镜像来源进行审核。</h5><p>容器镜像制作的简化让用户可以轻而易举的创建自定义的应用镜像，但制作的应用程序千差万别，功能完整性和测试完整性参差不齐。这让用户镜像的产生面临存在众多漏洞的风险，因此需要对镜像的制作过程尽量规范化，对放置的应用程序尽量做到测试完备并符合安全标准，从源头上减少漏洞镜像的生成。而在创建容器过程中，避免使用不受信任的镜像及应用程序，采用标准及合格厂商如时速云的镜像服务mirror，从而保证容器运行时的正规及安全。</p>
-<h5 id="3-日志安全审计及升级补丁"><a href="#3-日志安全审计及升级补丁" class="headerlink" title="3.日志安全审计及升级补丁"></a>3.日志安全审计及升级补丁</h5><p>对容器及系统中宿主机进行定期安全检查及漏洞补丁升级。定期针对容器及所在宿主机的网络环境进行渗透安全测试，及时发现可疑容器或危险服务端口。对主机内核及原始镜像进行定时更新，及时修补公开漏洞。在应用层次，收集及检测容器的安全日志，统计监督应用的运行过程，及时发现服务异常。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/25/云取证第一周周报/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="李睿">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/04/25/云取证第一周周报/" itemprop="url">云取证第一周周报</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-25T10:33:03+08:00">
-                2017-04-25
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/云取证/" itemprop="url" rel="index">
-                    <span itemprop="name">云取证</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>本周我主要做的工作有，上网查询有关于云计算方面的知识点、云安全的相关知识点以及云取证的一些概念。</p>
-<p>首先是对于云计算的一些见解，定义就是，云计算是基于互联网的相关服务的增加、使用和交付模式，通常涉及通过互联网来提供动态易扩展且经常是虚拟化的资源。特点是通过使计算分布在大量的分布式计算机上，而非本地计算机或远程服务器中，企业数据中心的运行将与互联网更相似。这使得企业能够将资源切换到需要的应用上，根据需求访问计算机和存储系统。从我个人角度出发，我认为云这个概念其实就是任何可以通过互联网访问的服务。而这个服务往往通过分布式计算机来协助完成。</p>
-<p>然后是云计算的分类，具体是分为IaaS、PaaS、SaaS。IaaS(Infrastructure as a Service，基础架构即服务)通过互联网提供了数据中心、基础架构硬件和软件资源。IaaS可以提供服务器、操作系统、磁盘存储、数据库和/或信息资源。IaaS通常会按照”弹性云”的模式引入其他的使用和计价模式，也就是在任何一个特定的时间，都只使用你需要的服务，并且只为之付费。PaaS(Platform as a Service，平台即服务)提供了基础架构，软件开发者可以在这个基础架构之上建设新的应用，或者扩展已有的应用，同时却不必购买开发、质量控制或生产服务器。这些平台允许公司创建个性化的应用，也允许独立软件厂商或者其他的第三方机构针对垂直细分行业创造新的解决方案。SaaS(Software as a Service，软件即服务)是最为成熟、最出名，也是得到最广泛应用的一种云计算。大家可以将它理解为一种软件分布模式，在这种模式下，应用软件安装在厂商或者服务供应商那里，用户可以通过某个网络来使用这些软件，通常使用的网络是互联网。这种模式通常也被称为”随需应变”软件，这是最成熟的云计算模式，因为这种模式具有高度的灵活性、已经证明可靠的支持服务、强大的可扩展性，因此能够降低客户的维护成本和投入，而且由于这种模式的多宗旨式的基础架构，运营成本也得以降低。</p>
-<p>“云安全（Cloud Security）”计划是网络时代信息安全的最新体现，它融合了并行处理、网格计算、未知病毒行为判断等新兴技术和概念，通过网状的大量客户端对网络中软件行为的异常监测，获取互联网中木马、恶意程序的最新信息，推送到Server端进行自动分析和处理，再把病毒和木马的解决方案分发到每一个客户端。常见的云安全问题有：用户身份安全问题、共享业务安全问题、用户数据安全问题。</p>
-<p>术语“云取证”是指从云基础设施采集数字取证数据。例如，本地取证证据包括从日志文件、存储在磁盘上的数据、网络流量和入侵标志物等收集到的信息。本地分析与云服务分析之间的基本区别是，使用本地计算机，通过简单地进入系统，从而可以收集并分析信息。然而，当涉及到云时，机器无法进行物理访问，只有计算机的某些部分，可以通过云应用程序接口进行访问。</p>
-<p>我的个人见解是，对于云取证来说，可以从两个方面进行考虑。第一个是怎么取证，也就是取证的手段，换句话说就是在取证的技术或者方式上有所改善或者突破；第二个就是对于获取到的证据如何去分析，也就是在分析证据的手段上有所改善或者突破，我觉得这块可以跟比如数据挖掘或者人工智能联系起来，例如有个论文提到的，用数据挖掘来形成聚类，找出ip的之间的关系，具体是通过kmeans的算法针对原始数据进行聚类，将所有数据划分成不同的数据集；接着在各个聚类后的数据集内部，使用 IP 地址统计方法来捕捉各个数据集特征，从而找出离群值，即可能的入侵者。又比如可以对文件简历索引，通过搜索引擎大大提高海量数据查询的效率，具体做法是集中为每个文件创建唯一标志签名， 该签名会一直跟随文件直到文件被删除， 然后借助分布式任务检测海量数据中符合签名的匹配文件 ， 从而大大提高了文件搜索的效率。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1740,7 +1796,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">52</span>
+                <span class="site-state-item-count">54</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

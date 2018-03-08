@@ -273,6 +273,285 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/05/01/云取证第二周周报/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="李睿">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/05/01/云取证第二周周报/" itemprop="url">云取证第二周周报</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-01T18:56:11+08:00">
+                2017-05-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/云取证/" itemprop="url" rel="index">
+                    <span itemprop="name">云取证</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>本周我主要做的工作有，看了几篇论文，主要还是了解现在云取证的一些情况和了解了一下docker这个新兴的技术在云计算中的应用和使用问题，印象比较深的有几篇云取证综述的论文。Cloud forensics State-of-the-art and future directions、cloud computing and digital forensics这两篇。</p>
+<p>首先是Cloud forensics State-of-the-art and future directions。本论文主要讲的是在现有阶段下云取证的研究进展所面临的的挑战以及移动云取证的一些研究。首先文章开篇讲了在，美国国家标准与技术研究在“NIST云计算取证科学挑战”草案中，这致力于报告这一新兴调查领域的最新进展和最新进展。而在这里，接受率仅为15.4%。这侧面反应了这个评审的难度，也说明现在的挑战还是很大。其次是在新工具的使用上，文章只是提到了促进多节点Hadoop集群中的取证调查，但并没有进行展开讨论。以此为例引出了如果没有开发根本的新工具和能力，取证专家将面临越来越多的困难和成本。因此，今天的数字侦探不仅与罪犯进行军备竞赛，而且还与未来计算机系统的开发者进行了斗争。文章最后提到移动（云）取证是一个未被研究的主题，特别是从提供高级安全性的设备中获取数据，不仅可以用于静态数据（现在已经在所有智能移动设备中变得司空见惯），而且还通过高级加密的数据。NIST IR 8006将挑战分为九组，涉及架构，数据收集，分析，反取证，事件首次响应者，角色管理，法律话题，标准和培训等问题。我的体会是，首先这篇论文也算是我的看的入门第一篇论文，首先在现在云取证面临的挑战是非常大的，不仅在于理论研究还在于新技术的取证工具。文章最后提到的移动云取证现在还是一个比较新的主题，可以算是一个小小备选方案（但我上周和学长们简单交流了下，他们说现在移动云取证几乎该挖的坑都挖完了，所以在这边还是有分歧，有可能跟时间有问题或者跟看的问题角度有关）。</p>
+<p>其次是cloud computing and digital forensics（云取证和数字取证）。这篇论文令我印象深的有这么几点：1.日志这一取证的手段。在网络入侵的情况下，受害者组织普遍存在于准备阶段，为了保护数字犯罪现场，关闭整个网络极少可行。因此，有用的证据可能不再可用，可能难以收集，也许完全不可接触，或者可能没有以法定的方式保存。例如，各种类型的日志在网络入侵调查中可能是非常有价值的，但是许多组织不会收集这些日志或不保留日志超过几天，或者不以确保其完整性的方式存储日志。这给我的体会是可以结合一个场景，将日志这个功能进行完善分析。2. 取证方法的分析，涉及哦取证技术；网络取证工具，内存取证方法和数据库取证方法。里面提到了计算机和智能手机云存储服务留下的痕迹的取证分析，是智能手机中碎片闪存页面的取证分析技术。Fasan和Olivier提出了一种重建存储在数据库中的数字证据的可靠方法（参见“数据库重建算法的正确性证明”）。这是一个重要的话题，因为更多的证据存储在数据库中，包括在云环境中，使得可以将很多证据得以保存，便于以后排查原因入侵者等因素。</p>
+<p>关于Docker的研究。Docker 是一个开源的应用容器引擎，让开发者可以打包他们的应用以及依赖包到一个可移植的容器中，然后发布到任何流行的 Linux 机器上，也可以实现虚拟化。容器是完全使用沙箱机制，相互之间不会有任何接口。docker的出现极大了加快了PAAS的发展，企业私有PAAS构建蓬勃发展起来。可以看到PAAS核心是解决软件代码完成后部署运行运维到监控的所有事情。基于Docker的PaaS平台现在逐渐成为主流。关于docker的安全问题有：</p>
+<h5 id="1-权限及资源限制。"><a href="#1-权限及资源限制。" class="headerlink" title="1.    权限及资源限制。"></a>1.    权限及资源限制。</h5><p>限制用户运行特权及访问资源。对于多租户应用，不同的容器共享同一主机的资源和环境，普通用户权限的恶意提升将会使宿主主机完全处于被非法操控的险境，而对于用户的合法操作，大量的资源申请也会将主机推向崩溃的编译。因此，有必要对用户权限进行限定，避免根权限的赋予，进而减少主机暴露的攻击面和潜力。同时，在CPU、内存及进程数等资源方面，限定用户在单一容器中的可用配额，来防止恶意的无限资源申请给整体系统带来的破坏。<br>镜像及制作管理</p>
+<h5 id="2-对容器的镜像来源进行审核。"><a href="#2-对容器的镜像来源进行审核。" class="headerlink" title="2.对容器的镜像来源进行审核。"></a>2.对容器的镜像来源进行审核。</h5><p>容器镜像制作的简化让用户可以轻而易举的创建自定义的应用镜像，但制作的应用程序千差万别，功能完整性和测试完整性参差不齐。这让用户镜像的产生面临存在众多漏洞的风险，因此需要对镜像的制作过程尽量规范化，对放置的应用程序尽量做到测试完备并符合安全标准，从源头上减少漏洞镜像的生成。而在创建容器过程中，避免使用不受信任的镜像及应用程序，采用标准及合格厂商如时速云的镜像服务mirror，从而保证容器运行时的正规及安全。</p>
+<h5 id="3-日志安全审计及升级补丁"><a href="#3-日志安全审计及升级补丁" class="headerlink" title="3.日志安全审计及升级补丁"></a>3.日志安全审计及升级补丁</h5><p>对容器及系统中宿主机进行定期安全检查及漏洞补丁升级。定期针对容器及所在宿主机的网络环境进行渗透安全测试，及时发现可疑容器或危险服务端口。对主机内核及原始镜像进行定时更新，及时修补公开漏洞。在应用层次，收集及检测容器的安全日志，统计监督应用的运行过程，及时发现服务异常。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/25/云取证第一周周报/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="李睿">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/04/25/云取证第一周周报/" itemprop="url">云取证第一周周报</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-25T10:33:03+08:00">
+                2017-04-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/云取证/" itemprop="url" rel="index">
+                    <span itemprop="name">云取证</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>本周我主要做的工作有，上网查询有关于云计算方面的知识点、云安全的相关知识点以及云取证的一些概念。</p>
+<p>首先是对于云计算的一些见解，定义就是，云计算是基于互联网的相关服务的增加、使用和交付模式，通常涉及通过互联网来提供动态易扩展且经常是虚拟化的资源。特点是通过使计算分布在大量的分布式计算机上，而非本地计算机或远程服务器中，企业数据中心的运行将与互联网更相似。这使得企业能够将资源切换到需要的应用上，根据需求访问计算机和存储系统。从我个人角度出发，我认为云这个概念其实就是任何可以通过互联网访问的服务。而这个服务往往通过分布式计算机来协助完成。</p>
+<p>然后是云计算的分类，具体是分为IaaS、PaaS、SaaS。IaaS(Infrastructure as a Service，基础架构即服务)通过互联网提供了数据中心、基础架构硬件和软件资源。IaaS可以提供服务器、操作系统、磁盘存储、数据库和/或信息资源。IaaS通常会按照”弹性云”的模式引入其他的使用和计价模式，也就是在任何一个特定的时间，都只使用你需要的服务，并且只为之付费。PaaS(Platform as a Service，平台即服务)提供了基础架构，软件开发者可以在这个基础架构之上建设新的应用，或者扩展已有的应用，同时却不必购买开发、质量控制或生产服务器。这些平台允许公司创建个性化的应用，也允许独立软件厂商或者其他的第三方机构针对垂直细分行业创造新的解决方案。SaaS(Software as a Service，软件即服务)是最为成熟、最出名，也是得到最广泛应用的一种云计算。大家可以将它理解为一种软件分布模式，在这种模式下，应用软件安装在厂商或者服务供应商那里，用户可以通过某个网络来使用这些软件，通常使用的网络是互联网。这种模式通常也被称为”随需应变”软件，这是最成熟的云计算模式，因为这种模式具有高度的灵活性、已经证明可靠的支持服务、强大的可扩展性，因此能够降低客户的维护成本和投入，而且由于这种模式的多宗旨式的基础架构，运营成本也得以降低。</p>
+<p>“云安全（Cloud Security）”计划是网络时代信息安全的最新体现，它融合了并行处理、网格计算、未知病毒行为判断等新兴技术和概念，通过网状的大量客户端对网络中软件行为的异常监测，获取互联网中木马、恶意程序的最新信息，推送到Server端进行自动分析和处理，再把病毒和木马的解决方案分发到每一个客户端。常见的云安全问题有：用户身份安全问题、共享业务安全问题、用户数据安全问题。</p>
+<p>术语“云取证”是指从云基础设施采集数字取证数据。例如，本地取证证据包括从日志文件、存储在磁盘上的数据、网络流量和入侵标志物等收集到的信息。本地分析与云服务分析之间的基本区别是，使用本地计算机，通过简单地进入系统，从而可以收集并分析信息。然而，当涉及到云时，机器无法进行物理访问，只有计算机的某些部分，可以通过云应用程序接口进行访问。</p>
+<p>我的个人见解是，对于云取证来说，可以从两个方面进行考虑。第一个是怎么取证，也就是取证的手段，换句话说就是在取证的技术或者方式上有所改善或者突破；第二个就是对于获取到的证据如何去分析，也就是在分析证据的手段上有所改善或者突破，我觉得这块可以跟比如数据挖掘或者人工智能联系起来，例如有个论文提到的，用数据挖掘来形成聚类，找出ip的之间的关系，具体是通过kmeans的算法针对原始数据进行聚类，将所有数据划分成不同的数据集；接着在各个聚类后的数据集内部，使用 IP 地址统计方法来捕捉各个数据集特征，从而找出离群值，即可能的入侵者。又比如可以对文件简历索引，通过搜索引擎大大提高海量数据查询的效率，具体做法是集中为每个文件创建唯一标志签名， 该签名会一直跟随文件直到文件被删除， 然后借助分布式任务检测海量数据中符合签名的匹配文件 ， 从而大大提高了文件搜索的效率。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/05/约瑟夫问题/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -548,7 +827,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">52</span>
+                <span class="site-state-item-count">54</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
