@@ -1,0 +1,779 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="python基础用法," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="博客" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="列表和元组列表和元组的主要不同在于，列表是可以修改的，而元组不可以。这意味着列表适用于需要中途添加元素的情形，而元组适用于出于某种考虑需要禁止修改序列的情形。12元组:(1, 2, 3)列表:[1,2,3] 列表list12list(&apos;Hello&apos;)[&apos;H&apos;, &apos;e&apos;, &apos;l&apos;, &apos;l&apos;, &apos;o&apos;] 赋值12x = [1, 1, 1]x[1] = 2 删除1del names[2] 切片赋值123">
+<meta name="keywords" content="python基础用法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python 基础">
+<meta property="og:url" content="http://yoursite.com/2019/01/12/python-基础/index.html">
+<meta property="og:site_name" content="博客">
+<meta property="og:description" content="列表和元组列表和元组的主要不同在于，列表是可以修改的，而元组不可以。这意味着列表适用于需要中途添加元素的情形，而元组适用于出于某种考虑需要禁止修改序列的情形。12元组:(1, 2, 3)列表:[1,2,3] 列表list12list(&apos;Hello&apos;)[&apos;H&apos;, &apos;e&apos;, &apos;l&apos;, &apos;l&apos;, &apos;o&apos;] 赋值12x = [1, 1, 1]x[1] = 2 删除1del names[2] 切片赋值123">
+<meta property="og:updated_time" content="2019-01-16T02:30:43.471Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="python 基础">
+<meta name="twitter:description" content="列表和元组列表和元组的主要不同在于，列表是可以修改的，而元组不可以。这意味着列表适用于需要中途添加元素的情形，而元组适用于出于某种考虑需要禁止修改序列的情形。12元组:(1, 2, 3)列表:[1,2,3] 列表list12list(&apos;Hello&apos;)[&apos;H&apos;, &apos;e&apos;, &apos;l&apos;, &apos;l&apos;, &apos;o&apos;] 赋值12x = [1, 1, 1]x[1] = 2 删除1del names[2] 切片赋值123">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/01/12/python-基础/"/>
+
+
+
+
+
+  <title>python 基础 | 博客</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/12/python-基础/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="李睿">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">python 基础</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-12T16:47:37+08:00">
+                2019-01-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index">
+                    <span itemprop="name">python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="列表和元组"><a href="#列表和元组" class="headerlink" title="列表和元组"></a>列表和元组</h1><p>列表和元组的主要不同在于，列表是可以修改的，而元组不可以。这意味着列表适用于需要中途添加元素的情形，而元组适用于出于某种考虑需要禁止修改序列的情形。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">元组:(1, 2, 3)</div><div class="line">列表:[1,2,3]</div></pre></td></tr></table></figure></p>
+<h2 id="列表"><a href="#列表" class="headerlink" title="列表"></a>列表</h2><h3 id="list"><a href="#list" class="headerlink" title="list"></a>list</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">list(<span class="string">'Hello'</span>)</div><div class="line">[<span class="string">'H'</span>, <span class="string">'e'</span>, <span class="string">'l'</span>, <span class="string">'l'</span>, <span class="string">'o'</span>]</div></pre></td></tr></table></figure>
+<h3 id="赋值"><a href="#赋值" class="headerlink" title="赋值"></a>赋值</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">x = [1, 1, 1]</div><div class="line">x[1] = 2</div></pre></td></tr></table></figure>
+<h3 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">del names[2]</div></pre></td></tr></table></figure>
+<h3 id="切片赋值"><a href="#切片赋值" class="headerlink" title="切片赋值"></a>切片赋值</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">name = list(<span class="string">'Perl'</span>)</div><div class="line">name[1:] = list(<span class="string">'ython'</span>)</div><div class="line">name</div><div class="line">[<span class="string">'P'</span>, <span class="string">'y'</span>, <span class="string">'t'</span>, <span class="string">'h'</span>, <span class="string">'o'</span>, <span class="string">'n'</span>]</div></pre></td></tr></table></figure>
+<h3 id="append"><a href="#append" class="headerlink" title="append"></a>append</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">st.append(4)</div></pre></td></tr></table></figure>
+<h3 id="clear"><a href="#clear" class="headerlink" title="clear"></a>clear</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">st.clear()</div></pre></td></tr></table></figure>
+<h3 id="count"><a href="#count" class="headerlink" title="count"></a>count</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&gt;&gt;&gt; x = [[1, 2], 1, 1, [2, 1, [1, 2]]]</div><div class="line">&gt;&gt;&gt; x.count(1)</div><div class="line">2</div></pre></td></tr></table></figure>
+<h3 id="extend"><a href="#extend" class="headerlink" title="extend"></a>extend</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&gt;&gt;&gt; a = [1, 2, 3]</div><div class="line">&gt;&gt;&gt; b = [4, 5, 6]</div><div class="line">&gt;&gt;&gt; a.extend(b)</div><div class="line">&gt;&gt;&gt; a</div><div class="line">[1, 2, 3, 4, 5, 6]</div></pre></td></tr></table></figure>
+<h3 id="index"><a href="#index" class="headerlink" title="index"></a>index</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&gt;&gt;&gt; knights = [<span class="string">'We'</span>, <span class="string">'are'</span>, <span class="string">'the'</span>, <span class="string">'knights'</span>, <span class="string">'who'</span>, <span class="string">'say'</span>, <span class="string">'ni'</span>]</div><div class="line">&gt;&gt;&gt; knights.index(<span class="string">'who'</span>)</div><div class="line">4</div></pre></td></tr></table></figure>
+<h3 id="insert"><a href="#insert" class="headerlink" title="insert"></a>insert</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&gt;&gt;&gt; numbers = [1, 2, 3, 5, 6, 7]</div><div class="line">&gt;&gt;&gt; numbers.insert(3, <span class="string">'four'</span>)</div><div class="line">&gt;&gt;&gt; numbers</div><div class="line">[1, 2, 3, <span class="string">'four'</span>, 5, 6, 7]</div></pre></td></tr></table></figure>
+<h3 id="pop"><a href="#pop" class="headerlink" title="pop"></a>pop</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&gt;&gt;&gt; x = [1, 2, 3]</div><div class="line">&gt;&gt;&gt; x.pop()</div><div class="line">3</div></pre></td></tr></table></figure>
+<p>python没有提供 push ，但可使用 append 来替代</p>
+<h3 id="remove"><a href="#remove" class="headerlink" title="remove"></a>remove</h3><p>方法 remove 用于删除第一个为指定值的元素<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&gt;&gt;&gt; x = [<span class="string">'to'</span>, <span class="string">'be'</span>, <span class="string">'or'</span>, <span class="string">'not'</span>, <span class="string">'to'</span>, <span class="string">'be'</span>]</div><div class="line">&gt;&gt;&gt; x.remove(<span class="string">'be'</span>)</div><div class="line">&gt;&gt;&gt; x</div><div class="line">[<span class="string">'to'</span>, <span class="string">'or'</span>, <span class="string">'not'</span>, <span class="string">'to'</span>, <span class="string">'be'</span>]</div></pre></td></tr></table></figure></p>
+<h3 id="reverse"><a href="#reverse" class="headerlink" title="reverse"></a>reverse</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&gt;&gt;&gt; x = [1, 2, 3]</div><div class="line">&gt;&gt;&gt; x.reverse()</div><div class="line">&gt;&gt;&gt; x</div><div class="line">[3, 2, 1]</div></pre></td></tr></table></figure>
+<h3 id="sort"><a href="#sort" class="headerlink" title="sort"></a>sort</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&gt;&gt;&gt; x = [4, 6, 2, 1, 7, 9]</div><div class="line">&gt;&gt;&gt; y = x.copy()</div><div class="line">&gt;&gt;&gt; y.sort()</div><div class="line">&gt;&gt;&gt; x</div><div class="line">[4, 6, 2, 1, 7, 9]</div><div class="line">&gt;&gt;&gt; y</div><div class="line">[1, 2, 4, 6, 7, 9]</div></pre></td></tr></table></figure>
+<h3 id="高级sort"><a href="#高级sort" class="headerlink" title="高级sort"></a>高级sort</h3><p>方法 sort 接受两个可选参数： key 和 reverse 。这两个参数通常是按名称指定的，称为关键字参数。参数 key 类似于参数 cmp ：你将其设置为一个用于排序的函数。然而，不会直接使用这个函数来判断一个元素是否比另一个元素小，而是使用它来为每个元素创建一个键， 再根据这些键对元素进行排序。 因此， 要根据长度对元素进行排序， 可将参数 key 设置为函数 len<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&gt;&gt;&gt; x = [<span class="string">'aardvark'</span>, <span class="string">'abalone'</span>, <span class="string">'acme'</span>, <span class="string">'add'</span>, <span class="string">'aerate'</span>]</div><div class="line">&gt;&gt;&gt; x.sort(key=len)</div><div class="line">&gt;&gt;&gt; x</div><div class="line">[<span class="string">'add'</span>, <span class="string">'acme'</span>, <span class="string">'aerate'</span>, <span class="string">'abalone'</span>, <span class="string">'aardvark'</span>]</div><div class="line">&gt;&gt;&gt; x = [4, 6, 2, 1, 7, 9]</div><div class="line">&gt;&gt;&gt; x.sort(reverse=True)</div><div class="line">&gt;&gt;&gt; x</div><div class="line">[9, 7, 6, 4, 2, 1]</div></pre></td></tr></table></figure></p>
+<h2 id="元组"><a href="#元组" class="headerlink" title="元组"></a>元组</h2><p>函数 tuple 的工作原理与 list 很像：它将一个序列作为参数，并将其转换为元组。如果参数已经是元组，就原封不动地返回它。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&gt;&gt;&gt; tuple([1, 2, 3])</div><div class="line">(1, 2, 3)</div></pre></td></tr></table></figure></p>
+<h1 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h1><h2 id="字符串方法"><a href="#字符串方法" class="headerlink" title="字符串方法"></a>字符串方法</h2><h3 id="center"><a href="#center" class="headerlink" title="center"></a>center</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&gt;&gt;&gt; <span class="string">"The Middle by Jimmy Eat World"</span>.center(39)</div><div class="line"><span class="string">' The Middle by Jimmy Eat World '</span></div></pre></td></tr></table></figure>
+<h3 id="find"><a href="#find" class="headerlink" title="find"></a>find</h3><p>方法 find 在字符串中查找子串。如果找到，就返回子串的第一个字符的索引，否则返回 -1 。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&gt;&gt;&gt; <span class="string">'With a moo-moo here, and a moo-moo there'</span>.find(<span class="string">'moo'</span>)</div><div class="line">7</div></pre></td></tr></table></figure></p>
+<h3 id="join"><a href="#join" class="headerlink" title="join"></a>join</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&gt;&gt;&gt; seq = [<span class="string">'1'</span>, <span class="string">'2'</span>, <span class="string">'3'</span>, <span class="string">'4'</span>, <span class="string">'5'</span>]</div><div class="line">&gt;&gt;&gt; sep = <span class="string">'+'</span></div><div class="line">&gt;&gt;&gt; sep.join(seq)</div></pre></td></tr></table></figure>
+<h3 id="lower"><a href="#lower" class="headerlink" title="lower"></a>lower</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&gt;&gt;&gt; <span class="string">'Trondheim Hammer Dance'</span>.lower()</div><div class="line"><span class="string">'trondheim hammer dance'</span></div></pre></td></tr></table></figure>
+<h3 id="replace"><a href="#replace" class="headerlink" title="replace"></a>replace</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&gt;&gt;&gt; <span class="string">'This is a test'</span>.replace(<span class="string">'is'</span>, <span class="string">'eez'</span>)</div><div class="line"><span class="string">'Theez eez a test'</span></div></pre></td></tr></table></figure>
+<h3 id="split"><a href="#split" class="headerlink" title="split"></a>split</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&gt;&gt;&gt; <span class="string">'1+2+3+4+5'</span>.split(<span class="string">'+'</span>)</div><div class="line">[<span class="string">'1'</span>, <span class="string">'2'</span>, <span class="string">'3'</span>, <span class="string">'4'</span>, <span class="string">'5'</span>]</div></pre></td></tr></table></figure>
+<h3 id="strip"><a href="#strip" class="headerlink" title="strip"></a>strip</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&gt;&gt;&gt; <span class="string">' internal whitespace is kept '</span>.strip()</div><div class="line"><span class="string">'internal whitespace is kept'</span></div></pre></td></tr></table></figure>
+<h3 id="translate"><a href="#translate" class="headerlink" title="translate"></a>translate</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&gt;&gt;&gt; table = str.maketrans(<span class="string">'cs'</span>, <span class="string">'kz'</span>, <span class="string">' '</span>)</div><div class="line">&gt;&gt;&gt; <span class="string">'this is an incredible test'</span>.translate(table)</div><div class="line"><span class="string">'thizizaninkredibletezt'</span></div></pre></td></tr></table></figure>
+<h1 id="字典"><a href="#字典" class="headerlink" title="字典"></a>字典</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">phonebook = &#123;<span class="string">'Alice'</span>: <span class="string">'2341'</span>, <span class="string">'Beth'</span>: <span class="string">'9102'</span>, <span class="string">'Cecil'</span>: <span class="string">'3258'</span>&#125;</div></pre></td></tr></table></figure>
+<h2 id="dict"><a href="#dict" class="headerlink" title="dict"></a>dict</h2><p>函数dict从其他映射（如其他字典）或键值对序列创建字典<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&gt;&gt;&gt; items = [(<span class="string">'name'</span>, <span class="string">'Gumby'</span>), (<span class="string">'age'</span>, 42)]</div><div class="line">&gt;&gt;&gt; d = dict(items)</div><div class="line">&gt;&gt;&gt; d</div><div class="line">&#123;<span class="string">'age'</span>: 42, <span class="string">'name'</span>: <span class="string">'Gumby'</span>&#125;</div><div class="line">&gt;&gt;&gt; d = dict(name=<span class="string">'Gumby'</span>, age=42)</div></pre></td></tr></table></figure></p>
+<h2 id="字典的基本操作"><a href="#字典的基本操作" class="headerlink" title="字典的基本操作"></a>字典的基本操作</h2><p>len(d) 返回字典 d 包含的项（键值对）数。<br>d[k] 返回与键 k 相关联的值。<br>d[k] = v 将值 v 关联到键 k 。<br>del d[k] 删除键为 k 的项。<br>k in d 检查字典 d 是否包含键为 k 的项。</p>
+<h2 id="字典方法"><a href="#字典方法" class="headerlink" title="字典方法"></a>字典方法</h2><h3 id="clear-1"><a href="#clear-1" class="headerlink" title="clear"></a>clear</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&gt;&gt;&gt; d = &#123;&#125;</div><div class="line">&gt;&gt;&gt; d[<span class="string">'name'</span>] = <span class="string">'Gumby'</span></div><div class="line">d.clear()</div></pre></td></tr></table></figure>
+<h3 id="copy"><a href="#copy" class="headerlink" title="copy"></a>copy</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&gt;&gt;&gt; x = &#123;<span class="string">'username'</span>: <span class="string">'admin'</span>, <span class="string">'machines'</span>: [<span class="string">'foo'</span>, <span class="string">'bar'</span>, <span class="string">'baz'</span>]&#125;</div><div class="line">&gt;&gt;&gt; y = x.copy()</div><div class="line">//深拷贝</div><div class="line">&gt;&gt;&gt; from copy import deepcopy</div><div class="line">&gt;&gt;&gt; d = &#123;&#125;</div><div class="line">&gt;&gt;&gt; d[<span class="string">'names'</span>] = [<span class="string">'Alfred'</span>, <span class="string">'Bertrand'</span>]</div><div class="line">&gt;&gt;&gt; dc = deepcopy(d)</div></pre></td></tr></table></figure>
+<h3 id="fromkeys"><a href="#fromkeys" class="headerlink" title="fromkeys"></a>fromkeys</h3><p>方法 fromkeys 创建一个新字典，其中包含指定的键，且每个键对应的值都是 None 。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&gt;&gt;&gt; &#123;&#125;.fromkeys([<span class="string">'name'</span>, <span class="string">'age'</span>])</div><div class="line">&#123;<span class="string">'age'</span>: None, <span class="string">'name'</span>: None&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="get"><a href="#get" class="headerlink" title="get"></a>get</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&gt;&gt;&gt; <span class="built_in">print</span>(d.get(<span class="string">'name'</span>))</div><div class="line">None</div></pre></td></tr></table></figure>
+<h3 id="items"><a href="#items" class="headerlink" title="items"></a>items</h3><p>items<br>方法 items 返回一个包含所有字典项的列表，其中每个元素都为 (key, value) 的形式。字典项在列表中的排列顺序不确定。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&gt;&gt;&gt; d = &#123;<span class="string">'title'</span>: <span class="string">'Python Web Site'</span>, <span class="string">'url'</span>: <span class="string">'http://www.python.org'</span>, <span class="string">'spam'</span>: 0&#125;</div><div class="line">&gt;&gt;&gt; d.items()</div><div class="line">dict_items([(<span class="string">'url'</span>, <span class="string">'http://www.python.org'</span>), (<span class="string">'spam'</span>, 0), (<span class="string">'title'</span>, <span class="string">'Python Web Site'</span>)])</div></pre></td></tr></table></figure></p>
+<h3 id="keys"><a href="#keys" class="headerlink" title="keys"></a>keys</h3><p>方法 keys 返回一个字典视图，其中包含指定字典中的键。</p>
+<h3 id="pop-1"><a href="#pop-1" class="headerlink" title="pop"></a>pop</h3><p>方法 pop 可用于获取与指定键相关联的值，并将该键值对从字典中删除。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&gt;&gt;&gt; d = &#123;<span class="string">'x'</span>: 1, <span class="string">'y'</span>: 2&#125;</div><div class="line">&gt;&gt;&gt; d.pop(<span class="string">'x'</span>)</div><div class="line">1</div><div class="line">&gt;&gt;&gt; d</div><div class="line">&#123;<span class="string">'y'</span>: 2&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="popitem"><a href="#popitem" class="headerlink" title="popitem"></a>popitem</h3><p>popitem 随机地弹出一个字典项</p>
+<h3 id="setDefault"><a href="#setDefault" class="headerlink" title="setDefault"></a>setDefault</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&gt;&gt;&gt; d = &#123;&#125;</div><div class="line">&gt;&gt;&gt; d.setdefault(<span class="string">'name'</span>, <span class="string">'N/A'</span>)</div><div class="line"><span class="string">'N/A'</span></div></pre></td></tr></table></figure>
+<h3 id="update"><a href="#update" class="headerlink" title="update"></a>update</h3><p>方法 update 使用一个字典中的项来更新另一个字典。</p>
+<h3 id="values"><a href="#values" class="headerlink" title="values"></a>values</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&gt;&gt;&gt; d = &#123;&#125;</div><div class="line">&gt;&gt;&gt; d[1] = 1</div><div class="line">&gt;&gt;&gt; d[2] = 2</div><div class="line">&gt;&gt;&gt; d[3] = 3</div><div class="line">&gt;&gt;&gt; d[4] = 1</div><div class="line">&gt;&gt;&gt; d.values()</div><div class="line">dict_values([1, 2, 3, 1])</div></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/python基础用法/" rel="tag"># python基础用法</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/02/23/sql查询优化/" rel="next" title="sql查询优化">
+                <i class="fa fa-chevron-left"></i> sql查询优化
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://pic23.nipic.com/20120808/4549724_124753431000_2.jpg"
+               alt="李睿" />
+          <p class="site-author-name" itemprop="name">李睿</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">55</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">26</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#列表和元组"><span class="nav-number">1.</span> <span class="nav-text">列表和元组</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#列表"><span class="nav-number">1.1.</span> <span class="nav-text">列表</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#list"><span class="nav-number">1.1.1.</span> <span class="nav-text">list</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#赋值"><span class="nav-number">1.1.2.</span> <span class="nav-text">赋值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除"><span class="nav-number">1.1.3.</span> <span class="nav-text">删除</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#切片赋值"><span class="nav-number">1.1.4.</span> <span class="nav-text">切片赋值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#append"><span class="nav-number">1.1.5.</span> <span class="nav-text">append</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#clear"><span class="nav-number">1.1.6.</span> <span class="nav-text">clear</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#count"><span class="nav-number">1.1.7.</span> <span class="nav-text">count</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#extend"><span class="nav-number">1.1.8.</span> <span class="nav-text">extend</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#index"><span class="nav-number">1.1.9.</span> <span class="nav-text">index</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#insert"><span class="nav-number">1.1.10.</span> <span class="nav-text">insert</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pop"><span class="nav-number">1.1.11.</span> <span class="nav-text">pop</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#remove"><span class="nav-number">1.1.12.</span> <span class="nav-text">remove</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#reverse"><span class="nav-number">1.1.13.</span> <span class="nav-text">reverse</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sort"><span class="nav-number">1.1.14.</span> <span class="nav-text">sort</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#高级sort"><span class="nav-number">1.1.15.</span> <span class="nav-text">高级sort</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#元组"><span class="nav-number">1.2.</span> <span class="nav-text">元组</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#字符串"><span class="nav-number">2.</span> <span class="nav-text">字符串</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#字符串方法"><span class="nav-number">2.1.</span> <span class="nav-text">字符串方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#center"><span class="nav-number">2.1.1.</span> <span class="nav-text">center</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#find"><span class="nav-number">2.1.2.</span> <span class="nav-text">find</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#join"><span class="nav-number">2.1.3.</span> <span class="nav-text">join</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lower"><span class="nav-number">2.1.4.</span> <span class="nav-text">lower</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#replace"><span class="nav-number">2.1.5.</span> <span class="nav-text">replace</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#split"><span class="nav-number">2.1.6.</span> <span class="nav-text">split</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#strip"><span class="nav-number">2.1.7.</span> <span class="nav-text">strip</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#translate"><span class="nav-number">2.1.8.</span> <span class="nav-text">translate</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#字典"><span class="nav-number">3.</span> <span class="nav-text">字典</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#dict"><span class="nav-number">3.1.</span> <span class="nav-text">dict</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#字典的基本操作"><span class="nav-number">3.2.</span> <span class="nav-text">字典的基本操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#字典方法"><span class="nav-number">3.3.</span> <span class="nav-text">字典方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#clear-1"><span class="nav-number">3.3.1.</span> <span class="nav-text">clear</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#copy"><span class="nav-number">3.3.2.</span> <span class="nav-text">copy</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#fromkeys"><span class="nav-number">3.3.3.</span> <span class="nav-text">fromkeys</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#get"><span class="nav-number">3.3.4.</span> <span class="nav-text">get</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#items"><span class="nav-number">3.3.5.</span> <span class="nav-text">items</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#keys"><span class="nav-number">3.3.6.</span> <span class="nav-text">keys</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pop-1"><span class="nav-number">3.3.7.</span> <span class="nav-text">pop</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#popitem"><span class="nav-number">3.3.8.</span> <span class="nav-text">popitem</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#setDefault"><span class="nav-number">3.3.9.</span> <span class="nav-text">setDefault</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#update"><span class="nav-number">3.3.10.</span> <span class="nav-text">update</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#values"><span class="nav-number">3.3.11.</span> <span class="nav-text">values</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">李睿</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
